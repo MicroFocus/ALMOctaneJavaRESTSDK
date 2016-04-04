@@ -1,9 +1,9 @@
-package java.com.hpe.adm.nga.sdk.metadata;
+package com.hpe.adm.nga.sdk.exception;
 
-import java.com.hpe.adm.nga.sdk.NGAError;
-import java.com.hpe.adm.nga.sdk.NGARequest;
-import java.com.hpe.adm.nga.sdk.authorisation.Authorisation;
-import java.com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.NGAError;
+import com.hpe.adm.nga.sdk.NGARequest;
+import com.hpe.adm.nga.sdk.authorisation.Authorisation;
+import com.hpe.adm.nga.sdk.model.EntityModel;
 
 import java.util.Collection;
 
@@ -12,10 +12,7 @@ import java.util.Collection;
  */
 public class NgaPartialException extends NgaException{
 
-	public Collection<EntityModel> getEntitiesModels() {
-		
-	}
-	
-	public Collection<NGAError> getErrors();
+	public Collection<EntityModel> getEntitiesModels(){return null;};
+	public Collection<NGAError> getErrors(){return null;};
 	
 }

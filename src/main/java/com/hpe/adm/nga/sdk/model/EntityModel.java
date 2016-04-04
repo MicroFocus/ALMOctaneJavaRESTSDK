@@ -1,6 +1,9 @@
-package java.com.hpe.adm.nga.sdk.model;
+package com.hpe.adm.nga.sdk.model;
 
+import java.util.Collection;
 import java.util.Set;
+
+import com.hpe.adm.nga.sdk.model.ReferenceFieldModel.ReferenceModel;
 
 /**
  * Created by brucesp on 22/02/2016.
@@ -8,16 +11,20 @@ import java.util.Set;
 public class EntityModel {
 
 	
-	public Set<FieldModel> getFields(){
-		return null;
+	Set<FieldModel> data;
+			
+	public EntityModel(Set<FieldModel> value){
+				
+		setValue(value);
 	}
-
-	public IFieldModel getField (String name){
-		return null;
-	}
-	
-	public void setFields(Set<IFieldModel> setFieldModels){
+			
+	public Set<FieldModel> getValue(){
+		return data;
+	};
+			
+			
+	public void setValue(Set<FieldModel> value){
 		
-	}
-
+		data = value;
+	};
 }

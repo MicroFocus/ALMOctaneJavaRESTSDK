@@ -1,6 +1,6 @@
-package java.com.hpe.adm.nga.sdk.metadata;
+package com.hpe.adm.nga.sdk.metadata;
 
-import java.com.hpe.adm.nga.sdk.NGARequest;
+import com.hpe.adm.nga.sdk.NGARequest;
 
 import java.util.Collection;
 

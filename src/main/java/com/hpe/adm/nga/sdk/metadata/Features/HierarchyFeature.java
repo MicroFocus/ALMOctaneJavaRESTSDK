@@ -1,11 +1,4 @@
-package java.com.hpe.adm.nga.sdk.metadata;
-
-import java.com.hpe.adm.nga.sdk.Entity.Entities;
-import java.com.hpe.adm.nga.sdk.Entity.EntityList;
-import java.com.hpe.adm.nga.sdk.Entity.EntityList.Create;
-import java.com.hpe.adm.nga.sdk.Entity.EntityList.Delete;
-import java.com.hpe.adm.nga.sdk.Entity.EntityList.Get;
-import java.com.hpe.adm.nga.sdk.Entity.EntityList.Update;
+package com.hpe.adm.nga.sdk.metadata.Features;
 
 /**
  * Created by brucesp on 23/02/2016.
@@ -13,13 +6,13 @@ import java.com.hpe.adm.nga.sdk.Entity.EntityList.Update;
 public class HierarchyFeature extends Feature{
 	
 	
-	public String[] childTypes(){};
-	public String[] parentTypes(){};
+	public String[] childTypes(){return null;};
+	public String[] parentTypes(){return null;};
 	public Root rootEnt;
 	
 	public static class Root {
-		public String type(){};
-		public String id(){};
+		public String type(){return null;};
+		public String id(){return null;};
 	}
 }
 

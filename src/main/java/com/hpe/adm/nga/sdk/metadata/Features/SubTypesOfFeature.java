@@ -1,4 +1,4 @@
-package java.com.hpe.adm.nga.sdk.metadata;
+package com.hpe.adm.nga.sdk.metadata.Features;
 
 import java.util.Collection;
 
@@ -9,9 +9,9 @@ import com.hpe.adm.nga.sdk.metadata.Metadata.Field;
 /**
  * Created by brucesp on 23/02/2016.
  */
-public class SubTypesOf extends Feature{
+public class SubTypesOfFeature extends Feature{
 	
-	public String getType();
+	public String getType(){return null;};
 }
 
 

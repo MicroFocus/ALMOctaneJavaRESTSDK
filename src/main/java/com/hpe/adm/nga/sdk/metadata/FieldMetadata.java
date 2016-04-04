@@ -1,4 +1,4 @@
-package java.com.hpe.adm.nga.sdk.metadata;
+package com.hpe.adm.nga.sdk.metadata;
 
 /**
  * Created by brucesp on 23/02/2016.
@@ -20,32 +20,32 @@ public class FieldMetadata {
 	
 	public class FieldTarget {
 		
-		public String[] getTypes();
-		public String  getType();
-		public String  logicalName();
+		public String[] getTypes(){return null;};
+		public String  getType(){return null;};
+		public String  logicalName(){return null;};
 		
 		
 	}
 	
 	public class FieldTypedata {
 		
-		public boolean isMultiple();
-		public FieldTarget getTarget();
+		public boolean isMultiple(){return false;};
+		public FieldTarget getTarget(){return null;};
 		
 	}
 	
-	public String getName();
-	public String getEntityName();
-	public boolean isFilterable();
-	public boolean isEditable();
-	public boolean isReturnByDeafault();
-	public String getLabel();
-	public boolean isSortable();
-	public boolean isRequired();
-	public String getSanitization();
-	public boolean isUnique();
-	public FieldType getFieldType();
-	public FieldTypedata getFieldTypedata();
-	public int getMaxLength();
+	public String getName(){return null;};
+	public String getEntityName(){return null;};
+	public boolean isFilterable(){return false;};
+	public boolean isEditable(){return false;};
+	public boolean isReturnByDeafault(){return false;};
+	public String getLabel(){return null;};
+	public boolean isSortable(){return false;};
+	public boolean isRequired(){return false;};
+	public String getSanitization(){return null;};
+	public boolean isUnique(){return false;};
+	public FieldType getFieldType(){return null;};
+	public FieldTypedata getFieldTypedata(){return null;};
+	public int getMaxLength(){return 0;};
 	
 }

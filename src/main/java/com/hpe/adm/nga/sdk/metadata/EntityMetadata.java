@@ -1,11 +1,11 @@
-package java.com.hpe.adm.nga.sdk.metadata;
+package com.hpe.adm.nga.sdk.metadata;
 
 import java.util.Collection;
 
-import java.com.hpe.adm.nga.sdk.NGARequest;
-import java.com.hpe.adm.nga.sdk.metadata.Metadata.Entity;
-import java.com.hpe.adm.nga.sdk.metadata.Metadata.Field;
-import java.com.hpe.adm.nga.sdk.metadata.Features.Feature;
+import com.hpe.adm.nga.sdk.NGARequest;
+import com.hpe.adm.nga.sdk.metadata.Metadata.Entity;
+import com.hpe.adm.nga.sdk.metadata.Metadata.Field;
+import com.hpe.adm.nga.sdk.metadata.Features.Feature;
 
 import java.util.Collection;
 
@@ -18,12 +18,8 @@ public class EntityMetadata {
 		return null;
 	};
 	
-	public Collection<Feature> features(){
-		return new Collection<Feature>();
-		
-	}
-	
-	
+	public Collection<Feature> features(){return null;};
+
 	
 }
 

@@ -1,17 +1,32 @@
-package java.com.hpe.adm.nga.sdk.model;
+package com.hpe.adm.nga.sdk.model;
 
 /**
  * Created by brucesp on 22/02/2016.
  */
-public class LongFieldModel implements IFieldModel {
+public class LongFieldModel implements FieldModel<Long> {
 	
-	public long getValue(String name){
-		return null;
-	}
-
-	public void setValue(String name,long value){
+	//Private 
+		private String strName;
+		private Long lValue;
 		
-	}
-
+		public LongFieldModel(String name,Long value){
+			
+			setValue(name,value);
+		}
+		
+		public Long getValue()	{
+			return lValue;
+		};
+		
+		public String getName(){
+			return strName;
+		}
+		
+		public void setValue(String name,Long value){
+			
+			strName = name;
+			lValue = value;
+		};
+	
 	
 }

@@ -1,11 +1,6 @@
-package java.com.hpe.adm.nga.sdk.exception;
+package com.hpe.adm.nga.sdk.exception;
 
-import java.com.hpe.adm.nga.sdk.NGARequest;
-import java.com.hpe.adm.nga.sdk.Entity.EntityList.Get;
-import java.com.hpe.adm.nga.sdk.Entity.EntityList.Update;
-import java.com.hpe.adm.nga.sdk.NGAError;
-import java.com.hpe.adm.nga.sdk.exception.NgaException.Error;
-
+import com.hpe.adm.nga.sdk.NGAError;
 import java.util.Collection;
 
 /**
@@ -13,6 +8,6 @@ import java.util.Collection;
  */
 public class NgaException extends RuntimeException {
 
-	public NGAError getError();
+	public NGAError getError(){return null;};
 }
 

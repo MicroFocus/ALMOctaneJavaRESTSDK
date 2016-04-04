@@ -1,4 +1,4 @@
-package java.com.hpe.adm.nga.sdk.metadata.Features;
+package com.hpe.adm.nga.sdk.metadata.Features;
 
 import java.util.Collection;
 
@@ -11,7 +11,7 @@ import com.hpe.adm.nga.sdk.metadata.Metadata.Field;
  */
 public class Feature {
 	
-	public String getName();
+	public String getName(){return null;};
 	
 }
 
