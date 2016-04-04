@@ -1,6 +1,6 @@
-package com.hpe.adm.nga.sdk.metadata;
+package java.com.hpe.adm.nga.sdk.metadata;
 
-import com.hpe.adm.nga.sdk.NGARequest;
+import java.com.hpe.adm.nga.sdk.NGARequest;
 
 import java.util.Collection;
 
@@ -25,16 +25,16 @@ public class Metadata {
 		return new Field();
 	}
 
-	public static class Entity extends NGARequest<Collection<com.hpe.adm.nga.sdk.metadata.EntityMetadata>> {
+	public static class Entity extends NGARequest<Collection<EntityMetadata>> {
 		@Override
-		public Collection<com.hpe.adm.nga.sdk.metadata.EntityMetadata> execute() {
+		public Collection<EntityMetadata> execute() {
 			return null;
 		}
 	}
 
-	public static class Field extends NGARequest<Collection<com.hpe.adm.nga.sdk.metadata.FieldMetadata>> {
+	public static class Field extends NGARequest<Collection<FieldMetadata>> {
 		@Override
-		public Collection<com.hpe.adm.nga.sdk.metadata.FieldMetadata> execute() {
+		public Collection<FieldMetadata> execute() {
 			return null;
 		}
 	}

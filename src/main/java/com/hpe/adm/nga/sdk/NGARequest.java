@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk;
+package java.com.hpe.adm.nga.sdk;
 
 /**
  * Created by brucesp on 22/02/2016.
