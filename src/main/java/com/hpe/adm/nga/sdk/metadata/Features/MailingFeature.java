@@ -5,7 +5,6 @@ package com.hpe.adm.nga.sdk.metadata.Features;
  */
 public class MailingFeature extends Feature{
 	
-	
 
 }
 

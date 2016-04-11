@@ -6,26 +6,26 @@ package com.hpe.adm.nga.sdk.model;
 public class LongFieldModel implements FieldModel<Long> {
 	
 	//Private 
-		private String strName;
-		private Long lValue;
+		private String name;
+		private Long value;
 		
-		public LongFieldModel(String name,Long value){
+		public LongFieldModel(String newName,Long newValue){
 			
-			setValue(name,value);
+			setValue(newName,newValue);
 		}
 		
 		public Long getValue()	{
-			return lValue;
+			return value;
 		};
 		
 		public String getName(){
-			return strName;
+			return name;
 		}
 		
-		public void setValue(String name,Long value){
+		public void setValue(String newName,Long newValue){
 			
-			strName = name;
-			lValue = value;
+			name = newName;
+			value = newValue;
 		};
 	
 	

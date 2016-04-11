@@ -1,8 +1,6 @@
 package com.hpe.adm.nga.sdk.exception;
 
 import com.hpe.adm.nga.sdk.NGAError;
-import com.hpe.adm.nga.sdk.NGARequest;
-import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 
 import java.util.Collection;

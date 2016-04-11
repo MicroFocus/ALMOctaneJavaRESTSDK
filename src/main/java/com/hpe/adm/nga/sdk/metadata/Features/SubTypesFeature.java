@@ -5,6 +5,8 @@ package com.hpe.adm.nga.sdk.metadata.Features;
  */
 public class SubTypesFeature extends Feature{
 	
+	private String[] types;
+	
 	public String[] getTypes(){return null;};
 }
 

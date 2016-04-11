@@ -1,7 +1,5 @@
 package com.hpe.adm.nga.sdk.model;
 
-import java.util.Collection;
-
 
 /**
  * Created by brucesp on 22/02/2016.

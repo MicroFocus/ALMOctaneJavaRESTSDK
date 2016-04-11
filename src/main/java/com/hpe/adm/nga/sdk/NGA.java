@@ -1,35 +1,22 @@
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpCookie;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpHeaders;
-//import com.google.api.client.extensions.appengine.http.UrlFetchTransport;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 
 
@@ -41,8 +28,27 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 public class NGA {
 
 	//Constants
-	private static String ENTITY_LIST_DOMAIN_FORMAT= "%s/api/shared_spaces/%s/workspaces/%s/%s";
+	private final String ENTITY_LIST_DOMAIN_FORMAT= "%s/api/shared_spaces/%s/workspaces/%s/%s";
+	private final String METADATA_DOMAIN_FORMAT= "%s/api/shared_spaces/%s/workspaces/%s/metadata";
+	private final String ATTACHMENT_LIST_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/workspaces/%s/attachments";	
+	
+	//private memebers
+	private HttpRequestFactory requestFactory = null;
+	private String urlDomain = "";
+	public String idsharedSpaceId = null;
+	private long workSpaceId = 0;
+	
+	// functions
+	public NGA(HttpRequestFactory reqFactory,String domain,String sharedSpaceId,long workId ) {
 		
+		requestFactory = reqFactory;
+		urlDomain = domain;
+		idsharedSpaceId = sharedSpaceId;
+		workSpaceId = workId;
+		
+		
+	}
+
 	/**
 	   * EntityList Getter
 	   * 
@@ -51,8 +57,8 @@ public class NGA {
 	   */
 	public EntityList entityList(String entityName) {
 		
-		String strEntityListDomain =  String.format(ENTITY_LIST_DOMAIN_FORMAT, Builder.strUrlDomain, Builder.strIdsharedSpaceId.toString(),String.valueOf(Builder.lworkSpaceId),entityName); 
-		return new EntityList(Builder.requestFactory,strEntityListDomain);
+		String entityListDomain =  String.format(ENTITY_LIST_DOMAIN_FORMAT, urlDomain, idsharedSpaceId.toString(),String.valueOf(workSpaceId),entityName); 
+		return new EntityList(requestFactory,entityListDomain);
 	}
 	
 	/**
@@ -61,7 +67,8 @@ public class NGA {
 	   * @return  A new Metadata object that hold the metadata
 	   */
 	public Metadata metadata() {
-		return null;
+		String metadataDomain =  String.format(METADATA_DOMAIN_FORMAT, urlDomain, idsharedSpaceId.toString(),String.valueOf(workSpaceId)); 
+		return new Metadata(requestFactory,metadataDomain) ;
 	}
 
 	/**
@@ -70,6 +77,7 @@ public class NGA {
 	   * @return  A new AttachmentList object that hold the Attachments
 	   */
 	public AttachmentList AttachmentList() {
+		
 		return null;
 	}
 
@@ -82,23 +90,28 @@ public class NGA {
 
 		
 		//Constants
-		private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-		private static final String OAUTH_AUTH_URL = "/authentication/sign_in";
-		private static final String SET_COOKIE = "set-cookie";
-		private static final String HPSSO_COOKIE_CSRF = "HPSSO_COOKIE_CSRF";
-		private static final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
-		private static final String HPSSO_HEADER_CSRF = "HPSSO_HEADER_CSRF";
+		private final String OAUTH_AUTH_URL = "/authentication/sign_in";
+		private final String SET_COOKIE = "set-cookie";
+		private final String HPSSO_COOKIE_CSRF = "HPSSO_COOKIE_CSRF";
+		private final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
+		private final String HPSSO_HEADER_CSRF = "HPSSO_HEADER_CSRF";
+		private final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
+		private final String HPE_MQM_UI ="HPE_MQM_UI";
+		private final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
+		private final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";
 
 		
 		//Private
-		private static String strLWSSOValue = "";
-		private static String strHPPSValue = "";
-		private static HttpRequestFactory requestFactory = null;
-		private static String strUrlDomain = "";
-		private static String strIdsharedSpaceId = null;
-		private static long lworkSpaceId = 0;
-		private static String strUserName = "";
-		private static String strPass = "";
+		private Logger logger = LogManager.getLogger(NGA.class.getName());
+		private HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+		private String lwssoValue = "";
+		private String hppsValue = "";
+		private HttpRequestFactory requestFactory = null;
+		private String urlDomain = "";
+		public String idsharedSpaceId = null;
+		private long workSpaceId = 0;
+		private String userName = "";
+		private String password = "";
 		
 		
 		//Functions
@@ -110,8 +123,8 @@ public class NGA {
 		 */
 		public Builder(BasicAuthorisation basicAuthorisation) throws IOException {
 
-	    	strUserName = basicAuthorisation.getUsername();
-	    	strPass = basicAuthorisation.getPassword();
+	    	userName = basicAuthorisation.getUsername();
+	    	password = basicAuthorisation.getPassword();
 		}
 		
 		/**
@@ -121,7 +134,7 @@ public class NGA {
 		 */
 		public Builder sharedSpace(UUID ssID) {
 			
-			strIdsharedSpaceId = ssID.toString();
+			idsharedSpaceId = ssID.toString();
 			return this;
 		}
 		
@@ -132,7 +145,7 @@ public class NGA {
 		 */
 		public Builder sharedSpace(long ssID) {
 			
-			strIdsharedSpaceId = String.valueOf(ssID);
+			idsharedSpaceId = String.valueOf(ssID);
 			return this;
 		}
 		/**
@@ -142,7 +155,7 @@ public class NGA {
 		 */
 		public Builder workSpace(long lId) {
 			
-			lworkSpaceId = lId;
+			workSpaceId = lId;
 			return this;
 		}
 		
@@ -154,7 +167,7 @@ public class NGA {
 		 */
 		public Builder Server(String domain, int port) {
 			
-			strUrlDomain = domain + ":" + String.valueOf(port);
+			urlDomain = domain + ":" + String.valueOf(port);
 			
 			return this;
 		}
@@ -165,7 +178,7 @@ public class NGA {
 		 */
 		public Builder Server(String domain) {
 			
-			strUrlDomain = domain;
+			urlDomain = domain;
 			
 			return this;
 		}
@@ -189,14 +202,16 @@ public class NGA {
 	                    public void initialize(HttpRequest request) {
 	                    	
 	                    	// BasicAuthentication needed only in first initialization
-	                    	if (strHPPSValue=="" && strLWSSOValue=="")
+	                    	if (hppsValue.isEmpty() && lwssoValue.isEmpty())
 	                    	{
-	                    		request.getHeaders().setBasicAuthentication(strUserName,strPass);
+	                    		request.getHeaders().setBasicAuthentication(userName,password);
 	                    	}
 	                    	else
 	                    	{
-	                    		request.getHeaders().set(HPSSO_HEADER_CSRF,strHPPSValue); 
-		                        request.getHeaders().setCookie(LWSSO_COOKIE_KEY+"="+strLWSSOValue); 
+	                    		request.getHeaders().set(HPSSO_HEADER_CSRF,hppsValue); 
+	                    		request.getHeaders().set(HPE_CLIENT_TYPE,HPE_MQM_UI); 
+		                        request.getHeaders().setCookie(LWSSO_COOKIE_KEY+"="+lwssoValue); 
+		                        
 	                    	}
 	                    		
 	                        
@@ -204,9 +219,11 @@ public class NGA {
 	                    }
 	                });
 			
-			GenericUrl urlDomain = new GenericUrl(strUrlDomain + OAUTH_AUTH_URL);
-			HttpRequest httpRequest = requestFactory.buildPostRequest(urlDomain, null);
+			GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
+			HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
+			logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL));
 			HttpResponse response = httpRequest.execute();
+			logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage()));
 			
 			// Initialize Cookies keys
 			if (response.isSuccessStatusCode()) {
@@ -218,14 +235,18 @@ public class NGA {
 				 for (HttpCookie ck : Cookies) {
 					 
 					 if (ck.getName().equals(HPSSO_COOKIE_CSRF))
-						 strHPPSValue = ck.getValue();
+						 hppsValue = ck.getValue();
 					 
 					 if (ck.getName().equals(LWSSO_COOKIE_KEY))
-						 strLWSSOValue = ck.getValue();
+						 lwssoValue = ck.getValue();
 						 
 				 }
 				
-	           objNga = new NGA();
+	           if(!hppsValue.isEmpty() && !lwssoValue.isEmpty())
+	           {
+	        	   objNga = new NGA(requestFactory,urlDomain,idsharedSpaceId,workSpaceId);
+	           }
+				 
 	        } 
    	       	        
 	        return objNga;

@@ -1,9 +1,6 @@
 package com.hpe.adm.nga.sdk.model;
 
-import java.util.Collection;
 import java.util.Set;
-
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel.ReferenceModel;
 
 /**
  * Created by brucesp on 22/02/2016.

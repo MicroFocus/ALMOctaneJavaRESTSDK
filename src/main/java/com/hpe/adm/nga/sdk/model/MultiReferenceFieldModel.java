@@ -1,9 +1,6 @@
 package com.hpe.adm.nga.sdk.model;
 
 import java.util.Collection;
-import java.util.List;
-
-import com.google.gson.Gson;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel.ReferenceModel;
 
 /**
@@ -14,14 +11,14 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<Reference
 	
 	
 		//Private 
-		private String strName;
+		private String name;
 		
-		//private List<ReferenceModel> data; // Variable name must refelct Rest variable name ( Gson().fromJson )
+
 		Collection<ReferenceModel> data;
 		
-		public MultiReferenceFieldModel(String name,Collection<ReferenceModel> value){
+		public MultiReferenceFieldModel(String newName,Collection<ReferenceModel> value){
 			
-			setValue(name,value);
+			setValue(newName,value);
 		}
 		
 		public Collection<ReferenceModel> getValue(){
@@ -30,17 +27,17 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<Reference
 		
 		public String getName(){
 			
-			return strName;
+			return name;
 		}
 		
-		public void setName(String name){
+		public void setName(String newName){
 			
-			strName = name;
+			name = newName;
 		}
 		
-		public void setValue(String name,Collection<ReferenceModel> value){
+		public void setValue(String newName,Collection<ReferenceModel> value){
 			
-			strName = name;
+			name = newName;
 			data = value;
 		};
 		

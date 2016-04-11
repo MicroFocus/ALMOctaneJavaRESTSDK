@@ -5,6 +5,21 @@ package com.hpe.adm.nga.sdk.metadata;
  */
 public class FieldMetadata {
 	
+	private String name;
+	private String label;
+	private String entity_name;
+	private boolean filterable;
+	private boolean sortable;
+	private boolean returned_by_default;
+	private String field_type;
+	private boolean required;
+	private int max_length;
+	private boolean unique;
+	private boolean editable;
+	private String sanitization;
+	private FieldTypedata field_type_data;
+	
+	
 	public enum FieldType {
 	    Integer, 
 	    Long, 
@@ -20,32 +35,39 @@ public class FieldMetadata {
 	
 	public class FieldTarget {
 		
-		public String[] getTypes(){return null;};
-		public String  getType(){return null;};
-		public String  logicalName(){return null;};
+		String[] types;
+		String type;
+		String logical_name;
+		
+		public String[] getTypes(){return types;};
+		public String  getType(){return type;};
+		public String  logicalName(){return logical_name;};
 		
 		
 	}
 	
 	public class FieldTypedata {
 		
-		public boolean isMultiple(){return false;};
-		public FieldTarget getTarget(){return null;};
+		private boolean multiple;
+		private FieldTarget target;
+		
+		public boolean isMultiple(){return multiple;};
+		public FieldTarget getTarget(){return target;};
 		
 	}
 	
-	public String getName(){return null;};
-	public String getEntityName(){return null;};
-	public boolean isFilterable(){return false;};
-	public boolean isEditable(){return false;};
-	public boolean isReturnByDeafault(){return false;};
-	public String getLabel(){return null;};
-	public boolean isSortable(){return false;};
-	public boolean isRequired(){return false;};
-	public String getSanitization(){return null;};
-	public boolean isUnique(){return false;};
-	public FieldType getFieldType(){return null;};
+	public String getName(){return name;};
+	public String getEntityName(){return entity_name;};
+	public boolean isFilterable(){return filterable;};
+	public boolean isEditable(){return editable;};
+	public boolean isReturnByDeafault(){return returned_by_default;};
+	public String getLabel(){return label;};
+	public boolean isSortable(){return sortable;};
+	public boolean isRequired(){return required;};
+	public String getSanitization(){return sanitization;};
+	public boolean isUnique(){return unique;};
+	public String getFieldType(){return field_type;};
 	public FieldTypedata getFieldTypedata(){return null;};
-	public int getMaxLength(){return 0;};
+	public int getMaxLength(){return max_length;};
 	
 }

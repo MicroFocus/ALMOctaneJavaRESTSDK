@@ -6,25 +6,25 @@ package com.hpe.adm.nga.sdk.model;
 public class StringFieldModel implements FieldModel<String> {
 	
 	//Private 
-	private String strName;
-	private String strValue;
+	private String name;
+	private String value;
 	
-	public StringFieldModel(String name,String value){
+	public StringFieldModel(String newName,String newValue){
 		
-		setValue(name,value);
+		setValue(newName,newValue);
 	}
 	
 	public String getValue()	{
-		return strValue;
+		return value;
 	};
 	
 	public String getName(){
-		return strName;
+		return name;
 	}
 	
-	public void setValue(String name,String value){
+	public void setValue(String newName,String newValue){
 		
-		strName = name;
-		strValue = value;
+		name = newName;
+		value = newValue;
 	};
 }

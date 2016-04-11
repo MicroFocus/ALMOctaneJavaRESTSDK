@@ -6,8 +6,16 @@ package com.hpe.adm.nga.sdk.metadata.Features;
  */
 public class RestFeature extends Feature{
 	
-	public String getUrl(){return null;};
-	public String[] getMethods(){return null;};
+	private String url; 
+	private String[] methods;
+	
+	public String getUrl(){
+		return url;
+	}
+	
+	public String[] getMethods(){
+		return methods;
+	}
 }
 
 
