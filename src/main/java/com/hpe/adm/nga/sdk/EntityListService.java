@@ -45,30 +45,30 @@ import org.json.JSONTokener;
 public class EntityListService {
 
 	// constant
-	private final String JSON_DATA_NAME = "data";
-	private final String JSON_ID_NAME = "id";
-	private final String JSON_TYPE_NAME = "type";
-	private final String JSON_TOTAL_COUNT_NAME = "total_count";
-	private final String JSON_EXCEEDS_TOTAL_COUNT_NAME = "exceeds_total_count";
-	private final String JSON_NULL_VALUE = "null";
-	private final String LIMIT_PARAM_FORMAT = "limit=%d&";
-	private final String OFFSET_PARAM_FORMAT = "offset=%d&";
-	private final String FIELDS_PARAM_FORMAT = "fields=%s";
-	private final String ORDER_BY_PARAM_FORMAT = "order_by=%s";
-	private final String QUERY_PARAM_FORMAT = "query=\"%s\"";
-	private final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
-	private final String LOGGER_REQUEST_CONTENT_FORMAT = "Request: %s - %s:%s";
-	private final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";
-	private final String HTTP_MEDIA_TYPE_MULTIPART_NAME = "multipart/form-data";
-	private final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
-	private final String HTTP_MULTIPART_BOUNDARY_VALUE = "__END_OF_PART__";
-	private final String HTTP_MULTIPART_PART_DISPOSITION_NAME = "Content-Disposition";
-	private final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"";
-	private final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
-	private final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
-	private final String HTTP_APPLICATION_JASON_VALUE = "application/json";
-	private final String HTTP_APPLICATION_OCTET_STREAM_VALUE = "application/octet-stream";
-	
+	private static final String JSON_DATA_NAME = "data";
+	private static final String JSON_ID_NAME = "id";
+	private static final String JSON_TYPE_NAME = "type";
+	private static final String JSON_TOTAL_COUNT_NAME = "total_count";
+	private static final String JSON_EXCEEDS_TOTAL_COUNT_NAME = "exceeds_total_count";
+	private static final String JSON_NULL_VALUE = "null";
+	private static final String LIMIT_PARAM_FORMAT = "limit=%d&";
+	private static final String OFFSET_PARAM_FORMAT = "offset=%d&";
+	private static final String FIELDS_PARAM_FORMAT = "fields=%s";
+	private static final String ORDER_BY_PARAM_FORMAT = "order_by=%s";
+	private static final String QUERY_PARAM_FORMAT = "query=\"%s\"";
+	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
+	private static final String LOGGER_REQUEST_CONTENT_FORMAT = "Request: %s - %s:%s";
+	private static final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";
+	private static final String HTTP_MEDIA_TYPE_MULTIPART_NAME = "multipart/form-data";
+	private static final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
+	private static final String HTTP_MULTIPART_BOUNDARY_VALUE = "__END_OF_PART__";
+	private static final String HTTP_MULTIPART_PART_DISPOSITION_NAME = "Content-Disposition";
+	private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"";
+	private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
+	private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
+	private static final String HTTP_APPLICATION_JASON_VALUE = "application/json";
+	private static final String HTTP_APPLICATION_OCTET_STREAM_VALUE = "application/octet-stream";
+	private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = " field scheme is invalid";
 	// private members
 	private String urlDomain = "";
 	private HttpRequestFactory requestFactory = null;
@@ -336,34 +336,33 @@ public class EntityListService {
 
 		while (keys.hasNext()) {
 
-			String strKey = (String) keys.next();
-			String strValue = jasoEntityObj.getString(strKey);
 			FieldModel fldModel = null;
+			String strKey = (String) keys.next();
+			Object aObj = jasoEntityObj.get(strKey);
+			if(aObj instanceof Long || aObj instanceof Integer){
+				fldModel = new LongFieldModel(strKey, Long.parseLong(aObj.toString()));
+			}
+			else if( aObj instanceof JSONArray){
 
-			if (isLong(strValue)) {
-				fldModel = new LongFieldModel(strKey, Long.parseLong(strValue));
-			} else if (isJasonArray(strValue)) {
-				JSONObject jasonObj = new JSONObject(strValue);
-				JSONArray jasonArr = jasonObj.getJSONArray(JSON_DATA_NAME);
-
-				fldModel = new Gson().fromJson(strValue, MultiReferenceFieldModel.class);
+				fldModel = new Gson().fromJson(aObj.toString(), MultiReferenceFieldModel.class);
 				((MultiReferenceFieldModel) fldModel).setName(strKey);
-
-			} else if (isJasonObject(strValue) || strValue.equals(JSON_NULL_VALUE)) {
+			}
+			else if( aObj instanceof JSONObject || aObj==JSONObject.NULL){
 				ReferenceModel ref = null;
-				if (!strValue.equals(JSON_NULL_VALUE)) {
-					JSONObject jasoref = new JSONObject(strValue);
-					ref = new ReferenceModel(jasoref.getLong(JSON_ID_NAME), jasoref.getString(JSON_TYPE_NAME));
+				if (aObj!=JSONObject.NULL) {
+					ref = new Gson().fromJson(aObj.toString(), ReferenceModel.class);
 				}
 
 				fldModel = new ReferenceFieldModel(strKey, ref);
-			} else {
-
-				fldModel = new StringFieldModel(strKey, strValue);
 			}
-
-			fieldModels.add(fldModel);
-
+			else if( aObj instanceof String || aObj instanceof Boolean){
+				fldModel = new StringFieldModel(strKey, aObj.toString());
+			}
+			else{
+				logger.debug(strKey + LOGGER_INVALID_FIELD_SCHEME_FORMAT);
+			}
+				
+			fieldModels.add(fldModel);	
 		}
 
 		entityModel = new EntityModel(fieldModels);
@@ -376,7 +375,7 @@ public class EntityListService {
 	 * @param str
 	 * @return true if String is a jason Object
 	 */
-	protected  boolean isJasonObject(String str) {
+	/*protected  boolean isJasonObject(String str) {
 
 		try {
 			new JSONObject(str);
@@ -393,7 +392,7 @@ public class EntityListService {
 	 * @param str
 	 * @return true if String is a jason array
 	 */
-	protected boolean isJasonArray(String str) {
+	/*protected boolean isJasonArray(String str) {
 
 		try {
 			JSONObject jasonObj = new JSONObject(str);
@@ -415,7 +414,7 @@ public class EntityListService {
 	 * @param str
 	 * @return true if string is a long type
 	 */
-	protected  boolean isLong(String str) {
+	/*protected  boolean isLong(String str) {
 		try {
 			Long.parseLong(str);
 			return true;
