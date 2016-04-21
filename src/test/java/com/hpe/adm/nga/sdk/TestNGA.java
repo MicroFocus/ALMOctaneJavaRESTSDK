@@ -1,18 +1,37 @@
-package com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.test;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.hpe.adm.nga.sdk.EntityList;
+import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.attachments.AttachmentList;
+import com.hpe.adm.nga.sdk.attachments.AttachmentList.Attachments;
 import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
+import com.hpe.adm.nga.sdk.exception.NgaException;
+import com.hpe.adm.nga.sdk.exception.NgaPartialException;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.JSONException;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.model.FieldModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
 
 
 
@@ -80,7 +99,10 @@ public class TestNGA {
 			
 			query = new Query.Field("user_tags").equal(new Query.Field("id").equal(new String("8024")).or().field("id").equal(new String("8026")).build()).build();
 			ColEntityList= defects.get().query(query).execute();
-					
+			
+			query = new Query.Field("team").equal(null).build();
+			ColEntityList = defects.get().query(query).execute();
+			
 			// Entityies examples
 			entityModel  = defects.at(8024).get().addFields("description").execute();
 			entityModel = defects.at(8024).update().entity(entityModel).execute();
@@ -101,21 +123,76 @@ public class TestNGA {
 			colFieldMetadat = metadata.fields("run", "business_rule").execute();
 					
 			// Attachmnts
+			AttachmentList attachmnts = nga.AttachmentList();
+			Collection<EntityModel> collEntityModel = attachmnts.get().execute();
 			
+			
+			entityModelsIn = new HashSet<EntityModel>();
+			Set<FieldModel> data = new HashSet<FieldModel>();
+			FieldModel FieldModel1 = new StringFieldModel("type", "attachment");
+			FieldModel FieldModel2 = new StringFieldModel("description", "description test1");
+			FieldModel FieldModel3 = new LongFieldModel("id",new Long(5001));
+			data.add(FieldModel1);
+			data.add(FieldModel2);
+			data.add(FieldModel3);
+			entityModel = new EntityModel(data);
+			entityModelsIn.add(entityModel);
+			FieldModel1 = new StringFieldModel("type", "attachment");
+			FieldModel2 = new StringFieldModel("description", "description test2");
+			FieldModel3 = new LongFieldModel("id",new Long(5002));
+			data = new HashSet<FieldModel>();
+			data.add(FieldModel1);
+			data.add(FieldModel2);
+			data.add(FieldModel3);
+			entityModel = new EntityModel(data);
+			entityModelsIn.add(entityModel);
+			
+			
+			collEntityModel = attachmnts.update().entities(entityModelsIn).execute();
+			
+			
+			
+			// get entity data of attachmnet with id=1001 
+			EntityModel entityModel2 = attachmnts.at(5001).get().execute();
+			data = entityModel2.getValue();
+			String strFileName = "";
+			for (FieldModel fieldModel : data) {
+
+				if (fieldModel.getName().equals("name"))
+				{
+					strFileName = ((StringFieldModel)(fieldModel)).getValue();
+					break;
+				}	
+		     }
+			// get binary data of attachmnet with id=1001 
+			InputStream is = attachmnts.at(5001).getBinary().execute();
+			FileOutputStream fos = new FileOutputStream(new File(strFileName)); 
+			int inByte;
+			while((inByte = is.read()) != -1)
+			     fos.write(inByte);
+			is.close();
+			fos.close();
+			
+			entityModel = attachmnts.at(5001).update().entity(entityModel).execute();
+			entityModelsOut = attachmnts.create().entities(entityModelsIn,strFileName).execute();
+			//attachmnts.at(5006).delete().execute();
+			//attachmnts.delete().execute();
+			//defects.delete().execute();
 		
-		} catch (IOException e) {
+		} 
+		catch (Exception e) {
 			
-			logger.fatal("Error description",e);
-			//e.printStackTrace();
-		}
-		catch (JSONException e) {
+			if (e instanceof NgaException)
+			{
+				ErrorModel errorModel = ((NgaException) e).getError();
+			}
+			else if(e instanceof NgaPartialException){
+				
+				Collection<EntityModel> entities = ((NgaPartialException)e).getEntitiesModels();
+				Collection<ErrorModel> errors = ((NgaPartialException)e).getErrorModels();
+			}
 			
-			logger.fatal("Error description",e);
-			//e.printStackTrace();
-		}
-		catch (RuntimeException e) {
-			
-			logger.fatal("Error description",e);
+		logger.fatal("Error description",e);
 			
 		}
 			

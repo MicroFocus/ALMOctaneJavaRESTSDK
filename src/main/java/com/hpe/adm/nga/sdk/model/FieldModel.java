@@ -1,7 +1,10 @@
 package com.hpe.adm.nga.sdk.model;
 
 /**
- * Created by brucesp on 22/02/2016.
+ * Interface of FieldModel
+ * 
+ * @author moris oz
+ *
  */
 public interface FieldModel<T> {
 	

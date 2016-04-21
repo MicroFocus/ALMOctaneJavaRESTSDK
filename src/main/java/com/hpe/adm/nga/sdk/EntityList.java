@@ -2,12 +2,11 @@ package com.hpe.adm.nga.sdk;
 
 import com.google.api.client.http.HttpRequestFactory;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import java.util.Collection;
 import org.json.JSONException;
 
-import java.util.Collection;
-
 /**
- * This class hold the entities objects and serve all functunality concern to entities.
+ * This class hold the entities objects and serve all functionality concern to entities.
  * 
  * @author moris oz
  *

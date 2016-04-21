@@ -5,10 +5,13 @@ import java.io.IOException;
 import org.json.JSONException;
 
 /**
- * Created by brucesp on 22/02/2016.
+ * NGA request Interface 
+ * @author Moris oz
+ *
+ * @param <T>
  */
 public abstract class NGARequest<T> {
 
-	public abstract T execute() throws IOException, JSONException;
+	public abstract T execute() throws Exception;
 
 }

@@ -1,7 +1,9 @@
 package com.hpe.adm.nga.sdk.authorisation;
 
 /**
- * Created by brucesp on 22/02/2016.
+ * BasicAuthorisation object - Hold all functionality concern Basic Authorization.
+ * @author Moris oz
+ *
  */
 public class BasicAuthorisation implements Authorisation{
 	

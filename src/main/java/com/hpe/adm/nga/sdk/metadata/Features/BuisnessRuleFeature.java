@@ -1,7 +1,9 @@
 package com.hpe.adm.nga.sdk.metadata.Features;
 
 /**
- * Created by brucesp on 23/02/2016.
+ * This class hold the BuisnessRuleFeature object and serve all functionality concern to  Business Rule Feature
+ * @autho Moris oz
+ *
  */
 public class BuisnessRuleFeature extends Feature{
 	

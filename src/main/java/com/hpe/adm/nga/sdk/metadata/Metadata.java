@@ -18,9 +18,14 @@ import com.hpe.adm.nga.sdk.metadata.Features.SubTypesFeature;
 import com.hpe.adm.nga.sdk.metadata.Features.SubTypesOfFeature;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,33 +33,37 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import java.lang.reflect.Type;
+import com.google.gson.reflect.TypeToken;
 
 /**
- * Created by brucesp on 23/02/2016.
+ * This class hold the  metadata object and serve all functionality concern to fields metadata and entity metadata
+ * @autho Moris oz
+ *
  */
 public class Metadata {
 
 	// constant
-	private final String JSON_DATA_FIELD_NAME = "data";
-	private final String JSON_NAME_FIELD_NAME = "name";
-	private final String JSON_FEATURES_FIELD_NAME = "features";
-	private final String QUERY_NAME_FIELD_NAME = "name";
-	private final String QUERY_ENTITY_NAME_FIELD_NAME = "entity_name";
-	private final String TYPE_NAME_ENTITIES_NAME = "entities";
-	private final String TYPE_NAME_FIELDS_NAME = "fields";
-	private final String TYPE_NAME_FIELDS_QUERY_FORMAT = "fields?query=\"";
-	private final String TYPE_NAME_ENTITIES_QUERY_FORMAT = "entities?query=\"";
-	private final String FEATURE_REST_NAME = "rest";
-	private final String FEATURE_MAILING_NAME = "mailing";
-	private final String FEATURE_HAS_ATTACHMENTS_NAME = "has_attachments";
-	private final String FEATURE_HAS_COMMENTS_NAME = "has_comments";
-	private final String FEATURE_BUSINESS_RULES_NAME = "business_rules";
-	private final String FEATURE_SUBTYPES_NAME = "subtypes";
-	private final String FEATURE_SUBTYPE_OF_NAME = "subtype_of";
-	private final String FEATURE_HIERARCHICAL_ENTITY_NAME = "hierarchical_entity";
-	private final String LOGGER_INVALID_FEATURE_FORMAT = ": not a valid feature";
-	private final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
-	private final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";	
+	private static final String JSON_DATA_FIELD_NAME = "data";
+	private static final String JSON_NAME_FIELD_NAME = "name";
+	private static final String JSON_FEATURES_FIELD_NAME = "features";
+	private static final String QUERY_NAME_FIELD_NAME = "name";
+	private static final String QUERY_ENTITY_NAME_FIELD_NAME = "entity_name";
+	private static final String TYPE_NAME_ENTITIES_NAME = "entities";
+	private static final String TYPE_NAME_FIELDS_NAME = "fields";
+	private static final String TYPE_NAME_FIELDS_QUERY_FORMAT = "fields?query=\"";
+	private static final String TYPE_NAME_ENTITIES_QUERY_FORMAT = "entities?query=\"";
+	private static final String FEATURE_REST_NAME = "rest";
+	private static final String FEATURE_MAILING_NAME = "mailing";
+	private static final String FEATURE_HAS_ATTACHMENTS_NAME = "has_attachments";
+	private static final String FEATURE_HAS_COMMENTS_NAME = "has_comments";
+	private static final String FEATURE_BUSINESS_RULES_NAME = "business_rules";
+	private static final String FEATURE_SUBTYPES_NAME = "subtypes";
+	private static final String FEATURE_SUBTYPE_OF_NAME = "subtype_of";
+	private static final String FEATURE_HIERARCHICAL_ENTITY_NAME = "hierarchical_entity";
+	private static final String LOGGER_INVALID_FEATURE_FORMAT = ": not a valid feature";
+	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
+	private static final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";	
     
 	// private members
 	private HttpRequestFactory requestFactory = null;
@@ -63,50 +72,138 @@ public class Metadata {
 	private Query quaryEntities = null;
 	private Logger logger = LogManager.getLogger(Metadata.class.getName());
 	
+	/**
+	 * Creates a new Metadata object
+	 * 
+	 * @param reqFactory
+	 *            - Http Request Factory
+	 * @param strMetadataDomain
+	 *            - metadata Domain Name
+	 */
 	public Metadata(HttpRequestFactory reqFactory, String strMetadataDomain){
 		
 		urlDomain = strMetadataDomain;
 		requestFactory = reqFactory;
 	}
 	
+	/**
+	 * Get metadata entity object
+	 * @return new metadata entity object
+	 */
 	public Entity entities(){
 		type = TYPE_NAME_ENTITIES_NAME;
 		return new Entity();
 	}
-
+	
+	/**
+	 * Get metadata entity object based on given entities names
+	 * @return new metadata entity object
+	 */
 	public Entity entities(String...entities){
 		
-		Query quaryEntities =  new Query();
-		String quaryList = "";	
+		
+		List<String> entitiesList =  Arrays.asList(entities);
+		
+		String quaryList =  entitiesList
+	            .stream()
+	            .map(s -> new Query.Field(QUERY_NAME_FIELD_NAME).equal(s).build().getQueryString())
+	            .collect(Collectors.joining("||"));
+		
+		// TBD - Remove after debugging
+		/*Query quaryEntities =  new Query();
+		String quaryList = "" ;	
 		for (String value : entities) {
 			
 			quaryEntities = new Query.Field(QUERY_NAME_FIELD_NAME).equal(value).build();
 			quaryList = quaryList + quaryEntities.getQueryString() + "||";
 		}
-		quaryList = quaryList.substring(0,quaryList.length()-2);
+		quaryList = quaryList.substring(0,quaryList.length()-2);*/
+		
 		type = TYPE_NAME_ENTITIES_QUERY_FORMAT + quaryList + "\"";
 				
 		return new Entity();
 	}
-
+	
+	/**
+	 * Get metadata field object
+	 * @return
+	 */
 	public Field fields(){
 		type = TYPE_NAME_FIELDS_NAME;
 		return new Field();
 	}
-
+	
+	/**
+	 * Get metadata field object based on given field names
+	 * @param entities
+	 * @return
+	 */
 	public Field fields(String...entities){
 		
+		
+		
+		// TBD - remove after debugging
+		/*String quaryList = "";	
 		Query quaryFields =  new Query();
-		String quaryList = "";	
 		for (String value : entities) {
 			
 			quaryFields = new Query.Field(QUERY_ENTITY_NAME_FIELD_NAME).equal(value).build();
 			quaryList = quaryList + quaryFields.getQueryString() + "||";
 		}
-		quaryList = quaryList.substring(0,quaryList.length()-2);
+		quaryList = quaryList.substring(0,quaryList.length()-2);*/
+		
+		List<String> entitiesList =  Arrays.asList(entities);
+		String quaryList =  entitiesList
+	            .stream()
+	            .map(s -> new Query.Field(QUERY_ENTITY_NAME_FIELD_NAME).equal(s).build().getQueryString())
+	            .collect(Collectors.joining("||"));
+		
 		type = TYPE_NAME_FIELDS_QUERY_FORMAT + quaryList + "\"";
 		
 		return new Field();
+	}
+	
+	/**
+	 * Get Feature Object based on the feature jason object
+	 * @param jasoFeatureObj - Jason Feature object
+	 * @return Feature Object
+	 */
+	protected Feature getFeatureObject(JSONObject jasoFeatureObj){
+		
+		Feature feature = null;
+		String featureName = jasoFeatureObj.getString(JSON_NAME_FIELD_NAME);
+		
+		switch (featureName) {
+			case FEATURE_REST_NAME: 
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), RestFeature.class);
+            break;
+			case FEATURE_MAILING_NAME:  
+        		feature = new Gson().fromJson(jasoFeatureObj.toString(), MailingFeature.class);
+            break;
+			case FEATURE_HAS_ATTACHMENTS_NAME:  
+		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), AttachmentsFeature.class);
+            break;
+			case FEATURE_HAS_COMMENTS_NAME:
+		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), CommentsFeature.class);
+            break;
+			case FEATURE_BUSINESS_RULES_NAME:  
+		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), BuisnessRuleFeature.class);
+            break;
+			case FEATURE_SUBTYPES_NAME:  
+        		feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesFeature.class);
+            break;
+			case FEATURE_SUBTYPE_OF_NAME: 
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesOfFeature.class);
+            break;
+			case FEATURE_HIERARCHICAL_ENTITY_NAME: 
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), HierarchyFeature.class);
+            break;
+			default:
+				logger.debug(featureName + LOGGER_INVALID_FEATURE_FORMAT);
+			break;
+		}
+		
+		return feature;
 	}
 	
 	/**
@@ -122,16 +219,18 @@ public class Metadata {
 		JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_FIELD_NAME);
 
 		// prepare entity collection
-		Collection<EntityMetadata> EntitiesMetadata = new ArrayList<EntityMetadata>();
+		Collection<EntityMetadata> entitiesMetadata = new ArrayList<EntityMetadata>();
+		IntStream.range(0, jasoDataArr.length()).forEach((i)->entitiesMetadata.add(getEntityMetadata(jasoDataArr.getJSONObject(i))));
 		
-		for (int i = 0; i < jasoDataArr.length(); i++) {
+		// TBD - Remove after debugging
+		/*for (int i = 0; i < jasoDataArr.length(); i++) {
 			JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
 			EntityMetadata entityModel = getEntityMetadata(jasoEntityObj);
-			EntitiesMetadata.add(entityModel);
+			entitiesMetadata.add(entityModel);
 
-		}
+		}*/
 		
-		return EntitiesMetadata;
+		return entitiesMetadata;
 	}
 	
 	/**
@@ -148,13 +247,17 @@ public class Metadata {
 
 		// prepare entity collection
 		Collection<FieldMetadata> fieldsMetadata = new ArrayList<FieldMetadata>();
+		IntStream.range(0, jasoDataArr.length()).forEach((i)->fieldsMetadata.add(new Gson().fromJson(jasoDataArr.getJSONObject(i).toString(), FieldMetadata.class)));
+		
+		// TBD - Remove after debugging
+		/*Collection<FieldMetadata> fieldsMetadata = new ArrayList<FieldMetadata>();
 		
 		for (int i = 0; i < jasoDataArr.length(); i++) {
 			JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
 			FieldMetadata fieldMetadata = new Gson().fromJson(jasoEntityObj.toString(), FieldMetadata.class);
 			fieldsMetadata.add(fieldMetadata);
 
-		}
+		}*/
 		
 		return fieldsMetadata;
 	}
@@ -171,55 +274,32 @@ public class Metadata {
 		Set<Feature> features = new HashSet<Feature>();
 		String name = jasoEntityObj.getString(JSON_NAME_FIELD_NAME);
 		JSONArray jasonFeatures = jasoEntityObj.getJSONArray(JSON_FEATURES_FIELD_NAME);
+		IntStream.range(0, jasonFeatures.length()).forEach((i)->features.add(getFeatureObject(jasonFeatures.getJSONObject(i))));
 		
-		
-		for (int i = 0; i < jasonFeatures.length(); i++) {
+		// TBD - Remove after debugging
+		/*for (int i = 0; i < jasonFeatures.length(); i++) {
 			JSONObject jasoFeatureObj = jasonFeatures.getJSONObject(i);
-			
-			String featureName = jasoFeatureObj.getString(JSON_NAME_FIELD_NAME);
-			Feature feature = null;
-			
-			switch (featureName) {
-				case FEATURE_REST_NAME: 
-					feature = new Gson().fromJson(jasoFeatureObj.toString(), RestFeature.class);
-                break;
-				case FEATURE_MAILING_NAME:  
-            		feature = new Gson().fromJson(jasoFeatureObj.toString(), MailingFeature.class);
-                break;
-				case FEATURE_HAS_ATTACHMENTS_NAME:  
-			 		feature = new Gson().fromJson(jasoFeatureObj.toString(), AttachmentsFeature.class);
-                break;
-				case FEATURE_HAS_COMMENTS_NAME:
-			 		feature = new Gson().fromJson(jasoFeatureObj.toString(), CommentsFeature.class);
-                break;
-				case FEATURE_BUSINESS_RULES_NAME:  
-			 		feature = new Gson().fromJson(jasoFeatureObj.toString(), BuisnessRuleFeature.class);
-                break;
-				case FEATURE_SUBTYPES_NAME:  
-            		feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesFeature.class);
-                break;
-				case FEATURE_SUBTYPE_OF_NAME: 
-					feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesOfFeature.class);
-                break;
-				case FEATURE_HIERARCHICAL_ENTITY_NAME: 
-					feature = new Gson().fromJson(jasoFeatureObj.toString(), HierarchyFeature.class);
-                break;
-				default:
-					logger.debug(featureName + LOGGER_INVALID_FEATURE_FORMAT);
-				break;
-			}
-			
+			Feature feature = getFeatureObject(jasoFeatureObj);
 			features.add(feature);
-		
-		}
+		}*/
 		
 		EntityMetadata entityMetadata = new EntityMetadata(name,features);
 		return entityMetadata;
 	}
 	
+	/**
+	 * This class hold the entity metadata object
+	 * @author Moris oz
+	 *
+	 */
 	public  class Entity extends NGARequest<Collection<EntityMetadata>> {
+		
+		/**
+		 * Get Request execution of metadata's entity info
+		 * Collection<EntityModel> object
+		 */
 		@Override
-		public Collection<EntityMetadata> execute() throws IOException, JSONException {
+		public Collection<EntityMetadata> execute() throws Exception {
 			
 			String url = urlDomain+ "/" + type;
 						
@@ -240,8 +320,18 @@ public class Metadata {
 			
 		}
 	}
-
+	
+	/**
+	 * This class hold the field metadata object
+	 * @author Moris oz
+	 *
+	 */
 	public  class Field extends NGARequest<Collection<FieldMetadata>> {
+		
+		/**
+		 * Get Request execution of metadata's field info
+		 * Collection<EntityModel> object
+		 */
 		@Override
 		public Collection<FieldMetadata> execute() throws IOException, JSONException {
 			

@@ -2,58 +2,50 @@ package com.hpe.adm.nga.sdk.model;
 
 
 /**
- * Created by brucesp on 22/02/2016.
+ * This class hold the ReferenceFieldModel objects and serve as a ReferenceField type FieldModel data holder 
+ * 
+ * @author moris oz
+ *
  */
-public class ReferenceFieldModel implements FieldModel<ReferenceFieldModel.ReferenceModel> {
+public class ReferenceFieldModel implements FieldModel<EntityModel> {
 	
 	//Private 
-	ReferenceModel refValue;
+	EntityModel refValue;
 	String refName;
 	
-	public ReferenceFieldModel(String name,ReferenceModel value){
+	/**
+	 * Creates a new ReferenceFieldModel object
+	 * 
+	 * @param newName - Field name
+	 * @param newValue - Field Value
+	 */
+	public ReferenceFieldModel(String name,EntityModel value){
 		
 		setValue( name, value);
 	}
 	
-	public ReferenceModel getValue(){
+	/**
+	 * Get Value
+	 */
+	public EntityModel getValue(){
 		return refValue ;
 	}
 	
+	/**
+	 * Get name
+	 */
 	public String getName(){
 		return refName;
 	}
-
-	public void setValue(String name,ReferenceModel value){
+	
+	/**
+	 * Set name/value
+	 */
+	public void setValue(String name,EntityModel value){
 		
 		refValue = value;
 		refName = name;
 	}
 	
-	public static class ReferenceModel  {
-		
-		private long id;  // Variable name must refelct Rest variable name ( Gson().fromJson )
-		private String type; // Variable name must refelct Rest variable name ( Gson().fromJson )
-		
-		public ReferenceModel(long Id,String type){
-			
-			setValues(Id,type);
-		}
-				
-		
-		public void setValues(long strId,String strType){
-			
-			id = strId;
-			type = strType;
-		}
-		
-		public long getId(){
-			return id;
-		}
-		
-		public String gettype(){
-			return type;
-		}
-		
-	}
 	
 }

@@ -1,12 +1,46 @@
 package com.hpe.adm.nga.sdk.exception;
 
-import com.hpe.adm.nga.sdk.NGAError;
+import java.util.Collection;
+
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
 
 /**
- * Created by brucesp on 23/02/2016.
+ * This extends the RuntimeException objects and serve all functionality concern to
+ * NGA Exceptions.
+ * @author Moris oz
+ *
  */
 public class NgaException extends RuntimeException {
 
-	public NGAError getError(){return null;};
+		
+	private ErrorModel errorModel = null;
+	
+	/**
+	 * Creates a new NgaException object based on error model
+	 * 
+	 * @param error - error model
+	 *   
+	 */
+	public NgaException(ErrorModel  error){
+		setError(error);
+	}
+	
+	/**
+	 * get error model
+	 * @return error model
+	 */
+	public ErrorModel getError(){
+		return errorModel;
+	}
+	
+	/**
+	 * set a new error model
+	 * @param error - error model
+	 */
+	public void setError(ErrorModel  error){
+		errorModel = error;
+	}
+	
 }
 

@@ -1,18 +1,54 @@
 package com.hpe.adm.nga.sdk.metadata.Features;
 
 /**
- * Created by brucesp on 23/02/2016.
+ * This class hold the HierarchyFeature object and serve all functionality concern to Hierarchy Feature
+ * @autho Moris oz
+ *
  */
 public class HierarchyFeature extends Feature{
 	
+	private String[] childTypes;
+	private String[] parentTypes;
+	private Root rootEnt;
 	
-	public String[] childTypes(){return null;};
-	public String[] parentTypes(){return null;};
-	public Root rootEnt;
+	/**
+	 * get Child Types
+	 * @return
+	 */
+	public String[] getChildTypes(){return childTypes;};
 	
+	/**
+	 * get Parent Types
+	 * @return
+	 */
+	public String[] getParentTypes(){return parentTypes;};
+	
+	/**
+	 * get Root Types
+	 * @return
+	 */
+	public Root getRootEnt(){return rootEnt;};
+	
+	/**
+	 * Root Data structure
+	 * @author Moris Oz
+	 *
+	 */
 	public static class Root {
-		public String type(){return null;};
-		public String id(){return null;};
+		private String type;
+		private String id;
+		
+		/**
+		 * get type
+		 * @return
+		 */
+		public String getType(){return type;};
+		
+		/**
+		 * get id
+		 * @return
+		 */
+		public String getId(){return id;};
 	}
 }
 
