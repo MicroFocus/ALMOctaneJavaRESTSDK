@@ -1,7 +1,6 @@
 package com.hpe.adm.nga.sdk.utils.generator;
 
 import com.hpe.adm.nga.sdk.NGA;
-import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 
@@ -33,6 +32,30 @@ public class DataGenerator {
         return entities;
     }
 
+    public static Collection<EntityModel> generateEntityModel(NGA nga, String entityName) throws Exception {
+        Set<FieldModel> fields = new HashSet<>();
+        return generateEntityModel(nga, entityName, fields);
+    }
+
+    public static Collection<EntityModel> generateEntityModelCollection(NGA nga, String entityName, Set<FieldModel> fields) throws Exception {
+        Collection<EntityModel> entities = new ArrayList<>();
+
+        entities.addAll(generateEntityModel(nga, entityName, fields));
+        entities.addAll(generateEntityModel(nga, entityName, fields));
+        entities.addAll(generateEntityModel(nga, entityName, fields));
+
+        return entities;
+    }
+
+    public static List<String> generateNamesForUpdate() {
+        List<String> generatedValues = new ArrayList<>();
+        generatedValues.add("updatedName" + UUID.randomUUID());
+        generatedValues.add("updatedName" + UUID.randomUUID());
+        generatedValues.add("updatedName" + UUID.randomUUID());
+        return generatedValues;
+    }
+
+
     private static EntityModel generatePA(Set<FieldModel> fields) {
         Set<FieldModel> parentFields = new HashSet<>();
         parentFields.add(new LongFieldModel("id", 1001l));
@@ -45,17 +68,6 @@ public class DataGenerator {
         fields.add(name);
         fields.add(parentField);
         return new EntityModel(fields);
-    }
-
-
-    public static Collection<EntityModel> generateEntityModelCollection(NGA nga, String entityName, Set<FieldModel> fields) throws Exception {
-        Collection<EntityModel> entities = new ArrayList<>();
-
-        entities.addAll(generateEntityModel(nga, entityName, fields));
-        entities.addAll(generateEntityModel(nga, entityName, fields));
-        entities.addAll(generateEntityModel(nga, entityName, fields));
-
-        return entities;
     }
 
     private static EntityModel generateFeature(NGA nga, Set<FieldModel> fields) throws Exception {
@@ -97,7 +109,7 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    public static EntityModel generateRelease() {
+    private static EntityModel generateRelease() {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_release_" + UUID.randomUUID());
         FieldModel startDate = new StringFieldModel("start_date", "2015-03-14T12:00:00Z");
@@ -108,20 +120,12 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    public static EntityModel generateMilestone() {
+    private static EntityModel generateMilestone() {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_milestone_" + UUID.randomUUID());
         FieldModel date = new StringFieldModel("date", "2016-03-17T12:00:00Z");
         fields.add(name);
         fields.add(date);
         return new EntityModel(fields);
-    }
-
-    public static List<String> generateNamesForUpdate() {
-        List<String> generatedValues = new ArrayList<>();
-        generatedValues.add("updatedName" + UUID.randomUUID());
-        generatedValues.add("updatedName" + UUID.randomUUID());
-        generatedValues.add("updatedName" + UUID.randomUUID());
-        return generatedValues;
     }
 }

@@ -19,7 +19,7 @@ public class CommonUtils {
                 return fm.getValue().toString();
             }
         }
-        return "";
+        throw new RuntimeException("Field  name [" + fieldName + "] not found in entity model: "+ entityModel.toString());
     }
 
     public static int getIdFromEntityModel(EntityModel entityModel) {
@@ -29,7 +29,7 @@ public class CommonUtils {
                 return Integer.parseInt(fm.getValue().toString());
             }
         }
-        return -1;
+        throw new RuntimeException("Field  ID not found in entity model: "+ entityModel.toString());
     }
 
 
