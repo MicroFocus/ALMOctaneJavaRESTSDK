@@ -26,7 +26,9 @@ import java.util.UUID;
 public class NGA {
 
     //Constants
-    private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/";
+    //private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/"; //???
+    private static final String SITE_ADMIN_DOMAIN_FORMAT = "/admin/";
+
     private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
     private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
     private static final String METADATA_DOMAIN_FORMAT = "metadata";
