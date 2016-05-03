@@ -2,19 +2,23 @@ package com.hpe.adm.nga.sdk.tests.base;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
-import com.sun.javafx.runtime.SystemProperties;
+import org.json.JSONException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import java.util.ResourceBundle;
+import java.io.IOException;
 
 /**
  * Created by Guy Guetta on 12/04/2016.
  */
 public class TestBase {
+
+    final static String MY_APP_ID = "rest@hpe.com";
+    final static String MY_APP_SECRET = "Welcome1";
+
     protected static NGA nga;
     protected static String entityName = "";
     private static String entityTypeOld = "";
@@ -30,17 +34,34 @@ public class TestBase {
 
     @BeforeClass
     public static void init() {
-        HttpUtils.SetSystemKeepAlive(false);
-        HttpUtils.SetSystemProxy();
+        try {
+            HttpUtils.SetSystemKeepAlive(false);
+            HttpUtils.SetSystemProxy();
 
-        String url = ResourceBundle.getBundle("configuration").getString("url");
-        String username = ResourceBundle.getBundle("configuration").getString("username");
-        String password = ResourceBundle.getBundle("configuration").getString("password");
-        String sharedSpaceId = ResourceBundle.getBundle("configuration").getString("sharedSpaceId");
-        String workspaceId = ResourceBundle.getBundle("configuration").getString("workspaceId");
+            nga = new NGA.Builder(
+                    new BasicAuthorisation() {
+                        @Override
+                        public String getUsername() {
 
-        nga = ContextUtils.getContextWorkspace(url, username, password, sharedSpaceId, workspaceId);
-        metadata = nga.metadata();
+                            return MY_APP_ID;
+                        }
+
+                        @Override
+                        public String getPassword() {
+
+                            return MY_APP_SECRET;
+                        }
+
+                    }
+            ).Server("http://localhost.emea.hpqcorp.net:8080").sharedSpace(2001).workSpace(1002).build();
+            metadata = nga.metadata();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Before
