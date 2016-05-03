@@ -37,12 +37,12 @@ public class DataGenerator {
         return generateEntityModel(nga, entityName, fields);
     }
 
-    public static Collection<EntityModel> generateEntityModelCollection(NGA nga, String entityName, Set<FieldModel> fields) throws Exception {
+    public static Collection<EntityModel> generateEntityModelCollection(NGA nga, String entityName) throws Exception {
         Collection<EntityModel> entities = new ArrayList<>();
 
-        entities.addAll(generateEntityModel(nga, entityName, fields));
-        entities.addAll(generateEntityModel(nga, entityName, fields));
-        entities.addAll(generateEntityModel(nga, entityName, fields));
+        entities.addAll(generateEntityModel(nga, entityName));
+        entities.addAll(generateEntityModel(nga, entityName));
+        entities.addAll(generateEntityModel(nga, entityName));
 
         return entities;
     }

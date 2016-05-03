@@ -40,8 +40,7 @@ public class DeleteEntity extends TestBase {
 
     @Test
     public void testDeleteEntitiesByQuery() throws Exception{
-        Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 

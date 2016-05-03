@@ -52,8 +52,7 @@ public class FieldsFilter extends TestBase {
     public void testFieldsFilterMultipleFields() throws Exception {
 
         List<String> filterFields = Arrays.asList("done_work", "description", "expected_velocity");
-        Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
         entityList.create().entities(generatedEntity).execute();
 
         Collection<EntityModel> getEntity = entityList.get().addFields("done_work", "description", "expected_velocity").execute();

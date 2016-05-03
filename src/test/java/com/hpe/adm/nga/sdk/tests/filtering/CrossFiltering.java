@@ -42,13 +42,26 @@ public class CrossFiltering extends TestBase {
         Query query = new Query().field("work_item_has_release").equal(new Query().field("id").equal(defectId).build()).build();
         Collection<EntityModel> releases = nga.entityList("releases").get().query(query).execute();
         long newReleaseId = CommonUtils.getIdFromEntityModel(releases.iterator().next());
-        Assert.assertEquals("More defects than expected in response", 1, releases.size());
-        Assert.assertEquals("Wrong defect id in response", releaseId, newReleaseId);
+        Assert.assertEquals("More releases than expected in response", 1, releases.size());
+        Assert.assertEquals("Wrong release id in response", releaseId, newReleaseId);
     }
 
     @Test
     public void crossFilterTwoHopes() throws Exception {
+        Query query = new Query().field("work_item").equal(new Query().field("release").equal(new Query().field("id").equal(releaseId).build()).build()).build();
+        Collection<EntityModel> pas = nga.entityList("product_areas").get().query(query).execute();
+        long newPaId = CommonUtils.getIdFromEntityModel(pas.iterator().next());
+        Assert.assertEquals("More PAs than expected in response", 1, pas.size());
+        Assert.assertEquals("Wrong PA id in response", paId, newPaId);
+    }
 
+    @Test
+    public void crossFilterTwoHopesReverse() throws Exception {
+        Query query = new Query().field("work_item_has_release").equal(new Query().field("product_areas").equal(new Query().field("id").equal(paId).build()).build()).build();
+        Collection<EntityModel> releases = nga.entityList("releases").get().query(query).execute();
+        long newReleaseId = CommonUtils.getIdFromEntityModel(releases.iterator().next());
+        Assert.assertEquals("More releases than expected in response", 1, releases.size());
+        Assert.assertEquals("Wrong release id in response", releaseId, newReleaseId);
     }
 
     @BeforeClass

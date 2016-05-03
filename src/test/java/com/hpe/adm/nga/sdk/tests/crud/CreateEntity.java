@@ -26,8 +26,7 @@ public class CreateEntity extends TestBase {
 
     @Test
     public void testCreateEntity() throws Exception {
-        Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         int entityId = CommonUtils.getIdFromEntityModel(entityModel);
@@ -39,8 +38,7 @@ public class CreateEntity extends TestBase {
 
     @Test
     public void testCreateEntityCollection() throws Exception {
-        Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
         Query query = QueryUtils.getQueryForIds(entityIds);

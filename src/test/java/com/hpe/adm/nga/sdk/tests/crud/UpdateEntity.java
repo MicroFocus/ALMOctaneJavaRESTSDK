@@ -49,7 +49,7 @@ public class UpdateEntity extends TestBase {
 
         List<String> updatedNameValues =  DataGenerator.generateNamesForUpdate();
         Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
@@ -78,14 +78,15 @@ public class UpdateEntity extends TestBase {
     public void testUpdateEntityCollectionWithQuery() throws Exception {
 
         String updatedEndDateValue =  "2026-03-14T12:00:00Z";
-        Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(nga, entityName, fields);
+        Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedDefect).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
 
         StringFieldModel nameField = new StringFieldModel("end_date", updatedEndDateValue);
+        Set<FieldModel> fields = new HashSet<>();
+
         fields.add(nameField);
         EntityModel updatedEntity = new EntityModel(fields);
         updatedEntityCollection.add(updatedEntity);
