@@ -39,6 +39,12 @@ public class CommonUtils {
         return idList;
     }
 
+    public static List<String> getValuesFromEntityModelCollection(Collection<EntityModel> entityModels, String fieldName) {
+        ArrayList<String> idList = new ArrayList<>();
+        entityModels.forEach(entityModel -> idList.add(getValueFromEntityModel(entityModel, fieldName)));
+        return idList;
+    }
+
     public static EntityModel getEntityWithStringValue(Collection<EntityModel> entityModels, String fieldName, String value) {
         Collection<EntityModel> entityModelsResult = new ArrayList<>();
         entityModels.forEach(entityModel -> {if(getValueFromEntityModel(entityModel, fieldName).equals(value)){entityModelsResult.add(entityModel);}});
