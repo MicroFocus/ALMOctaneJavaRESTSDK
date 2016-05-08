@@ -21,6 +21,6 @@ public class Demo extends TestBase {
     @Test
     public void demoTest() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName);
-        Collection<EntityModel> entityModels = entityList.get().addOrderBy("attachments", true).execute();
+
     }
 }

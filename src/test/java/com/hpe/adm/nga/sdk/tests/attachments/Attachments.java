@@ -29,9 +29,9 @@ public class Attachments extends TestBase {
 //    @Test
     public void testCreateAttachmentForDefect() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, "defects");
-        Collection<EntityModel> entityModels = nga.entityList("defects").create().entities(generatedEntity).execute();
+        Collection<EntityModel> defectModel = nga.entityList("defects").create().entities(generatedEntity).execute();
 
-        Collection<EntityModel> expectedComments = createAttachment("owner_work_item", entityModels);
+        Collection<EntityModel> expectedComments = createAttachment("owner_work_item", defectModel);
 
         Collection<EntityModel> actualComments = nga.entityList("attachments").get().execute();
 
@@ -43,16 +43,16 @@ public class Attachments extends TestBase {
 
         Set<FieldModel> fields = new HashSet<>();
         fields.add(new ReferenceFieldModel(fieldEntityType, entity));
-        FieldModel name = new StringFieldModel("name", "sdk_attachment_" + UUID.randomUUID());
+        FieldModel name = new StringFieldModel("name", "sdk_attachment_" + UUID.randomUUID() + ".txt");
         fields.add(name);
         Collection<EntityModel> attachments = new ArrayList<>();
         attachments.add(new EntityModel(fields));
 
         List<String> lines = Arrays.asList("The first line", "The second line");
-        Path file = Paths.get("text_attachment.txt");
-        Files.write(file, lines, Charset.forName("UTF-8"));
+        Path path = Paths.get("text_attachment.txt");
+        Files.write(path, lines, Charset.forName("UTF-8"));
 
-        nga.AttachmentList().create().entities(attachments, file.toString()).execute();
+        nga.AttachmentList().create().entities(attachments, path.toString()).execute();
 
         return attachments;
     }
