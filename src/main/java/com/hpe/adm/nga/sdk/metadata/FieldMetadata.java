@@ -31,7 +31,7 @@ public class FieldMetadata {
 	    String, 
 	    Memo, 
 	    Object,
-	    Refrence
+		Reference
 	}
 	
 	/**
