@@ -55,5 +55,7 @@
     <orderEntry type="library" name="Maven: com.google.api-client:google-api-client-protobuf:1.21.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.api-client:google-api-client-xml:1.21.0" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20160212" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.11" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
 </module>

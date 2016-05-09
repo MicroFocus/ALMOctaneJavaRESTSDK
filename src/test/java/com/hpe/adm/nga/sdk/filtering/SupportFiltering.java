@@ -1,8 +1,8 @@
-package com.hpe.adm.nga.tests.filtering;
+package com.hpe.adm.nga.sdk.filtering;
 
 import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.base.TestBase;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;

@@ -1,32 +1,17 @@
-package com.hpe.adm.nga.tests.crud;
-
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.junit.Test;
+package com.hpe.adm.nga.sdk.crud;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.LongFieldModel;
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel; 
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
-import com.hpe.adm.nga.sdk.utils.CommonUtils;
-import com.hpe.adm.nga.sdk.utils.QueryUtils;
+import com.hpe.adm.nga.sdk.base.TestBase;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import com.hpe.adm.nga.tests.base.TestBase;
+import org.junit.Test;
 
-import junit.framework.AssertionFailedError;
+import java.util.*;
 
-public class GetEntity extends TestBase{
+import static org.junit.Assert.*;
+
+public class GetEntity extends TestBase {
 
 	public GetEntity() {
 		entityName = "themes";

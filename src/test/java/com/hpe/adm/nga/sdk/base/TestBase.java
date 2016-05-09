@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.tests.base;
+package com.hpe.adm.nga.sdk.base;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.NGA;

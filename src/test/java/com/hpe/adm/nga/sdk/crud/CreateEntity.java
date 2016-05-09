@@ -1,10 +1,9 @@
-package com.hpe.adm.nga.tests.crud;
+package com.hpe.adm.nga.sdk.crud;
 
 import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.tests.base.TestBase;
+import com.hpe.adm.nga.sdk.base.TestBase;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
@@ -12,15 +11,9 @@ import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertSame;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import static org.junit.Assert.assertSame;
 
 /**
  * Created by Guy Guetta on 12/04/2016.
