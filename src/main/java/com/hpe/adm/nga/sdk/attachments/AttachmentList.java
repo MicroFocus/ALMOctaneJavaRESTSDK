@@ -6,8 +6,11 @@ import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.NGARequest;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+
+import org.json.JSONException;
 
 /**
  * This class hold the AttachmentList objects
