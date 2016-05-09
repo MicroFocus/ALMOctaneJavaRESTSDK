@@ -1,21 +1,12 @@
-package com.hpe.adm.nga.tests;
+package com.hpe.adm.nga.sdk;
+
+import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import org.junit.Test;
+
+import java.util.Collection;
 
 import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.IntStream;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Test;
-import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
-import com.google.api.client.http.HttpRequestFactory;
-import com.hpe.adm.nga.sdk.EntityList;
-import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.NGA;
-import com.hpe.adm.nga.sdk.model.EntityModel;
 
 
 public class EntityListServiceGetTest {

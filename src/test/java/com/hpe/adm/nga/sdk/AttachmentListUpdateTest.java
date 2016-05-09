@@ -1,20 +1,18 @@
-package com.hpe.adm.nga.tests;
+package com.hpe.adm.nga.sdk;
 
-import static org.junit.Assert.*;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.Test;
-
-import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import org.junit.Test;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 public class AttachmentListUpdateTest  {
 

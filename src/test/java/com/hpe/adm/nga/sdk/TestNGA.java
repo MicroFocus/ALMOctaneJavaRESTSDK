@@ -1,37 +1,24 @@
-package com.hpe.adm.nga.tests;
+package com.hpe.adm.nga.sdk;
 
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.hpe.adm.nga.sdk.EntityList;
-import com.hpe.adm.nga.sdk.NGA;
-import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.attachments.AttachmentList.Attachments;
 import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
 import com.hpe.adm.nga.sdk.exception.NgaException;
 import com.hpe.adm.nga.sdk.exception.NgaPartialException;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.ErrorModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.LongFieldModel;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 
 
