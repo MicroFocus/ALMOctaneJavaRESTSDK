@@ -68,7 +68,7 @@ public class ParallelExecution extends TestBase {
         String url = ResourceBundle.getBundle("configuration").getString("url");
         String username = "rest2@hpe.com";
         String password = "Welcome2";
-        String sharedSpaceId = ResourceBundle.getBundle("configuration").getString("sharedSpaceId");
+        String sharedSpaceId = "2002";
         String workspaceId = ResourceBundle.getBundle("configuration").getString("workspaceId");
 
         nga = ContextUtils.getContextWorkspace(url, username, password, sharedSpaceId, workspaceId);
