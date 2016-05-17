@@ -26,7 +26,7 @@ public class DataGenerator {
                 entities.add(generateDefect(nga, fields));
                 break;
             case "product_areas":
-                entities.add(generatePA(fields));
+                entities.add(generatePA(nga, fields));
                 break;
         }
         return entities;
@@ -56,9 +56,12 @@ public class DataGenerator {
     }
 
 
-    private static EntityModel generatePA(Set<FieldModel> fields) {
+    private static EntityModel generatePA(NGA nga, Set<FieldModel> fields) throws Exception {
+        Collection<EntityModel> pas = nga.entityList("product_areas").get().execute();
+        EntityModel parentEntity = CommonUtils.getEntityWithStringValue(pas, "parent", null);
+        long parentId = CommonUtils.getIdFromEntityModel(parentEntity);
         Set<FieldModel> parentFields = new HashSet<>();
-        parentFields.add(new LongFieldModel("id", 1001l));
+        parentFields.add(new LongFieldModel("id", parentId));
         parentFields.add(new StringFieldModel("type", "product_area"));
         EntityModel parent = new EntityModel(parentFields);
 
@@ -87,22 +90,28 @@ public class DataGenerator {
     }
 
     private static EntityModel generateDefect(NGA nga, Set<FieldModel> fields) throws Exception {
-        Collection<EntityModel> phases = nga.entityList("phases").get().execute();
-        EntityModel phase = phases.iterator().next();
         Set<FieldModel> parentFields = new HashSet<>();
         parentFields.add(new LongFieldModel("id", 1001l));
         parentFields.add(new StringFieldModel("type", "work_item_root"));
         EntityModel parent = new EntityModel(parentFields);
+        FieldModel parentField = new ReferenceFieldModel("parent", parent);
+
+        Collection<EntityModel> users = nga.entityList("workspace_users").get().execute();
+        EntityModel user = users.iterator().next();
+        FieldModel author = new ReferenceFieldModel("author", user);
+
+        Collection<EntityModel> phases = nga.entityList("phases").get().execute();
+        EntityModel phase = phases.iterator().next();
+        FieldModel phaseField = new ReferenceFieldModel("phase", phase);
 
         FieldModel name = new StringFieldModel("name", "sdk_defect_" + UUID.randomUUID());
-        FieldModel phaseField = new ReferenceFieldModel("phase", phase);
-        FieldModel parentField = new ReferenceFieldModel("parent", parent);
 
         Collection<EntityModel> listNodes = nga.entityList("list_nodes").get().execute();
         EntityModel severity = CommonUtils.getEntityWithStringValue(listNodes, "logical_name", "list_node.severity.low");
         FieldModel severityField = new ReferenceFieldModel("severity", severity);
 
         fields.add(name);
+        fields.add(author);
         fields.add(phaseField);
         fields.add(parentField);
         fields.add(severityField);

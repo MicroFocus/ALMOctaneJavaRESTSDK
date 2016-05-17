@@ -16,6 +16,9 @@ public class CommonUtils {
         Set<FieldModel> fieldModelSet = entityModel.getValue();
         for (FieldModel fm : fieldModelSet) {
             if (fm.getName().equals(fieldName)) {
+                if(fm.getValue() == null){
+                    return null;
+                }
                 return fm.getValue().toString();
             }
         }
@@ -47,7 +50,7 @@ public class CommonUtils {
 
     public static EntityModel getEntityWithStringValue(Collection<EntityModel> entityModels, String fieldName, String value) {
         Collection<EntityModel> entityModelsResult = new ArrayList<>();
-        entityModels.forEach(entityModel -> {if(getValueFromEntityModel(entityModel, fieldName).equals(value)){entityModelsResult.add(entityModel);}});
+        entityModels.forEach(entityModel -> {if(getValueFromEntityModel(entityModel, fieldName) == value || getValueFromEntityModel(entityModel, fieldName).equals(value)){entityModelsResult.add(entityModel);}});
         return entityModelsResult.iterator().next();
     }
 
