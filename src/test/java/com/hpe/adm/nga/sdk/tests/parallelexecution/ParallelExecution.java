@@ -28,8 +28,9 @@ public class ParallelExecution extends TestBase {
 
         NGA nga1 = getNgaClientFirst();
         EntityList entityList1 = nga1.entityList(entityName1);
+
         NGA nga2 = getNgaClientSecond();
-        EntityList entityList2 = nga1.entityList(entityName2);
+        EntityList entityList2 = nga2.entityList(entityName2);
 
         Collection<EntityModel> generatedEntity1 = DataGenerator.generateEntityModel(nga1, entityName1);
         Collection<EntityModel> entityModels1 = entityList1.create().entities(generatedEntity1).execute();

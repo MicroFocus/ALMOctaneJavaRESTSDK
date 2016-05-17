@@ -13,7 +13,7 @@ import java.util.Collection;
 /**
  * Created by Dmitry Zavyalov on 08/05/2016.
  */
-@Ignore // before to execute this test change mockssso.xml on server
+@Ignore // before to execute this test change mockssso.xml on server -> tokenIdleTimeout="1"
 public class CookieUpdate extends TestBase {
 
     public CookieUpdate() {
@@ -28,12 +28,12 @@ public class CookieUpdate extends TestBase {
         int entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         int counter = 0;
-        do {
+        while (counter < 10) {
             EntityModel getEntity = entityList.at(entityId).get().execute();
             Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
             sleepTime(10);
             counter++;
-        } while (counter < 10);
+        }
     }
 
     private static void sleepTime(int sleepTimeInSec) {
