@@ -1,6 +1,6 @@
-package main.java.com.hpe.adm.nga.sdk.exception;
+package com.hpe.adm.nga.sdk.exception;
 
-import main.java.com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
 
 /**
  * This extends the RuntimeException objects and serve all functionality concern to

@@ -1,4 +1,4 @@
-package main.java.com.hpe.adm.nga.sdk.model;
+package com.hpe.adm.nga.sdk.model;
 
 import java.util.HashSet;
 import java.util.Set;

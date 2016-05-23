@@ -1,4 +1,4 @@
-package main.java.com.hpe.adm.nga.sdk.metadata;
+package com.hpe.adm.nga.sdk.metadata;
 
 import com.google.gson.annotations.SerializedName;
 

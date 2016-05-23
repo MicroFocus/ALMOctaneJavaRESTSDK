@@ -1,5 +1,10 @@
-package test.java.com.hpe.adm.nga.sdk.unit_tests;
+package com.hpe.adm.nga.sdk.unit_tests;
 
+import com.hpe.adm.nga.sdk.EntityList;
+import com.hpe.adm.nga.sdk.EntityListService;
+import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,12 +12,6 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import main.java.com.hpe.adm.nga.sdk.EntityList;
-import main.java.com.hpe.adm.nga.sdk.EntityListService;
-import main.java.com.hpe.adm.nga.sdk.NGA;
-import main.java.com.hpe.adm.nga.sdk.Query;
-import test.java.com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 
 import java.lang.reflect.Method;
 
@@ -56,7 +55,7 @@ public class TestBuildUrl{
 			String orderByParam = (String) Whitebox.getInternalState(spiedGetEntity, "orderByParam");
 			long limitParam = (Long) Whitebox.getInternalState(spiedGetEntity, "limitParam");
 			long ofsetParam = (Long) Whitebox.getInternalState(spiedGetEntity, "ofsetParam");
-			Query queryParams = (Query) Whitebox.getInternalState(spiedGetEntity, "queryParams");						
+			Query queryParams = (Query) Whitebox.getInternalState(spiedGetEntity, "queryParams");
 			
 			Method urlBuilder = service.getClass().getDeclaredMethod("urlBuilder", new Class[] {String.class, String.class, String.class, long.class, long.class, Query.class});
 			urlBuilder.setAccessible(true);

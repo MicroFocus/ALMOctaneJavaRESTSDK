@@ -1,5 +1,19 @@
-package test.java.com.hpe.adm.nga.sdk.integration;
+package com.hpe.adm.nga.sdk.unit_tests;
 
+
+import com.hpe.adm.nga.sdk.EntityList;
+import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.attachments.AttachmentList;
+import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
+import com.hpe.adm.nga.sdk.exception.NgaException;
+import com.hpe.adm.nga.sdk.exception.NgaPartialException;
+import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
+import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
+import com.hpe.adm.nga.sdk.metadata.Metadata;
+import com.hpe.adm.nga.sdk.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,26 +21,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import main.java.com.hpe.adm.nga.sdk.EntityList;
-import main.java.com.hpe.adm.nga.sdk.NGA;
-import main.java.com.hpe.adm.nga.sdk.Query;
-import main.java.com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import main.java.com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
-import main.java.com.hpe.adm.nga.sdk.exception.NgaException;
-import main.java.com.hpe.adm.nga.sdk.exception.NgaPartialException;
-import main.java.com.hpe.adm.nga.sdk.metadata.EntityMetadata;
-import main.java.com.hpe.adm.nga.sdk.metadata.FieldMetadata;
-import main.java.com.hpe.adm.nga.sdk.metadata.Metadata;
-import main.java.com.hpe.adm.nga.sdk.model.EntityModel;
-import main.java.com.hpe.adm.nga.sdk.model.ErrorModel;
-import main.java.com.hpe.adm.nga.sdk.model.FieldModel;
-import main.java.com.hpe.adm.nga.sdk.model.LongFieldModel;
-import main.java.com.hpe.adm.nga.sdk.model.StringFieldModel;
-
 
 
 /**
@@ -48,20 +42,7 @@ public class TestNGA {
 		NGA nga;
 		try {
 			nga = (new NGA.Builder(
-					new BasicAuthorisation(){
-						@Override
-						public String getUsername(){
-							
-							return MY_APP_ID;
-						}
-						
-						@Override
-						public String getPassword(){
-							
-							return MY_APP_SECRET;
-						}
-						
-					}
+					new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)
 					)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(21025).workSpace(1002).build();
 			 
 			if (nga==null)

@@ -1,8 +1,7 @@
-package main.java.com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk;
 
 import com.google.api.client.http.HttpRequestFactory;
-
-import main.java.com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.EntityModel;
 
 import java.util.Collection;
 

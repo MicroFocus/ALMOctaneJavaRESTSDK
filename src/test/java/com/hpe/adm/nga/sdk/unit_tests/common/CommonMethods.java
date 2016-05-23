@@ -1,4 +1,4 @@
-package test.java.com.hpe.adm.nga.sdk.unit_tests.common;
+package com.hpe.adm.nga.sdk.unit_tests.common;
 
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;

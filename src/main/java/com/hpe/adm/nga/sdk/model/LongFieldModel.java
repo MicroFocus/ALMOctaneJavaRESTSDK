@@ -1,4 +1,4 @@
-package main.java.com.hpe.adm.nga.sdk.model;
+package com.hpe.adm.nga.sdk.model;
 
 /**
  * This class hold the LongFieldModel objects and serve as a long type FieldModel data holder 

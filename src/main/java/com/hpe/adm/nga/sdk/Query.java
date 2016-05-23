@@ -1,4 +1,4 @@
-package main.java.com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

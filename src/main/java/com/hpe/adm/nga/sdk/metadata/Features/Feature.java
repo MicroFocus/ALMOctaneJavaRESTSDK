@@ -1,4 +1,4 @@
-package main.java.com.hpe.adm.nga.sdk.metadata.Features;
+package com.hpe.adm.nga.sdk.metadata.Features;
 
 /**
  * This class hold the base class of all Features

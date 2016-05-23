@@ -1,4 +1,4 @@
-package main.java.com.hpe.adm.nga.sdk.metadata;
+package com.hpe.adm.nga.sdk.metadata;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -6,34 +6,22 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.gson.Gson;
 
-import main.java.com.hpe.adm.nga.sdk.NGARequest;
-import main.java.com.hpe.adm.nga.sdk.Query;
-import main.java.com.hpe.adm.nga.sdk.exception.NgaException;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.AttachmentsFeature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.BuisnessRuleFeature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.CommentsFeature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.Feature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.HierarchyFeature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.MailingFeature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.RestFeature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.SubTypesFeature;
-import main.java.com.hpe.adm.nga.sdk.metadata.Features.SubTypesOfFeature;
-import main.java.com.hpe.adm.nga.sdk.model.ErrorModel;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import com.hpe.adm.nga.sdk.NGARequest;
+import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.exception.NgaException;
+import com.hpe.adm.nga.sdk.metadata.Features.*;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import com.hpe.adm.nga.sdk.NGARequest;
 
 /**
  * This class hold the  metadata object and serve all functionality concern to fields metadata and entity metadata

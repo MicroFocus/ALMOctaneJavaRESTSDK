@@ -1,25 +1,18 @@
-package main.java.com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk;
+
+import com.google.api.client.http.*;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.hpe.adm.nga.sdk.attachments.AttachmentList;
+import com.hpe.adm.nga.sdk.authorisation.Authorisation;
+import com.hpe.adm.nga.sdk.exception.NgaException;
+import com.hpe.adm.nga.sdk.metadata.Metadata;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.HttpCookie;
 import java.util.List;
 import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.javanet.NetHttpTransport;
-
-import main.java.com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import main.java.com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
-import main.java.com.hpe.adm.nga.sdk.exception.NgaException;
-import main.java.com.hpe.adm.nga.sdk.metadata.Metadata;
-import main.java.com.hpe.adm.nga.sdk.model.ErrorModel;
-
 
 /**
  * This class represents the main NGA builder
@@ -137,20 +130,17 @@ public class NGA {
 		private String urlDomain = "";
 		public String idsharedSpaceId = null;
 		private long workSpaceId = 0;
-		private String userName = "";
-		private String password = "";
+		private final Authorisation authorisation;
 		
 		
 		//Functions
 		
 		/** Creates a new Builder object 
 		 * 
-		 * @param basicAuthorisation - hold the details of Authorisation
+		 * @param authorisation - hold the details of Authorisation
 		 */
-		public Builder(BasicAuthorisation basicAuthorisation)  {
-
-	    	userName = basicAuthorisation.getUsername();
-	    	password = basicAuthorisation.getPassword();
+		public Builder(Authorisation authorisation)  {
+	    	this.authorisation = authorisation;
 		}
 		
 		/**

@@ -1,11 +1,10 @@
-package main.java.com.hpe.adm.nga.sdk.attachments;
+package com.hpe.adm.nga.sdk.attachments;
 
 
 import com.google.api.client.http.HttpRequestFactory;
-
-import main.java.com.hpe.adm.nga.sdk.EntityListService;
-import main.java.com.hpe.adm.nga.sdk.NGARequest;
-import main.java.com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.EntityListService;
+import com.hpe.adm.nga.sdk.NGARequest;
+import com.hpe.adm.nga.sdk.model.EntityModel;
 
 import java.io.InputStream;
 import java.util.Collection;

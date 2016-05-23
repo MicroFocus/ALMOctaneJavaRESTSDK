@@ -1,4 +1,4 @@
-package main.java.com.hpe.adm.nga.sdk.model;
+package com.hpe.adm.nga.sdk.model;
 
 /**
  * This class hold the BooleanFieldModel objects and serve as a Boolean type FieldModel data holder 
