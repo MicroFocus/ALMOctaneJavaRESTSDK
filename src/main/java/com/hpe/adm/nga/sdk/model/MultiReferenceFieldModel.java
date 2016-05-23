@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.model;
+package main.java.com.hpe.adm.nga.sdk.model;
 
 import java.util.Collection;
 

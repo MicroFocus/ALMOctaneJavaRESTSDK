@@ -1,6 +1,5 @@
-package com.hpe.adm.nga.sdk;
+package test.java.com.hpe.adm.nga.sdk.unit_tests;
 
-import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +8,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import main.java.com.hpe.adm.nga.sdk.EntityList;
+import main.java.com.hpe.adm.nga.sdk.EntityListService;
+import main.java.com.hpe.adm.nga.sdk.NGA;
+import main.java.com.hpe.adm.nga.sdk.Query;
+import test.java.com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
+
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.*;
@@ -16,22 +21,17 @@ import static org.junit.Assert.*;
 
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
-public class TestGetEntity{
+public class TestBuildUrl{
 
 	private static EntityListService service = null;
 	private static EntityListService spiedService = null;
 	private static EntityListService.Get spiedGetEntity = null;
 	private static NGA nga;
-	private static String MY_APP_ID = "moris@korentec.co.il";
-	private static String MY_APP_SECRET = "Moris4095";
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-//		nga = new NGA(requestFactory, "https://mqast001pngx.saas.hpe.com", "4063", 1002);
-		
-		nga = (new NGA.Builder(
-				new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)
-				)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(4063).workSpace(1002).build();
-		
+		//nga = new NGA(CommonMethods.getRequestfactory(), "https://mqast001pngx.saas.hpe.com", "4063", 1002);
+		nga = new NGA(CommonMethods.getRequestfactory(), "https://mqast001pngx.saas.hpe.com", "21025", 1002);
 		
 		EntityList defects = nga.entityList("defects");
 		spiedGetEntity = PowerMockito.spy(defects.get());
@@ -46,7 +46,8 @@ public class TestGetEntity{
 	 */
 	@Test
 	public void testUrlBuild(){
-		final String expectedResult = "https://mqast001pngx.saas.hpe.com/api/shared_spaces/4063/workspaces/1002/defects?fields=version_stamp,item_type&limit=10&offset=1&order_by=-version_stamp";
+		//final String expectedResult = "https://mqast001pngx.saas.hpe.com/api/shared_spaces/4063/workspaces/1002/defects?fields=version_stamp,item_type&limit=10&offset=1&order_by=-version_stamp";
+		final String expectedResult = "https://mqast001pngx.saas.hpe.com/api/shared_spaces/21025/workspaces/1002/defects?fields=version_stamp,item_type&limit=10&offset=1&order_by=-version_stamp";
 		try{					
 			spiedGetEntity.addFields("version_stamp", "item_type").limit(10).offset(1).addOrderBy("version_stamp",false);
 			// get Internal fields values and call internal protected method			
@@ -60,7 +61,7 @@ public class TestGetEntity{
 			Method urlBuilder = service.getClass().getDeclaredMethod("urlBuilder", new Class[] {String.class, String.class, String.class, long.class, long.class, Query.class});
 			urlBuilder.setAccessible(true);
 			String url = (String)urlBuilder.invoke(service, urlDomain, fieldsParams, orderByParam, limitParam, ofsetParam, queryParams);
-			assertEquals(expectedResult, url);
+			assertEquals(expectedResult, url); // TBD - Should be assertNotEquals
 		}
 		catch(Exception ex){
 			fail("Failed with exception: " + ex);
@@ -73,7 +74,8 @@ public class TestGetEntity{
 	 */
 	@Test
 	public void testUrlBuildFailure(){
-		final String expectedFalseResult = "https://mqast001pngx.saas.hpe.com/api/shared_spaces/4063/workspaces/1002/defects?fields=version_stamp,item_type&limit=10&offset=1&order_by=-version_stamp";
+		//final String expectedFalseResult = "https://mqast001pngx.saas.hpe.com/api/shared_spaces/4063/workspaces/1002/defects?fields=version_stamp,item_type&limit=10&offset=1&order_by=-version_stamp";
+		final String expectedFalseResult = "https://mqast001pngx.saas.hpe.com/api/shared_spaces/21025/workspaces/1002/defects?fields=version_stamp,item_type&limit=10&offset=1&order_by=-version_stamp";
 		try{					
 			spiedGetEntity.addFields("version_stamp", "item_type", "id").limit(10).offset(1).addOrderBy("version_stamp",true); // Field was added, and orderBy was changed to TRUE value
 			// get Internal fields values and call internal protected method			

@@ -1,8 +1,4 @@
-package com.hpe.adm.nga.sdk;
-
-import java.io.IOException;
-
-import org.json.JSONException;
+package main.java.com.hpe.adm.nga.sdk;
 
 /**
  * NGA request Interface 
@@ -12,6 +8,6 @@ import org.json.JSONException;
  */
 public abstract class NGARequest<T> {
 
-	public abstract T execute() throws Exception;
+	public abstract T execute() throws RuntimeException;
 
 }

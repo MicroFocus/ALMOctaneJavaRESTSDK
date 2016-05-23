@@ -1,7 +1,8 @@
-package com.hpe.adm.nga.sdk.metadata;
+package main.java.com.hpe.adm.nga.sdk.metadata;
 
 import java.util.Collection;
-import com.hpe.adm.nga.sdk.metadata.Features.Feature;
+
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.Feature;
 
 /**
  * This class hold the entity metadata object and serve all functionality concern to metadata of entities

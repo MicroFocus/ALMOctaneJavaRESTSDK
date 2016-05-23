@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.metadata.Features;
+package main.java.com.hpe.adm.nga.sdk.metadata.Features;
 
 
 /**

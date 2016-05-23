@@ -1,9 +1,6 @@
-package com.hpe.adm.nga.sdk.model;
+package main.java.com.hpe.adm.nga.sdk.model;
 
-import java.util.Collection;
 import java.util.Set;
-
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
 
 /**
  * This class hold the ErrorModel objects and server as an error data holder
@@ -13,6 +10,8 @@ import com.hpe.adm.nga.sdk.model.StringFieldModel;
  *
  */
 public class ErrorModel extends  EntityModel{
+	
+	private static final String ERROR_DESCRIPTION_KEY 	= "Description";
 	
 	/**
 	 * Creates a new ErrorModel object with given field models
@@ -24,6 +23,14 @@ public class ErrorModel extends  EntityModel{
 		super(value);
 		
 	}
-
 	
+	/**
+	 * Creates a new ErrorModel object with given error message
+	 * @param value -  error message
+	 */
+	public ErrorModel(String value) {
+		
+		super(ERROR_DESCRIPTION_KEY,value);
+			
+	}
 }

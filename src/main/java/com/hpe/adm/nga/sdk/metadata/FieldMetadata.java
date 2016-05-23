@@ -1,4 +1,6 @@
-package com.hpe.adm.nga.sdk.metadata;
+package main.java.com.hpe.adm.nga.sdk.metadata;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * This class hold the field metadata object and serve all functionality concern to metadata of fields
@@ -7,13 +9,36 @@ package com.hpe.adm.nga.sdk.metadata;
  */
 public class FieldMetadata {
 	
+	//Enums
+	public enum FieldType {
+		@SerializedName("integer")
+		Integer, 
+		@SerializedName("long")
+		Long, 
+		@SerializedName("boolean")
+	    Boolean, 
+	    @SerializedName("date_time")
+	    DateTime,
+	    @SerializedName("date")
+	    Date, 
+	    @SerializedName("string")
+	    String, 
+	    @SerializedName("memo")
+	    Memo, 
+	    @SerializedName("object")
+	    Object,
+	    @SerializedName("reference")
+		Reference
+	}
+	
+	// Private
 	private String name;
 	private String label;
 	private String entity_name;
 	private boolean filterable;
 	private boolean sortable;
 	private boolean returned_by_default;
-	private String field_type;
+	private FieldType field_type;
 	private boolean required;
 	private int max_length;
 	private boolean unique;
@@ -21,18 +46,6 @@ public class FieldMetadata {
 	private String sanitization;
 	private FieldTypedata field_type_data;
 	
-	
-	public enum FieldType {
-	    Integer, 
-	    Long, 
-	    Boolean, 
-	    DateTime,
-	    Date, 
-	    String, 
-	    Memo, 
-	    Object,
-	    Refrence
-	}
 	
 	/**
 	 * This class hold the data structure of Field Target
@@ -131,13 +144,13 @@ public class FieldMetadata {
 	 * get FieldMetadata's field Type
 	 * @return
 	 */
-	public String getFieldType(){return field_type;};
+	public FieldType getFieldType(){return field_type;};
 	
 	/**
 	 * get FieldMetadata's Field Type data
 	 * @return
 	 */
-	public FieldTypedata getFieldTypedata(){return null;};
+	public FieldTypedata getFieldTypedata(){return field_type_data;};
 	
 	/**
 	 * get FieldMetadata's Max Length

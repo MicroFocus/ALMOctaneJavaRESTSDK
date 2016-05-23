@@ -1,5 +1,6 @@
-package com.hpe.adm.nga.sdk.model;
+package main.java.com.hpe.adm.nga.sdk.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -22,14 +23,28 @@ public class EntityModel {
 	 */
 	public EntityModel(Set<FieldModel> value){
 				
-		setValue(value);
+		setValues(value);
+	}
+	
+	/**
+	 * Creates a new EntityModel object with solo string filed
+	 * 
+	 * @param value
+	 *            - a collection of field models
+	 */
+	public EntityModel(String key,String value){
+				
+		Set<FieldModel> fieldModels = new HashSet<FieldModel>();
+		FieldModel fldModel = new StringFieldModel(key,value);
+		fieldModels.add(fldModel);
+		setValues(fieldModels);
 	}
 		
 	/**
 	 * getter of entity value
 	 * @return  a collection of field models
 	 */
-	public Set<FieldModel> getValue(){
+	public Set<FieldModel> getValues(){
 		return data;
 	};
 			
@@ -37,7 +52,7 @@ public class EntityModel {
 	 * 	setter of new entity value	
 	 * @param value - a collection of field models
 	 */
-	public void setValue(Set<FieldModel> value){
+	public void setValues(Set<FieldModel> value){
 		
 		data = value;
 	};

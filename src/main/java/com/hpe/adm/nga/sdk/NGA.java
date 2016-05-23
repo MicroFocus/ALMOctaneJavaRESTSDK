@@ -1,18 +1,24 @@
-package com.hpe.adm.nga.sdk;
+package main.java.com.hpe.adm.nga.sdk;
 
-import com.google.api.client.http.*;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.authorisation.Authorisation;
-import com.hpe.adm.nga.sdk.metadata.Metadata;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.net.HttpCookie;
 import java.util.List;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+
+import main.java.com.hpe.adm.nga.sdk.attachments.AttachmentList;
+import main.java.com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
+import main.java.com.hpe.adm.nga.sdk.exception.NgaException;
+import main.java.com.hpe.adm.nga.sdk.metadata.Metadata;
+import main.java.com.hpe.adm.nga.sdk.model.ErrorModel;
 
 
 /**
@@ -27,7 +33,8 @@ public class NGA {
 	private static final String SHARED_SPACES_DOMAIN_FORMAT= "%s/api/shared_spaces/%s/"; 
 	private static final String WORKSPACES_DOMAIN_FORMAT= "workspaces/%s/"; 
 	private static final String METADATA_DOMAIN_FORMAT= "metadata";
-	private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";	
+	private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";
+	
 	
 	//private memebers
 	private HttpRequestFactory requestFactory = null;
@@ -117,8 +124,8 @@ public class NGA {
 		private static final String HPSSO_HEADER_CSRF = "HPSSO_HEADER_CSRF";
 		private static final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
 		private static final String HPE_MQM_UI ="HPE_MQM_UI";
-		private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
-		private static final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";
+		private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
+		private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
 
 		
 		//Private
@@ -130,18 +137,20 @@ public class NGA {
 		private String urlDomain = "";
 		public String idsharedSpaceId = null;
 		private long workSpaceId = 0;
-		private final Authorisation authorisation;
+		private String userName = "";
+		private String password = "";
 		
 		
 		//Functions
 		
 		/** Creates a new Builder object 
 		 * 
-		 * @param authorisation - hold the details of Authorisation
-		 * @throws IOException
+		 * @param basicAuthorisation - hold the details of Authorisation
 		 */
-		public Builder(Authorisation authorisation) throws IOException {
-			this.authorisation = authorisation;
+		public Builder(BasicAuthorisation basicAuthorisation)  {
+
+	    	userName = basicAuthorisation.getUsername();
+	    	password = basicAuthorisation.getPassword();
 		}
 		
 		/**
@@ -208,10 +217,9 @@ public class NGA {
 		 * 3. Create a new NGA objects.
 		 *  
 		 * @return a new NGA object
-		 * @throws IOException
-		 * @throws JSONException
+		 * @throws RuntimeException
 		 */
-		public NGA build() throws IOException, JSONException{
+		public NGA build() throws RuntimeException{
 			
 			NGA objNga = null;
 			
@@ -219,10 +227,13 @@ public class NGA {
 	                .createRequestFactory(new HttpRequestInitializer() {
 	                    @Override
 	                    public void initialize(HttpRequest request) {
-	                    	// Authentication needed only in first initialization
+	                    	
+	                    	// BasicAuthentication needed only in first initialization
 	                    	if ((hppsValue!=null && hppsValue.isEmpty()) && (lwssoValue!=null && lwssoValue.isEmpty()))
 	                    	{
 								authorisation.executeAuthorisation(request);
+	                    		
+	                    		// username and password should be transient. 
 	                    	}
 	                    	else
 	                    	{
@@ -237,39 +248,47 @@ public class NGA {
 	                });
 			
 			GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
-			HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
-			logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL));
-			HttpResponse response = httpRequest.execute();
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage()));
+			try{
+				HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
+				logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
+				HttpResponse response = httpRequest.execute();
+				logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
 			
-			// Initialize Cookies keys
-			if (response.isSuccessStatusCode()) {
+			
+				// Initialize Cookies keys
+				if (response.isSuccessStatusCode()) {
 
-				HttpHeaders hdr1 = response.getHeaders();	
-				List<String> strHPSSOCookieCsrf1 = hdr1.getHeaderStringValues(SET_COOKIE);
-				String strCookies = strHPSSOCookieCsrf1.toString();
-				List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
-				
-				hppsValue = Cookies.stream().filter(a -> a.getName().equals(HPSSO_COOKIE_CSRF)).findFirst().get().getValue();
-				lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();
-				
-				// TBD - Remove after debugging
-				/* for (HttpCookie ck : Cookies) {
-					 
-					 if (ck.getName().equals(HPSSO_COOKIE_CSRF))
-						 hppsValue = ck.getValue();
-					 
-					 if (ck.getName().equals(LWSSO_COOKIE_KEY))
-						 lwssoValue = ck.getValue();
+					HttpHeaders hdr1 = response.getHeaders();	
+					List<String> strHPSSOCookieCsrf1 = hdr1.getHeaderStringValues(SET_COOKIE);
+					String strCookies = strHPSSOCookieCsrf1.toString();
+					List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
+					
+					hppsValue = Cookies.stream().filter(a -> a.getName().equals(HPSSO_COOKIE_CSRF)).findFirst().get().getValue();
+					lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();
+					
+					// TBD - Remove after debugging
+					/* for (HttpCookie ck : Cookies) {
 						 
-				 }*/
-				
-	           if((hppsValue!=null && !hppsValue.isEmpty()) && (lwssoValue!=null && !lwssoValue.isEmpty()))
-	           {
-	        	   objNga = new NGA(requestFactory,urlDomain,idsharedSpaceId,workSpaceId);
-	           }
+						 if (ck.getName().equals(HPSSO_COOKIE_CSRF))
+							 hppsValue = ck.getValue();
+						 
+						 if (ck.getName().equals(LWSSO_COOKIE_KEY))
+							 lwssoValue = ck.getValue();
+							 
+					 }*/
+					
+		           if((hppsValue!=null && !hppsValue.isEmpty()) && (lwssoValue!=null && !lwssoValue.isEmpty()))
+		           {
+		        	   objNga = new NGA(requestFactory,urlDomain,idsharedSpaceId,workSpaceId);
+		           }
+				}
 				 
 	        } 
+			catch (Exception e){
+
+				ErrorModel errorModel =  new ErrorModel(e.getMessage());
+				throw new NgaException(errorModel);
+			}
    	       	        
 	        return objNga;
 		}

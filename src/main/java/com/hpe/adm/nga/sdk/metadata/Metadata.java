@@ -1,40 +1,39 @@
-package com.hpe.adm.nga.sdk.metadata;
+package main.java.com.hpe.adm.nga.sdk.metadata;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.gson.Gson;
-import com.hpe.adm.nga.sdk.NGARequest;
-import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.metadata.Features.AttachmentsFeature;
-import com.hpe.adm.nga.sdk.metadata.Features.BuisnessRuleFeature;
-import com.hpe.adm.nga.sdk.metadata.Features.CommentsFeature;
-import com.hpe.adm.nga.sdk.metadata.Features.Feature;
-import com.hpe.adm.nga.sdk.metadata.Features.HierarchyFeature;
-import com.hpe.adm.nga.sdk.metadata.Features.MailingFeature;
-import com.hpe.adm.nga.sdk.metadata.Features.RestFeature;
-import com.hpe.adm.nga.sdk.metadata.Features.SubTypesFeature;
-import com.hpe.adm.nga.sdk.metadata.Features.SubTypesOfFeature;
-import java.io.IOException;
+
+import main.java.com.hpe.adm.nga.sdk.NGARequest;
+import main.java.com.hpe.adm.nga.sdk.Query;
+import main.java.com.hpe.adm.nga.sdk.exception.NgaException;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.AttachmentsFeature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.BuisnessRuleFeature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.CommentsFeature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.Feature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.HierarchyFeature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.MailingFeature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.RestFeature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.SubTypesFeature;
+import main.java.com.hpe.adm.nga.sdk.metadata.Features.SubTypesOfFeature;
+import main.java.com.hpe.adm.nga.sdk.model.ErrorModel;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import java.lang.reflect.Type;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * This class hold the  metadata object and serve all functionality concern to fields metadata and entity metadata
@@ -62,14 +61,13 @@ public class Metadata {
 	private static final String FEATURE_SUBTYPE_OF_NAME = "subtype_of";
 	private static final String FEATURE_HIERARCHICAL_ENTITY_NAME = "hierarchical_entity";
 	private static final String LOGGER_INVALID_FEATURE_FORMAT = ": not a valid feature";
-	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
-	private static final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";	
-    
+	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
+	private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";	
+	private static final String LOGGER_RESPONSE_JASON_FORMAT = "Response_Jason: %s";
+	
 	// private members
 	private HttpRequestFactory requestFactory = null;
 	private String urlDomain = "";
-	private String type = "";
-	private Query quaryEntities = null;
 	private Logger logger = LogManager.getLogger(Metadata.class.getName());
 	
 	/**
@@ -91,8 +89,8 @@ public class Metadata {
 	 * @return new metadata entity object
 	 */
 	public Entity entities(){
-		type = TYPE_NAME_ENTITIES_NAME;
-		return new Entity();
+		
+		return new Entity(TYPE_NAME_ENTITIES_NAME);
 	}
 	
 	/**
@@ -118,10 +116,8 @@ public class Metadata {
 			quaryList = quaryList + quaryEntities.getQueryString() + "||";
 		}
 		quaryList = quaryList.substring(0,quaryList.length()-2);*/
-		
-		type = TYPE_NAME_ENTITIES_QUERY_FORMAT + quaryList + "\"";
 				
-		return new Entity();
+		return new Entity(TYPE_NAME_ENTITIES_QUERY_FORMAT + quaryList + "\"");
 	}
 	
 	/**
@@ -129,8 +125,8 @@ public class Metadata {
 	 * @return
 	 */
 	public Field fields(){
-		type = TYPE_NAME_FIELDS_NAME;
-		return new Field();
+		
+		return new Field(TYPE_NAME_FIELDS_NAME);
 	}
 	
 	/**
@@ -157,10 +153,9 @@ public class Metadata {
 	            .stream()
 	            .map(s -> new Query.Field(QUERY_ENTITY_NAME_FIELD_NAME).equal(s).build().getQueryString())
 	            .collect(Collectors.joining("||"));
+	
 		
-		type = TYPE_NAME_FIELDS_QUERY_FORMAT + quaryList + "\"";
-		
-		return new Field();
+		return new Field(TYPE_NAME_FIELDS_QUERY_FORMAT + quaryList + "\"");
 	}
 	
 	/**
@@ -210,9 +205,8 @@ public class Metadata {
 	 * get a entities metadata collection based on a given jason string
 	 * @param json
 	 * @return entity metadata collection based on a given jason string
-	 * @throws JSONException
 	 */
-	protected  Collection<EntityMetadata> getEntitiesMetadata(String json) throws JSONException {
+	protected  Collection<EntityMetadata> getEntitiesMetadata(String json)  {
 		
 		JSONTokener tokener = new JSONTokener(json);
 		JSONObject jasoObj = new JSONObject(tokener);
@@ -237,9 +231,8 @@ public class Metadata {
 	 * get a fields metadata collection based on a given jason string
 	 * @param json
 	 * @return fields metadata collection based on a given jason string
-	 * @throws JSONException
 	 */
-	protected  Collection<FieldMetadata> getFieldMetadata(String json) throws JSONException {
+	protected  Collection<FieldMetadata> getFieldMetadata(String json) {
 		
 		JSONTokener tokener = new JSONTokener(json);
 		JSONObject jasoObj = new JSONObject(tokener);
@@ -267,9 +260,8 @@ public class Metadata {
 	 * get a new EntityMetadata object based on jason object
 	 * @param jasoEntityObj - Jason object
 	 * @return new EntityMetadata object
-	 * @throws JSONException
 	 */
-	protected  EntityMetadata getEntityMetadata(JSONObject jasoEntityObj) throws JSONException {
+	protected  EntityMetadata getEntityMetadata(JSONObject jasoEntityObj)  {
 
 		Set<Feature> features = new HashSet<Feature>();
 		String name = jasoEntityObj.getString(JSON_NAME_FIELD_NAME);
@@ -288,34 +280,67 @@ public class Metadata {
 	}
 	
 	/**
+	 * Handle exceptions
+	 * @param e - exception
+	 * @throws RuntimeException
+	 */
+	protected void handleException(Exception e) throws RuntimeException{
+		
+		ErrorModel errorModel =  new ErrorModel(e.getMessage());
+		throw new NgaException(errorModel);
+		
+	}
+	
+	/**
 	 * This class hold the entity metadata object
 	 * @author Moris oz
 	 *
 	 */
 	public  class Entity extends NGARequest<Collection<EntityMetadata>> {
 		
+		
+		private String type = "";
+		
+		/**
+		 * Creates a new entity object
+		 * 
+		 * @param typeName  - Type Value
+		 */
+		public Entity(String typeValue){
+			
+			type = typeValue;
+		}
+		
 		/**
 		 * Get Request execution of metadata's entity info
 		 * Collection<EntityModel> object
 		 */
 		@Override
-		public Collection<EntityMetadata> execute() throws Exception {
+		public Collection<EntityMetadata> execute() throws RuntimeException {
 			
-			String url = urlDomain+ "/" + type;
-						
-			GenericUrl domain = new GenericUrl(url);
-			HttpRequest httpRequest = requestFactory.buildGetRequest(domain);
-			logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url));
-			HttpResponse response = httpRequest.execute();
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage()));
 			Collection<EntityMetadata> entitiesMetadata = null;
-
-			if (response.isSuccessStatusCode()) {
-
-				String json = response.parseAsString();
-				entitiesMetadata = getEntitiesMetadata(json);
+			String url = urlDomain+ "/" + type;
+			String json = "";			
+			GenericUrl domain = new GenericUrl(url);
+			try{
+				HttpRequest httpRequest = requestFactory.buildGetRequest(domain);
+				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
+				HttpResponse response = httpRequest.execute();
+				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+				
+				if (response.isSuccessStatusCode()) {
+	
+					json = response.parseAsString();
+					entitiesMetadata = getEntitiesMetadata(json);
+				}
+				
+				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
 			}
-
+			catch (Exception e){
+				
+				handleException(e);
+			}
+			
 			return entitiesMetadata;
 			
 		}
@@ -328,28 +353,48 @@ public class Metadata {
 	 */
 	public  class Field extends NGARequest<Collection<FieldMetadata>> {
 		
+		private String type = "";
+		
+		/**
+		 * Creates a new Field object
+		 * 
+		 * @param typeName  - Type Value
+		 */
+		public Field(String typeValue){
+			
+			type = typeValue;
+		}
+		
 		/**
 		 * Get Request execution of metadata's field info
 		 * Collection<EntityModel> object
 		 */
 		@Override
-		public Collection<FieldMetadata> execute() throws IOException, JSONException {
+		public Collection<FieldMetadata> execute() throws RuntimeException {
 			
-			String url = urlDomain+ "/" + type;
-			
-			GenericUrl urlDomain = new GenericUrl(url);
-			HttpRequest httpRequest = requestFactory.buildGetRequest(urlDomain);
-			logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url));
-			HttpResponse response = httpRequest.execute();
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage()));
 			Collection<FieldMetadata> colEntitiesMetadata = null;
-
-			if (response.isSuccessStatusCode()) {
-
-				String json = response.parseAsString();
-				colEntitiesMetadata = getFieldMetadata(json);
+			String url = urlDomain+ "/" + type;
+			String json = "";
+			GenericUrl urlDomain = new GenericUrl(url);
+			try{
+				 
+				HttpRequest httpRequest = requestFactory.buildGetRequest(urlDomain);
+				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
+				HttpResponse response = httpRequest.execute();
+				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+				
+				if (response.isSuccessStatusCode()) {
+	
+					json = response.parseAsString();
+					colEntitiesMetadata = getFieldMetadata(json);
+				}
+				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
 			}
-
+			catch (Exception e){
+				
+				handleException(e);
+			}
+			
 			return colEntitiesMetadata;
 		
 		}

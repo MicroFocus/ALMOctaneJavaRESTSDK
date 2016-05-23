@@ -1,9 +1,10 @@
-package com.hpe.adm.nga.sdk;
+package main.java.com.hpe.adm.nga.sdk;
 
 import com.google.api.client.http.HttpRequestFactory;
-import com.hpe.adm.nga.sdk.model.EntityModel;
+
+import main.java.com.hpe.adm.nga.sdk.model.EntityModel;
+
 import java.util.Collection;
-import org.json.JSONException;
 
 /**
  * This class hold the entities objects and serve all functionality concern to entities.
@@ -72,10 +73,8 @@ public class EntityList {
 
 	/**
 	 * TBD - Remove after testing
-	 * 
-	 * @throws JSONException
 	 */
-	public Collection<EntityModel> testGetEntityModels(String jason) throws JSONException {
+	public Collection<EntityModel> testGetEntityModels(String jason)  {
 
 		return entityListService.testGetEntityModels(jason);
 	}

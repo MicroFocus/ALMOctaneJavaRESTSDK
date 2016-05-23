@@ -1,6 +1,4 @@
-package com.hpe.adm.nga.sdk.authorisation;
-
-import com.google.api.client.http.HttpRequest;
+package main.java.com.hpe.adm.nga.sdk.authorisation;
 
 /**
  * Interface of Authorization , hold contract functions.
@@ -8,7 +6,9 @@ import com.google.api.client.http.HttpRequest;
  *
  */
 public interface Authorisation {
-	void executeAuthorisation(HttpRequest request);
+	
+	 String getUsername();
+	 String getPassword();
 }
 
 

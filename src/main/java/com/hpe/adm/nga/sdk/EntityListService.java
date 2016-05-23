@@ -1,39 +1,38 @@
-package com.hpe.adm.nga.sdk;
+package main.java.com.hpe.adm.nga.sdk;
 
 import com.google.api.client.http.ByteArrayContent;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpMediaType;
-import com.google.api.client.http.HttpMethods;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
-import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.http.MultipartContent;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson.JacksonFactory;
-import com.hpe.adm.nga.sdk.exception.NgaException;
-import com.hpe.adm.nga.sdk.exception.NgaPartialException;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.ErrorModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.LongFieldModel;
-import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
-import com.hpe.adm.nga.sdk.model.ReferenceErrorModel;
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 
+import main.java.com.hpe.adm.nga.sdk.exception.NgaException;
+import main.java.com.hpe.adm.nga.sdk.exception.NgaPartialException;
+import main.java.com.hpe.adm.nga.sdk.model.BooleanFieldModel;
+import main.java.com.hpe.adm.nga.sdk.model.DateFieldModel;
+import main.java.com.hpe.adm.nga.sdk.model.EntityModel;
+import main.java.com.hpe.adm.nga.sdk.model.ErrorModel;
+import main.java.com.hpe.adm.nga.sdk.model.FieldModel;
+import main.java.com.hpe.adm.nga.sdk.model.LongFieldModel;
+import main.java.com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
+import main.java.com.hpe.adm.nga.sdk.model.ReferenceErrorModel;
+import main.java.com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
+import main.java.com.hpe.adm.nga.sdk.model.StringFieldModel;
 
-
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
-
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -42,9 +41,9 @@ import java.util.stream.IntStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
 
 /**
  * This class hold the entities objects and serve all functionality concern to
@@ -58,21 +57,16 @@ public class EntityListService {
 	// constant
 	private static final String JSON_DATA_NAME = "data";
 	private static final String JSON_ERRORS_NAME = "errors";
-	private static final String JSON_ID_NAME = "id";
-	private static final String JSON_TYPE_NAME = "type";
-	private static final String JSON_ENTITY_ID_NAME = "entity_id";
-	private static final String JSON_ENTITY_TYPE_NAME = "entity_type";
 	private static final String JSON_TOTAL_COUNT_NAME = "total_count";
 	private static final String JSON_EXCEEDS_TOTAL_COUNT_NAME = "exceeds_total_count";
-	private static final String JSON_NULL_VALUE = "null";
 	private static final String LIMIT_PARAM_FORMAT = "limit=%d&";
 	private static final String OFFSET_PARAM_FORMAT = "offset=%d&";
 	private static final String FIELDS_PARAM_FORMAT = "fields=%s";
 	private static final String ORDER_BY_PARAM_FORMAT = "order_by=%s";
 	private static final String QUERY_PARAM_FORMAT = "query=\"%s\"";
-	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s";
-	private static final String LOGGER_REQUEST_CONTENT_FORMAT = "Request: %s - %s:%s";
-	private static final String LOGGER_RESPONSE_FORMAT = "Response: %s:%s";
+	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
+	private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
+	private static final String LOGGER_RESPONSE_JASON_FORMAT = "Response_Jason: %s";
 	private static final String HTTP_MEDIA_TYPE_MULTIPART_NAME = "multipart/form-data";
 	private static final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
 	private static final String HTTP_MULTIPART_BOUNDARY_VALUE = "---------------------------92348603315617859231724135434";
@@ -84,6 +78,10 @@ public class EntityListService {
 	private static final String HTTP_APPLICATION_OCTET_STREAM_VALUE = "application/octet-stream";
 	private static final long HTTPS_CONFLICT_STATUS_CODE = 409;
 	private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = " field scheme is invalid";
+	private static final String REGEX_DATE_FORMAT = "\\d{4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z";
+	private  static final String DATE_TIME_ISO_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss'Z'";
+	private  static final String LOGGER_INVALID_DATE_SCHEME_FORMAT 	= " date scheme is invalid";
+
 	
 	// private members
 	private String urlDomain = "";
@@ -164,9 +162,8 @@ public class EntityListService {
 	/**
 	 * TBD - Remove after testing
 	 * 
-	 * @throws JSONException
 	 */
-	public Collection<EntityModel> testGetEntityModels(String jason) throws JSONException {
+	public Collection<EntityModel> testGetEntityModels(String jason)  {
 
 
 		JSONObject jasonObj = new JSONObject(jason);
@@ -193,17 +190,16 @@ public class EntityListService {
 	 * @param urlDomain
 	 *            - domain name
 	 * @return url string ready to transmit
-	 * @throws UnsupportedEncodingException
 	 */
-	protected String urlBuilder(String urlDomain,String fieldsParams,String orderByParam,long limitParam,long ofsetParam,Query queryParams) throws UnsupportedEncodingException {
+	protected String urlBuilder(String urlDomain,String fieldsParams,String orderByParam,long limitParam,long ofsetParam,Query queryParams)  {
 
 		// Construct url paramters
 		fieldsParams = (fieldsParams != null && !fieldsParams.isEmpty())
 				? String.format(FIELDS_PARAM_FORMAT, fieldsParams) : "";
 		fieldsParams = (fieldsParams != null && !fieldsParams.isEmpty())
 				? fieldsParams.substring(0, fieldsParams.length() - 1) + "&" : "";
-		String limitParamString = limitParam != 0 ? String.format(LIMIT_PARAM_FORMAT, limitParam) : "";
-		String OfsetParamString = ofsetParam != 0 ? String.format(OFFSET_PARAM_FORMAT, ofsetParam) : "";
+		String limitParamString = limitParam >= 0 ? String.format(LIMIT_PARAM_FORMAT, limitParam) : "";
+		String OfsetParamString = ofsetParam >= 0 ? String.format(OFFSET_PARAM_FORMAT, ofsetParam) : "";
 		orderByParam = (orderByParam != null && !orderByParam.isEmpty())
 				? String.format(ORDER_BY_PARAM_FORMAT, orderByParam) : "";
 		orderByParam = (orderByParam != null && !orderByParam.isEmpty())
@@ -229,10 +225,10 @@ public class EntityListService {
 	 * @return url string ready to transmit
 	 * @throws UnsupportedEncodingException
 	 */
-	protected String urlBuilder(String urlDomain,Query queryParams) throws UnsupportedEncodingException {
+	protected String urlBuilder(String urlDomain,Query queryParams)  {
 
 		
-		return urlBuilder(urlDomain,"","",0,0,queryParams);
+		return urlBuilder(urlDomain,"","",Long.MIN_VALUE,Long.MIN_VALUE,queryParams);
 
 	}
 	
@@ -241,13 +237,26 @@ public class EntityListService {
 	 * given domain name and the global quarry parameters of entity list.
 	 * 
 	 * @param urlDomain	 - domain name
+	 * @param queryParams- query parameters
 	 * @return url string ready to transmit
-	 * @throws UnsupportedEncodingException
 	 */
-	protected String urlBuilder(String urlDomain) throws UnsupportedEncodingException {
+	protected String urlBuilder(String urlDomain,String fieldsParams) {
+
+		return urlBuilder(urlDomain,fieldsParams,"",Long.MIN_VALUE,Long.MIN_VALUE,null);
+	}
+	
+	/**
+	 * A utility class for building a URIs with various components, based on the
+	 * given domain name and the global quarry parameters of entity list.
+	 * 
+	 * @param urlDomain	 - domain name
+	 * @return url string ready to transmit
+	 */
+	protected String urlBuilder(String urlDomain)  {
 
 		
-		return urlBuilder(urlDomain,null);
+		Query queryParams = null;
+		return urlBuilder(urlDomain,queryParams);
 
 	}
 
@@ -256,9 +265,8 @@ public class EntityListService {
 	 * 
 	 * @param json
 	 * @return entity model collection based on a given jason string
-	 * @throws JSONException
 	 */
-	protected  Collection<EntityModel> getEntities(String json) throws JSONException {
+	protected  Collection<EntityModel> getEntities(String json) {
 
 		JSONTokener tokener = new JSONTokener(json);
 		JSONObject jasoObj = new JSONObject(tokener);
@@ -313,11 +321,10 @@ public class EntityListService {
 	 * 
 	 * @param entityModel
 	 * @return new jason object based on a given EntityModel object
-	 * @throws JSONException
 	 */
-	protected JSONObject getEntityJSONObject(EntityModel entityModel) throws JSONException {
+	protected JSONObject getEntityJSONObject(EntityModel entityModel)  {
 
-		Set<FieldModel> fieldModels = entityModel.getValue();
+		Set<FieldModel> fieldModels = entityModel.getValues();
 		JSONObject objField = new JSONObject();
 		fieldModels.forEach((i)->objField.put(i.getName(),getFieldValue(i)));
 		
@@ -337,9 +344,8 @@ public class EntityListService {
 	 * @param colEntities
 	 *            - Collection of entities models
 	 * @return new jason object conatin entities data
-	 * @throws JSONException
 	 */
-	protected JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels) throws JSONException {
+	protected JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels)  {
 
 		JSONObject objBase = new JSONObject();
 		JSONArray objEntities = new JSONArray();
@@ -366,9 +372,8 @@ public class EntityListService {
 	 * @param jasoEntityObj
 	 *            - Jason object
 	 * @return new EntityModel object
-	 * @throws JSONException
 	 */
-	protected EntityModel getEntityModel(JSONObject jasoEntityObj) throws JSONException {
+	protected EntityModel getEntityModel(JSONObject jasoEntityObj) {
 
 		Set<FieldModel> fieldModels = new HashSet<FieldModel>();
 		Iterator<?> keys = jasoEntityObj.keys();
@@ -384,6 +389,9 @@ public class EntityListService {
 			}
 			else if(aObj instanceof Long || aObj instanceof Integer){
 				fldModel = new LongFieldModel(strKey, Long.parseLong(aObj.toString()));
+			}
+			else if(aObj instanceof Boolean ){
+				fldModel = new BooleanFieldModel(strKey, Boolean.parseBoolean(aObj.toString()));
 			}
 			else if( aObj instanceof JSONObject ){
 
@@ -401,8 +409,23 @@ public class EntityListService {
 				}
 						
 			}
-			else if( aObj instanceof String || aObj instanceof Boolean){
-				fldModel = new StringFieldModel(strKey, aObj.toString());
+			else if( aObj instanceof String ){
+				
+				boolean isMatch =  aObj.toString().matches(REGEX_DATE_FORMAT);
+				if(isMatch == true){
+
+					DateFormat df = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
+					try{
+						Date result =  df.parse(aObj.toString());
+						fldModel = new DateFieldModel(strKey, result);
+					}
+				    catch ( Exception ex ){
+				    	logger.debug(aObj + LOGGER_INVALID_DATE_SCHEME_FORMAT);
+				    }
+				}
+				else{
+					fldModel = new StringFieldModel(strKey, aObj.toString());
+				}
 			}
 			else{
 				logger.debug(strKey + LOGGER_INVALID_FIELD_SCHEME_FORMAT);
@@ -420,15 +443,14 @@ public class EntityListService {
 	 * Get Error models based on a given error jason string
 	 * @param jason - jason string with error information
 	 * @return collection of error models
-	 * @throws JSONException
 	 */
-	protected Collection<ErrorModel> getErrorModels(String jason) throws JSONException {
+	protected Collection<ErrorModel> getErrorModels(String jason) {
 
 		JSONTokener tokener = new JSONTokener(jason);
 		JSONObject jasoObj = new JSONObject(tokener);
 		JSONArray jasoErrArr = jasoObj.getJSONArray(JSON_ERRORS_NAME);
 		Collection<ErrorModel> ErrModels = new ArrayList<ErrorModel>();
-		IntStream.range(0, jasoErrArr.length()).forEach((i)->ErrModels.add(getErrorModel(jasoErrArr.getJSONObject(i).toString())));
+		IntStream.range(0, jasoErrArr.length()).forEach((i)->ErrModels.add(getErrorModelFromJason(jasoErrArr.getJSONObject(i).toString())));
 		
 		// TBD- Remove after debug
 		// prepare entity collection
@@ -446,9 +468,8 @@ public class EntityListService {
 	 *  Get Error model based on a given error jason string
 	 * @param jason - jason string with error information
 	 * @return error model
-	 * @throws JSONException
 	 */
-	protected ErrorModel getErrorModel(String jason) throws JSONException {
+	protected ErrorModel getErrorModelFromJason(String jason){
 
 			JSONTokener tokener = new JSONTokener(jason);
 			JSONObject jasoErrObj = new JSONObject(tokener);
@@ -483,51 +504,34 @@ public class EntityListService {
 			return new ErrorModel(fieldModels);
 	}
 	
+	
 	/**
 	 * get entities result based on Http Request
 	 * @param httpRequest - http request
 	 * @return entities ased on Http Request
-	 * @throws Exception 
+	 * * @throws Exception
 	 */
-	protected Collection<EntityModel> getEntitiesResponse(HttpRequest httpRequest,boolean partialSupport) throws Exception{
+	protected Collection<EntityModel> getEntitiesResponse(HttpRequest httpRequest) throws Exception{
 	
-		Collection<EntityModel> entityModels = null;
-		logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString()));
-		try{
+		Collection<EntityModel> newEntityModels = null;
+		logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(),httpRequest.getHeaders().toString()));
 			
-			HttpResponse response = httpRequest.execute();
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage()));
+		HttpResponse response = httpRequest.execute();
+		logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
 		
-			String json = response.parseAsString();
-			if (response.isSuccessStatusCode() && json!=null && !json.isEmpty()) {
+		String json = response.parseAsString();
+		logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
+			
+		if (response.isSuccessStatusCode() && json!=null && !json.isEmpty()) {
 
-				entityModels = getEntities(json);
-			}
-			
-			// Update request factory with the latest response Cookie
-			requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
-			
+			newEntityModels = getEntities(json);
 		}
-		catch (HttpResponseException e){
 			
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, e.getStatusCode(), e.getStatusMessage()));
-			if (partialSupport && e.getStatusCode() == HTTPS_CONFLICT_STATUS_CODE ) {
-               
-            	Collection<EntityModel> entities = getEntities(e.getContent());
-            	Collection<ErrorModel> errorModels = getErrorModels(e.getContent());
-            	throw new NgaPartialException(errorModels,entities);
-            }
-			else
-			{
-				ErrorModel errorModel = getErrorModel(e.getContent());
-				throw new NgaException(errorModel);
-			}
+		// Update request factory with the latest response Cookie
+		requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
+		return newEntityModels;
+	}
 	
-		}
-	
-	return entityModels;
-	
-}
 	/**
 	 * get entity result based on Http Request
 	 * @param httpRequest
@@ -537,32 +541,58 @@ public class EntityListService {
 	protected EntityModel getEntityResponse(HttpRequest httpRequest) throws Exception{
 		
 		EntityModel newEntityModel = null;
-		logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString()));
-		try{
-			HttpResponse response = httpRequest.execute();
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage()));
-			String json = response.parseAsString();
-			if (response.isSuccessStatusCode() && (json!=null && !json.isEmpty())) {
+		logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(),httpRequest.getHeaders().toString()));
+		
+		HttpResponse response = httpRequest.execute();
+		logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+		String json = response.parseAsString();
+		logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
+		if (response.isSuccessStatusCode() && (json!=null && !json.isEmpty())) {
 
 				JSONTokener tokener = new JSONTokener(json);
 				JSONObject jasoObj = new JSONObject(tokener);
 				newEntityModel = getEntityModel(jasoObj);
-
 			}
 			
-			// Update request factory with the latest response Cookie
-			requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
-					
-		}catch (HttpResponseException e){
-			
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, e.getStatusCode(), e.getStatusMessage()));
-			ErrorModel errorModel = getErrorModel(e.getContent());
-			throw new NgaException(errorModel);
-
-		}
-	
+		// Update request factory with the latest response Cookie
+		requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
+		
 		return newEntityModel;
 		
+	}
+	
+	/**
+	 * Handle exceptions
+	 * @param e - exception
+	 * @param partialSupport - Is Partial ?
+	 * @throws RuntimeException
+	 */
+	protected void handleException(Exception e,boolean partialSupport) throws RuntimeException{
+		
+		
+		if (e instanceof HttpResponseException ){
+			
+			HttpResponseException httpResponseException = (HttpResponseException)e; 
+			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(),httpResponseException.getHeaders().toString()));
+			if (partialSupport && httpResponseException.getStatusCode() == HTTPS_CONFLICT_STATUS_CODE ) {
+               
+            	Collection<EntityModel> entities = getEntities(httpResponseException.getContent());
+            	Collection<ErrorModel> errorModels = getErrorModels(httpResponseException.getContent());
+            	throw new NgaPartialException(errorModels,entities);
+            }
+			else
+			{
+				ErrorModel errorModel = getErrorModelFromJason(httpResponseException.getContent());
+				throw new NgaException(errorModel);
+			}
+	
+		}
+		else{
+			
+			ErrorModel errorModel =  new ErrorModel(e.getMessage());
+			throw new NgaException(errorModel);
+			
+		}
 	}
 	
 	// **** Classes ***
@@ -577,23 +607,35 @@ public class EntityListService {
 
 		private String fieldsParams = "";
 		private String orderByParam = "";
-		private long limitParam = 0;
-		private long ofsetParam = 0;
+		private long limitParam = Long.MIN_VALUE;
+		private long ofsetParam =  Long.MIN_VALUE;
 		private Query queryParams = null;
 
 		// Public
 
 		/**
-		 * 1. Request Get Execution 2. Parse response to a new Collection
+		 * 1. Request Get Execution 
+		 * 2. Parse response to a new Collection
 		 * <EntityModel> object
 		 */
 		@Override
-		public Collection<EntityModel> execute() throws Exception {
+		public Collection<EntityModel> execute() throws RuntimeException {
 
+
+			Collection<EntityModel> newEntityModels = null;
 			String url = urlBuilder(urlDomain,fieldsParams,orderByParam,limitParam,ofsetParam,queryParams);
 			GenericUrl domain = new GenericUrl(url);
-			HttpRequest httpRequest = requestFactory.buildGetRequest(domain);
-			return getEntitiesResponse(httpRequest,false);
+			
+			try{
+				HttpRequest httpRequest = requestFactory.buildGetRequest(domain);
+				newEntityModels =  getEntitiesResponse(httpRequest);
+			}
+			catch (Exception e){
+				
+				handleException(e,false);
+			}
+			
+			return newEntityModels;
 		}
 
 		/**
@@ -668,7 +710,7 @@ public class EntityListService {
 	 */
 	public class Update extends NGARequest<Collection<EntityModel>> {
 
-		private Collection<EntityModel> entityModels;
+		private Collection<EntityModel> entityModels = null;
 		private Query queryParams = null;
 		
 		/**
@@ -678,20 +720,31 @@ public class EntityListService {
 		 * <EntityModel> object
 		 */
 		@Override
-		public Collection<EntityModel> execute() throws Exception /*throws NgaPartialException,NgaException,IOException,UnsupportedEncodingException*/ {
+		public Collection<EntityModel> execute() throws RuntimeException  {
 
+			Collection<EntityModel> newEntityModels = null;
 			String url = urlBuilder(urlDomain,queryParams);
 			GenericUrl domain = new GenericUrl(url);
 			JSONObject objBase = getEntitiesJSONObject(entityModels);
 			String jasonEntityModel = objBase.toString();
+			
+			try{
+				HttpRequest httpRequest = requestFactory.buildPutRequest(domain,
+						ByteArrayContent.fromString(null, jasonEntityModel));
 
-			HttpRequest httpRequest = requestFactory.buildPutRequest(domain,
-					ByteArrayContent.fromString(null, jasonEntityModel));
-
-			// add default headers
-			httpRequest.getHeaders().setContentType("application/json");
-			httpRequest.getHeaders().setAccept("application/json");
-			return getEntitiesResponse(httpRequest,true) ;
+				// add default headers
+				httpRequest.getHeaders().setContentType("application/json");
+				httpRequest.getHeaders().setAccept("application/json");
+				newEntityModels = getEntitiesResponse(httpRequest) ;
+				
+			}
+			catch (Exception e){
+				
+				handleException(e,true);
+			}
+			
+			return newEntityModels;
+			
 		}
 
 		/**
@@ -726,7 +779,7 @@ public class EntityListService {
 	 */
 	public class Create extends NGARequest<Collection<EntityModel>> {
 
-		private Collection<EntityModel> entityModels;
+		private Collection<EntityModel> entityModels = null;
 
 		/**
 		 * 1. build Entity Jason Object from Collection<EntityModel> 2. Post
@@ -734,21 +787,28 @@ public class EntityListService {
 		 * Collection<EntityModel> object
 		 */
 		@Override
-		public Collection<EntityModel> execute() throws Exception {
+		public Collection<EntityModel> execute() throws RuntimeException {
 
+			Collection<EntityModel> newEntityModels = null;
 			String url = urlBuilder(urlDomain);
 			GenericUrl urlDomain = new GenericUrl(url);
 			JSONObject objBase = getEntitiesJSONObject(entityModels);
 			String strJasonEntityModel = objBase.toString();
+			try{
+				HttpRequest httpRequest = requestFactory.buildPostRequest(urlDomain,
+						ByteArrayContent.fromString(null, strJasonEntityModel));
 
-			HttpRequest httpRequest = requestFactory.buildPostRequest(urlDomain,
-					ByteArrayContent.fromString(null, strJasonEntityModel));
-
-			// add default headers
-			httpRequest.getHeaders().setContentType("application/json");
-			httpRequest.getHeaders().setAccept("application/json");
-			return getEntitiesResponse(httpRequest,true) ;
-
+				// add default headers
+				httpRequest.getHeaders().setContentType("application/json");
+				httpRequest.getHeaders().setAccept("application/json");
+				newEntityModels =  getEntitiesResponse(httpRequest);
+			}
+			catch (Exception e){
+				
+				handleException(e,true);
+			}
+			
+			return newEntityModels;
 		}
 		
 		/**
@@ -760,9 +820,10 @@ public class EntityListService {
 		 * @return - response - collection of entity models which have been created
 		 * @throws Exception 
 		 */
-		public Collection<EntityModel> executeMultipart(Collection<EntityModel> entities, String strFileName)
-				throws Exception {
+		public Collection<EntityModel> executeMultipart(Collection<EntityModel> entities, InputStream inputStream,String contentType,String contentName)
+				throws RuntimeException {
 
+			Collection<EntityModel> newEntityModels = null;
 			String url = urlBuilder(urlDomain);
 			GenericUrl urlDomain = new GenericUrl(url);
 
@@ -778,15 +839,21 @@ public class EntityListService {
 			part1.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT, HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE)));
 			content.addPart(part1);
 
-			// Add file
-			File file = new File(strFileName);
-			FileContent fileContent = new FileContent("text/plain", file);
-			MultipartContent.Part part2 = new MultipartContent.Part(fileContent);
-			part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, strFileName)));
+			// Add Stream
+			InputStreamContent inputStreamContent  = new InputStreamContent(contentType,inputStream);
+			MultipartContent.Part part2 = new MultipartContent.Part(inputStreamContent);
+			part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, contentName)));
 			content.addPart(part2);
 			
-			HttpRequest httpRequest = requestFactory.buildPostRequest(urlDomain, content);
-			return getEntitiesResponse(httpRequest,false) ;
+			try{
+				HttpRequest httpRequest = requestFactory.buildPostRequest(urlDomain, content);
+				newEntityModels =  getEntitiesResponse(httpRequest);
+			}
+			catch (Exception e){
+				handleException(e,false);
+			}
+			
+			return newEntityModels;
 
 		}
 
@@ -819,13 +886,22 @@ public class EntityListService {
 		 * @return null
 		 */
 		@Override
-		public Collection<EntityModel> execute() throws Exception {
+		public Collection<EntityModel> execute() throws RuntimeException {
 
+			Collection<EntityModel> newEntityModels = null;
 			String url = urlBuilder(urlDomain,queryParams);
-
 			GenericUrl urlDomain = new GenericUrl(url);
-			HttpRequest httpRequest = requestFactory.buildDeleteRequest(urlDomain);
-			return getEntitiesResponse(httpRequest,false);
+			
+			try{
+				HttpRequest httpRequest = requestFactory.buildDeleteRequest(urlDomain);
+				newEntityModels = getEntitiesResponse(httpRequest);
+			}
+			catch (Exception e){
+				
+				handleException(e,false);
+			}
+			
+			return newEntityModels;
 			
 		}
 		
@@ -898,10 +974,7 @@ public class EntityListService {
 		public class Get extends NGARequest<EntityModel> {
 
 			private String fieldsParams = "";
-			private String orderByParam = "";
-			private long limitParam = 0;
-			private long ofsetParam = 0;
-			private Query queryParams = null;
+			
 			
 			/**
 			 * 
@@ -909,56 +982,62 @@ public class EntityListService {
 			 * new Collection<EntityModel> object
 			 */
 			@Override
-			public EntityModel execute() throws Exception {
+			public EntityModel execute() throws RuntimeException {
 
 				EntityModel newEntityModel = null;
 				String domain = urlDomain + "/" + String.valueOf(iEntityId);
-				String url = urlBuilder(domain,fieldsParams,orderByParam,limitParam,ofsetParam,queryParams);
+				String url = urlBuilder(domain,fieldsParams);
 				GenericUrl urlDomain = new GenericUrl(url);
-				HttpRequest httpRequest = requestFactory.buildGetRequest(urlDomain);
-				httpRequest.getHeaders().setAccept(HTTP_APPLICATION_JASON_VALUE);
-				return getEntityResponse(httpRequest);
+				try{
+					HttpRequest httpRequest = requestFactory.buildGetRequest(urlDomain);
+					httpRequest.getHeaders().setAccept(HTTP_APPLICATION_JASON_VALUE);
+					newEntityModel = getEntityResponse(httpRequest);
+				}
+				catch (Exception e){
+					
+					handleException(e,false);
+				}
+				
+				return newEntityModel;
 				
 			}
 			
 			/**
 			 * Get binary data
 			 * @return - Stream with binary data
-			 * @throws JSONException
-			 * @throws IOException
+			 * @throws RuntimeException
 			 */
-			public InputStream executeBinary() throws Exception {
+			public InputStream executeBinary() throws RuntimeException {
 
+				InputStream inputStream = null;
 				String domain = urlDomain + "/" + String.valueOf(iEntityId);
-				String url = urlBuilder(domain,fieldsParams,orderByParam,limitParam,ofsetParam,queryParams);
+				String url = urlBuilder(domain,fieldsParams);
 
 				GenericUrl urlDomain = new GenericUrl(url);
-
-				HttpRequest httpRequest = requestFactory.buildGetRequest(urlDomain);
-				httpRequest.getHeaders().setAccept(HTTP_APPLICATION_OCTET_STREAM_VALUE);
-				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url));
 				try{
+					HttpRequest httpRequest = requestFactory.buildGetRequest(urlDomain);
+					httpRequest.getHeaders().setAccept(HTTP_APPLICATION_OCTET_STREAM_VALUE);
+					logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
+				
 					HttpResponse response = httpRequest.execute();
-					logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage()));
-	
+					logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+					
 					if (response.isSuccessStatusCode()) {
-	
-						return response.getContent();
-	
+
+						inputStream = response.getContent();
 					}
 					
 					// Update request factory with the latest response Cookie
 					requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
 				
 				}
-				catch (HttpResponseException e){
-			
-					logger.debug(String.format(LOGGER_RESPONSE_FORMAT, e.getStatusCode(), e.getStatusMessage()));
-					ErrorModel errorModel = getErrorModel(e.getContent());
-					throw new NgaException(errorModel);
+				catch (Exception e){
+						
+					handleException(e,false);
+					
 				}
 				
-				return null;
+				return inputStream;
 			}
 
 			/**
@@ -989,25 +1068,32 @@ public class EntityListService {
 			 * 1. Update Request execution with jason data 2. Parse response to
 			 * a new EntityModel object
 			 * 
-			 * @throws IOException
-			 * @throws JSONException
+			 * @throws RuntimeException
 			 */
 			@Override
-			public EntityModel execute() throws Exception {
+			public EntityModel execute() throws RuntimeException {
 
 				EntityModel newEntityModel = null;
 				String domain = urlDomain + "/" + String.valueOf(iEntityId);
 				GenericUrl urlDomain = new GenericUrl(domain);
 				JSONObject objBase = getEntityJSONObject(entityModel);
 				String jasonEntityModel = objBase.toString();
+				
+				try{
+					HttpRequest httpRequest = requestFactory.buildPutRequest(urlDomain,
+							ByteArrayContent.fromString(null, jasonEntityModel));
 
-				HttpRequest httpRequest = requestFactory.buildPutRequest(urlDomain,
-						ByteArrayContent.fromString(null, jasonEntityModel));
-
-				// add default headers
-				httpRequest.getHeaders().setContentType(HTTP_APPLICATION_JASON_VALUE);
-				httpRequest.getHeaders().setAccept(HTTP_APPLICATION_JASON_VALUE);
-				return getEntityResponse(httpRequest);
+					// add default headers
+					httpRequest.getHeaders().setContentType(HTTP_APPLICATION_JASON_VALUE);
+					httpRequest.getHeaders().setAccept(HTTP_APPLICATION_JASON_VALUE);
+					newEntityModel = getEntityResponse(httpRequest);
+				}
+				catch (Exception e){
+					
+					handleException(e,false);
+				}
+				
+				return newEntityModel;
 
 			}
 
@@ -1037,14 +1123,23 @@ public class EntityListService {
 			 * new Collection<EntityModel> object
 			 */
 			@Override
-			public EntityModel execute() throws Exception {
+			public EntityModel execute() throws RuntimeException {
 
 				EntityModel newEntityModel = null;
 				String domain = urlDomain + "/" + String.valueOf(iEntityId);
 				String url = urlBuilder(domain);
 				GenericUrl urlDomain = new GenericUrl(url);
-				HttpRequest httpRequest = requestFactory.buildDeleteRequest(urlDomain);
-				return getEntityResponse(httpRequest);
+				try{
+					HttpRequest httpRequest = requestFactory.buildDeleteRequest(urlDomain);
+					newEntityModel = getEntityResponse(httpRequest);
+				}
+				catch (Exception e){
+					
+					handleException(e,false);
+				}
+				
+				return newEntityModel;
+				
 			}
 		}
 	}

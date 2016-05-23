@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.metadata.Features;
+package main.java.com.hpe.adm.nga.sdk.metadata.Features;
 
 /**
  * This class hold the CommentsFeature object and serve all functionality concern to Comments Feature

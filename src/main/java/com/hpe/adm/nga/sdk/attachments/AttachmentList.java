@@ -1,16 +1,14 @@
-package com.hpe.adm.nga.sdk.attachments;
+package main.java.com.hpe.adm.nga.sdk.attachments;
 
 
 import com.google.api.client.http.HttpRequestFactory;
-import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.NGARequest;
-import com.hpe.adm.nga.sdk.model.EntityModel;
 
-import java.io.IOException;
+import main.java.com.hpe.adm.nga.sdk.EntityListService;
+import main.java.com.hpe.adm.nga.sdk.NGARequest;
+import main.java.com.hpe.adm.nga.sdk.model.EntityModel;
+
 import java.io.InputStream;
 import java.util.Collection;
-
-import org.json.JSONException;
 
 /**
  * This class hold the AttachmentList objects
@@ -84,7 +82,7 @@ public class AttachmentList {
 		 * return collection of entities models
 		 */
 		@Override
-		public Collection<EntityModel> execute() throws Exception{
+		public Collection<EntityModel> execute() throws RuntimeException{
 			
 			return entityListService.get().execute();
 		}
@@ -100,7 +98,9 @@ public class AttachmentList {
 	public class Create extends NGARequest<Collection<EntityModel>> {
 		
 		
-		private String filename = "";
+		private String contentType = "";
+		private String contentName = "";
+		private InputStream inputStream = null;
 		private Collection<EntityModel> colEntities = null;
 		
 		/**
@@ -108,9 +108,9 @@ public class AttachmentList {
 		 * return a collection of entities models that have been created
 		 */
 		@Override
-		public Collection<EntityModel> execute() throws Exception {
+		public Collection<EntityModel> execute() throws RuntimeException {
 			
-			return entityListService.create().executeMultipart(colEntities,filename); 
+			return entityListService.create().executeMultipart(colEntities,inputStream,contentType,contentName); 
 		}
 		
 		/**
@@ -119,10 +119,13 @@ public class AttachmentList {
 		 * @param file - file path 
 		 * @return - An Object with new data
 		 */
-		public Create entities(Collection<EntityModel> entities,String file) {
+		public Create entities(Collection<EntityModel> entities,InputStream stream,String type,String name ) {
 
 			colEntities = entities;
-			filename = file;
+			inputStream = stream;
+			contentType = type;
+			contentName = name;
+			
 			return this;
 		}
 		
@@ -192,7 +195,7 @@ public class AttachmentList {
 			 * return a stream with binary data
 			 */		
 			@Override
-			public InputStream execute() throws Exception{
+			public InputStream execute() throws RuntimeException{
 
 				return entityListService.at(iEntityId).get().executeBinary();
 			}
@@ -211,7 +214,7 @@ public class AttachmentList {
 			 * return a new entity model 
 			 */				
 			@Override
-			public EntityModel execute() throws Exception {
+			public EntityModel execute() throws RuntimeException {
 
 				return entityListService.at(iEntityId).get().execute();
 			
@@ -234,7 +237,7 @@ public class AttachmentList {
 			 * return a new entity model 
 			 */		
 			@Override
-			public EntityModel execute() throws Exception {
+			public EntityModel execute() throws RuntimeException {
 				return entityListService.at(iEntityId).update().entity(entityModel).execute();
 			}
 			
@@ -264,7 +267,7 @@ public class AttachmentList {
 			 * return null
 			 */		
 			@Override
-			public EntityModel execute() throws Exception {
+			public EntityModel execute() throws RuntimeException {
 				return entityListService.at(iEntityId).delete().execute();
 			}
 		}	
