@@ -1,24 +1,18 @@
 package com.hpe.adm.nga.sdk;
 
+import com.google.api.client.http.*;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
+import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-import java.io.IOException;
-import java.net.HttpCookie;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.javanet.NetHttpTransport;
+
+import java.io.IOException;
+import java.net.HttpCookie;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -136,21 +130,18 @@ public class NGA {
 		private String urlDomain = "";
 		public String idsharedSpaceId = null;
 		private long workSpaceId = 0;
-		private String userName = "";
-		private String password = "";
+		private final Authorisation authorisation;
 		
 		
 		//Functions
 		
 		/** Creates a new Builder object 
 		 * 
-		 * @param basicAuthorisation - hold the details of Authorisation
+		 * @param authorisation - hold the details of Authorisation
 		 * @throws IOException
 		 */
-		public Builder(BasicAuthorisation basicAuthorisation) throws IOException {
-
-	    	userName = basicAuthorisation.getUsername();
-	    	password = basicAuthorisation.getPassword();
+		public Builder(Authorisation authorisation) throws IOException {
+			this.authorisation = authorisation;
 		}
 		
 		/**
@@ -228,15 +219,10 @@ public class NGA {
 	                .createRequestFactory(new HttpRequestInitializer() {
 	                    @Override
 	                    public void initialize(HttpRequest request) {
-	                    	
-	                    	// BasicAuthentication needed only in first initialization
+	                    	// Authentication needed only in first initialization
 	                    	if ((hppsValue!=null && hppsValue.isEmpty()) && (lwssoValue!=null && lwssoValue.isEmpty()))
 	                    	{
-	                    		request.getHeaders().setBasicAuthentication(userName,password);
-	                    		
-	                    		// username and password should be transient. 
-	                    		userName = "";
-	                    		password = "";
+								authorisation.executeAuthorisation(request);
 	                    	}
 	                    	else
 	                    	{

@@ -1,6 +1,6 @@
 package com.hpe.adm.nga.sdk;
 
-import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
+import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,20 +29,7 @@ public class TestGetEntity{
 //		nga = new NGA(requestFactory, "https://mqast001pngx.saas.hpe.com", "4063", 1002);
 		
 		nga = (new NGA.Builder(
-				new BasicAuthorisation(){
-					@Override
-					public String getUsername(){
-						
-						return MY_APP_ID;
-					}
-					
-					@Override
-					public String getPassword(){
-						
-						return MY_APP_SECRET;
-					}
-					
-				}
+				new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)
 				)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(4063).workSpace(1002).build();
 		
 		

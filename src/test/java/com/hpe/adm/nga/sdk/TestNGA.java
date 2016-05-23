@@ -1,24 +1,15 @@
 package com.hpe.adm.nga.sdk;
 
 
-import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.authorisation.BasicAuthorisation;
+import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
 import com.hpe.adm.nga.sdk.exception.NgaException;
 import com.hpe.adm.nga.sdk.exception.NgaPartialException;
-import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
-import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
-import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 
 
@@ -40,21 +31,8 @@ public class TestNGA {
 		NGA nga;
 		try {
 			nga = (new NGA.Builder(
-					new BasicAuthorisation(){
-						@Override
-						public String getUsername(){
-							
-							return MY_APP_ID;
-						}
-						
-						@Override
-						public String getPassword(){
-							
-							return MY_APP_SECRET;
-						}
-						
-					}
-					)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(4063).workSpace(1002).build();
+					new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)
+					)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(21025).workSpace(1002).build();
 			
 			if (nga==null)
 			{
@@ -66,105 +44,105 @@ public class TestNGA {
 			// ************************** TESTED ****************************
 			// EntityList examples
 			Collection<EntityModel> ColEntityList =  defects.get().execute();
-			ColEntityList = defects.get().addFields("version_stamp", "item_type").limit(10).offset(1).addOrderBy("version_stamp",false).execute();
-			Collection<EntityModel> entityModelsIn = defects.testGetEntityModels(CREATE_DEMO3);
-			Collection<EntityModel> entityModelsOut = defects.create().entities(entityModelsIn).execute();
-			
-			String newJasonDemo = CREATE_DEMO3.replace("\"id\":1,", "\"id\":6030,");
-			entityModelsIn = defects.testGetEntityModels(newJasonDemo);
-			
-			ColEntityList = defects.update().entities(entityModelsIn).execute();
-			
-			Query query = new Query.Field("creation_time").less(new Date()).or().field("id").equal(new String("5028")).or().field("id").equal(new String("5015")).build();
-			ColEntityList = defects.get().query(query).execute();
-			
-			EntityModel entityModel  = defects.at(8024).get().addFields("description").execute();
-			entityModel = defects.at(8024).update().entity(entityModel).execute();
-			
-			query = new Query.Field("id",true).equal(new Long("8024")).build();
-			ColEntityList = defects.get().query(query).execute();
-			
-			query = new Query.Field("user_tags").equal(new Query.Field("id").equal(new String("8024")).or().field("id").equal(new String("8026")).build()).build();
-			ColEntityList= defects.get().query(query).execute();
-			
-			query = new Query.Field("team").equal(null).build();
-			ColEntityList = defects.get().query(query).execute();
-			
-			// Entityies examples
-			entityModel  = defects.at(8024).get().addFields("description").execute();
-			entityModel = defects.at(8024).update().entity(entityModel).execute();
-			//defects.at(5044).delete().execute();
-			
-			
-			
-			// metadata
-			Metadata metadata = nga.metadata();
-			// all entities
-			Collection<EntityMetadata> colEntityMetadata  = metadata.entities().execute();
-			colEntityMetadata  = metadata.entities("runs","taxonomy_item_node","test_suite","theme").execute();
-			
-			
-			// fields
-			Collection<FieldMetadata> colFieldMetadat = metadata.fields().execute();
-						// only fields of defects and tests
-			colFieldMetadat = metadata.fields("run", "business_rule").execute();
-					
-			// Attachmnts
-			AttachmentList attachmnts = nga.AttachmentList();
-			Collection<EntityModel> collEntityModel = attachmnts.get().execute();
-			
-			
-			entityModelsIn = new HashSet<EntityModel>();
-			Set<FieldModel> data = new HashSet<FieldModel>();
-			FieldModel FieldModel1 = new StringFieldModel("type", "attachment");
-			FieldModel FieldModel2 = new StringFieldModel("description", "description test1");
-			FieldModel FieldModel3 = new LongFieldModel("id",new Long(5001));
-			data.add(FieldModel1);
-			data.add(FieldModel2);
-			data.add(FieldModel3);
-			entityModel = new EntityModel(data);
-			entityModelsIn.add(entityModel);
-			FieldModel1 = new StringFieldModel("type", "attachment");
-			FieldModel2 = new StringFieldModel("description", "description test2");
-			FieldModel3 = new LongFieldModel("id",new Long(5002));
-			data = new HashSet<FieldModel>();
-			data.add(FieldModel1);
-			data.add(FieldModel2);
-			data.add(FieldModel3);
-			entityModel = new EntityModel(data);
-			entityModelsIn.add(entityModel);
-			
-			
-			collEntityModel = attachmnts.update().entities(entityModelsIn).execute();
-			
-			
-			
-			// get entity data of attachmnet with id=1001 
-			EntityModel entityModel2 = attachmnts.at(5001).get().execute();
-			data = entityModel2.getValue();
-			String strFileName = "";
-			for (FieldModel fieldModel : data) {
-
-				if (fieldModel.getName().equals("name"))
-				{
-					strFileName = ((StringFieldModel)(fieldModel)).getValue();
-					break;
-				}	
-		     }
-			// get binary data of attachmnet with id=1001 
-			InputStream is = attachmnts.at(5001).getBinary().execute();
-			FileOutputStream fos = new FileOutputStream(new File(strFileName)); 
-			int inByte;
-			while((inByte = is.read()) != -1)
-			     fos.write(inByte);
-			is.close();
-			fos.close();
-			
-			entityModel = attachmnts.at(5001).update().entity(entityModel).execute();
-			entityModelsOut = attachmnts.create().entities(entityModelsIn,strFileName).execute();
-			//attachmnts.at(5006).delete().execute();
-			//attachmnts.delete().execute();
-			//defects.delete().execute();
+//			ColEntityList = defects.get().addFields("version_stamp", "item_type").limit(10).offset(1).addOrderBy("version_stamp",false).execute();
+//			Collection<EntityModel> entityModelsIn = defects.testGetEntityModels(CREATE_DEMO3);
+//			Collection<EntityModel> entityModelsOut = defects.create().entities(entityModelsIn).execute();
+//
+//			String newJasonDemo = CREATE_DEMO3.replace("\"id\":1,", "\"id\":6030,");
+//			entityModelsIn = defects.testGetEntityModels(newJasonDemo);
+//
+//			ColEntityList = defects.update().entities(entityModelsIn).execute();
+//
+//			Query query = new Query.Field("creation_time").less(new Date()).or().field("id").equal(new String("5028")).or().field("id").equal(new String("5015")).build();
+//			ColEntityList = defects.get().query(query).execute();
+//
+//			EntityModel entityModel  = defects.at(8024).get().addFields("description").execute();
+//			entityModel = defects.at(8024).update().entity(entityModel).execute();
+//
+//			query = new Query.Field("id",true).equal(new Long("8024")).build();
+//			ColEntityList = defects.get().query(query).execute();
+//
+//			query = new Query.Field("user_tags").equal(new Query.Field("id").equal(new String("8024")).or().field("id").equal(new String("8026")).build()).build();
+//			ColEntityList= defects.get().query(query).execute();
+//
+//			query = new Query.Field("team").equal(null).build();
+//			ColEntityList = defects.get().query(query).execute();
+//
+//			// Entityies examples
+//			entityModel  = defects.at(8024).get().addFields("description").execute();
+//			entityModel = defects.at(8024).update().entity(entityModel).execute();
+//			//defects.at(5044).delete().execute();
+//
+//
+//
+//			// metadata
+//			Metadata metadata = nga.metadata();
+//			// all entities
+//			Collection<EntityMetadata> colEntityMetadata  = metadata.entities().execute();
+//			colEntityMetadata  = metadata.entities("runs","taxonomy_item_node","test_suite","theme").execute();
+//
+//
+//			// fields
+//			Collection<FieldMetadata> colFieldMetadat = metadata.fields().execute();
+//						// only fields of defects and tests
+//			colFieldMetadat = metadata.fields("run", "business_rule").execute();
+//
+//			// Attachmnts
+//			AttachmentList attachmnts = nga.AttachmentList();
+//			Collection<EntityModel> collEntityModel = attachmnts.get().execute();
+//
+//
+//			entityModelsIn = new HashSet<EntityModel>();
+//			Set<FieldModel> data = new HashSet<FieldModel>();
+//			FieldModel FieldModel1 = new StringFieldModel("type", "attachment");
+//			FieldModel FieldModel2 = new StringFieldModel("description", "description test1");
+//			FieldModel FieldModel3 = new LongFieldModel("id",new Long(5001));
+//			data.add(FieldModel1);
+//			data.add(FieldModel2);
+//			data.add(FieldModel3);
+//			entityModel = new EntityModel(data);
+//			entityModelsIn.add(entityModel);
+//			FieldModel1 = new StringFieldModel("type", "attachment");
+//			FieldModel2 = new StringFieldModel("description", "description test2");
+//			FieldModel3 = new LongFieldModel("id",new Long(5002));
+//			data = new HashSet<FieldModel>();
+//			data.add(FieldModel1);
+//			data.add(FieldModel2);
+//			data.add(FieldModel3);
+//			entityModel = new EntityModel(data);
+//			entityModelsIn.add(entityModel);
+//
+//
+//			collEntityModel = attachmnts.update().entities(entityModelsIn).execute();
+//
+//
+//
+//			// get entity data of attachmnet with id=1001
+//			EntityModel entityModel2 = attachmnts.at(5001).get().execute();
+//			data = entityModel2.getValue();
+//			String strFileName = "";
+//			for (FieldModel fieldModel : data) {
+//
+//				if (fieldModel.getName().equals("name"))
+//				{
+//					strFileName = ((StringFieldModel)(fieldModel)).getValue();
+//					break;
+//				}
+//		     }
+//			// get binary data of attachmnet with id=1001
+//			InputStream is = attachmnts.at(5001).getBinary().execute();
+//			FileOutputStream fos = new FileOutputStream(new File(strFileName));
+//			int inByte;
+//			while((inByte = is.read()) != -1)
+//			     fos.write(inByte);
+//			is.close();
+//			fos.close();
+//
+//			entityModel = attachmnts.at(5001).update().entity(entityModel).execute();
+//			entityModelsOut = attachmnts.create().entities(entityModelsIn,strFileName).execute();
+//			//attachmnts.at(5006).delete().execute();
+//			//attachmnts.delete().execute();
+//			//defects.delete().execute();
 		
 		} 
 		catch (Exception e) {
