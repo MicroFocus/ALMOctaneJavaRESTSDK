@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/sdk.iml" filepath="$PROJECT_DIR$/sdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sdk-integration-tests/sdk-integration-tests.iml" filepath="$PROJECT_DIR$/sdk-integration-tests/sdk-integration-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/sdk-src/sdk-src.iml" filepath="$PROJECT_DIR$/sdk-src/sdk-src.iml" />
     </modules>
   </component>

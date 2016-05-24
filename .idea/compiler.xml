@@ -24,9 +24,17 @@
         <processorPath useClasspath="true" />
         <module name="sdk-src" />
       </profile>
+      <profile default="false" name="Annotation profile for sdk-integration-tests" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="sdk-integration-tests" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="sdk" target="1.5" />
+      <module name="sdk-integration-tests" target="1.8" />
       <module name="sdk-src" target="1.8" />
     </bytecodeTargetLevel>
   </component>
