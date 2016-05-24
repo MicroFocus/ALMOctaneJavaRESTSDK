@@ -5,6 +5,8 @@ import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,7 @@ public class TestBuildUrl{
 	private static EntityListService spiedService = null;
 	private static EntityListService.Get spiedGetEntity = null;
 	private static NGA nga;
+	final Logger logger = LogManager.getLogger(TestNGA.class.getName());
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -55,12 +58,16 @@ public class TestBuildUrl{
 			String orderByParam = (String) Whitebox.getInternalState(spiedGetEntity, "orderByParam");
 			long limitParam = (Long) Whitebox.getInternalState(spiedGetEntity, "limitParam");
 			long ofsetParam = (Long) Whitebox.getInternalState(spiedGetEntity, "ofsetParam");
-			Query queryParams = (Query) Whitebox.getInternalState(spiedGetEntity, "queryParams");
+			Query queryParams = (Query) Whitebox.getInternalState(spiedGetEntity, "queryParams");						
 			
 			Method urlBuilder = service.getClass().getDeclaredMethod("urlBuilder", new Class[] {String.class, String.class, String.class, long.class, long.class, Query.class});
 			urlBuilder.setAccessible(true);
 			String url = (String)urlBuilder.invoke(service, urlDomain, fieldsParams, orderByParam, limitParam, ofsetParam, queryParams);
-			assertEquals(expectedResult, url); // TBD - Should be assertNotEquals
+			logger.debug(String.format("url=%s",url));
+			logger.debug(String.format("expectedResult=%s",expectedResult));
+			
+			assertEquals(expectedResult, url);
+			
 		}
 		catch(Exception ex){
 			fail("Failed with exception: " + ex);

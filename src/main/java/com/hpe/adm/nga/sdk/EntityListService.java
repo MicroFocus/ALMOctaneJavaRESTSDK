@@ -3,6 +3,7 @@ package com.hpe.adm.nga.sdk;
 import com.google.api.client.http.*;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson.JacksonFactory;
+
 import com.hpe.adm.nga.sdk.exception.NgaException;
 import com.hpe.adm.nga.sdk.exception.NgaPartialException;
 import com.hpe.adm.nga.sdk.model.*;
@@ -18,6 +19,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.IntStream;
+
 
 
 /**

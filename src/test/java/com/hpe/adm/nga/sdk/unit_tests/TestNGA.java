@@ -72,7 +72,7 @@ public class TestNGA {
 			
 			ColEntityList = defects.update().entities(entityModelsIn).execute();
 			
-			Query query = new Query.Field("creation_time").less(new Date()).or().field("id").equal(new String("5028")).or().field("id").equal(new String("5015")).build();
+			Query query = new Query.Field("creation_time").less(new Date()).or().field("id",true).equal(new String("5028")).or().field("id").equal(new String("5015")).build();
 			ColEntityList = defects.get().query(query).execute();
 			
 			EntityModel entityModel  = defects.at(2006).get().addFields("description").execute();

@@ -20,8 +20,17 @@ public class Query {
 	 * @param name - field name
 	 * @return - field object
 	 */
+	public Field field (String name,boolean negate){
+		return new Field(name,this,negate);
+	}
+	
+	/**
+	 * getter of field object 
+	 * @param name - field name
+	 * @return - field object
+	 */
 	public Field field (String name){
-		return new Field(name,this);
+		return new Field(name,this,false);
 	}
 	
 	/**
@@ -78,10 +87,10 @@ public class Query {
 		 * @param Name - Field name
 		 * @param base - query base
 		 */
-		public Field(String Name,Query base) {
+		protected Field(String Name,Query base,boolean negate) {
 			queryName = Name;
 			querybase = base;
-			isNegate = false;
+			isNegate = negate;
 		}
 		
 		/**
