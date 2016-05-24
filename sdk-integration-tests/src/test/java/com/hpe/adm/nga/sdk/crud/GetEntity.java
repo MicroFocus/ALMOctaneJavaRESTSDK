@@ -63,7 +63,7 @@ public class GetEntity extends TestBase {
 	        Collection<EntityModel> getEntity = entityList.get().query(query).limit(1).execute();
 	        Iterator<EntityModel> entIter = getEntity.iterator();
 	        EntityModel firstEnt = entIter.next();
-	        Set<FieldModel> fieldModelSet = firstEnt.getValue();
+	        Set<FieldModel> fieldModelSet = firstEnt.getValues();
 	        int firstId = 0;
 	        for (FieldModel fm : fieldModelSet) {
 	            if (fm.getName().equals("id")) {
@@ -74,7 +74,7 @@ public class GetEntity extends TestBase {
 	        getEntity = entityList.get().query(query).offset(2).limit(1).execute();
 	        entIter = getEntity.iterator();
 	        EntityModel secnEnt = entIter.next();
-	        Set<FieldModel> secondModelSet = secnEnt.getValue();
+	        Set<FieldModel> secondModelSet = secnEnt.getValues();
 	        int secId = 0;
 	        for (FieldModel fm : secondModelSet) {
 	            if (fm.getName().equals("id")) {
@@ -122,7 +122,7 @@ public class GetEntity extends TestBase {
 		
 		ArrayList<Integer> rankList = new ArrayList<>();
 		getEntity.forEach(ent -> {
-			Set<FieldModel> fieldModelSet = ent.getValue();	        
+			Set<FieldModel> fieldModelSet = ent.getValues();
 	        for (FieldModel fm : fieldModelSet) {
 	            if (fm.getName().equals("rank")) {
 	            	rankList.add(Integer.parseInt(fm.getValue().toString()));	                

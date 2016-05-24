@@ -13,7 +13,7 @@ import java.util.*;
 public class CommonUtils {
 
     public static String getValueFromEntityModel(EntityModel entityModel, String fieldName) {
-        Set<FieldModel> fieldModelSet = entityModel.getValue();
+        Set<FieldModel> fieldModelSet = entityModel.getValues();
         for (FieldModel fm : fieldModelSet) {
             if (fm.getName().equals(fieldName)) {
                 if(fm.getValue() == null){
@@ -26,7 +26,7 @@ public class CommonUtils {
     }
 
     public static int getIdFromEntityModel(EntityModel entityModel) {
-        Set<FieldModel> fieldModelSet = entityModel.getValue();
+        Set<FieldModel> fieldModelSet = entityModel.getValues();
         for (FieldModel fm : fieldModelSet) {
             if (fm.getName().equals("id")) {
                 return Integer.parseInt(fm.getValue().toString());
@@ -58,8 +58,8 @@ public class CommonUtils {
         if (entityA == null) {
             return true;
         }
-        Set<FieldModel> fieldsA = entityA.getValue();
-        Set<FieldModel> fieldsB = entityB.getValue();
+        Set<FieldModel> fieldsA = entityA.getValues();
+        Set<FieldModel> fieldsB = entityB.getValues();
         boolean isMatch;
         for (FieldModel fieldA : fieldsA) {
             if (fieldA.getClass().equals(MultiReferenceFieldModel.class) || fieldA.getClass().equals(ReferenceFieldModel.class)) {

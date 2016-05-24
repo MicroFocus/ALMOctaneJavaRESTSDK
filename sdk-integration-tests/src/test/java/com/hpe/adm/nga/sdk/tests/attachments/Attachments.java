@@ -8,13 +8,8 @@ import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
-import org.junit.Test;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.ByteArrayInputStream;
 import java.util.*;
 
 /**
@@ -48,11 +43,9 @@ public class Attachments extends TestBase {
         Collection<EntityModel> attachments = new ArrayList<>();
         attachments.add(new EntityModel(fields));
 
-        List<String> lines = Arrays.asList("The first line", "The second line");
-        Path path = Paths.get("text_attachment.txt");
-        Files.write(path, lines, Charset.forName("UTF-8"));
+        ByteArrayInputStream bais = new ByteArrayInputStream("The first line\nThe second line".getBytes());
 
-        nga.AttachmentList().create().entities(attachments, path.toString()).execute();
+        nga.AttachmentList().create().entities(attachments, bais, "text/plain", "text_attachment.txt").execute();
 
         return attachments;
     }

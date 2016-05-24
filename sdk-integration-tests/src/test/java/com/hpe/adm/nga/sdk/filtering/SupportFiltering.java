@@ -48,7 +48,7 @@ public class SupportFiltering extends TestBase {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
-        String entityName = CommonUtils.getNameFromEntityModel(entityModel);
+        String entityName = CommonUtils.getValueFromEntityModel(entityModel, "name");
 
         Query query = getQuery(entityName, logicalOperation);
 
