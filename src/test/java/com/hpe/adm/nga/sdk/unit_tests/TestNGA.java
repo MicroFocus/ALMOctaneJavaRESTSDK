@@ -5,7 +5,7 @@ import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
+import com.hpe.adm.nga.sdk.authorisation.ClientAuthorisation;
 import com.hpe.adm.nga.sdk.exception.NgaException;
 import com.hpe.adm.nga.sdk.exception.NgaPartialException;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
@@ -42,8 +42,9 @@ public class TestNGA {
 		NGA nga;
 		try {
 			nga = (new NGA.Builder(
-					new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)
-					)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(21025).workSpace(1002).build();
+//					new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)
+					new ClientAuthorisation("spencer_ws_key_xp21zon50pw2lh30gw74kj8q9", "#2e253d4654d757dbE")
+					)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(21025).workSpace(3001).build();
 			 
 			if (nga==null)
 			{
@@ -176,11 +177,13 @@ public class TestNGA {
 		catch (NgaException e) {
 			
 			ErrorModel errorModel = ((NgaException) e).getError();
+			logger.fatal(e);
 		}
 		catch (NgaPartialException e){
 			
 			Collection<EntityModel> entities = ((NgaPartialException)e).getEntitiesModels();
 			Collection<ErrorModel> errors = ((NgaPartialException)e).getErrorModels();
+			logger.fatal(errors);
 		}
 
 	}
