@@ -33,4 +33,9 @@ public class ErrorModel extends  EntityModel{
 		super(ERROR_DESCRIPTION_KEY,value);
 			
 	}
+
+	@Override
+	public String toString() {
+		return (String) getValues().stream().filter(model -> model.getName().equals("description")).findFirst().get().getValue();
+	}
 }
