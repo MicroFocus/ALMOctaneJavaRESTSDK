@@ -34,7 +34,7 @@ public class CreateEntity extends TestBase {
 
         EntityModel getEntity = entityList.at(entityId).get().execute();
 
-        Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
+        Assert.assertTrue(CommonUtils.isEntityAInEntityB(entityModel, getEntity));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class CreateEntity extends TestBase {
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
         Query query = QueryUtils.getQueryForIds(entityIds);
         Collection<EntityModel> getEntity = entityList.get().query(query).execute();
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(generatedEntity, getEntity));
+        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModels, getEntity));
     }
     
     @Test

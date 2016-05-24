@@ -20,6 +20,7 @@ public class NgaException extends RuntimeException {
 	 *   
 	 */
 	public NgaException(ErrorModel  error){
+		super(error.toString());
 		setError(error);
 	}
 	
@@ -38,6 +39,8 @@ public class NgaException extends RuntimeException {
 	public void setError(ErrorModel  error){
 		errorModel = error;
 	}
+
+
 	
 }
 

@@ -13,8 +13,8 @@ import org.junit.BeforeClass;
  */
 public class TestBase {
 
-	final static String MY_APP_ID = "moris@korentec.co.il";
-	final static String MY_APP_SECRET = "Moris4095";
+	final static String MY_APP_ID = "spencer.bruce@hpe.com";
+	final static String MY_APP_SECRET = "Password21";
 
 	protected static NGA nga;
 	protected static String entityName = "";
@@ -35,7 +35,7 @@ public class TestBase {
 		HttpUtils.SetSystemProxy();
 
 		nga = new NGA.Builder(
-				new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(4063).workSpace(1002).build();
+				new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(21025).workSpace(3001).build();
 		metadata = nga.metadata();
 	}
 
