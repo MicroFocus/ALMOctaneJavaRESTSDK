@@ -3,7 +3,6 @@ package com.hpe.adm.nga.sdk;
 import com.google.api.client.http.*;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson.JacksonFactory;
-
 import com.hpe.adm.nga.sdk.exception.NgaException;
 import com.hpe.adm.nga.sdk.exception.NgaPartialException;
 import com.hpe.adm.nga.sdk.model.*;
@@ -19,8 +18,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.IntStream;
-
-
 
 /**
  * This class hold the entities objects and serve all functionality concern to
@@ -284,7 +281,18 @@ public class EntityListService {
 			Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
 			fieldValue = getEntitiesJSONObject(entities);
 
-		} else {
+		} else if (fieldModel.getClass() == DateFieldModel.class) {
+
+			DateFormat df = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
+			try{
+				fieldValue = df.format(fieldModel.getValue());
+			}
+		    catch ( Exception ex ){
+		    	logger.debug(fieldModel.getValue().toString() + LOGGER_INVALID_DATE_SCHEME_FORMAT);
+		    }
+
+		} 
+		else {
 
 			fieldValue = fieldModel.getValue();
 		}
