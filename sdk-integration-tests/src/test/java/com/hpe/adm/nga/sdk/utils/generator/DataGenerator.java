@@ -4,12 +4,18 @@ import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
  * Created by Guy Guetta on 21/04/2016.
  */
 public class DataGenerator {
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
     public static Collection<EntityModel> generateEntityModel(NGA nga, String entityName, Set<FieldModel> fields) throws Exception {
         Collection<EntityModel> entities = new ArrayList<>();
         switch (entityName) {
@@ -118,21 +124,21 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateRelease() {
+    private static EntityModel generateRelease() throws ParseException {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_release_" + UUID.randomUUID());
-        FieldModel startDate = new StringFieldModel("start_date", "2015-03-14T12:00:00Z");
-        FieldModel endDate = new StringFieldModel("end_date", "2016-03-14T12:00:00Z");
+        FieldModel startDate = new DateFieldModel("start_date", DATE_FORMAT.parse("2015-03-14T12:00:00Z"));
+        FieldModel endDate = new DateFieldModel("end_date", DATE_FORMAT.parse("2016-03-14T12:00:00Z"));
         fields.add(name);
         fields.add(startDate);
         fields.add(endDate);
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateMilestone() {
+    private static EntityModel generateMilestone() throws ParseException {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_milestone_" + UUID.randomUUID());
-        FieldModel date = new StringFieldModel("date", "2016-03-17T12:00:00Z");
+        FieldModel date = new DateFieldModel("date", DATE_FORMAT.parse("2016-03-17T12:00:00Z"));
         fields.add(name);
         fields.add(date);
         return new EntityModel(fields);

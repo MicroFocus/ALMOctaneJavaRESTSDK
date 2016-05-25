@@ -5,7 +5,6 @@ import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
-import com.sun.javafx.runtime.SystemProperties;
 import org.junit.Before;
 import org.junit.BeforeClass;
 

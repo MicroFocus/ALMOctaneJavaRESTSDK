@@ -1,10 +1,7 @@
 package com.hpe.adm.nga.sdk.tests.crud;
 
 import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.LongFieldModel;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
@@ -12,6 +9,7 @@ import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -78,13 +76,17 @@ public class UpdateEntity extends TestBase {
     public void testUpdateEntityCollectionWithQuery() throws Exception {
 
         String updatedEndDateValue =  "2026-03-14T12:00:00Z";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final Date date = simpleDateFormat.parse(updatedEndDateValue);
+
         Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedDefect).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
 
-        StringFieldModel nameField = new StringFieldModel("end_date", updatedEndDateValue);
+//        StringFieldModel nameField = new StringFieldModel("end_date", updatedEndDateValue);
+        DateFieldModel nameField = new DateFieldModel("end_date", date);
         Set<FieldModel> fields = new HashSet<>();
 
         fields.add(nameField);
