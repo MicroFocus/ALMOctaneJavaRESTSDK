@@ -10,6 +10,7 @@ import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -19,6 +20,7 @@ import java.util.Set;
 /**
  * Created by Guy Guetta on 02/05/2016.
  */
+@Ignore
 public class CrossFiltering extends TestBase {
     private static long defectId;
     private static long releaseId;

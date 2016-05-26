@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
  */
 public class SwitchContext {
 
-    @Test
+//    @Test
     public void contextSiteAdmin() throws Exception {
         String url = ResourceBundle.getBundle("configuration").getString("url");
         String username = ResourceBundle.getBundle("configuration").getString("username");
