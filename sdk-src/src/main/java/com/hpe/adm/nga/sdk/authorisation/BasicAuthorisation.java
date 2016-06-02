@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.authorisation;
+package  com.hpe.adm.nga.sdk.authorisation;
 
 import com.google.api.client.http.HttpRequest;
 
@@ -7,7 +7,7 @@ import com.google.api.client.http.HttpRequest;
  * @author Moris oz
  *
  */
-public class BasicAuthorisation implements Authorisation{
+public class BasicAuthorisation implements Authorisation {
 
 	private final String userName;
 	private final String password;

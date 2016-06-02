@@ -9,19 +9,31 @@ import com.google.gson.Gson;
 import com.hpe.adm.nga.sdk.NGARequest;
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.exception.NgaException;
-import com.hpe.adm.nga.sdk.metadata.Features.*;
+import com.hpe.adm.nga.sdk.metadata.Features.AttachmentsFeature;
+import com.hpe.adm.nga.sdk.metadata.Features.BuisnessRuleFeature;
+import com.hpe.adm.nga.sdk.metadata.Features.CommentsFeature;
+import com.hpe.adm.nga.sdk.metadata.Features.Feature;
+import com.hpe.adm.nga.sdk.metadata.Features.HierarchyFeature;
+import com.hpe.adm.nga.sdk.metadata.Features.MailingFeature;
+import com.hpe.adm.nga.sdk.metadata.Features.RestFeature;
+import com.hpe.adm.nga.sdk.metadata.Features.SubTypesFeature;
+import com.hpe.adm.nga.sdk.metadata.Features.SubTypesOfFeature;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import com.hpe.adm.nga.sdk.NGARequest;
 
 /**
  * This class hold the  metadata object and serve all functionality concern to fields metadata and entity metadata

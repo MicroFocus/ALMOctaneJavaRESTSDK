@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.authorisation;
+package  com.hpe.adm.nga.sdk.authorisation;
 
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.json.JsonHttpContent;
