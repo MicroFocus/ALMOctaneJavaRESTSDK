@@ -9,7 +9,6 @@ import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -46,16 +45,15 @@ public class UpdateEntity extends TestBase {
     public void testUpdateEntityCollectionIdInBody() throws Exception {
 
         List<String> updatedNameValues =  DataGenerator.generateNamesForUpdate();
-        Set<FieldModel> fields = new HashSet<>();
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
         for(int i = 0; i < entityIds.size(); i++) {
-            fields.clear();
+            Set<FieldModel> fields = new HashSet<>();
             StringFieldModel nameField = new StringFieldModel("name", updatedNameValues.get(i));
-            LongFieldModel id = new LongFieldModel("id", entityIds.get(i).longValue());
+            StringFieldModel id = new StringFieldModel("id", entityIds.get(i).toString());
             fields.add(nameField);
             fields.add(id);
             EntityModel updatedEntity = new EntityModel(fields);
@@ -75,18 +73,21 @@ public class UpdateEntity extends TestBase {
     @Test // for release entity only
     public void testUpdateEntityCollectionWithQuery() throws Exception {
 
-        String updatedEndDateValue =  "2026-03-14T12:00:00Z";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        final Date date = simpleDateFormat.parse(updatedEndDateValue);
+        String entityName = "releases";
+
+        Calendar updatedEndDateValue =  Calendar.getInstance();
+        updatedEndDateValue.set(Calendar.MILLISECOND, 0);
+        updatedEndDateValue.set(Calendar.SECOND, 0);
+        updatedEndDateValue.set(Calendar.MINUTE, 0);
+        updatedEndDateValue.set(Calendar.HOUR_OF_DAY, 12);
 
         Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(nga, entityName);
-        Collection<EntityModel> entityModels = entityList.create().entities(generatedDefect).execute();
+        Collection<EntityModel> entityModels = nga.entityList(entityName).create().entities(generatedDefect).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
 
-//        StringFieldModel nameField = new StringFieldModel("end_date", updatedEndDateValue);
-        DateFieldModel nameField = new DateFieldModel("end_date", date);
+        DateFieldModel nameField = new DateFieldModel("end_date", updatedEndDateValue.getTime());
         Set<FieldModel> fields = new HashSet<>();
 
         fields.add(nameField);
@@ -95,9 +96,9 @@ public class UpdateEntity extends TestBase {
 
         Query query = QueryUtils.getQueryForIds(entityIds);
 
-        entityList.update().entities(updatedEntityCollection).query(query).execute();
+        nga.entityList(entityName).update().entities(updatedEntityCollection).query(query).execute();
 
-        Collection<EntityModel> getEntity = entityList.get().query(query).execute();
+        Collection<EntityModel> getEntity = nga.entityList(entityName).get().query(query).execute();
 
         Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
     }
