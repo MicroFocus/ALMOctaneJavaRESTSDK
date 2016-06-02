@@ -1,36 +1,21 @@
 package com.hpe.adm.nga.sdk.unit_tests.model;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.hpe.adm.nga.sdk.EntityListService;
+import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 
-import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.model.BooleanFieldModel;
-import com.hpe.adm.nga.sdk.model.DateFieldModel;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.ErrorModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.LongFieldModel;
-import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
-import com.hpe.adm.nga.sdk.model.ReferenceErrorModel;
-import com.hpe.adm.nga.sdk.model.ReferenceErrorModel.ReferenceError;
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 public class TestModel {
@@ -157,7 +142,8 @@ public class TestModel {
 	@Test
 	public void testEntityModelWithDateField() {
 		Date now = new Date();
-		expectedResult = "{\"field\":\"" + now.toString() + "\"}";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		expectedResult = "{\"field\":\"" + simpleDateFormat.format(now) + "\"}";
 		set.add(new DateFieldModel("field", now));		
 		model = new EntityModel(set);
 		try{
@@ -185,7 +171,8 @@ public class TestModel {
 	@Test
 	public void testComplexEntityModel(){
 		Date now = new Date();
-		expectedResult = "{\"longField\":200,\"RefField\":{\"falseValue\":false,\"trueValue\":true},\"dateField\":\"" + now.toString() + "\",\"stringField\":\"first\",\"multiRefField\":{\"exceeds_total_count\":false,\"data\":[{\"falseValue\":false,\"trueValue\":true},{\"falseValue\":false,\"trueValue\":true}],\"total_count\":2},\"boolField\":true}";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		expectedResult = "{\"longField\":200,\"RefField\":{\"falseValue\":false,\"trueValue\":true},\"dateField\":\"" + simpleDateFormat.format(now) + "\",\"stringField\":\"first\",\"multiRefField\":{\"exceeds_total_count\":false,\"data\":[{\"falseValue\":false,\"trueValue\":true},{\"falseValue\":false,\"trueValue\":true}],\"total_count\":2},\"boolField\":true}";
 		
 		Set<FieldModel> refSet = new HashSet<>();
 		refSet.add(new BooleanFieldModel("trueValue", true));
