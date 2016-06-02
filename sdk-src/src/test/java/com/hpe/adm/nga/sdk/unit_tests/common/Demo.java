@@ -1,12 +1,11 @@
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
-import java.util.Collection;
-
 import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
-import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
+
+import java.util.Collection;
 
 public class Demo {
 
