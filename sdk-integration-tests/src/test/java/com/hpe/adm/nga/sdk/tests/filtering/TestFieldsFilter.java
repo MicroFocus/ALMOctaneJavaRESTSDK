@@ -13,8 +13,8 @@ import java.util.*;
 /**
  * Created by Guy Guetta on 25/04/2016.
  */
-public class FieldsFilter extends TestBase {
-    public FieldsFilter() {
+public class TestFieldsFilter extends TestBase {
+    public TestFieldsFilter() {
         entityName = "releases";
     }
 

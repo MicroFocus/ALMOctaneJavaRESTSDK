@@ -2,7 +2,6 @@ package com.hpe.adm.nga.sdk.tests.filtering;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,9 +11,9 @@ import java.util.Collection;
 /**
  * Created by perach on 08/05/2016.
  */
-public class Limit extends TestBase {
+public class TestLimit extends TestBase {
 
-    public Limit() {
+    public TestLimit() {
         entityName = "releases";
     }
 

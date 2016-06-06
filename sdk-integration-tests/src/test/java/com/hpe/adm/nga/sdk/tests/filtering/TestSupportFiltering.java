@@ -16,9 +16,9 @@ import java.util.Set;
 /**
  * Created by Guy Guetta on 25/04/2016.
  */
-public class SupportFiltering extends TestBase {
+public class TestSupportFiltering extends TestBase {
 
-    public SupportFiltering() {
+    public TestSupportFiltering() {
         entityName = "releases";
     }
 

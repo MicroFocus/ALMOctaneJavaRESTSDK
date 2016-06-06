@@ -17,8 +17,8 @@ import java.util.Set;
 /**
  * Created by Guy Guetta on 02/05/2016.
  */
-public class Comments extends TestBase {
-    public Comments() {
+public class TestComments extends TestBase {
+    public TestComments() {
         entityName = "product_areas";
     }
 

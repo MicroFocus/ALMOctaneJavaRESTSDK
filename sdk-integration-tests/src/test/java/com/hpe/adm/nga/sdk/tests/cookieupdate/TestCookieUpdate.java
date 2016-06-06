@@ -14,9 +14,9 @@ import java.util.Collection;
  * Created by Dmitry Zavyalov on 08/05/2016.
  */
 @Ignore // before to execute this test change mockssso.xml on server -> tokenIdleTimeout="1"
-public class CookieUpdate extends TestBase {
+public class TestCookieUpdate extends TestBase {
 
-    public CookieUpdate() {
+    public TestCookieUpdate() {
         entityName = "product_areas";
     }
 

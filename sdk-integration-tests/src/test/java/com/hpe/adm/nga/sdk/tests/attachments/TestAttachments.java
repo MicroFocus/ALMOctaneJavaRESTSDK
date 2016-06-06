@@ -15,9 +15,9 @@ import java.util.*;
 /**
  * Created by Guy Guetta on 03/05/2016.
  */
-public class Attachments extends TestBase {
+public class TestAttachments extends TestBase {
 
-    public Attachments() {
+    public TestAttachments() {
         entityName = "product_areas";
     }
 

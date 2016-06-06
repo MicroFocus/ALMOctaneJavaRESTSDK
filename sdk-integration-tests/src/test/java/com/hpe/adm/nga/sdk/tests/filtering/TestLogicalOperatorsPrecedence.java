@@ -10,18 +10,17 @@ import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.util.*;
 
 /**
  * Created by Guy Guetta on 25/04/2016.
  */
-public class LogicalOperatorsPrecedence extends TestBase {
+public class TestLogicalOperatorsPrecedence extends TestBase {
 
     private static List<Integer> featureIds = new ArrayList<>();
 
-    public LogicalOperatorsPrecedence() {
+    public TestLogicalOperatorsPrecedence() {
         entityName = "features";
     }
 

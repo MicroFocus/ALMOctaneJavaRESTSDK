@@ -14,9 +14,9 @@ import java.util.*;
 /**
  * Created by Guy Guetta on 21/04/2016.
  */
-public class UpdateEntity extends TestBase {
+public class TestUpdateEntity extends TestBase {
 
-    public UpdateEntity() {
+    public TestUpdateEntity() {
         entityName = "releases";
     }
 

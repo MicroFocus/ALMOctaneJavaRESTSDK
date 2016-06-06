@@ -12,9 +12,9 @@ import java.util.Collection;
 /**
  * Created by Dmitry Zavyalov on 08/05/2016.
  */
-public class ReadMetadata extends TestBase {
+public class TestReadMetadata extends TestBase {
 
-    public ReadMetadata() {
+    public TestReadMetadata() {
         entityName = "product_areas";
     }
 

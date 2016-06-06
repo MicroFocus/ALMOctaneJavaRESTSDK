@@ -22,7 +22,7 @@ import java.util.Collection;
  */
 
 @Ignore //Before remove ignore, please support username = "rest2@hpe.com" with password = "Welcome2"
-public class ParallelExecution extends TestBase {
+public class TestParallelExecution extends TestBase {
 
     @Test
     public void testParallelExecution_two_clients() throws Exception {

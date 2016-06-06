@@ -16,7 +16,7 @@ import java.util.Collection;
 /**
  * Created by Dmitry Zavyalov on 03/05/2016.
  */
-public class SwitchContext {
+public class TestSwitchContext {
 
 //    @Test
     public void contextSiteAdmin() throws Exception {

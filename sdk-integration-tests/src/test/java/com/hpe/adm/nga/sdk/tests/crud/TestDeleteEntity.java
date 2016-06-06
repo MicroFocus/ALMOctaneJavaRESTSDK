@@ -16,8 +16,8 @@ import java.util.*;
 /**
  * Created by Guy Guetta on 25/04/2016.
  */
-public class DeleteEntity extends TestBase {
-    public DeleteEntity() {
+public class TestDeleteEntity extends TestBase {
+    public TestDeleteEntity() {
         entityName = "releases";
     }
 

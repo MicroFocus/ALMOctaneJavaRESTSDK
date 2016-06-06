@@ -21,12 +21,12 @@ import java.util.Set;
  * Created by Guy Guetta on 02/05/2016.
  */
 @Ignore
-public class CrossFiltering extends TestBase {
+public class TestCrossFiltering extends TestBase {
     private static long defectId;
     private static long releaseId;
     private static long paId;
 
-    public CrossFiltering() {
+    public TestCrossFiltering() {
         entityName = "releases";
     }
 

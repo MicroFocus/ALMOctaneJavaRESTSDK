@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by Guy Guetta on 03/05/2016.
  */
-public class OrderBy extends TestBase {
+public class TestOrderBy extends TestBase {
 
     private static Query idQuery;
 
