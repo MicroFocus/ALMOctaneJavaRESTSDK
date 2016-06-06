@@ -2,9 +2,13 @@ package com.hpe.adm.nga.sdk.tests.parallelexecution;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.authorisation.Authorisation;
+import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
+import com.hpe.adm.nga.sdk.utils.AuthorisationUtils;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
+import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
@@ -12,7 +16,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
-import java.util.ResourceBundle;
 
 /**
  * Created by Dmitry Zavyalov on 09/05/2016.
@@ -55,24 +58,24 @@ public class ParallelExecution extends TestBase {
     }
 
     private NGA getNgaClientFirst() {
-        String url = ResourceBundle.getBundle("configuration").getString("url");
-        String username = ResourceBundle.getBundle("configuration").getString("username");
-        String password = ResourceBundle.getBundle("configuration").getString("password");
-        String sharedSpaceId = ResourceBundle.getBundle("configuration").getString("sharedSpaceId");
-        String workspaceId = ResourceBundle.getBundle("configuration").getString("workspaceId");
+        final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
+        String url = configuration.getString("sdk.url");
+        Authorisation authorisation = AuthorisationUtils.getAuthorisation();
+        String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
+        String workspaceId = configuration.getString("sdk.workspaceId");
 
-        nga = ContextUtils.getContextWorkspace(url, username, password, sharedSpaceId, workspaceId);
+        nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
         return nga;
     }
 
     private NGA getNgaClientSecond() {
-        String url = ResourceBundle.getBundle("configuration").getString("url");
-        String username = "rest2@hpe.com";
-        String password = "Welcome2";
+        final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
+        String url = configuration.getString("sdk.url");
+        Authorisation authorisation = new UserAuthorisation("rest2@hpe.com", "Welcome2");
         String sharedSpaceId = "2002";
-        String workspaceId = ResourceBundle.getBundle("configuration").getString("workspaceId");
+        String workspaceId = configuration.getString("sdk.workspaceId");
 
-        nga = ContextUtils.getContextWorkspace(url, username, password, sharedSpaceId, workspaceId);
+        nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
         return nga;
     }
 

@@ -1,29 +1,30 @@
 package com.hpe.adm.nga.sdk.utils;
 
 import com.hpe.adm.nga.sdk.NGA;
-import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
+import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 
 /**
  * Created by Dmitry Zavyalov on 03/05/2016.
  */
 public class ContextUtils {
 
-    public static NGA getContextSiteAdmin(String url, String userName, String password) {
-        return getContext(url, userName, password, "", "");
+    public static NGA getContextSiteAdmin(String url, Authorisation authorisation) {
+        return getContext(url, authorisation, "", "");
     }
 
-    public static NGA getContextSharedSpace(String url, String userName, String password, String sharedSpaceId) {
-        return getContext(url, userName, password, sharedSpaceId, "");
+    public static NGA getContextSharedSpace(String url, Authorisation authorisation, String sharedSpaceId) {
+        return getContext(url, authorisation, sharedSpaceId, "");
     }
 
-    public static NGA getContextWorkspace(String url, String userName, String password, String sharedSpaceId, String workspaceId) {
-        return getContext(url, userName, password, sharedSpaceId, workspaceId);
+    public static NGA getContextWorkspace(String url, Authorisation authorisation, String sharedSpaceId, String workspaceId) {
+        return getContext(url, authorisation, sharedSpaceId, workspaceId);
     }
 
-    private static NGA getContext(String url, String userName, String password, String sharedSpaceId, String workspaceId) {
+    private static NGA getContext(String url, Authorisation authorisation, String sharedSpaceId, String workspaceId) {
         NGA nga = null;
         try {
-            NGA.Builder builder = new NGA.Builder(new UserAuthorisation(userName, password)).Server(url);
+//            NGA.Builder builder = new NGA.Builder(new UserAuthorisation(userName, password)).Server(url);
+            NGA.Builder builder = new NGA.Builder(authorisation).Server(url);
 
             if (!sharedSpaceId.isEmpty()) {
                 builder = builder.sharedSpace(Long.valueOf(sharedSpaceId));

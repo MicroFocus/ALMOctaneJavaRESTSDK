@@ -3,13 +3,15 @@ package com.hpe.adm.nga.sdk.tests.context;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.utils.AuthorisationUtils;
+import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import org.junit.Test;
 
 import java.util.Collection;
-import java.util.ResourceBundle;
 
 /**
  * Created by Dmitry Zavyalov on 03/05/2016.
@@ -18,11 +20,11 @@ public class SwitchContext {
 
 //    @Test
     public void contextSiteAdmin() throws Exception {
-        String url = ResourceBundle.getBundle("configuration").getString("url");
-        String username = ResourceBundle.getBundle("configuration").getString("username");
-        String password = ResourceBundle.getBundle("configuration").getString("password");
+        final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
+        String url = configuration.getString("sdk.url");
+        Authorisation authorisation = AuthorisationUtils.getAuthorisation();
 
-        NGA nga = ContextUtils.getContextSiteAdmin(url, username, password);
+        NGA nga = ContextUtils.getContextSiteAdmin(url, authorisation);
         Metadata metadata = nga.metadata();
 
         EntityList entities = nga.entityList("shared_spaces");
@@ -31,12 +33,12 @@ public class SwitchContext {
 
     @Test
     public void contextSharedSpace() throws Exception {
-        String url = ResourceBundle.getBundle("configuration").getString("url");
-        String username = ResourceBundle.getBundle("configuration").getString("username");
-        String password = ResourceBundle.getBundle("configuration").getString("password");
-        String sharedSpaceId = ResourceBundle.getBundle("configuration").getString("sharedSpaceId");
+        final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
+        String url = configuration.getString("sdk.url");
+        Authorisation authorisation = AuthorisationUtils.getAuthorisation();
+        String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
 
-        NGA nga = ContextUtils.getContextSharedSpace(url, username, password, sharedSpaceId);
+        NGA nga = ContextUtils.getContextSharedSpace(url, authorisation, sharedSpaceId);
         Metadata metadata = nga.metadata();
 
         EntityList entities = nga.entityList("workspaces");
@@ -45,13 +47,13 @@ public class SwitchContext {
 
     @Test
     public void contextWorkspace() throws Exception {
-        String url = ResourceBundle.getBundle("configuration").getString("url");
-        String username = ResourceBundle.getBundle("configuration").getString("username");
-        String password = ResourceBundle.getBundle("configuration").getString("password");
-        String sharedSpaceId = ResourceBundle.getBundle("configuration").getString("sharedSpaceId");
-        String workspaceId = ResourceBundle.getBundle("configuration").getString("workspaceId");
+        final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
+        String url = configuration.getString("sdk.url");
+        Authorisation authorisation = AuthorisationUtils.getAuthorisation();
+        String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
+        String workspaceId = configuration.getString("sdk.workspaceId");
 
-        NGA nga = ContextUtils.getContextWorkspace(url, username, password, sharedSpaceId, workspaceId);
+        NGA nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
         Metadata metadata = nga.metadata();
 
         EntityList entities = nga.entityList("list_nodes");

@@ -2,13 +2,14 @@ package com.hpe.adm.nga.sdk.tests.base;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
+import com.hpe.adm.nga.sdk.utils.AuthorisationUtils;
+import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
-import java.util.ResourceBundle;
 
 /**
  * Created by Guy Guetta on 12/04/2016.
@@ -32,13 +33,13 @@ public class TestBase {
         HttpUtils.SetSystemKeepAlive(false);
         HttpUtils.SetSystemProxy();
 
-        String url = ResourceBundle.getBundle("configuration").getString("url");
-        String username = ResourceBundle.getBundle("configuration").getString("username");
-        String password = ResourceBundle.getBundle("configuration").getString("password");
-        String sharedSpaceId = ResourceBundle.getBundle("configuration").getString("sharedSpaceId");
-        String workspaceId = ResourceBundle.getBundle("configuration").getString("workspaceId");
+        final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
+        String url = configuration.getString("sdk.url");
+        Authorisation authorisation = AuthorisationUtils.getAuthorisation();
+        String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
+        String workspaceId = configuration.getString("sdk.workspaceId");
 
-        nga = ContextUtils.getContextWorkspace(url, username, password, sharedSpaceId, workspaceId);
+        nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
         metadata = nga.metadata();
     }
 
