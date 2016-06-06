@@ -278,6 +278,7 @@ public class NGA {
 			catch (Exception e){
 
 				ErrorModel errorModel =  new ErrorModel(e.getMessage());
+				logger.error("Error in contacting server: ", e);
 				throw new NgaException(errorModel);
 			}
    	       	        
