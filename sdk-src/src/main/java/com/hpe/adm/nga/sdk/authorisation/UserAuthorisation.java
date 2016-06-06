@@ -2,7 +2,7 @@ package  com.hpe.adm.nga.sdk.authorisation;
 
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.json.JsonHttpContent;
-import com.google.api.client.json.jackson.JacksonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.GenericData;
 
 /**
