@@ -7,7 +7,7 @@
     <groupId>com.hpe.adm.nga.sdk</groupId>
     <artifactId>sdk-root</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0-SNAPSHOT</version>
     <modules>
         <module>sdk-src</module>
         <module>sdk-integration-tests</module>
@@ -29,9 +29,13 @@
     </properties>
     <distributionManagement>
         <repository>
-            <id>mqm-public</id>
-            <url>http://mydtbld0051.hpeswlab.net:8081/nexus/content/groups/mqm-public/</url>
+            <id>mqm-prod</id>
+            <url>http://mydtbld0051.hpeswlab.net:8081/nexus/content/repositories/mqm-prod/</url>
         </repository>
+        <snapshotRepository>
+            <id>mqm-snapshots</id>
+            <url>http://mydtbld0051.hpeswlab.net:8081/nexus/content/repositories/mqm-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
     <scm>
         <developerConnection>scm:git:ssh://git@mydtbld0005.hpeswlab.net:7999/~brucesp/java-rest-sdk
