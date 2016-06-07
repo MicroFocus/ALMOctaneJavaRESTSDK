@@ -26,6 +26,12 @@
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <maven-release.version>2.5.3</maven-release.version>
     </properties>
+    <distributionManagement>
+        <repository>
+            <id>mqm-public</id>
+            <url>http://mydtbld0051.hpeswlab.net:8081/nexus/content/groups/mqm-public/</url>
+        </repository>
+    </distributionManagement>
     <scm>
         <developerConnection>scm:git:ssh://git@mydtbld0005.hpeswlab.net:7999/~brucesp/java-rest-sdk</developerConnection>
     </scm>
@@ -109,13 +115,15 @@
                         <target>${java.version}</target>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>${maven-release.version}</version>
-                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release.version}</version>
+            </plugin>
+        </plugins>
     </build>
     <profiles>
         <profile>
