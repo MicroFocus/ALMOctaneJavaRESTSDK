@@ -3,8 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>sdk</artifactId>
-        <groupId>com.hpe.adm.nga</groupId>
+        <artifactId>sdk-root</artifactId>
+        <groupId>com.hpe.adm.nga.sdk</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,9 +13,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.hpe.adm.nga</groupId>
+            <groupId>com.hpe.adm.nga.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
