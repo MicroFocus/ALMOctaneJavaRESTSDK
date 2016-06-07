@@ -10,12 +10,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>sdk-integration-tests</artifactId>
-
+    <properties>
+        <skip-integration-tests>true</skip-integration-tests>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.hpe.adm.nga.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -32,5 +34,23 @@
             <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
-
+    <profiles>
+        <profile>
+            <id>integration-test</id>
+            <properties>
+                <skip-integration-tests>false</skip-integration-tests>
+            </properties>
+        </profile>
+    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>${skip-integration-tests}</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

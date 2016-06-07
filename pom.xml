@@ -25,6 +25,7 @@
         <commons-configuration.version>2.0</commons-configuration.version>
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <maven-release.version>2.5.3</maven-release.version>
+        <maven-surefire.version>2.19.1</maven-surefire.version>
     </properties>
     <distributionManagement>
         <repository>
@@ -33,7 +34,8 @@
         </repository>
     </distributionManagement>
     <scm>
-        <developerConnection>scm:git:ssh://git@mydtbld0005.hpeswlab.net:7999/~brucesp/java-rest-sdk</developerConnection>
+        <developerConnection>scm:git:ssh://git@mydtbld0005.hpeswlab.net:7999/~brucesp/java-rest-sdk
+        </developerConnection>
     </scm>
     <dependencyManagement>
         <dependencies>
@@ -114,6 +116,11 @@
                         <source>${java.version}</source>
                         <target>${java.version}</target>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
