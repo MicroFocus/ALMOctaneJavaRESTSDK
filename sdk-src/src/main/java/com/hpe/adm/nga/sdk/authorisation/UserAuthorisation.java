@@ -22,7 +22,7 @@ public class UserAuthorisation implements Authorisation {
 	public void executeAuthorisation(HttpRequest request) {
 		GenericData genericData = new GenericData();
 		genericData.put("user", userName);
-		genericData.put("sdk.password", password);
+		genericData.put("password", password);
 		request.setContent(new JsonHttpContent(new JacksonFactory(), genericData));
 	}
 }

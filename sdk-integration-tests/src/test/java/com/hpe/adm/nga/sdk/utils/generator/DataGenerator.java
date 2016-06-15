@@ -1,6 +1,7 @@
 package com.hpe.adm.nga.sdk.utils.generator;
 
 import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 
@@ -96,17 +97,17 @@ public class DataGenerator {
     }
 
     private static EntityModel generateDefect(NGA nga, Set<FieldModel> fields) throws Exception {
-        Set<FieldModel> parentFields = new HashSet<>();
-        parentFields.add(new LongFieldModel("id", 1001l));
-        parentFields.add(new StringFieldModel("type", "work_item_root"));
-        EntityModel parent = new EntityModel(parentFields);
-        FieldModel parentField = new ReferenceFieldModel("parent", parent);
+        Query query = new Query().field("subtype").equal("work_item_root").build();
+        Collection<EntityModel> roots = nga.entityList("work_items").get().query(query).execute();
+        EntityModel root = roots.iterator().next();
+        FieldModel parentField = new ReferenceFieldModel("parent", root);
 
         Collection<EntityModel> users = nga.entityList("workspace_users").get().execute();
         EntityModel user = users.iterator().next();
         FieldModel author = new ReferenceFieldModel("author", user);
 
-        Collection<EntityModel> phases = nga.entityList("phases").get().execute();
+        Query query2 = new Query().field("entity").equal("defect").build();
+        Collection<EntityModel> phases = nga.entityList("phases").get().query(query2).execute();
         EntityModel phase = phases.iterator().next();
         FieldModel phaseField = new ReferenceFieldModel("phase", phase);
 

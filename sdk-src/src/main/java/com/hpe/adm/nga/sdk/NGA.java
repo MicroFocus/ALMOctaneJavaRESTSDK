@@ -254,7 +254,6 @@ public class NGA {
 					String strCookies = strHPSSOCookieCsrf1.toString();
 					List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
 					
-					hppsValue = Cookies.stream().filter(a -> a.getName().equals(HPSSO_COOKIE_CSRF)).findFirst().get().getValue();
 					lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();
 					
 					// TBD - Remove after debugging
@@ -268,7 +267,7 @@ public class NGA {
 							 
 					 }*/
 					
-		           if((hppsValue!=null && !hppsValue.isEmpty()) && (lwssoValue!=null && !lwssoValue.isEmpty()))
+		           if(lwssoValue!=null && !lwssoValue.isEmpty())
 		           {
 		        	   objNga = new NGA(requestFactory,urlDomain,idsharedSpaceId,workSpaceId);
 		           }
