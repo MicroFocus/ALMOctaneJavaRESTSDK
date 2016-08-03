@@ -1,59 +1,87 @@
 package com.hpe.adm.nga.sdk.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class hold the EntityModel objects and server as an entity data holder
  * entities.
- * 
- * @author moris oz
  *
+ * @author moris oz
  */
 public class EntityModel {
 
-	
-	private Set<FieldModel> data = null;
-	
-	/**
-	 * Creates a new EntityModel object with given field models
-	 * 
-	 * @param value
-	 *            - a collection of field models
-	 */
-	public EntityModel(Set<FieldModel> value){
-				
-		setValues(value);
-	}
-	
-	/**
-	 * Creates a new EntityModel object with solo string filed
-	 * 
-	 * @param value
-	 *            - a collection of field models
-	 */
-	public EntityModel(String key,String value){
-				
-		Set<FieldModel> fieldModels = new HashSet<FieldModel>();
-		FieldModel fldModel = new StringFieldModel(key,value);
-		fieldModels.add(fldModel);
-		setValues(fieldModels);
-	}
-		
-	/**
-	 * getter of entity value
-	 * @return  a collection of field models
-	 */
-	public Set<FieldModel> getValues(){
-		return data;
-	};
-			
-	/**
-	 * 	setter of new entity value	
-	 * @param value - a collection of field models
-	 */
-	public void setValues(Set<FieldModel> value){
-		
-		data = value;
-	};
+
+    private Map<String, FieldModel> data = null;
+
+    public EntityModel() {
+        data = new HashMap<>();
+    }
+
+    /**
+     * Creates a new EntityModel object with given field models
+     * Use this when create entity model with mass of fields
+     *
+     * @param values - a collection of field models
+     */
+    public EntityModel(Set<FieldModel> values) {
+        if (values != null) {
+            data = new HashMap<>(values.size());
+            values.forEach(field -> data.put(field.getName(), field));
+        } else {
+            data = new HashMap<>();
+        }
+    }
+
+    /**
+     * Creates a new EntityModel object with solo string field
+     *
+     * @param value - a collection of field models
+     */
+    public EntityModel(String key, String value) {
+        this();
+        FieldModel fldModel = new StringFieldModel(key, value);
+        data.put(key, fldModel);
+    }
+
+    /**
+     * getter of entity value
+     *
+     * @return a collection of field models
+     */
+    public Set<FieldModel> getValues() {
+        return data.values().stream().collect(Collectors.toSet());
+    }
+
+    /**
+     * getter of single field
+     *
+     * @param key the fieldName
+     * @param <T> fieldModel type
+     * @return the field of specified field name
+     */
+    public <T extends FieldModel> T getValue(String key) {
+        T fieldModel = (T) data.get(key);
+        return fieldModel;
+    }
+
+    /**
+     * setter of new entity value, all old fields are cleared
+     *
+     * @param values - a collection of field models
+     */
+    public void setValues(Set<FieldModel> values) {
+        if (values != null) {
+            data.clear();
+            values.forEach(field -> data.put(field.getName(), field));
+        }
+    }
+
+    /**
+     * setter of single field, update if field exists
+     * @param fieldModel
+     */
+    public void setValue(FieldModel fieldModel) {
+        data.put(fieldModel.getName(), fieldModel);
+    }
 }

@@ -206,4 +206,32 @@ public class TestModel {
 			fail("Failed with exception: " + ex);
 		}
 	}
+
+    @Test
+	public void testAddSingleValue() {
+		expectedResult = "{\"trueValue\":true}";
+        model = new EntityModel();
+        model.setValue(new BooleanFieldModel("trueValue", true));
+        try{
+            JSONObject outJsonEntity = (JSONObject)getEntityJSONObject.invoke(service, model);
+            gotResult = outJsonEntity.toString();
+        } catch(Exception ex){
+            fail("Failed with exception: " + ex);
+        }
+	}
+
+    @Test
+    public void testUpdateSingleValue() {
+        expectedResult = "{\"trueValue\":true}";
+        Set<FieldModel> fieldSet = new HashSet<>();
+        fieldSet.add(new BooleanFieldModel("trueValue", false));
+        model = new EntityModel(fieldSet);
+        model.setValue(new BooleanFieldModel("trueValue", true));
+        try{
+            JSONObject outJsonEntity = (JSONObject)getEntityJSONObject.invoke(service, model);
+            gotResult = outJsonEntity.toString();
+        } catch(Exception ex){
+            fail("Failed with exception: " + ex);
+        }
+    }
 }
