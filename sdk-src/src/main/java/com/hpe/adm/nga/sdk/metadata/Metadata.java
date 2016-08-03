@@ -30,6 +30,8 @@ public class Metadata {
 	// constant
 	private static final String JSON_DATA_FIELD_NAME = "data";
 	private static final String JSON_NAME_FIELD_NAME = "name";
+	private static final String JSON_LABEL_FIELD_NAME = "label";
+	private static final String JSON_CAN_MODIFY_LABEL_FIELD_NAME = "can_modify_label";
 	private static final String JSON_FEATURES_FIELD_NAME = "features";
 	private static final String QUERY_NAME_FIELD_NAME = "name";
 	private static final String QUERY_ENTITY_NAME_FIELD_NAME = "entity_name";
@@ -45,6 +47,11 @@ public class Metadata {
 	private static final String FEATURE_SUBTYPES_NAME = "subtypes";
 	private static final String FEATURE_SUBTYPE_OF_NAME = "subtype_of";
 	private static final String FEATURE_HIERARCHICAL_ENTITY_NAME = "hierarchical_entity";
+	private static final String FEATURE_UDF_ENTITY_NAME = "user_defined_fields";
+	private static final String FEATURE_ORDERING_ENTITY_NAME = "ordering";
+	private static final String FEATURE_GROUPING_ENTITY_NAME = "grouping";
+	private static final String FEATURE_PHASES_ENTITY_NAME = "phases";
+	private static final String FEATURE_AUDITING_ENTITY_NAME = "auditing";
 	private static final String LOGGER_INVALID_FEATURE_FORMAT = ": not a valid feature";
 	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
 	private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";	
@@ -167,7 +174,7 @@ public class Metadata {
 		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), CommentsFeature.class);
             break;
 			case FEATURE_BUSINESS_RULES_NAME:  
-		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), BuisnessRuleFeature.class);
+		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), BusinessRulesFeature.class);
             break;
 			case FEATURE_SUBTYPES_NAME:  
         		feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesFeature.class);
@@ -178,6 +185,21 @@ public class Metadata {
 			case FEATURE_HIERARCHICAL_ENTITY_NAME: 
 				feature = new Gson().fromJson(jasoFeatureObj.toString(), HierarchyFeature.class);
             break;
+			case FEATURE_UDF_ENTITY_NAME:
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), UdfFearture.class);
+				break;
+			case FEATURE_ORDERING_ENTITY_NAME:
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), OrderingFeature.class);
+				break;
+			case FEATURE_GROUPING_ENTITY_NAME:
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), GroupingFeature.class);
+				break;
+			case FEATURE_PHASES_ENTITY_NAME:
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), PhasesFeature.class);
+				break;
+			case FEATURE_AUDITING_ENTITY_NAME:
+				feature = new Gson().fromJson(jasoFeatureObj.toString(), AuditingFeature.class);
+				break;
 			default:
 				logger.debug(featureName + LOGGER_INVALID_FEATURE_FORMAT);
 			break;
@@ -250,6 +272,8 @@ public class Metadata {
 
 		Set<Feature> features = new HashSet<Feature>();
 		String name = jasoEntityObj.getString(JSON_NAME_FIELD_NAME);
+		String label = jasoEntityObj.getString(JSON_LABEL_FIELD_NAME);
+		Boolean canModifyLabel = jasoEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
 		JSONArray jasonFeatures = jasoEntityObj.getJSONArray(JSON_FEATURES_FIELD_NAME);
 		IntStream.range(0, jasonFeatures.length()).forEach((i)->features.add(getFeatureObject(jasonFeatures.getJSONObject(i))));
 		
@@ -260,7 +284,7 @@ public class Metadata {
 			features.add(feature);
 		}*/
 		
-		EntityMetadata entityMetadata = new EntityMetadata(name,features);
+		EntityMetadata entityMetadata = new EntityMetadata(name, label, canModifyLabel, features);
 		return entityMetadata;
 	}
 	
@@ -289,7 +313,7 @@ public class Metadata {
 		/**
 		 * Creates a new entity object
 		 * 
-		 * @param typeName  - Type Value
+		 * @param typeValue  - Type Value
 		 */
 		public Entity(String typeValue){
 			
@@ -343,7 +367,7 @@ public class Metadata {
 		/**
 		 * Creates a new Field object
 		 * 
-		 * @param typeName  - Type Value
+		 * @param typeValue  - Type Value
 		 */
 		public Field(String typeValue){
 			

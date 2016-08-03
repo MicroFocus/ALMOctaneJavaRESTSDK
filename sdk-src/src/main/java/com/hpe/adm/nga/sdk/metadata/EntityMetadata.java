@@ -12,6 +12,9 @@ import com.hpe.adm.nga.sdk.metadata.Features.Feature;
 public class EntityMetadata {
 	
 	private String name = "";
+	private String label = "";
+	private final String type = "entity_metadata";
+	private boolean canModifyLabel = false;
 	private Collection<Feature> features = null;
 	
 	/**
@@ -21,9 +24,11 @@ public class EntityMetadata {
 	 * @param newFeatures - Metadata features
 	 *           
 	 */
-	public  EntityMetadata(String name,Collection<Feature> newFeatures){
+	public EntityMetadata(String name, String label, boolean canModifyLabel, Collection<Feature> newFeatures){
 		
 		setName(name);
+		this.label = label;
+		this.canModifyLabel = canModifyLabel;
 		features = newFeatures;
 	};
 	
@@ -59,7 +64,36 @@ public class EntityMetadata {
 		features = newFeatures;
 	}
 
-	
+	/**
+	 * get metadata's label
+	 * @return
+     */
+	public String getLabel() { return label; }
+
+	/**
+	 * set metadata's label
+	 * @param value
+	 * @throws IllegalAccessException if canModifyLabel is false
+     */
+	public void setLabel(String value) throws IllegalAccessException {
+		if (!canModifyLabel) {
+			throw new IllegalAccessException("Can't modify Label field.");
+		}
+
+		label = value;
+	}
+
+	/**
+	 * get metadata's type
+	 * @return
+     */
+	public String getType() { return type; }
+
+	/**
+	 * get metadata's canModifyLabel
+	 * @return
+     */
+	public boolean canModifyLabel() { return canModifyLabel; }
 }
 
 

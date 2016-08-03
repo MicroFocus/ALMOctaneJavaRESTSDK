@@ -7,9 +7,14 @@ package com.hpe.adm.nga.sdk.metadata.Features;
  *
  */
 public class AttachmentsFeature extends Feature{
-	
-	
 
+	private String relationName;
+
+    /**
+     * get relation name
+     * @return the name of the relation
+     */
+    public String getRelationName() { return relationName; }
 }
 
 

@@ -6,8 +6,10 @@ package com.hpe.adm.nga.sdk.metadata.Features;
  *
  */
 public class CommentsFeature extends Feature{
-	
 
+    private String relationName;
+
+    public String getRelationName() { return relationName; }
 }
 
 

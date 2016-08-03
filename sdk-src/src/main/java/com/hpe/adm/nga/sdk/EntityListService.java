@@ -376,6 +376,9 @@ public class EntityListService {
 			else if(aObj instanceof Long || aObj instanceof Integer){
 				fldModel = new LongFieldModel(strKey, Long.parseLong(aObj.toString()));
 			}
+			else if (aObj instanceof Float) {
+				fldModel = new FloatFieldModel(strKey, Float.parseFloat(aObj.toString()));
+			}
 			else if(aObj instanceof Boolean ){
 				fldModel = new BooleanFieldModel(strKey, Boolean.parseBoolean(aObj.toString()));
 			}
