@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.HttpCookie;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -215,28 +216,34 @@ public class NGA {
 			NGA objNga = null;
 			
 			requestFactory = HTTP_TRANSPORT
-	                .createRequestFactory(new HttpRequestInitializer() {
-	                    @Override
-	                    public void initialize(HttpRequest request) {
-	                    	
-	                    	// BasicAuthentication needed only in first initialization
-	                    	if ((hppsValue!=null && hppsValue.isEmpty()) && (lwssoValue!=null && lwssoValue.isEmpty()))
-	                    	{
-								authorisation.executeAuthorisation(request);
-	                    		
-	                    		// username and password should be transient. 
-	                    	}
-	                    	else
-	                    	{
-	                    		String lastResponseCoockie = request.getHeaders().getCookie()!=null ? request.getHeaders().getCookie() : LWSSO_COOKIE_KEY+"="+lwssoValue;
-	                    		request.getHeaders().setCookie(lastResponseCoockie); 
-	                    		request.getHeaders().set(HPSSO_HEADER_CSRF,hppsValue); 
-	                    		request.getHeaders().set(HPE_CLIENT_TYPE,HPE_MQM_UI); 
-               
-	                    	}
-	               
-	                    }
-	                });
+                .createRequestFactory(new HttpRequestInitializer() {
+                    @Override
+                    public void initialize(HttpRequest request) {
+
+                        // BasicAuthentication needed only in first initialization
+                        if (lwssoValue != null && lwssoValue.isEmpty())
+                        {
+                            authorisation.executeAuthorisation(request);
+                            // username and password should be transient.
+                        }
+                        else
+                        {
+                            // retrieve new LWSSO in response if any
+                            HttpHeaders responseHeaders = request.getResponseHeaders();
+                            String lastResponseCookie;
+                            if (updateLWSSOCookieValue(responseHeaders)) {
+                                // renew LWSSO cookie
+                                lastResponseCookie = LWSSO_COOKIE_KEY + "=" + lwssoValue;
+                            } else {
+                                // use current request cookie or set from current lwssoValue
+                                lastResponseCookie = request.getHeaders().getCookie() != null ? request.getHeaders().getCookie() : LWSSO_COOKIE_KEY + "=" + lwssoValue;
+                            }
+
+                            request.getHeaders().setCookie(lastResponseCookie);
+                            request.getHeaders().set(HPE_CLIENT_TYPE,HPE_MQM_UI);
+                        }
+                    }
+                });
 			
 			GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
 			try{
@@ -248,13 +255,8 @@ public class NGA {
 			
 				// Initialize Cookies keys
 				if (response.isSuccessStatusCode()) {
-
-					HttpHeaders hdr1 = response.getHeaders();	
-					List<String> strHPSSOCookieCsrf1 = hdr1.getHeaderStringValues(SET_COOKIE);
-					String strCookies = strHPSSOCookieCsrf1.toString();
-					List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
-					
-					lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();
+                    HttpHeaders hdr1 = response.getHeaders();
+                    updateLWSSOCookieValue(hdr1);
 					
 					// TBD - Remove after debugging
 					/* for (HttpCookie ck : Cookies) {
@@ -282,6 +284,36 @@ public class NGA {
 			}
    	       	        
 	        return objNga;
+		}
+
+        /**
+         * retrieve new cookie from set-cookie header
+         * @param headers
+         * @return true if LWSSO cookie is renewed
+         */
+		private boolean updateLWSSOCookieValue(HttpHeaders headers) {
+            boolean renewed = false;
+			List<String> strHPSSOCookieCsrf1 = headers.getHeaderStringValues(SET_COOKIE);
+            if (strHPSSOCookieCsrf1.isEmpty()) {
+                return false;
+            }
+
+            /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
+            String strCookies = strHPSSOCookieCsrf1.toString();
+            List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
+            lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();*/
+            for (String strCookie :
+                    strHPSSOCookieCsrf1) {
+                List<HttpCookie> cookies = HttpCookie.parse(strCookie);
+                Optional<HttpCookie> lwssoCookie = cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst();
+                if (lwssoCookie.isPresent()) {
+                    lwssoValue = lwssoCookie.get().getValue();
+                    renewed = true;
+                    break;
+                }
+            }
+
+            return renewed;
 		}
 	}
 

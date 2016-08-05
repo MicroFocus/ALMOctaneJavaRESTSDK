@@ -1,9 +1,6 @@
 package com.hpe.adm.nga.sdk.metadata;
 
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.*;
 import com.google.gson.Gson;
 import com.hpe.adm.nga.sdk.NGARequest;
 import com.hpe.adm.nga.sdk.Query;
@@ -273,7 +270,7 @@ public class Metadata {
 		Set<Feature> features = new HashSet<Feature>();
 		String name = jasoEntityObj.getString(JSON_NAME_FIELD_NAME);
 		String label = jasoEntityObj.getString(JSON_LABEL_FIELD_NAME);
-		Boolean canModifyLabel = jasoEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
+		//Boolean canModifyLabel = jasoEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
 		JSONArray jasonFeatures = jasoEntityObj.getJSONArray(JSON_FEATURES_FIELD_NAME);
 		IntStream.range(0, jasonFeatures.length()).forEach((i)->features.add(getFeatureObject(jasonFeatures.getJSONObject(i))));
 		
@@ -284,7 +281,7 @@ public class Metadata {
 			features.add(feature);
 		}*/
 		
-		EntityMetadata entityMetadata = new EntityMetadata(name, label, canModifyLabel, features);
+		EntityMetadata entityMetadata = new EntityMetadata(name, label, false, features);
 		return entityMetadata;
 	}
 	
@@ -342,11 +339,14 @@ public class Metadata {
 					json = response.parseAsString();
 					entitiesMetadata = getEntitiesMetadata(json);
 				}
-				
+
 				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
-			}
+
+                // Update request factory with the latest response Cookie
+                requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
+            }
 			catch (Exception e){
-				
+				logger.debug("Fail to execute GET request.", e);
 				handleException(e);
 			}
 			
@@ -397,8 +397,12 @@ public class Metadata {
 					json = response.parseAsString();
 					colEntitiesMetadata = getFieldMetadata(json);
 				}
-				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
-			}
+
+                logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
+
+                // Update request factory with the latest response Cookie
+                requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
+            }
 			catch (Exception e){
 				
 				handleException(e);

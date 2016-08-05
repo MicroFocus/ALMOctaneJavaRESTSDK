@@ -504,7 +504,7 @@ public class EntityListService {
 	
 		Collection<EntityModel> newEntityModels = null;
 		logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(),httpRequest.getHeaders().toString()));
-			
+
 		HttpResponse response = httpRequest.execute();
 		logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
 		
@@ -512,10 +512,10 @@ public class EntityListService {
 		logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
 			
 		if (response.isSuccessStatusCode() && json!=null && !json.isEmpty()) {
-
 			newEntityModels = getEntities(json);
+
 		}
-			
+
 		// Update request factory with the latest response Cookie
 		requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
 		return newEntityModels;
@@ -541,11 +541,10 @@ public class EntityListService {
 				JSONTokener tokener = new JSONTokener(json);
 				JSONObject jasoObj = new JSONObject(tokener);
 				newEntityModel = getEntityModel(jasoObj);
-			}
+        }
 			
 		// Update request factory with the latest response Cookie
 		requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
-		
 		return newEntityModel;
 		
 	}
