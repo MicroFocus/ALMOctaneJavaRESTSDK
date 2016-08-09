@@ -11,6 +11,7 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.net.HttpCookie;
 import java.util.List;
 import java.util.Optional;
@@ -93,7 +94,7 @@ public class NGA {
 		
 		if (idsharedSpaceId!=null && !idsharedSpaceId.isEmpty())
 		{
-			baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT,urlDomain,idsharedSpaceId.toString());
+			baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT,urlDomain, idsharedSpaceId);
 			
 			if (workSpaceId!=0)
 				baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT,String.valueOf(workSpaceId));
@@ -217,8 +218,59 @@ public class NGA {
 			
 			requestFactory = HTTP_TRANSPORT
                 .createRequestFactory(new HttpRequestInitializer() {
+
                     @Override
                     public void initialize(HttpRequest request) {
+
+                        request.setUnsuccessfulResponseHandler(new HttpUnsuccessfulResponseHandler() {
+                            @Override
+                            public boolean handleResponse(HttpRequest httpRequest, HttpResponse httpResponse, boolean b) throws IOException {
+                                if (httpResponse.getStatusCode() == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED) {
+                                    return refreshToken();
+                                }
+
+                                return false;
+                            }
+
+                            /**
+                             * refresh the LWSSO token and retry
+                             * @return true if token is renewed and need retry and false otherwise
+                             */
+                            private boolean refreshToken() {
+                                logger.debug("Session is expired, renew token and retry.");
+                                GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
+                                try{
+                                    // clear lwssoValue for re-login
+                                    lwssoValue = "";
+                                    logger.debug("Login to renew token.");
+                                    HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
+                                    logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
+                                    HttpResponse response = httpRequest.execute();
+                                    logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
+
+                                    // refresh Cookies keys
+                                    if (response.isSuccessStatusCode()) {
+                                        HttpHeaders hdr1 = response.getHeaders();
+                                        if (updateLWSSOCookieValue(hdr1)) {
+                                            String newCookie = LWSSO_COOKIE_KEY + "=" + lwssoValue;
+                                            request.getHeaders().setCookie(newCookie);
+                                            logger.debug("Retry with updated token.");
+                                            logger.debug(String.format(LOGGER_REQUEST_FORMAT, request.getRequestMethod(), request.getUrl().toString(), request.getHeaders().toString()));
+
+                                            // return true for retrying the origin request
+                                            return true;
+                                        }
+                                    }
+                                }
+                                catch (Exception e){
+                                    ErrorModel errorModel =  new ErrorModel(e.getMessage());
+                                    logger.error("Error in contacting server: ", e);
+                                    throw new NgaException(errorModel);
+                                }
+
+                                return false;
+                            }
+                        });
 
                         // BasicAuthentication needed only in first initialization
                         if (lwssoValue != null && lwssoValue.isEmpty())
