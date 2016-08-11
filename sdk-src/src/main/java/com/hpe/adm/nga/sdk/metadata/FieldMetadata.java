@@ -131,19 +131,6 @@ public class FieldMetadata {
 	public boolean isEditable(){return editable;};
 
 	/**
-	 * set FieldMetadata's Editable state
-	 * @param value new editable state
-	 * @throws IllegalAccessException when can_modify_editable is false
-     */
-	public void setEditable(boolean value) throws IllegalAccessException {
-		if (!can_modify_editable) {
-			throw new IllegalAccessException("Can't modify Editable field.");
-		}
-
-		editable = value;
-	};
-
-	/**
 	 * get FieldMetadata's ReturnByDefault state
 	 * @return
 	 */
@@ -154,19 +141,6 @@ public class FieldMetadata {
 	 * @return
 	 */
 	public String getLabel(){return label;};
-
-	/**
-	 * set FieldMetadata's Label
-	 * @param value new label
-	 * @throws IllegalAccessException when can_modify_label is false
-     */
-	public void setLabel(String value) throws IllegalAccessException {
-		if (!can_modify_label) {
-			throw new IllegalAccessException("Can't modify Label field.");
-		}
-
-		label = value;
-	}
 
 	/**
 	 * get FieldMetadata's CanModifyLabel
@@ -193,19 +167,6 @@ public class FieldMetadata {
 	public String getDescription() {return description;}
 
 	/**
-	 * set FieldMetadata's Description
-	 * @param value new description
-	 * @throws IllegalAccessException when can_modify_description is false
-     */
-	public void setDescription(String value) throws IllegalAccessException {
-		if (!can_modify_description) {
-			throw new IllegalAccessException("Can't modify Description field.");
-		}
-
-		description = value;
-	}
-
-	/**
 	 * get FieldMetadata's CanModifyDescription
 	 * @return
      */
@@ -230,19 +191,6 @@ public class FieldMetadata {
 	public boolean getAuditable() {return auditable;}
 
 	/**
-	 * set FieldMetadata's Auditable state
-	 * @param value new auditable state
-	 * @throws IllegalAccessException
-     */
-	public void setAuditable(boolean value) throws IllegalAccessException {
-		if (!can_modify_auditable) {
-			throw new IllegalAccessException("Can't modify Auditable field.");
-		}
-
-		auditable = value;
-	}
-
-	/**
 	 * get FieldMetadata's CanModifyAuditable
 	 * @return
      */
@@ -259,19 +207,6 @@ public class FieldMetadata {
 	 * @return
      */
 	public String getFormat() {return format;}
-
-	/**
-	 * set FieldMetadata's format
-	 * @param value new format
-	 * @throws IllegalAccessException when can_modify_format is false
-     */
-	public void setFormat(String value) throws IllegalAccessException {
-		if (!can_modify_format) {
-			throw new IllegalAccessException("Can't modify Format field.");
-		}
-
-		format = value;
-	}
 
 	/**
 	 * get FieldMetadata's min value
@@ -298,55 +233,16 @@ public class FieldMetadata {
 	public boolean isRequired(){return required;};
 
 	/**
-	 * set FieldMetadata's Required state
-	 * @param value new required state
-	 * @throws IllegalAccessException when can_modify_required is false
-     */
-	public void setRequired(boolean value) throws IllegalAccessException {
-		if (!can_modify_required) {
-			throw new IllegalAccessException("Can't modify Required field.");
-		}
-
-		required = value;
-	}
-
-	/**
 	 * get FieldMetadata's Sanitization state 
 	 * @return
 	 */
 	public String getSanitization(){return sanitization;};
 
 	/**
-	 * set FieldMetadata's Sanitization state
-	 * @param value new Sanitization state
-	 * @throws IllegalAccessException when can_modify_sanitization is false
-     */
-	public void setSanitization(String value) throws IllegalAccessException {
-		if (!can_modify_sanitization) {
-			throw new IllegalAccessException("Can't modify Sanitization field.");
-		}
-
-		sanitization = value;
-	}
-
-	/**
 	 * get FieldMetadata's Unique state 
 	 * @return
 	 */
 	public boolean isUnique(){return unique;};
-
-	/**
-	 * set FieldMetadata's Unique state
-	 * @param value new unique state
-	 * @throws IllegalAccessException
-     */
-	public void setUnique(boolean value) throws IllegalAccessException {
-		if (!can_modify_unique) {
-			throw new IllegalAccessException("Can't modify Unique field.");
-		}
-
-		unique = value;
-	}
 
 	/**
 	 * get FieldMetadata's field Type
@@ -365,19 +261,6 @@ public class FieldMetadata {
 	 * @return
 	 */
 	public int getMaxLength(){return max_length;};
-
-	/**
-	 * set FieldMetadata's MaxLength
-	 * @param value new max length
-	 * @throws IllegalAccessException when can_modify_max_length is false
-     */
-	public void setMaxLength(int value) throws IllegalAccessException {
-		if (!can_modify_max_length) {
-			throw new IllegalAccessException("Can't modify MaxLength field.");
-		}
-
-		max_length = value;
-	}
 
 	/**
 	 * get FieldMetadata's CanModifyRequired

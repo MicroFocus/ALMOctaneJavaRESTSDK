@@ -26,7 +26,7 @@ public class EntityMetadata {
 	 */
 	public EntityMetadata(String name, String label, boolean canModifyLabel, Collection<Feature> newFeatures){
 		
-		setName(name);
+		this.name = name;
 		this.label = label;
 		this.canModifyLabel = canModifyLabel;
 		features = newFeatures;
@@ -39,15 +39,7 @@ public class EntityMetadata {
 	public String getName(){
 		return name;
 	};
-	
-	/**
-	 * set metadata name
-	 * @param newName
-	 */
-	public void setName(String newName){
-		name = newName;
-	};
-	
+
 	/**
 	 * get metadata's features
 	 * @return
@@ -55,33 +47,12 @@ public class EntityMetadata {
 	public Collection<Feature> features(){
 		return features;
 	}
-	
-	/**
-	 * set metadata's features
-	 * @param newFeatures
-	 */
-	public void setfeatures(Collection<Feature> newFeatures){
-		features = newFeatures;
-	}
 
 	/**
 	 * get metadata's label
 	 * @return
      */
 	public String getLabel() { return label; }
-
-	/**
-	 * set metadata's label
-	 * @param value
-	 * @throws IllegalAccessException if canModifyLabel is false
-     */
-	public void setLabel(String value) throws IllegalAccessException {
-		if (!canModifyLabel) {
-			throw new IllegalAccessException("Can't modify Label field.");
-		}
-
-		label = value;
-	}
 
 	/**
 	 * get metadata's type
