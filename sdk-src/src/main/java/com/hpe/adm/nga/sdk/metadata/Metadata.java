@@ -38,12 +38,12 @@ public class Metadata {
 	private static final String TYPE_NAME_ENTITIES_QUERY_FORMAT = "entities?query=\"";
 	private static final String FEATURE_REST_NAME = "rest";
 	private static final String FEATURE_MAILING_NAME = "mailing";
-	private static final String FEATURE_HAS_ATTACHMENTS_NAME = "has_attachments";
-	private static final String FEATURE_HAS_COMMENTS_NAME = "has_comments";
+	private static final String FEATURE_HAS_ATTACHMENTS_NAME = "attachments";
+	private static final String FEATURE_HAS_COMMENTS_NAME = "comments";
 	private static final String FEATURE_BUSINESS_RULES_NAME = "business_rules";
 	private static final String FEATURE_SUBTYPES_NAME = "subtypes";
 	private static final String FEATURE_SUBTYPE_OF_NAME = "subtype_of";
-	private static final String FEATURE_HIERARCHICAL_ENTITY_NAME = "hierarchical_entity";
+	private static final String FEATURE_HIERARCHY_NAME = "hierarchy";
 	private static final String FEATURE_UDF_ENTITY_NAME = "user_defined_fields";
 	private static final String FEATURE_ORDERING_ENTITY_NAME = "ordering";
 	private static final String FEATURE_GROUPING_ENTITY_NAME = "grouping";
@@ -179,7 +179,7 @@ public class Metadata {
 			case FEATURE_SUBTYPE_OF_NAME: 
 				feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesOfFeature.class);
             break;
-			case FEATURE_HIERARCHICAL_ENTITY_NAME: 
+			case FEATURE_HIERARCHY_NAME:
 				feature = new Gson().fromJson(jasoFeatureObj.toString(), HierarchyFeature.class);
             break;
 			case FEATURE_UDF_ENTITY_NAME:
@@ -272,7 +272,12 @@ public class Metadata {
 		String label = jasoEntityObj.getString(JSON_LABEL_FIELD_NAME);
 		//Boolean canModifyLabel = jasoEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
 		JSONArray jasonFeatures = jasoEntityObj.getJSONArray(JSON_FEATURES_FIELD_NAME);
-		IntStream.range(0, jasonFeatures.length()).forEach((i)->features.add(getFeatureObject(jasonFeatures.getJSONObject(i))));
+		IntStream.range(0, jasonFeatures.length()).forEach((i)-> {
+			Feature featureObject = getFeatureObject(jasonFeatures.getJSONObject(i));
+			if (featureObject != null) {
+				features.add(featureObject);
+			}
+		});
 		
 		// TBD - Remove after debugging
 		/*for (int i = 0; i < jasonFeatures.length(); i++) {

@@ -7,27 +7,27 @@ package com.hpe.adm.nga.sdk.metadata.Features;
  */
 public class HierarchyFeature extends Feature{
 	
-	private String[] childTypes;
-	private String[] parentTypes;
-	private Root rootEnt;
+	private String[] child_types;
+	private String[] parent_types;
+	private Root root;
 	
 	/**
 	 * get Child Types
 	 * @return
 	 */
-	public String[] getChildTypes(){return childTypes;};
+	public String[] getChildTypes(){return child_types;};
 	
 	/**
 	 * get Parent Types
 	 * @return
 	 */
-	public String[] getParentTypes(){return parentTypes;};
+	public String[] getParentTypes(){return parent_types;};
 	
 	/**
 	 * get Root Types
 	 * @return
 	 */
-	public Root getRootEnt(){return rootEnt;};
+	public Root getRootEnt(){return root;};
 	
 	/**
 	 * Root Data structure

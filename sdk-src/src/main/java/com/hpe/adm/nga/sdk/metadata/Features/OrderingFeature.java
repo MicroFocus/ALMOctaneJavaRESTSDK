@@ -14,12 +14,12 @@ public class OrderingFeature extends Feature {
     public Aspect[] getAspects() { return aspects; }
 
     public class Aspect {
-        private String aspectName;
-        private String orderFieldName;
-        private String contextFieldName;
+        private String aspect_name;
+        private String order_field_name;
+        private String context_field_name;
 
-        public String getAspectName() { return aspectName; }
-        public String getOrderFieldName() { return orderFieldName; }
-        public String getContextFieldName() { return contextFieldName; }
+        public String getAspectName() { return aspect_name; }
+        public String getOrderFieldName() { return order_field_name; }
+        public String getContextFieldName() { return context_field_name; }
     }
 }
