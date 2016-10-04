@@ -11,7 +11,7 @@ public class QueryUtils {
     public static Query getQueryForIds(List<Integer> entityIds) {
         Query query = new Query();
         for (int i = 0; i < entityIds.size(); i++) {
-            Query.Field.Logical logical = query.field("id").equal(entityIds.get(i));
+            Query.Field.Logical logical = query.field("id").equalTo(entityIds.get(i));
             if (i < entityIds.size() - 1) {
                 query = logical.or();
             } else {

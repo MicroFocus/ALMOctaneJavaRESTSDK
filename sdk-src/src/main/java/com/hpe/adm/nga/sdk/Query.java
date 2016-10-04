@@ -11,17 +11,19 @@ import java.util.TimeZone;
  *
  */
 public class Query {
+	
+	private String query = "";
 
-	
-	private  String query = "";
-	
+	public Query() {
+	}
+
 	/**
 	 * getter of field object 
 	 * @param name - field name
 	 * @return - field object
 	 */
-	public Field field (String name,boolean negate){
-		return new Field(name,this,negate);
+	public Field field (String name,boolean negate) {
+		return new Field(name, this, negate);
 	}
 	
 	/**
@@ -30,7 +32,7 @@ public class Query {
 	 * @return - field object
 	 */
 	public Field field (String name){
-		return new Field(name,this,false);
+		return new Field(name, this, false);
 	}
 	
 	/**
@@ -77,7 +79,7 @@ public class Query {
 		
 		// private
 		private String queryName = "";
-		private Query querybase = null;
+		private Query queryBase = null;
 		private boolean isNegate = false;
 		
 		// functions
@@ -87,9 +89,9 @@ public class Query {
 		 * @param Name - Field name
 		 * @param base - query base
 		 */
-		protected Field(String Name,Query base,boolean negate) {
+		protected Field(String Name, Query base, boolean negate) {
 			queryName = Name;
-			querybase = base;
+			queryBase = base;
 			isNegate = negate;
 		}
 		
@@ -99,7 +101,7 @@ public class Query {
 		 */
 		public Field(String Name) {
 			queryName = Name;
-			querybase = null;
+			queryBase = null;
 			isNegate = false;
 		}
 		
@@ -110,17 +112,27 @@ public class Query {
 		 */
 		public Field(String Name,boolean negate) {
 			queryName = Name;
-			querybase = null;
+			queryBase = null;
 			isNegate = negate;
 		}
-		
+
+		/**
+		 * getter of an equal logical Object based on a given value ( Support any given value type )
+		 * @param value
+		 * @return - a new logical Object based on a given value
+		 */
+		public Field not() {
+			return new Field(queryName, queryBase, !isNegate);
+			//isNegate = true;
+		}
+
 		/**
 		 * getter of an equal logical Object based on a given value ( Support any given value type )
 		 * @param value 
 		 * @return - a new logical Object based on a given value
 		 */
-		public Logical equal(Object value) {
-			return new Logical(querybase,queryName,COMPARISON_OPERATOR_EQUALS,value,isNegate);
+		public Logical equalTo(Object value) {
+			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_EQUALS,value,isNegate);
 		}
 		
 		/**
@@ -128,8 +140,8 @@ public class Query {
 		 * @param value 
 		 * @return - a new logical Object based on a given value
 		 */
-		public Logical less(Object value) {
-			return new Logical(querybase,queryName,COMPARISON_OPERATOR_LESS,value,isNegate);
+		public Logical lessThan(Object value) {
+			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_LESS,value,isNegate);
 		}
 		
 		/**
@@ -137,8 +149,8 @@ public class Query {
 		 * @param value 
 		 * @return - a new logical Object based on a given value
 		 */
-		public Logical greater(Object value) {
-			return new Logical(querybase,queryName,COMPARISON_OPERATOR_GREATER,value,isNegate);
+		public Logical greaterThan(Object value) {
+			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_GREATER,value,isNegate);
 		}
 		
 		/**
@@ -146,8 +158,8 @@ public class Query {
 		 * @param value 
 		 * @return - a new logical Object based on a given value
 		 */
-		public Logical lessEqual(Object value) {
-			return new Logical(querybase,queryName,COMPARISON_OPERATOR_LESS_EQUALS,value,isNegate);
+		public Logical lessOrEqualThan(Object value) {
+			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_LESS_EQUALS,value,isNegate);
 		}
 		
 		/**
@@ -155,8 +167,8 @@ public class Query {
 		 * @param value 
 		 * @return - a new logical Object based on a given value
 		 */
-		public Logical greaterEqual(Object value) {
-			return new Logical(querybase,queryName,COMPARISON_OPERATOR_GREATER_EQUALS,value,isNegate);
+		public Logical greaterOrEqualThan(Object value) {
+			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_GREATER_EQUALS,value,isNegate);
 		}
 		
 		/**
@@ -186,15 +198,20 @@ public class Query {
 			 * @param sign - query's value
 			 * @param negate - is negate ?
 			 */
-			public Logical(Query base,String name,String sign,Object value,boolean negate){
-				
+			public Logical(Query base,String name,String sign,Object value,boolean negate) {
 				nameLogical = name;
 				objValue = value;
 				signLogical = sign;
 				queryBase = base;
 				isNegate = negate; 
 			}
-			
+
+			public Logical(Query base, String name, boolean negate) {
+				nameLogical = name;
+				queryBase = base;
+				isNegate = negate;
+			}
+
 			/**
 			 * getter of a new query with "Or" procedure
 			 * @return
@@ -222,7 +239,6 @@ public class Query {
 			 * @return
 			 */
 			public Query build() {
-				
 				String base = "";
 				String value = "";
 				String isNegatebuild = "";
@@ -230,7 +246,7 @@ public class Query {
 				if (isNegate)
 					isNegatebuild = "!";
 				
-				if(queryBase!=null)
+				if(queryBase != null)
 					base = queryBase.getQueryString();
 				
 				if( objValue == null)

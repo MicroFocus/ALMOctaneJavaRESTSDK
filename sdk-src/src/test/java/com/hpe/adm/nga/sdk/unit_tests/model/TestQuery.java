@@ -30,14 +30,14 @@ public class TestQuery {
 	@Test
 	public void testEquality() {
 		expectedResult = "(id EQ 5)";
-		queryBuild = new Query.Field("id").equal(5).build();		
+		queryBuild = new Query.Field("id").equalTo(5).build();
 		assertEquals(expectedResult, queryBuild.getQueryString());
 	}
 	
 	@Test
 	public void testStringEquality(){
 		expectedResult = "(name EQ 'test')";
-		queryBuild = new Query.Field("name").equal(new String("test")).build();					
+		queryBuild = new Query.Field("name").equalTo("test").build();
 		assertEquals(expectedResult, queryBuild.getQueryString());
 	}
 	
@@ -45,21 +45,21 @@ public class TestQuery {
 	public void testDateFormat(){			
 		
 		expectedResult = "(createn_time LT '" + dateFormat.format(now) + "')";
-		queryBuild = new Query.Field("createn_time").less(now).build();					
+		queryBuild = new Query.Field("createn_time").lessThan(now).build();
 		assertEquals(expectedResult, queryBuild.getQueryString());
 	}
 	
 	@Test
 	public void testComplexStatementOr(){
 		expectedResult = "(creation_time LT '" + dateFormat.format(now) + "')||(id EQ '5028')||(id EQ '5015')";
-		queryBuild = new Query.Field("creation_time").less(now).or().field("id").equal(new String("5028")).or().field("id").equal(new String("5015")).build();
-		assertEquals(expectedResult, queryBuild.getQueryString());
-	}
-	@Test
-	public void testComplexStatementAndNegate(){
-		expectedResult = "!(id GE '5028');!(name EQ '5028')";
-		queryBuild = new Query.Field("id", true).greaterEqual(new String("5028")).and().field("name", true).equal(new String("5028")).build();		
+		queryBuild = new Query.Field("creation_time").lessThan(now).or().field("id").equalTo("5028").or().field("id").equalTo("5015").build();
 		assertEquals(expectedResult, queryBuild.getQueryString());
 	}
 
+	@Test
+	public void testComplexStatementAndNegate(){
+		expectedResult = "!(id GE '5028');!(name EQ '5028')";
+		queryBuild = (new Query()).field("id").not().greaterOrEqualThan("5028").and().field("name").not().equalTo("5028").build();
+		assertEquals(expectedResult, queryBuild.getQueryString());
+	}
 }
