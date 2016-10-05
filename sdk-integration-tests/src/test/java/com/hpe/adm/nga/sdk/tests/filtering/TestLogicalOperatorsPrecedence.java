@@ -27,8 +27,8 @@ public class TestLogicalOperatorsPrecedence extends TestBase {
 //    @Test // cannot build complicated query
     public void supportEqual() throws Exception {
         //query="name='Alfred' AND !story_points=1"
-        Query.Field.Logical logic1 = new Query.Field("name").equalTo("Alfred");
-        Query.Field.Logical logic2 = new Query.Field("story_points", false).equalTo(1);
+        Query.Field.Logical logic1 = new Query().field("name").equalTo("Alfred");
+        Query.Field.Logical logic2 = new Query().field("story_points").equalTo(1);
 //        Query query = logic1.and(logic2);
 //        testFiltering(query);
     }

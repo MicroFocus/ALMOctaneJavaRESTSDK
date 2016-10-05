@@ -22,15 +22,6 @@ public class Query {
 	 * @param name - field name
 	 * @return - field object
 	 */
-	public Field field (String name,boolean negate) {
-		return new Field(name, this, negate);
-	}
-	
-	/**
-	 * getter of field object 
-	 * @param name - field name
-	 * @return - field object
-	 */
 	public Field field (String name){
 		return new Field(name, this, false);
 	}
@@ -40,7 +31,6 @@ public class Query {
 	 * @return query string
 	 */
 	public String getQueryString() {
-		
 		return query;
 	}
 	
@@ -48,8 +38,7 @@ public class Query {
 	 * setter of new query string
 	 * @param qry - query string
 	 */
-	protected void setQuery(String qry) {
-		
+	protected void setQueryString(String qry) {
 		query = qry;
 	}
 	
@@ -57,8 +46,7 @@ public class Query {
 	 * add new query
 	 * @param qry - query string
 	 */
-	protected void addQuery(String add) {
-		
+	protected void addQueryString(String add) {
 		query += add;
 	}
 	
@@ -99,31 +87,18 @@ public class Query {
 		 * Creates a new Field object on a given name ( new query )
 		 * @param Name - field name
 		 */
-		public Field(String Name) {
+		protected Field(String Name) {
 			queryName = Name;
 			queryBase = null;
 			isNegate = false;
 		}
-		
-		/**
-		 * Creates a new Field object with negate value
-		 * @param Name - field name
-		 * @param negate - (Eg: field equal value , field not equal value )
-		 */
-		public Field(String Name,boolean negate) {
-			queryName = Name;
-			queryBase = null;
-			isNegate = negate;
-		}
 
 		/**
-		 * getter of an equal logical Object based on a given value ( Support any given value type )
-		 * @param value
-		 * @return - a new logical Object based on a given value
+		 * Negates the next logical Object
+		 * @return - a new field Object
 		 */
 		public Field not() {
 			return new Field(queryName, queryBase, !isNegate);
-			//isNegate = true;
 		}
 
 		/**
@@ -132,7 +107,7 @@ public class Query {
 		 * @return - a new logical Object based on a given value
 		 */
 		public Logical equalTo(Object value) {
-			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_EQUALS,value,isNegate);
+			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_EQUALS, value, isNegate);
 		}
 		
 		/**
@@ -141,7 +116,7 @@ public class Query {
 		 * @return - a new logical Object based on a given value
 		 */
 		public Logical lessThan(Object value) {
-			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_LESS,value,isNegate);
+			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_LESS, value, isNegate);
 		}
 		
 		/**
@@ -150,7 +125,7 @@ public class Query {
 		 * @return - a new logical Object based on a given value
 		 */
 		public Logical greaterThan(Object value) {
-			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_GREATER,value,isNegate);
+			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_GREATER, value, isNegate);
 		}
 		
 		/**
@@ -159,7 +134,7 @@ public class Query {
 		 * @return - a new logical Object based on a given value
 		 */
 		public Logical lessOrEqualThan(Object value) {
-			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_LESS_EQUALS,value,isNegate);
+			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_LESS_EQUALS, value, isNegate);
 		}
 		
 		/**
@@ -168,7 +143,7 @@ public class Query {
 		 * @return - a new logical Object based on a given value
 		 */
 		public Logical greaterOrEqualThan(Object value) {
-			return new Logical(queryBase,queryName,COMPARISON_OPERATOR_GREATER_EQUALS,value,isNegate);
+			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_GREATER_EQUALS, value, isNegate);
 		}
 		
 		/**
@@ -179,15 +154,15 @@ public class Query {
 		public static class Logical {
 			
 			// constant
-			private  static final String DATE_TIME_ISO_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss'Z'";
-			private  static final String DATE_TIME_UTC_ZONE_NAME 	= "UTC";
+			private static final String DATE_TIME_ISO_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss'Z'";
+			private static final String DATE_TIME_UTC_ZONE_NAME 	= "UTC";
 			
 			// private members
-			private String nameLogical="";
-			private Object objValue=null;
-			private String signLogical="";
-			private Query queryBase=null;
-			private boolean isNegate=false;
+			private String nameLogical = "";
+			private Object objValue = null;
+			private String signLogical = "";
+			private Query queryBase = null;
+			private boolean isNegate = false;
 			
 			// functions
 			
@@ -219,7 +194,7 @@ public class Query {
 			public Query or() {
 				
 				Query quary = build();
-				quary.addQuery("||");
+				quary.addQueryString("||");
 				return quary;
 			}
 			
@@ -230,7 +205,7 @@ public class Query {
 			public Query and() {
 				
 				Query quary = build();
-				quary.addQuery(";");
+				quary.addQueryString(";");
 				return quary;
 			}
 			
@@ -275,7 +250,7 @@ public class Query {
 				
 				String  strQuery = base +  isNegatebuild + "(" + nameLogical + " " + signLogical + " " + value + ")";
 				Query quary = new Query();
-				quary.setQuery(strQuery);
+				quary.setQueryString(strQuery);
 				return quary;
 			}
 		}
