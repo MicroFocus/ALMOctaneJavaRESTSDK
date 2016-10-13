@@ -64,15 +64,15 @@ public class TestSupportFiltering extends TestBase {
     private Query getQuery(String entityName, String logicalOperation) {
         switch (logicalOperation) {
             case "EQ":
-                return new Query().field("name").equalTo(entityName).build();
+                return new Query.QueryBuilder("name", Query::equalTo, entityName).build();
             case "LT":
-                return new Query().field("name").lessThan("z_" + entityName).build();
+                return new Query.QueryBuilder("name", Query::lessThan, "z_" + entityName).build();
             case "GT":
-                return new Query().field("name").greaterThan("a_" + entityName).build();
+                return new Query.QueryBuilder("name", Query::greaterThan, "a_" + entityName).build();
             case "LE":
-                return new Query().field("name").lessOrEqualThan(entityName).build();
+                return new Query.QueryBuilder("name", Query::lessThanOrEqualTo, entityName).build();
             case "GE":
-                return new Query().field("name").greaterOrEqualThan(entityName).build();
+                return new Query.QueryBuilder("name", Query::greaterThanOrEqualTo, entityName).build();
             default:
                 return new Query();
         }

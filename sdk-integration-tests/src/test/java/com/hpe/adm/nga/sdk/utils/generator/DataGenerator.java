@@ -97,7 +97,7 @@ public class DataGenerator {
     }
 
     private static EntityModel generateDefect(NGA nga, Set<FieldModel> fields) throws Exception {
-        Query query = new Query().field("subtype").equalTo("work_item_root").build();
+        Query query = new Query.QueryBuilder("subtype", Query::equalTo, "work_item_root").build();
         Collection<EntityModel> roots = nga.entityList("work_items").get().query(query).execute();
         EntityModel root = roots.iterator().next();
         FieldModel parentField = new ReferenceFieldModel("parent", root);
@@ -106,7 +106,7 @@ public class DataGenerator {
         EntityModel user = users.iterator().next();
         FieldModel author = new ReferenceFieldModel("author", user);
 
-        Query query2 = new Query().field("entity").equalTo("defect").build();
+        Query query2 = new Query.QueryBuilder("entity", Query::equalTo, "defect").build();
         Collection<EntityModel> phases = nga.entityList("phases").get().query(query2).execute();
         EntityModel phase = phases.iterator().next();
         FieldModel phaseField = new ReferenceFieldModel("phase", phase);

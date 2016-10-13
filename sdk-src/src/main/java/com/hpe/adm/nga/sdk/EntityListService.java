@@ -166,7 +166,7 @@ public class EntityListService {
 	 *            - domain name
 	 * @return url string ready to transmit
 	 */
-	protected String urlBuilder(String urlDomain,String fieldsParams,String orderByParam,long limitParam,long ofsetParam,Query queryParams)  {
+	protected String urlBuilder(String urlDomain, String fieldsParams, String orderByParam, long limitParam, long offsetParam, Query queryParams)  {
 
 		// Construct url paramters
 		fieldsParams = (fieldsParams != null && !fieldsParams.isEmpty())
@@ -174,14 +174,14 @@ public class EntityListService {
 		fieldsParams = (fieldsParams != null && !fieldsParams.isEmpty())
 				? fieldsParams.substring(0, fieldsParams.length() - 1) + "&" : "";
 		String limitParamString = limitParam >= 0 ? String.format(LIMIT_PARAM_FORMAT, limitParam) : "";
-		String OfsetParamString = ofsetParam >= 0 ? String.format(OFFSET_PARAM_FORMAT, ofsetParam) : "";
+		String offsetParamString = offsetParam >= 0 ? String.format(OFFSET_PARAM_FORMAT, offsetParam) : "";
 		orderByParam = (orderByParam != null && !orderByParam.isEmpty())
 				? String.format(ORDER_BY_PARAM_FORMAT, orderByParam) : "";
 		orderByParam = (orderByParam != null && !orderByParam.isEmpty())
 				? orderByParam.substring(0, orderByParam.length() - 1) + "&" : "";
 		String queryParamsString = queryParams != null ? String.format(QUERY_PARAM_FORMAT, queryParams.getQueryString())
 				: "";
-		String params = fieldsParams + limitParamString + OfsetParamString + orderByParam + queryParamsString;
+		String params = fieldsParams + limitParamString + offsetParamString + orderByParam + queryParamsString;
 		params = (params!=null && !params.isEmpty()) && params.charAt(params.length() - 1) == '&'
 				? params.substring(0, params.length() - 1) : params;
 		params = (params!=null && params.isEmpty()) ? "" : "?" + params;
@@ -203,7 +203,7 @@ public class EntityListService {
 	protected String urlBuilder(String urlDomain,Query queryParams)  {
 
 		
-		return urlBuilder(urlDomain,"","",Long.MIN_VALUE,Long.MIN_VALUE,queryParams);
+		return urlBuilder(urlDomain, "", "", Long.MIN_VALUE, Long.MIN_VALUE, queryParams);
 
 	}
 	
@@ -212,10 +212,10 @@ public class EntityListService {
 	 * given domain name and the global quarry parameters of entity list.
 	 * 
 	 * @param urlDomain	 - domain name
-	 * @param queryParams- query parameters
+	 * @param fieldsParams - field parameters
 	 * @return url string ready to transmit
 	 */
-	protected String urlBuilder(String urlDomain,String fieldsParams) {
+	protected String urlBuilder(String urlDomain, String fieldsParams) {
 
 		return urlBuilder(urlDomain,fieldsParams,"",Long.MIN_VALUE,Long.MIN_VALUE,null);
 	}
@@ -231,7 +231,7 @@ public class EntityListService {
 
 		
 		Query queryParams = null;
-		return urlBuilder(urlDomain,queryParams);
+		return urlBuilder(urlDomain, queryParams);
 
 	}
 
@@ -596,7 +596,7 @@ public class EntityListService {
 		private String fieldsParams = "";
 		private String orderByParam = "";
 		private long limitParam = Long.MIN_VALUE;
-		private long ofsetParam =  Long.MIN_VALUE;
+		private long offsetParam =  Long.MIN_VALUE;
 		private Query queryParams = null;
 
 		// Public
@@ -611,7 +611,7 @@ public class EntityListService {
 
 
 			Collection<EntityModel> newEntityModels = null;
-			String url = urlBuilder(urlDomain,fieldsParams,orderByParam,limitParam,ofsetParam,queryParams);
+			String url = urlBuilder(urlDomain, fieldsParams, orderByParam, limitParam, offsetParam, queryParams);
 			GenericUrl domain = new GenericUrl(url);
 			
 			try{
@@ -657,7 +657,7 @@ public class EntityListService {
 		 * @return Get Object with new offset parameter
 		 */
 		public Get offset(int offset) {
-			ofsetParam = offset;
+			offsetParam = offset;
 			return this;
 		}
 

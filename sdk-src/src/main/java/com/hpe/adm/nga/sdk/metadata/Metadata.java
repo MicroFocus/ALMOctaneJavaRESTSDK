@@ -93,7 +93,7 @@ public class Metadata {
 		
 		String quaryList =  entitiesList
 	            .stream()
-	            .map(s -> new Query().field(QUERY_NAME_FIELD_NAME).equalTo(s).build().getQueryString())
+	            .map(s -> new Query.QueryBuilder(QUERY_NAME_FIELD_NAME, Query::equalTo, s).getQueryString())
 	            .collect(Collectors.joining("||"));
 		
 		// TBD - Remove after debugging
@@ -140,7 +140,7 @@ public class Metadata {
 		List<String> entitiesList =  Arrays.asList(entities);
 		String quaryList =  entitiesList
 	            .stream()
-	            .map(s -> new Query().field(QUERY_ENTITY_NAME_FIELD_NAME).equalTo(s).build().getQueryString())
+	            .map(s -> new Query.QueryBuilder(QUERY_ENTITY_NAME_FIELD_NAME, Query::equalTo, s).getQueryString())
 	            .collect(Collectors.joining("||"));
 	
 		

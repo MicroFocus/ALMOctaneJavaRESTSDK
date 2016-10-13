@@ -1,6 +1,7 @@
 package com.hpe.adm.nga.sdk.utils;
 
 import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.Query.QueryBuilder;
 
 import java.util.List;
 
@@ -10,14 +11,16 @@ import java.util.List;
 public class QueryUtils {
     public static Query getQueryForIds(List<Integer> entityIds) {
         Query query = new Query();
+
+        QueryBuilder queryBuilder = null;
+
         for (int i = 0; i < entityIds.size(); i++) {
-            Query.Field.Logical logical = query.field("id").equalTo(entityIds.get(i));
-            if (i < entityIds.size() - 1) {
-                query = logical.or();
+            if (queryBuilder == null) {
+                queryBuilder = new Query.QueryBuilder("id", Query::equalTo, entityIds.get(i));
             } else {
-                query = logical.build();
+                queryBuilder.or("id", Query::equalTo, entityIds.get(i));
             }
         }
-        return query;
+        return queryBuilder.build();
     }
 }

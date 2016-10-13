@@ -3,259 +3,140 @@ package com.hpe.adm.nga.sdk;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.function.BiFunction;
 
 /**
- * This class serve all functionality concern to query ( filtering)
- * Each Query is build based on the following scheme : {Field} {Logic procedure} {value}
- * @author Moris Oz
- *
+ * Created by leufl on 10/10/2016.
  */
 public class Query {
-	
-	private String query = "";
 
-	public Query() {
-	}
+    private String queryString = "";
 
-	/**
-	 * getter of field object 
-	 * @param name - field name
-	 * @return - field object
-	 */
-	public Field field (String name){
-		return new Field(name, this, false);
-	}
-	
-	/**
-	 * getter of a query string
-	 * @return query string
-	 */
-	public String getQueryString() {
-		return query;
-	}
-	
-	/**
-	 * setter of new query string
-	 * @param qry - query string
-	 */
-	protected void setQueryString(String qry) {
-		query = qry;
-	}
-	
-	/**
-	 * add new query
-	 * @param qry - query string
-	 */
-	protected void addQueryString(String add) {
-		query += add;
-	}
-	
-	/**
-	 * This class hold the query's field data and functionality
-	 * @author mor4095
-	 *
-	 */
-	public static class Field {
-		
-		// constant
-		private static final String COMPARISON_OPERATOR_EQUALS 			= "EQ";
-		private static final String COMPARISON_OPERATOR_LESS			= "LT";
-		private static final String COMPARISON_OPERATOR_GREATER 		= "GT";
-		private static final String COMPARISON_OPERATOR_LESS_EQUALS  	= "LE";
-		private static final String COMPARISON_OPERATOR_GREATER_EQUALS 	= "GE";
-		
-		
-		// private
-		private String queryName = "";
-		private Query queryBase = null;
-		private boolean isNegate = false;
-		
-		// functions
-		
-		/**
-		 * Creates a new Field object based on a given name and base query ( A filed that is already part of a given query )
-		 * @param Name - Field name
-		 * @param base - query base
-		 */
-		protected Field(String Name, Query base, boolean negate) {
-			queryName = Name;
-			queryBase = base;
-			isNegate = negate;
-		}
-		
-		/**
-		 * Creates a new Field object on a given name ( new query )
-		 * @param Name - field name
-		 */
-		protected Field(String Name) {
-			queryName = Name;
-			queryBase = null;
-			isNegate = false;
-		}
+    // constant
+    private static final String DATE_TIME_ISO_FORMAT 	            = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static final String DATE_TIME_UTC_ZONE_NAME 	        = "UTC";
 
-		/**
-		 * Negates the next logical Object
-		 * @return - a new field Object
-		 */
-		public Field not() {
-			return new Field(queryName, queryBase, !isNegate);
-		}
+    private static final String COMPARISON_OPERATOR_EQUALS 			= "EQ";
+    private static final String COMPARISON_OPERATOR_LESS			= "LT";
+    private static final String COMPARISON_OPERATOR_GREATER 		= "GT";
+    private static final String COMPARISON_OPERATOR_LESS_EQUALS  	= "LE";
+    private static final String COMPARISON_OPERATOR_GREATER_EQUALS 	= "GE";
 
-		/**
-		 * getter of an equal logical Object based on a given value ( Support any given value type )
-		 * @param value 
-		 * @return - a new logical Object based on a given value
-		 */
-		public Logical equalTo(Object value) {
-			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_EQUALS, value, isNegate);
-		}
-		
-		/**
-		 * getter of an less logical Object based on a given value ( Support any given value type )
-		 * @param value 
-		 * @return - a new logical Object based on a given value
-		 */
-		public Logical lessThan(Object value) {
-			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_LESS, value, isNegate);
-		}
-		
-		/**
-		 * getter of an greater logical Object based on a given value ( Support any given value type )
-		 * @param value 
-		 * @return - a new logical Object based on a given value
-		 */
-		public Logical greaterThan(Object value) {
-			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_GREATER, value, isNegate);
-		}
-		
-		/**
-		 * getter of an lessEqual logical Object based on a given value ( Support any given value type )
-		 * @param value 
-		 * @return - a new logical Object based on a given value
-		 */
-		public Logical lessOrEqualThan(Object value) {
-			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_LESS_EQUALS, value, isNegate);
-		}
-		
-		/**
-		 * getter of an greaterEqual logical Object based on a given value ( Support any given value type )
-		 * @param value 
-		 * @return - a new logical Object based on a given value
-		 */
-		public Logical greaterOrEqualThan(Object value) {
-			return new Logical(queryBase, queryName, COMPARISON_OPERATOR_GREATER_EQUALS, value, isNegate);
-		}
-		
-		/**
-		 * This class hold the query's Logical procedure functionality
-		 * @author moris oz
-		 *
-		 */
-		public static class Logical {
-			
-			// constant
-			private static final String DATE_TIME_ISO_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss'Z'";
-			private static final String DATE_TIME_UTC_ZONE_NAME 	= "UTC";
-			
-			// private members
-			private String nameLogical = "";
-			private Object objValue = null;
-			private String signLogical = "";
-			private Query queryBase = null;
-			private boolean isNegate = false;
-			
-			// functions
-			
-			/**
-			 * Creates a new Logical object 
-			 * @param base - base Query ( query can contain dew Logical statements )
-			 * @param sign - query's logical sign
-			 * @param sign - query's value
-			 * @param negate - is negate ?
-			 */
-			public Logical(Query base,String name,String sign,Object value,boolean negate) {
-				nameLogical = name;
-				objValue = value;
-				signLogical = sign;
-				queryBase = base;
-				isNegate = negate; 
-			}
+    public Query() {}
 
-			public Logical(Query base, String name, boolean negate) {
-				nameLogical = name;
-				queryBase = base;
-				isNegate = negate;
-			}
+    private Query(QueryBuilder builder) {
+        queryString = builder.queryString;
+    }
 
-			/**
-			 * getter of a new query with "Or" procedure
-			 * @return
-			 */
-			public Query or() {
-				
-				Query quary = build();
-				quary.addQueryString("||");
-				return quary;
-			}
-			
-			/**
-			 * getter of a new query with "And" procedure
-			 * @return
-			 */
-			public Query and() {
-				
-				Query quary = build();
-				quary.addQueryString(";");
-				return quary;
-			}
-			
-			/**
-			 * Build new query
-			 * @return
-			 */
-			public Query build() {
-				String base = "";
-				String value = "";
-				String isNegatebuild = "";
-				
-				if (isNegate)
-					isNegatebuild = "!";
-				
-				if(queryBase != null)
-					base = queryBase.getQueryString();
-				
-				if( objValue == null)
-				{
-					value = "{null}";
-				}
-				else if (objValue.getClass() == Date.class)
-				{
-					SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
-					TimeZone utc = TimeZone.getTimeZone(DATE_TIME_UTC_ZONE_NAME);
-					sdf.setTimeZone(utc);
-					value = "'" + sdf.format(objValue) + "'";
-				}
-				else if (objValue.getClass() == String.class)
-				{
-					value = "'" +  objValue.toString() + "'";
-				}
-				else if (objValue.getClass() == Query.class) 
-				{
-					value =  "{" + ((Query)objValue).getQueryString() +  "}" ;
-				}
-				else
-				{
-					value = objValue.toString();
-				}
-				
-				String  strQuery = base +  isNegatebuild + "(" + nameLogical + " " + signLogical + " " + value + ")";
-				Query quary = new Query();
-				quary.setQueryString(strQuery);
-				return quary;
-			}
-		}
-	}
-	
-	
+    /**
+     * Accessor method of query string
+     * @return query string
+     */
+    public String getQueryString() {
+        return queryString;
+    }
 
+//    /**
+//     * Mutator method of query string
+//     * @param queryString - query string
+//     */
+//    private void setQueryString(String queryString) {
+//        this.queryString = queryString;
+//    }
+//
+//    /**
+//     * Appends new query to the existing one
+//     * @param queryString - query string
+//     */
+//    private void addQueryString(String queryString) {
+//        this.queryString += queryString;
+//    }
+
+    public static String equalTo(String field, Object value) {
+        return "(" + field + " " + COMPARISON_OPERATOR_EQUALS + " " + toString(value) + ")";
+    }
+
+    public static String lessThan(String field, Object value) {
+        return "(" + field + " " + COMPARISON_OPERATOR_LESS + " " + toString(value) + ")";
+    }
+
+    public static String greaterThan(String field, Object value) {
+        return "(" + field + " " + COMPARISON_OPERATOR_GREATER + " " + toString(value) + ")";
+    }
+
+    public static String lessThanOrEqualTo(String field, Object value) {
+        return "(" + field + " " + COMPARISON_OPERATOR_LESS_EQUALS + " " + toString(value) + ")";
+    }
+
+    public static String greaterThanOrEqualTo(String field, Object value) {
+        return "(" + field + " " + COMPARISON_OPERATOR_GREATER_EQUALS + " " + toString(value) + ")";
+    }
+
+    private static String toString(Object value) {
+        if( value == null) {
+            return "{null}";
+        } else if (value.getClass() == Date.class) {
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
+            TimeZone utc = TimeZone.getTimeZone(DATE_TIME_UTC_ZONE_NAME);
+            sdf.setTimeZone(utc);
+            return "'" + sdf.format(value) + "'";
+        } else if (value.getClass() == String.class) {
+            return "'" +  value.toString() + "'";
+        } else if (value.getClass() == QueryBuilder.class) {
+            return  "{" + ((QueryBuilder)value).getQueryString() +  "}" ;
+        } else {
+            return value.toString();
+        }
+    }
+
+    public static class QueryBuilder {
+
+        String queryString = "";
+
+        public QueryBuilder(String fieldName, BiFunction<String, Object, String> function, Object fieldValue) {
+            this(fieldName, function, fieldValue, false);
+        }
+
+        public QueryBuilder(String fieldName, BiFunction<String, Object, String> function, Object fieldValue, boolean isNegate) {
+            queryString = function.apply(fieldName, fieldValue);
+            if (isNegate)
+                queryString = negate(queryString);
+        }
+
+        public QueryBuilder and(String fieldName, BiFunction<String, Object, String> function, Object fieldValue) {
+            return and(fieldName, function, fieldValue, false);
+        }
+
+        public QueryBuilder and(String fieldName, BiFunction<String, Object, String> function, Object fieldValue, boolean isNegate) {
+            String rightQueryString = function.apply(fieldName, fieldValue);
+            if (isNegate)
+                rightQueryString = negate(rightQueryString);
+            queryString += ";" + rightQueryString;
+            return this;
+        }
+
+        public QueryBuilder or(String fieldName, BiFunction<String, Object, String> function, Object fieldValue) {
+            return or(fieldName, function, fieldValue, false);
+        }
+
+        public QueryBuilder or(String fieldName, BiFunction<String, Object, String> function, Object fieldValue, boolean isNegate) {
+            String rightQueryString = function.apply(fieldName, fieldValue);
+            if (isNegate)
+                rightQueryString = negate(rightQueryString);
+            queryString += "||" + rightQueryString;
+            return this;
+        }
+
+        public String getQueryString() {
+            return queryString;
+        }
+
+        String negate(String queryString) {
+            return "!(" + queryString + ")";
+        }
+
+        public Query build() {
+            return new Query(this);
+        }
+    }
 }
