@@ -44,7 +44,7 @@ public class TestQuery {
 	@Test
 	public void testDateFormat(){
 		expectedResult = "(createn_time LT '" + dateFormat.format(now) + "')";
-		queryBuilder = new Query.QueryBuilder("creationTime", Query::lessThan, now);
+		queryBuilder = new Query.QueryBuilder("createn_time", Query::lessThan, now);
 		assertEquals(expectedResult, queryBuilder.getQueryString());
 	}
 	
@@ -60,7 +60,16 @@ public class TestQuery {
 	@Test
 	public void testComplexStatementAndNegate(){
 		expectedResult = "!(id GE '5028');!(name EQ '5028')";
-        queryBuilder = new Query.QueryBuilder("id", Query::greaterThanOrEqualTo, "5028", true).and("name", Query::equalTo, "5028");
+        queryBuilder = new Query.QueryBuilder("id", Query::greaterThanOrEqualTo, "5028", true).and("name", Query::equalTo, "5028", true);
 		assertEquals(expectedResult, queryBuilder.getQueryString());
 	}
+
+    @Test
+    public void testQueryBuilderComposition(){
+        expectedResult = "(id GE '5028')||!(name EQ '5028')";
+        QueryBuilder qb1 = new Query.QueryBuilder("id", Query::greaterThanOrEqualTo, "5028");
+        QueryBuilder qb2 = new Query.QueryBuilder("name", Query::equalTo, "5028", true);
+        queryBuilder = qb1.or(qb2);
+        assertEquals(expectedResult, queryBuilder.getQueryString());
+    }
 }
