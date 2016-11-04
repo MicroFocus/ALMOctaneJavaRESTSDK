@@ -1,8 +1,7 @@
 package com.hpe.adm.nga.sdk;
 
-import com.google.api.client.http.HttpRequestFactory;
-
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 
 import java.util.Collection;
 
@@ -24,7 +23,7 @@ public class EntityList {
 	 */
 	public EntityList(HttpRequestFactory reqFactory, String strEntityListDomain) {
 
-		entityListService = new EntityListService(reqFactory,strEntityListDomain);
+		entityListService = new EntityListService(reqFactory, strEntityListDomain);
 		
 	}
 	
@@ -78,5 +77,4 @@ public class EntityList {
 
 		return entityListService.testGetEntityModels(jason);
 	}
-	
 }

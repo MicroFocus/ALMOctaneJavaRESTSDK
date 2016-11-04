@@ -1,9 +1,7 @@
 package  com.hpe.adm.nga.sdk.authorisation;
 
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.json.JsonHttpContent;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.GenericData;
+import com.hpe.adm.nga.sdk.network.HttpRequest;
 
 /**
  * Created by brucesp on 23/05/2016.
@@ -23,6 +21,6 @@ public class ClientAuthorisation implements Authorisation {
 		final GenericData genericData = new GenericData();
 		genericData.put("client_id", clientId);
 		genericData.put("client_secret", clientSecret);
-		request.setContent(new JsonHttpContent(new JacksonFactory(), genericData));
+		request.setContent(genericData);
 	}
 }

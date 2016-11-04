@@ -4,6 +4,7 @@ import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import org.json.JSONObject;

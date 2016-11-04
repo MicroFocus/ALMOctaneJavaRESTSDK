@@ -1,6 +1,6 @@
 package  com.hpe.adm.nga.sdk.authorisation;
 
-import com.google.api.client.http.HttpRequest;
+import com.hpe.adm.nga.sdk.network.HttpRequest;
 
 /**
  * BasicAuthorisation object - Hold all functionality concern Basic Authorization.
@@ -19,7 +19,6 @@ public class BasicAuthorisation implements Authorisation {
 
 	@Override
 	public void executeAuthorisation(HttpRequest request) {
-		request.getHeaders().setBasicAuthentication(userName, password);
+		request.setBasicAuthentication(userName, password);
 	}
-
 }

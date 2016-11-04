@@ -3,6 +3,7 @@ package com.hpe.adm.nga.sdk.unit_tests.model;
 
 import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.json.JSONObject;
 import org.junit.After;

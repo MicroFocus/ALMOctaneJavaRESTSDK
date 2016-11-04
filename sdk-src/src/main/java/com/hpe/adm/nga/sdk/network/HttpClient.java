@@ -2,15 +2,21 @@ package com.hpe.adm.nga.sdk.network;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.http.json.JsonHttpContent;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.exception.NgaException;
+import com.hpe.adm.nga.sdk.exception.NgaPartialException;
+import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpCookie;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +33,14 @@ public class HttpClient {
     private static final String SET_COOKIE = "set-cookie";
     private static final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
     public static final String HPE_MQM_UI = "HPE_MQM_UI";
+
+    private static final String HTTP_MEDIA_TYPE_MULTIPART_NAME = "multipart/form-data";
+    private static final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
+    private static final String HTTP_MULTIPART_BOUNDARY_VALUE = "---------------------------92348603315617859231724135434";
+    private static final String HTTP_MULTIPART_PART_DISPOSITION_NAME = "Content-Disposition";
+    private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"";
+    private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
+    private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
 
     private Logger logger = LogManager.getLogger(NGA.class.getName());
     private com.google.api.client.http.HttpRequestFactory requestFactory;
@@ -66,7 +80,7 @@ public class HttpClient {
                                     logger.debug("Login to renew token.");
                                     com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
                                     logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
-                                    HttpResponse response = httpRequest.execute();
+                                    HttpResponse response = new HttpResponse(httpRequest.execute());
                                     logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
 
                                     // refresh Cookies keys
@@ -124,7 +138,7 @@ public class HttpClient {
         try{
             com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
             logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(), urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
-            HttpResponse response = httpRequest.execute();
+            HttpResponse response = new HttpResponse(httpRequest.execute());
             logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
 
             // Initialize Cookies keys
@@ -189,5 +203,25 @@ public class HttpClient {
         }
 
         return renewed;
+    }
+
+    public static MultipartContent generateMultiPartContent(String strJasonEntityModel, InputStream inputStream, String contentType, String contentName) {
+        // Add parameters
+        MultipartContent content = new MultipartContent()
+                .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
+                .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
+
+        MultipartContent.Part part1 = new MultipartContent.Part(new JsonHttpContent(new JacksonFactory(), strJasonEntityModel));
+        part1.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME,
+                            String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT,
+                            HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE)));
+        content.addPart(part1);
+
+        // Add Stream
+        InputStreamContent inputStreamContent = new InputStreamContent(contentType, inputStream);
+        MultipartContent.Part part2 = new MultipartContent.Part(inputStreamContent);
+        part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, contentName)));
+        content.addPart(part2);
+        return content;
     }
 }

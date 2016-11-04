@@ -1,5 +1,6 @@
 package com.hpe.adm.nga.sdk.unit_tests.entityListService;
 
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;

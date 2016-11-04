@@ -50,6 +50,6 @@ public class HttpRequest {
     }
 
     public HttpResponse execute() throws IOException {
-        return request.execute();
+        return new HttpResponse(request.execute());
     }
 }

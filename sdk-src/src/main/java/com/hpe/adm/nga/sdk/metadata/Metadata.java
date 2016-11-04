@@ -1,12 +1,14 @@
 package com.hpe.adm.nga.sdk.metadata;
 
-import com.google.api.client.http.*;
 import com.google.gson.Gson;
 import com.hpe.adm.nga.sdk.NGARequest;
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.exception.NgaException;
 import com.hpe.adm.nga.sdk.metadata.Features.*;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.network.HttpRequest;
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.network.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -331,10 +333,9 @@ public class Metadata {
 			
 			Collection<EntityMetadata> entitiesMetadata = null;
 			String url = urlDomain+ "/" + type;
-			String json = "";			
-			GenericUrl domain = new GenericUrl(url);
+			String json = "";
 			try{
-				HttpRequest httpRequest = requestFactory.buildGetRequest(domain);
+				HttpRequest httpRequest = requestFactory.buildGetRequest(url);
 				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
 				HttpResponse response = httpRequest.execute();
 				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
@@ -348,7 +349,7 @@ public class Metadata {
 				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
 
                 // Update request factory with the latest response Cookie
-                requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
+                requestFactory.initialize(httpRequest.setContent(response));
             }
 			catch (Exception e){
 				logger.debug("Fail to execute GET request.", e);
@@ -389,10 +390,9 @@ public class Metadata {
 			Collection<FieldMetadata> colEntitiesMetadata = null;
 			String url = urlDomain+ "/" + type;
 			String json = "";
-			GenericUrl urlDomain = new GenericUrl(url);
 			try{
 				 
-				HttpRequest httpRequest = requestFactory.buildGetRequest(urlDomain);
+				HttpRequest httpRequest = requestFactory.buildGetRequest(url);
 				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
 				HttpResponse response = httpRequest.execute();
 				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
@@ -406,7 +406,7 @@ public class Metadata {
                 logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
 
                 // Update request factory with the latest response Cookie
-                requestFactory.getInitializer().initialize(httpRequest.setContent(ByteArrayContent.fromString(null, response.toString())));
+                requestFactory.initialize(httpRequest.setContent(response));
             }
 			catch (Exception e){
 				

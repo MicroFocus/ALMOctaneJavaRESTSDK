@@ -1,18 +1,16 @@
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
-import java.util.Collection;
-import java.util.Set;
-
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
-
-import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+
+import java.util.Collection;
+import java.util.Set;
 
 public class CommonMethods {
 	private final static String urlDomain = "https://mqast001pngx.saas.hpe.com";
@@ -24,7 +22,7 @@ public class CommonMethods {
 		final String HPSSO_HEADER_CSRF = "HPSSO_HEADER_CSRF";
 		final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
 		final String HPE_MQM_UI ="HPE_MQM_UI";
-		return new NetHttpTransport().createRequestFactory(new HttpRequestInitializer() {
+		return new HttpRequestFactory(new NetHttpTransport().createRequestFactory(new HttpRequestInitializer() {
             @Override
             public void initialize(HttpRequest request) {
             		String lastResponseCoockie = request.getHeaders().getCookie()!=null ? request.getHeaders().getCookie() : LWSSO_COOKIE_KEY+"="+"";
@@ -32,7 +30,7 @@ public class CommonMethods {
             		request.getHeaders().set(HPSSO_HEADER_CSRF,""); 
             		request.getHeaders().set(HPE_CLIENT_TYPE,HPE_MQM_UI); 
             }
-        });
+        }));
 	}
 	
 	public static String getDomain(){

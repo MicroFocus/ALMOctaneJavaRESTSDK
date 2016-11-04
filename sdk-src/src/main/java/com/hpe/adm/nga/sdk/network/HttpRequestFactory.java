@@ -18,31 +18,43 @@ public class HttpRequestFactory {
         requestFactory.getInitializer().initialize(var1);
     }
 
-    public HttpRequest buildRequest(String requestMethod, GenericUrl url, HttpContent content) throws IOException {
-        return new HttpRequest(requestFactory.buildRequest(requestMethod, url, content));
+    public HttpRequest buildRequest(String requestMethod, String url, HttpContent content) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildRequest(requestMethod, domain, content));
     }
 
-    public HttpRequest buildDeleteRequest(GenericUrl url) throws IOException {
-        return new HttpRequest(requestFactory.buildDeleteRequest(url));
+    public HttpRequest buildDeleteRequest(String url) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildDeleteRequest(domain));
     }
 
-    public HttpRequest buildGetRequest(GenericUrl url) throws IOException {
-        return new HttpRequest(requestFactory.buildGetRequest(url));
+    public HttpRequest buildGetRequest(String url) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildGetRequest(domain));
     }
 
-    public HttpRequest buildPostRequest(GenericUrl url, HttpContent content) throws IOException {
-        return new HttpRequest(requestFactory.buildPostRequest(url, content));
+    public HttpRequest buildPostRequest(String url, String content) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildPostRequest(domain, ByteArrayContent.fromString(null, content)));
     }
 
-    public HttpRequest buildPutRequest(GenericUrl url, HttpContent content) throws IOException {
-        return new HttpRequest(requestFactory.buildPutRequest(url, content));
+    public HttpRequest buildPostRequest(String url, HttpContent content) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildPostRequest(domain, content));
     }
 
-    public HttpRequest buildPatchRequest(GenericUrl url, HttpContent content) throws IOException {
-        return new HttpRequest(requestFactory.buildPatchRequest(url, content));
+    public HttpRequest buildPutRequest(String url, String content) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildPutRequest(domain, ByteArrayContent.fromString(null, content)));
     }
 
-    public HttpRequest buildHeadRequest(GenericUrl url) throws IOException {
-        return new HttpRequest(requestFactory.buildHeadRequest(url));
+    public HttpRequest buildPatchRequest(String url, String content) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildPatchRequest(domain, ByteArrayContent.fromString(null, content)));
+    }
+
+    public HttpRequest buildHeadRequest(String url) throws IOException {
+        GenericUrl domain = new GenericUrl(url);
+        return new HttpRequest(requestFactory.buildHeadRequest(domain));
     }
 }

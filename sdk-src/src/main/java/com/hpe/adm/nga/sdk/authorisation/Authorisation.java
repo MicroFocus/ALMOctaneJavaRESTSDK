@@ -1,6 +1,6 @@
 package com.hpe.adm.nga.sdk.authorisation;
 
-import com.google.api.client.http.HttpRequest;
+import com.hpe.adm.nga.sdk.network.HttpRequest;
 
 /**
  * Interface of Authorization , hold contract functions.

@@ -2,6 +2,7 @@ package com.hpe.adm.nga.sdk.unit_tests.attachments;
 
 import static org.junit.Assert.*;
 
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;

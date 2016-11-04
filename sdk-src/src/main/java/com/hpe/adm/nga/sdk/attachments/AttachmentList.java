@@ -1,11 +1,9 @@
 package com.hpe.adm.nga.sdk.attachments;
 
-
-import com.google.api.client.http.HttpRequestFactory;
-
 import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.NGARequest;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -25,7 +23,7 @@ public class AttachmentList {
 	 */
 	public AttachmentList(HttpRequestFactory reqFactory, String attachmentListDomain) {
 		
-		entityListService = new EntityListService(reqFactory,attachmentListDomain);
+		entityListService = new EntityListService(reqFactory, attachmentListDomain);
 	}
 	
 	/**
@@ -116,10 +114,10 @@ public class AttachmentList {
 		/**
 		 * Setter of new entities to create and file to upload
 		 * @param entities - new entities to create
-		 * @param file - file path 
+		 * @param stream - file stream
 		 * @return - An Object with new data
 		 */
-		public Create entities(Collection<EntityModel> entities,InputStream stream,String type,String name ) {
+		public Create entities(Collection<EntityModel> entities, InputStream stream, String type, String name ) {
 
 			colEntities = entities;
 			inputStream = stream;

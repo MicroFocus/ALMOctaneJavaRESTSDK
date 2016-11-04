@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.Collection;
+
+import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
