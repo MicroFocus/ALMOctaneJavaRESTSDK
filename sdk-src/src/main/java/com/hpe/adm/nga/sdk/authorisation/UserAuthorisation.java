@@ -1,6 +1,5 @@
 package  com.hpe.adm.nga.sdk.authorisation;
 
-import com.google.api.client.util.GenericData;
 import com.hpe.adm.nga.sdk.network.HttpRequest;
 
 /**
@@ -18,9 +17,6 @@ public class UserAuthorisation implements Authorisation {
 
 	@Override
 	public void executeAuthorisation(HttpRequest request) {
-		GenericData genericData = new GenericData();
-		genericData.put("user", userName);
-		genericData.put("password", password);
-		request.setContent(genericData);
+		request.setUserAuthentication(userName, password);
 	}
 }

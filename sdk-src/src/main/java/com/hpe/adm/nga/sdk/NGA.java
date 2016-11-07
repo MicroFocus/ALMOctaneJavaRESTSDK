@@ -197,7 +197,6 @@ public class NGA {
 			return this;
 		}
 
-
 		/**
 		 * The main build procedure which create the NGA objects,based on this steps :
 		 * 1. Build an HTTP request
@@ -211,9 +210,9 @@ public class NGA {
 
 			NGA objNga = null;
 
-			httpClient.createRequestFactory(urlDomain, authorisation);
-			if (httpClient.checkLogin()) {
-				objNga = new NGA(httpClient.getRequestFactory(), urlDomain, idsharedSpaceId, workSpaceId);
+			HttpRequestFactory requestFactory = httpClient.getRequestFactory(urlDomain, authorisation);
+			if (httpClient.checkAuthentication()) {
+				objNga = new NGA(requestFactory, urlDomain, idsharedSpaceId, workSpaceId);
 			}
 
 			return objNga;

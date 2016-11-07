@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * HTTP Client
+ *
  * Created by leufl on 2/11/2016.
  */
 public class HttpClient {
@@ -32,15 +34,7 @@ public class HttpClient {
     private static final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
     private static final String SET_COOKIE = "set-cookie";
     private static final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
-    public static final String HPE_MQM_UI = "HPE_MQM_UI";
-
-    private static final String HTTP_MEDIA_TYPE_MULTIPART_NAME = "multipart/form-data";
-    private static final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
-    private static final String HTTP_MULTIPART_BOUNDARY_VALUE = "---------------------------92348603315617859231724135434";
-    private static final String HTTP_MULTIPART_PART_DISPOSITION_NAME = "Content-Disposition";
-    private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"";
-    private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
-    private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
+    private static final String HPE_MQM_UI = "HPE_MQM_UI";
 
     private Logger logger = LogManager.getLogger(NGA.class.getName());
     private com.google.api.client.http.HttpRequestFactory requestFactory;
@@ -49,9 +43,14 @@ public class HttpClient {
 
     private HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 
-    public void createRequestFactory(String urlDomain, Authorisation authorisation) {
+    /**
+     * Creates an HTTP request factory using the url and authorisation.
+     * @param urlDomain
+     * @param authorisation
+     */
+    public HttpRequestFactory getRequestFactory(String urlDomain, Authorisation authorisation) {
         this.urlDomain = urlDomain;
-        requestFactory = HTTP_TRANSPORT
+        return new HttpRequestFactory(HTTP_TRANSPORT
                 .createRequestFactory(new HttpRequestInitializer() {
 
                     @Override
@@ -130,14 +129,17 @@ public class HttpClient {
                             request.getHeaders().set(HPE_CLIENT_TYPE, HPE_MQM_UI);
                         }
                     }
-                });
+                }));
     }
 
-    public boolean checkLogin() {
+    /**
+     * @return - Returns true if the authentication succeeded, false otherwise.
+     */
+    public boolean checkAuthentication() {
         GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
         try{
             com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
-            logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(), urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
+            logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), urlDomain + OAUTH_AUTH_URL, httpRequest.getHeaders().toString()));
             HttpResponse response = new HttpResponse(httpRequest.execute());
             logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
 
@@ -157,7 +159,7 @@ public class HttpClient {
 
 					 }*/
 
-                if(lwssoValue!=null && !lwssoValue.isEmpty()) {
+                if(lwssoValue != null && !lwssoValue.isEmpty()) {
                     return true;
                 }
             }
@@ -171,12 +173,8 @@ public class HttpClient {
         return false;
     }
 
-    public HttpRequestFactory getRequestFactory() {
-        return new HttpRequestFactory(requestFactory);
-    }
-
     /**
-     * retrieve new cookie from set-cookie header
+     * Retrieve new cookie from set-cookie header
      * @param headers
      * @return true if LWSSO cookie is renewed
      */
@@ -203,25 +201,5 @@ public class HttpClient {
         }
 
         return renewed;
-    }
-
-    public static MultipartContent generateMultiPartContent(String strJasonEntityModel, InputStream inputStream, String contentType, String contentName) {
-        // Add parameters
-        MultipartContent content = new MultipartContent()
-                .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
-                .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
-
-        MultipartContent.Part part1 = new MultipartContent.Part(new JsonHttpContent(new JacksonFactory(), strJasonEntityModel));
-        part1.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME,
-                            String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT,
-                            HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE)));
-        content.addPart(part1);
-
-        // Add Stream
-        InputStreamContent inputStreamContent = new InputStreamContent(contentType, inputStream);
-        MultipartContent.Part part2 = new MultipartContent.Part(inputStreamContent);
-        part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, contentName)));
-        content.addPart(part2);
-        return content;
     }
 }

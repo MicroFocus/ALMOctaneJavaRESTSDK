@@ -28,7 +28,7 @@ public class CommonMethods {
             		String lastResponseCoockie = request.getHeaders().getCookie()!=null ? request.getHeaders().getCookie() : LWSSO_COOKIE_KEY+"="+"";
             		request.getHeaders().setCookie(lastResponseCoockie); 
             		request.getHeaders().set(HPSSO_HEADER_CSRF,""); 
-            		request.getHeaders().set(HPE_CLIENT_TYPE,HPE_MQM_UI); 
+            		request.getHeaders().set(HPE_CLIENT_TYPE, HPE_MQM_UI);
             }
         }));
 	}

@@ -1,14 +1,9 @@
 package com.hpe.adm.nga.sdk;
 
-//import com.google.api.client.http.HttpResponseException;
-import com.google.api.client.http.HttpResponseException;
 import com.hpe.adm.nga.sdk.exception.NgaException;
 import com.hpe.adm.nga.sdk.exception.NgaPartialException;
 import com.hpe.adm.nga.sdk.model.*;
-import com.hpe.adm.nga.sdk.network.HttpClient;
-import com.hpe.adm.nga.sdk.network.HttpRequest;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
-import com.hpe.adm.nga.sdk.network.HttpResponse;
+import com.hpe.adm.nga.sdk.network.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -567,10 +562,8 @@ public class EntityListService {
 			}
 		}
 		else{
-			
 			ErrorModel errorModel =  new ErrorModel(e.getMessage());
 			throw new NgaException(errorModel);
-			
 		}
 	}
 	
@@ -804,7 +797,7 @@ public class EntityListService {
 			
 			try{
 				HttpRequest httpRequest = requestFactory.buildPostRequest(url,
-						HttpClient.generateMultiPartContent(strJasonEntityModel, inputStream, contentType, contentName));
+						requestFactory.generateMultiPartContent(strJasonEntityModel, inputStream, contentType, contentName));
 				newEntityModels = getEntitiesResponse(httpRequest);
 			}
 			catch (Exception e){
