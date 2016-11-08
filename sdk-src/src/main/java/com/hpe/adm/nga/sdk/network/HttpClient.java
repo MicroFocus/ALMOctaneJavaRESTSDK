@@ -2,21 +2,15 @@ package com.hpe.adm.nga.sdk.network;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.http.json.JsonHttpContent;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.exception.NgaException;
-import com.hpe.adm.nga.sdk.exception.NgaPartialException;
-import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpCookie;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,86 +44,82 @@ public class HttpClient {
      */
     public HttpRequestFactory getRequestFactory(String urlDomain, Authorisation authorisation) {
         this.urlDomain = urlDomain;
-        return new HttpRequestFactory(HTTP_TRANSPORT
-                .createRequestFactory(new HttpRequestInitializer() {
-
-                    @Override
-                    public void initialize(com.google.api.client.http.HttpRequest request) {
-
-                        request.setUnsuccessfulResponseHandler(new com.google.api.client.http.HttpUnsuccessfulResponseHandler() {
-                            @Override
-                            public boolean handleResponse(com.google.api.client.http.HttpRequest httpRequest, com.google.api.client.http.HttpResponse httpResponse, boolean b) throws IOException {
-                                if (httpResponse.getStatusCode() == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED) {
-                                    return refreshToken();
-                                }
-
-                                return false;
+        requestFactory = HTTP_TRANSPORT
+                .createRequestFactory(request -> {
+                    request.setUnsuccessfulResponseHandler(new HttpUnsuccessfulResponseHandler() {
+                        @Override
+                        public boolean handleResponse(com.google.api.client.http.HttpRequest httpRequest, com.google.api.client.http.HttpResponse httpResponse, boolean b) throws IOException {
+                            if (httpResponse.getStatusCode() == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED) {
+                                return refreshToken();
                             }
 
-                            /**
-                             * refresh the LWSSO token and retry
-                             * @return true if token is renewed and need retry and false otherwise
-                             */
-                            private boolean refreshToken() {
-                                logger.debug("Session is expired, renew token and retry.");
-                                GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
-                                try{
-                                    // clear lwssoValue for re-login
-                                    lwssoValue = "";
-                                    logger.debug("Login to renew token.");
-                                    com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
-                                    logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
-                                    HttpResponse response = new HttpResponse(httpRequest.execute());
-                                    logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
+                            return false;
+                        }
 
-                                    // refresh Cookies keys
-                                    if (response.isSuccessStatusCode()) {
-                                        HttpHeaders hdr1 = response.getHeaders();
-                                        if (updateLWSSOCookieValue(hdr1)) {
-                                            String newCookie = LWSSO_COOKIE_KEY + "=" + lwssoValue;
-                                            request.getHeaders().setCookie(newCookie);
-                                            logger.debug("Retry with updated token.");
-                                            logger.debug(String.format(LOGGER_REQUEST_FORMAT, request.getRequestMethod(), request.getUrl().toString(), request.getHeaders().toString()));
+                        /**
+                         * refresh the LWSSO token and retry
+                         * @return true if token is renewed and need retry and false otherwise
+                         */
+                        private boolean refreshToken() {
+                            logger.debug("Session is expired, renew token and retry.");
+                            GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
+                            try{
+                                // clear lwssoValue for re-login
+                                lwssoValue = "";
+                                logger.debug("Login to renew token.");
+                                com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
+                                logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
+                                HttpResponse response = new HttpResponse(httpRequest.execute());
+                                logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
 
-                                            // return true for retrying the origin request
-                                            return true;
-                                        }
+                                // refresh Cookies keys
+                                if (response.isSuccessStatusCode()) {
+                                    HttpHeaders hdr1 = response.getHeaders();
+                                    if (updateLWSSOCookieValue(hdr1)) {
+                                        String newCookie = LWSSO_COOKIE_KEY + "=" + lwssoValue;
+                                        request.getHeaders().setCookie(newCookie);
+                                        logger.debug("Retry with updated token.");
+                                        logger.debug(String.format(LOGGER_REQUEST_FORMAT, request.getRequestMethod(), request.getUrl().toString(), request.getHeaders().toString()));
+
+                                        // return true for retrying the origin request
+                                        return true;
                                     }
                                 }
-                                catch (Exception e){
-                                    ErrorModel errorModel =  new ErrorModel(e.getMessage());
-                                    logger.error("Error in contacting server: ", e);
-                                    throw new NgaException(errorModel);
-                                }
-
-                                return false;
                             }
-                        });
-
-                        // BasicAuthentication needed only in first initialization
-                        if (lwssoValue != null && lwssoValue.isEmpty())
-                        {
-                            authorisation.executeAuthorisation(new HttpRequest((request)));
-                            // username and password should be transient.
-                        }
-                        else
-                        {
-                            // retrieve new LWSSO in response if any
-                            HttpHeaders responseHeaders = request.getResponseHeaders();
-                            String lastResponseCookie;
-                            if (updateLWSSOCookieValue(responseHeaders)) {
-                                // renew LWSSO cookie
-                                lastResponseCookie = LWSSO_COOKIE_KEY + "=" + lwssoValue;
-                            } else {
-                                // use current request cookie or set from current lwssoValue
-                                lastResponseCookie = request.getHeaders().getCookie() != null ? request.getHeaders().getCookie() : LWSSO_COOKIE_KEY + "=" + lwssoValue;
+                            catch (Exception e){
+                                ErrorModel errorModel =  new ErrorModel(e.getMessage());
+                                logger.error("Error in contacting server: ", e);
+                                throw new NgaException(errorModel);
                             }
 
-                            request.getHeaders().setCookie(lastResponseCookie);
-                            request.getHeaders().set(HPE_CLIENT_TYPE, HPE_MQM_UI);
+                            return false;
                         }
+                    });
+
+                    // BasicAuthentication needed only in first initialization
+                    if (lwssoValue != null && lwssoValue.isEmpty())
+                    {
+                        authorisation.executeAuthorisation(new HttpRequest((request)));
+                        // username and password should be transient.
                     }
-                }));
+                    else
+                    {
+                        // retrieve new LWSSO in response if any
+                        HttpHeaders responseHeaders = request.getResponseHeaders();
+                        String lastResponseCookie;
+                        if (updateLWSSOCookieValue(responseHeaders)) {
+                            // renew LWSSO cookie
+                            lastResponseCookie = LWSSO_COOKIE_KEY + "=" + lwssoValue;
+                        } else {
+                            // use current request cookie or set from current lwssoValue
+                            lastResponseCookie = request.getHeaders().getCookie() != null ? request.getHeaders().getCookie() : LWSSO_COOKIE_KEY + "=" + lwssoValue;
+                        }
+
+                        request.getHeaders().setCookie(lastResponseCookie);
+                        request.getHeaders().set(HPE_CLIENT_TYPE, HPE_MQM_UI);
+                    }
+                });
+        return new HttpRequestFactory(requestFactory);
     }
 
     /**
