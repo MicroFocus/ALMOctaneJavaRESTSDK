@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk;
 
-import com.hpe.adm.nga.sdk.exception.NgaException;
-import com.hpe.adm.nga.sdk.exception.NgaPartialException;
+import com.hpe.adm.nga.sdk.exception.OctaneException;
+import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.network.*;
 import org.apache.logging.log4j.LogManager;
@@ -555,15 +555,15 @@ public class EntityListService {
 			if (partialSupport && httpResponseException.getStatusCode() == HTTPS_CONFLICT_STATUS_CODE ) {
             	Collection<EntityModel> entities = getEntities(httpResponseException.getContent());
             	Collection<ErrorModel> errorModels = getErrorModels(httpResponseException.getContent());
-            	throw new NgaPartialException(errorModels,entities);
+            	throw new OctanePartialException(errorModels,entities);
             } else {
 				ErrorModel errorModel = getErrorModelFromJason(httpResponseException.getContent());
-				throw new NgaException(errorModel);
+				throw new OctaneException(errorModel);
 			}
 		}
 		else{
 			ErrorModel errorModel =  new ErrorModel(e.getMessage());
-			throw new NgaException(errorModel);
+			throw new OctaneException(errorModel);
 		}
 	}
 	
@@ -575,7 +575,7 @@ public class EntityListService {
 	 * @author Moris Oz
 	 *
 	 */
-	public class Get extends NGARequest<Collection<EntityModel>> {
+	public class Get extends OctaneRequest<Collection<EntityModel>> {
 
 		private String fieldsParams = "";
 		private String orderByParam = "";
@@ -678,7 +678,7 @@ public class EntityListService {
 	 * @author moris oz
 	 *
 	 */
-	public class Update extends NGARequest<Collection<EntityModel>> {
+	public class Update extends OctaneRequest<Collection<EntityModel>> {
 
 		private Collection<EntityModel> entityModels = null;
 		private Query queryParams = null;
@@ -745,7 +745,7 @@ public class EntityListService {
 	 * @author Moris Oz
 	 *
 	 */
-	public class Create extends NGARequest<Collection<EntityModel>> {
+	public class Create extends OctaneRequest<Collection<EntityModel>> {
 
 		private Collection<EntityModel> entityModels = null;
 
@@ -827,7 +827,7 @@ public class EntityListService {
 	 * @author Moris Oz
 	 *
 	 */
-	public class Delete extends NGARequest<Collection<EntityModel>> {
+	public class Delete extends OctaneRequest<Collection<EntityModel>> {
 		
 		private Query queryParams = null;
 		
@@ -920,7 +920,7 @@ public class EntityListService {
 		 * @author Moris Oz
 		 *
 		 */
-		public class Get extends NGARequest<EntityModel> {
+		public class Get extends OctaneRequest<EntityModel> {
 
 			private String fieldsParams = "";
 			
@@ -1006,7 +1006,7 @@ public class EntityListService {
 		 * @author Moris Oz
 		 *
 		 */
-		public class Update extends NGARequest<EntityModel> {
+		public class Update extends OctaneRequest<EntityModel> {
 
 			private EntityModel entityModel;
 
@@ -1057,7 +1057,7 @@ public class EntityListService {
 		 * @author Moris Oz
 		 *
 		 */
-		public class Delete extends NGARequest<EntityModel> {
+		public class Delete extends OctaneRequest<EntityModel> {
 
 			/**
 			 * 

@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk.attachments;
 
 import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.NGARequest;
+import com.hpe.adm.nga.sdk.OctaneRequest;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 
@@ -18,7 +18,7 @@ public class AttachmentList {
 	
 	/**
 	 * Creates a new AttachmentList object
-	 * @param reqFactory - NGA request factory 
+	 * @param reqFactory - Octane request factory
 	 * @param attachmentListDomain - domain of attachmentList
 	 */
 	public AttachmentList(HttpRequestFactory reqFactory, String attachmentListDomain) {
@@ -73,7 +73,7 @@ public class AttachmentList {
 	 * @author Moris oz
 	 *
 	 */
-	public class Get extends NGARequest<Collection<EntityModel>> {
+	public class Get extends OctaneRequest<Collection<EntityModel>> {
 		
 		/**
 		 * Request Get Execution 
@@ -93,7 +93,7 @@ public class AttachmentList {
 	 * @author Moris oz
 	 *
 	 */
-	public class Create extends NGARequest<Collection<EntityModel>> {
+	public class Create extends OctaneRequest<Collection<EntityModel>> {
 		
 		
 		private String contentType = "";
@@ -185,7 +185,7 @@ public class AttachmentList {
 		 * @author Moris oz
 		 *
 		 */
-		public class GetBinary extends NGARequest<InputStream> {
+		public class GetBinary extends OctaneRequest<InputStream> {
 			
 			/**
 			 * 
@@ -204,7 +204,7 @@ public class AttachmentList {
 		 * @author moris oz
 		 *
 		 */
-		public class Get extends NGARequest<EntityModel> {
+		public class Get extends OctaneRequest<EntityModel> {
 			
 			/**
 			 * 
@@ -225,7 +225,7 @@ public class AttachmentList {
 		 * @author moris oz
 		 *
 		 */
-		public class Update extends NGARequest<EntityModel> {
+		public class Update extends OctaneRequest<EntityModel> {
 			
 			EntityModel entityModel = null;
 			
@@ -257,7 +257,7 @@ public class AttachmentList {
 		 * @author moris oz
 		 *
 		 */
-		public  class Delete extends NGARequest<EntityModel> {
+		public  class Delete extends OctaneRequest<EntityModel> {
 			
 			/**
 			 * 

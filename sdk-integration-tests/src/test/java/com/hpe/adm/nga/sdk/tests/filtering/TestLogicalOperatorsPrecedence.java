@@ -37,7 +37,7 @@ public class TestLogicalOperatorsPrecedence extends TestBase {
 
     private void testFiltering(Query query) throws Exception {
         Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         String entityName = CommonUtils.getValueFromEntityModel(entityModel, "name");
@@ -50,7 +50,7 @@ public class TestLogicalOperatorsPrecedence extends TestBase {
     @BeforeClass
     public static void initTests() throws Exception {
 
-        nga.entityList("features").delete().execute();
+        octane.entityList("features").delete().execute();
 
         createFeature("Alfred", 0, 0); //1 ( A) & (!B) & (!C)
         createFeature("Alfred", 1, 0); //2 ( A) & ( B) & (!C)
@@ -68,7 +68,7 @@ public class TestLogicalOperatorsPrecedence extends TestBase {
         fields.add(new StringFieldModel("name",nameValue));
         fields.add(new LongFieldModel("story_points", storyPointsValue));
         fields.add(new LongFieldModel("initial_estimate", initialEstimateValue));
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         featureIds.addAll(CommonUtils.getIdFromEntityModelCollection(generatedEntity));
     }
 }

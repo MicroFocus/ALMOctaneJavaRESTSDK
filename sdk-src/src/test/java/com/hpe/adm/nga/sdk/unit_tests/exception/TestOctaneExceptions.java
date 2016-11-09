@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk.unit_tests.exception;
 
-import com.hpe.adm.nga.sdk.exception.NgaException;
-import com.hpe.adm.nga.sdk.exception.NgaPartialException;
+import com.hpe.adm.nga.sdk.exception.OctaneException;
+import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
@@ -16,7 +16,7 @@ import java.util.Set;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class TestNgaExceptions {
+public class TestOctaneExceptions {
 
 	private static FieldModel stringField;
 	private static FieldModel booleanField;
@@ -35,9 +35,9 @@ public class TestNgaExceptions {
 	}
 	
 	@Test 
-	public void testNgaException(){				
+	public void testOctaneException(){
 		ErrorModel err = new ErrorModel(set);
-		NgaException exc = new NgaException(err);
+		OctaneException exc = new OctaneException(err);
 		
 		// get the internal errorSet and check equivalence
 		ErrorModel internalError = exc.getError();
@@ -45,7 +45,7 @@ public class TestNgaExceptions {
 	}
 	
 	@Test 
-	public void testNgaPartialException(){
+	public void testOctanePartialException(){
 		Collection<ErrorModel> errorCol = new ArrayList<ErrorModel>();
 		Collection<EntityModel> entityCol = new ArrayList<EntityModel>();
 		errorCol.add(new ErrorModel(set));
@@ -53,7 +53,7 @@ public class TestNgaExceptions {
 		entityCol.add(new EntityModel(set));
 		entityCol.add(new EntityModel(set));
 		
-		NgaPartialException exc = new NgaPartialException(errorCol, entityCol);
+		OctanePartialException exc = new OctanePartialException(errorCol, entityCol);
 		// get the internal fields state and check for equivalence
 		Collection<EntityModel> internalEntities = exc.getEntitiesModels();
 		Collection<ErrorModel> internalErrors = exc.getErrorModels();

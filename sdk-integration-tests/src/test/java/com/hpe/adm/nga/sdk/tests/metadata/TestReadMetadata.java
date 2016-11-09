@@ -20,14 +20,14 @@ public class TestReadMetadata extends TestBase {
 
     @Test
     public void testReadMetadataEntities() throws Exception {
-        Metadata metadata = nga.metadata();
+        Metadata metadata = octane.metadata();
         Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
         Collection<EntityMetadata> entityMetadataTwoEntities = metadata.entities("defects").execute();
     }
 
     @Test
     public void testReadMetadataFields() throws Exception {
-        Metadata metadata = nga.metadata();
+        Metadata metadata = octane.metadata();
         Collection<FieldMetadata> fieldMetadata = metadata.fields().execute();
 
         int referenceTypeDataIsEmpty = 0;

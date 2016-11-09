@@ -11,11 +11,11 @@ import org.apache.logging.log4j.Logger;
 import java.util.UUID;
 
 /**
- * This class represents the main NGA builder
+ * This class represents the main Octane builder
  *
  * @author Moris Oz
   */
-public class NGA {
+public class Octane {
 
 	//Constants
 	private static final String SITE_ADMIN_DOMAIN_FORMAT= "/api/siteadmin/";
@@ -32,7 +32,7 @@ public class NGA {
 	private long workSpaceId = 0;
 	
 	// functions
-	public NGA(HttpRequestFactory reqFactory,String domain,String sharedSpaceId,long workId ) {
+	public Octane(HttpRequestFactory reqFactory, String domain, String sharedSpaceId, long workId ) {
 		
 		requestFactory = reqFactory;
 		urlDomain = domain;
@@ -114,7 +114,7 @@ public class NGA {
 
 
 		//Private
-		private Logger logger = LogManager.getLogger(NGA.class.getName());
+		private Logger logger = LogManager.getLogger(Octane.class.getName());
 		private String hppsValue = "";
 		private HttpClient httpClient = new HttpClient();
 		private String urlDomain = "";
@@ -198,24 +198,24 @@ public class NGA {
 		}
 
 		/**
-		 * The main build procedure which create the NGA objects,based on this steps :
+		 * The main build procedure which create the Octane objects,based on this steps :
 		 * 1. Build an HTTP request
 		 * 2. Handle response - Initialize Cookies keys
-		 * 3. Create a new NGA objects.
+		 * 3. Create a new Octane objects.
 		 *
-		 * @return a new NGA object
+		 * @return a new Octane object
 		 * @throws RuntimeException
 		 */
-		public NGA build() throws RuntimeException {
+		public Octane build() throws RuntimeException {
 
-			NGA objNga = null;
+			Octane objOctane = null;
 
 			HttpRequestFactory requestFactory = httpClient.getRequestFactory(urlDomain, authorisation);
 			if (httpClient.checkAuthentication()) {
-				objNga = new NGA(requestFactory, urlDomain, idsharedSpaceId, workSpaceId);
+				objOctane = new Octane(requestFactory, urlDomain, idsharedSpaceId, workSpaceId);
 			}
 
-			return objNga;
+			return objOctane;
 		}
 	}
 }

@@ -24,12 +24,12 @@ public class TestComments extends TestBase {
 
     @Test
     public void testCreateCommentForDefect() throws Exception {
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, "defects");
-        Collection<EntityModel> entityModels = nga.entityList("defects").create().entities(generatedEntity).execute();
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects");
+        Collection<EntityModel> entityModels = octane.entityList("defects").create().entities(generatedEntity).execute();
 
         Collection<EntityModel> expectedComments = createComments("owner_work_item", entityModels);
 
-        Collection<EntityModel> actualComments = nga.entityList("comments").get().execute();
+        Collection<EntityModel> actualComments = octane.entityList("comments").get().execute();
 
         Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedComments, actualComments));
     }
@@ -37,7 +37,7 @@ public class TestComments extends TestBase {
     private Collection<EntityModel> createComments(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {
         EntityModel entity = entityModels.iterator().next();
 
-        Collection<EntityModel> users = nga.entityList("workspace_users").get().execute();
+        Collection<EntityModel> users = octane.entityList("workspace_users").get().execute();
 
         EntityModel user = users.iterator().next();
         Set<FieldModel> fields = new HashSet<>();
@@ -47,7 +47,7 @@ public class TestComments extends TestBase {
         Collection<EntityModel> comments = new ArrayList<>();
         comments.add(new EntityModel(fields));
 
-        nga.entityList("comments").create().entities(comments).execute();
+        octane.entityList("comments").create().entities(comments).execute();
 
         return comments;
     }

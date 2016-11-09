@@ -1,9 +1,8 @@
 package com.hpe.adm.nga.sdk.unit_tests.entityListService;
 
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.Octane;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,10 +12,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javassist.expr.Instanceof;
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
@@ -42,17 +39,17 @@ public class TestServiceMethods{
 	private EntityListService service = null;
 	private EntityListService spiedService = null;
 	private EntityListService.Get spiedGetEntity = null;
-	private static NGA nga;
+	private static Octane octane;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		nga = new NGA(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
+		octane = new Octane(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
 
 	}
 	
 	@Before
 	public void setUpBeforeMethod(){
-		EntityList defects = nga.entityList("defects");
+		EntityList defects = octane.entityList("defects");
 		spiedGetEntity = PowerMockito.spy(defects.get());
 		EntityList spiedDefects = PowerMockito.spy(defects);
 		service = (EntityListService)Whitebox.getInternalState(spiedDefects, "entityListService");					

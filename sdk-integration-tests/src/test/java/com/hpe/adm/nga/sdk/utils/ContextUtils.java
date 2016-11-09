@@ -1,6 +1,6 @@
 package com.hpe.adm.nga.sdk.utils;
 
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 
 /**
@@ -8,23 +8,23 @@ import com.hpe.adm.nga.sdk.authorisation.Authorisation;
  */
 public class ContextUtils {
 
-    public static NGA getContextSiteAdmin(String url, Authorisation authorisation) {
+    public static Octane getContextSiteAdmin(String url, Authorisation authorisation) {
         return getContext(url, authorisation, "", "");
     }
 
-    public static NGA getContextSharedSpace(String url, Authorisation authorisation, String sharedSpaceId) {
+    public static Octane getContextSharedSpace(String url, Authorisation authorisation, String sharedSpaceId) {
         return getContext(url, authorisation, sharedSpaceId, "");
     }
 
-    public static NGA getContextWorkspace(String url, Authorisation authorisation, String sharedSpaceId, String workspaceId) {
+    public static Octane getContextWorkspace(String url, Authorisation authorisation, String sharedSpaceId, String workspaceId) {
         return getContext(url, authorisation, sharedSpaceId, workspaceId);
     }
 
-    private static NGA getContext(String url, Authorisation authorisation, String sharedSpaceId, String workspaceId) {
-        NGA nga = null;
+    private static Octane getContext(String url, Authorisation authorisation, String sharedSpaceId, String workspaceId) {
+        Octane octane = null;
         try {
-//            NGA.Builder builder = new NGA.Builder(new UserAuthorisation(userName, password)).Server(url);
-            NGA.Builder builder = new NGA.Builder(authorisation).Server(url);
+//            Octane.Builder builder = new Octane.Builder(new UserAuthorisation(userName, password)).Server(url);
+            Octane.Builder builder = new Octane.Builder(authorisation).Server(url);
 
             if (!sharedSpaceId.isEmpty()) {
                 builder = builder.sharedSpace(Long.valueOf(sharedSpaceId));
@@ -34,13 +34,13 @@ public class ContextUtils {
                 builder = builder.workSpace(Long.valueOf(workspaceId));
             }
 
-            nga = builder.build();
+            octane = builder.build();
 
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
-        return nga;
+        return octane;
     }
 }

@@ -23,12 +23,12 @@ public class TestAttachments extends TestBase {
 
 //    @Test
     public void testCreateAttachmentForDefect() throws Exception {
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, "defects");
-        Collection<EntityModel> defectModel = nga.entityList("defects").create().entities(generatedEntity).execute();
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects");
+        Collection<EntityModel> defectModel = octane.entityList("defects").create().entities(generatedEntity).execute();
 
         Collection<EntityModel> expectedComments = createAttachment("owner_work_item", defectModel);
 
-        Collection<EntityModel> actualComments = nga.entityList("attachments").get().execute();
+        Collection<EntityModel> actualComments = octane.entityList("attachments").get().execute();
 
         Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedComments, actualComments));
     }
@@ -45,7 +45,7 @@ public class TestAttachments extends TestBase {
 
         ByteArrayInputStream bais = new ByteArrayInputStream("The first line\nThe second line".getBytes());
 
-        nga.AttachmentList().create().entities(attachments, bais, "text/plain", "text_attachment.txt").execute();
+        octane.AttachmentList().create().entities(attachments, bais, "text/plain", "text_attachment.txt").execute();
 
         return attachments;
     }

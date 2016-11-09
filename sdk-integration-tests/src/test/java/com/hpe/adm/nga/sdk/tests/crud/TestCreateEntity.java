@@ -23,7 +23,7 @@ public class TestCreateEntity extends TestBase {
 
     @Test
     public void testCreateEntity() throws Exception {
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         int entityId = CommonUtils.getIdFromEntityModel(entityModel);
@@ -35,7 +35,7 @@ public class TestCreateEntity extends TestBase {
 
     @Test
     public void testCreateEntityCollection() throws Exception {
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
         Query query = QueryUtils.getQueryForIds(entityIds);

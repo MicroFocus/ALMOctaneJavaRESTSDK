@@ -2,9 +2,8 @@ package com.hpe.adm.nga.sdk.unit_tests.entityListService;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import org.json.JSONObject;
@@ -25,11 +24,11 @@ import static org.junit.Assert.fail;
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 public class TestCreateEntities {
-	private static NGA nga;
+	private static Octane octane;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		nga = new NGA(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
+		octane = new Octane(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
 
 	}
 	
@@ -37,7 +36,7 @@ public class TestCreateEntities {
 	public void testCreateEntity(){		
 		final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"moris2\"}],\"total_count\":1}";
 		
-		EntityList defects = nga.entityList("defects");
+		EntityList defects = octane.entityList("defects");
 		EntityListService.Create spiedCreateEntity = PowerMockito.spy(defects.create());
 		EntityList spiedDefects = PowerMockito.spy(defects);
 		EntityListService service = (EntityListService)Whitebox.getInternalState(spiedDefects, "entityListService");							

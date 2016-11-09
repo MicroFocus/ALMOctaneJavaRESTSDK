@@ -22,7 +22,7 @@ public class TestCookieUpdate extends TestBase {
 
     @Test
     public void testCookieUpdate() throws Exception {
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         int entityId = CommonUtils.getIdFromEntityModel(entityModel);

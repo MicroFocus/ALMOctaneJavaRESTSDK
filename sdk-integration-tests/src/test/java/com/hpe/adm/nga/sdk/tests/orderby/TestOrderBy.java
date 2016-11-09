@@ -25,9 +25,9 @@ public class TestOrderBy extends TestBase {
     public static void initTest() throws Exception {
         Collection<EntityModel> generatedEntity = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            generatedEntity.addAll(DataGenerator.generateEntityModel(nga, "releases"));
+            generatedEntity.addAll(DataGenerator.generateEntityModel(octane, "releases"));
         }
-        Collection<EntityModel> releases = nga.entityList("releases").create().entities(generatedEntity).execute();
+        Collection<EntityModel> releases = octane.entityList("releases").create().entities(generatedEntity).execute();
         List<Integer> ids = CommonUtils.getIdFromEntityModelCollection(releases);
         idQuery = QueryUtils.getQueryForIds(ids);
     }
@@ -35,7 +35,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByOneFieldAscending() throws Exception {
 
-        Collection<EntityModel> entityModels = nga.entityList("releases").get().query(idQuery).addOrderBy("name", true).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("name", true).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
@@ -45,7 +45,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByOneFieldDescending() throws Exception {
 
-        Collection<EntityModel> entityModels = nga.entityList("releases").get().query(idQuery).addOrderBy("name", false).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("name", false).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
@@ -55,7 +55,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByTwoFieldAscending() throws Exception {
 
-        Collection<EntityModel> entityModels = nga.entityList("releases").get().query(idQuery).addOrderBy("end_date,name", true).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("end_date,name", true).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
@@ -65,7 +65,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByTwoFieldDescending() throws Exception {
 
-        Collection<EntityModel> entityModels = nga.entityList("releases").get().query(idQuery).addOrderBy("end_date", true).addOrderBy("name", false).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("end_date", true).addOrderBy("name", false).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 

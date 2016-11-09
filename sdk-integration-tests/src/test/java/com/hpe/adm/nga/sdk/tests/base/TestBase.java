@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk.tests.base;
 
 import com.hpe.adm.nga.sdk.EntityList;
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.utils.AuthorisationUtils;
@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
  * Created by Guy Guetta on 12/04/2016.
  */
 public class TestBase {
-    protected static NGA nga;
+    protected static Octane octane;
     protected static String entityName = "";
     private static String entityTypeOld = "";
     protected static EntityList entityList;
@@ -39,14 +39,14 @@ public class TestBase {
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
-        metadata = nga.metadata();
+        octane = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
+        metadata = octane.metadata();
     }
 
     @Before
     public void before() {
         if (!entityName.equals(entityTypeOld)) {
-            entityList = nga.entityList(entityName);
+            entityList = octane.entityList(entityName);
             entityTypeOld = entityName;
         }
     }

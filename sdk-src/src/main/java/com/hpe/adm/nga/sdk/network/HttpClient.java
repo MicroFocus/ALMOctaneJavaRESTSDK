@@ -2,9 +2,9 @@ package com.hpe.adm.nga.sdk.network;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
-import com.hpe.adm.nga.sdk.exception.NgaException;
+import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +30,7 @@ public class HttpClient {
     private static final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
     private static final String HPE_MQM_UI = "HPE_MQM_UI";
 
-    private Logger logger = LogManager.getLogger(NGA.class.getName());
+    private Logger logger = LogManager.getLogger(Octane.class.getName());
     private com.google.api.client.http.HttpRequestFactory requestFactory;
     private String lwssoValue = "";
     private String urlDomain = "";
@@ -89,7 +89,7 @@ public class HttpClient {
                             catch (Exception e){
                                 ErrorModel errorModel =  new ErrorModel(e.getMessage());
                                 logger.error("Error in contacting server: ", e);
-                                throw new NgaException(errorModel);
+                                throw new OctaneException(errorModel);
                             }
 
                             return false;
@@ -158,7 +158,7 @@ public class HttpClient {
 
             ErrorModel errorModel =  new ErrorModel(e.getMessage());
             logger.error("Error in contacting server: ", e);
-            throw new NgaException(errorModel);
+            throw new OctaneException(errorModel);
         }
         return false;
     }

@@ -1,6 +1,6 @@
 package com.hpe.adm.nga.sdk.utils.generator;
 
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
@@ -17,7 +17,7 @@ public class DataGenerator {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    public static Collection<EntityModel> generateEntityModel(NGA nga, String entityName, Set<FieldModel> fields) throws Exception {
+    public static Collection<EntityModel> generateEntityModel(Octane octane, String entityName, Set<FieldModel> fields) throws Exception {
         Collection<EntityModel> entities = new ArrayList<>();
         switch (entityName) {
             case "releases":
@@ -27,29 +27,29 @@ public class DataGenerator {
                 entities.add(generateMilestone());
                 break;
             case "features":
-                entities.add(generateFeature(nga, fields));
+                entities.add(generateFeature(octane, fields));
                 break;
             case "defects":
-                entities.add(generateDefect(nga, fields));
+                entities.add(generateDefect(octane, fields));
                 break;
             case "product_areas":
-                entities.add(generatePA(nga, fields));
+                entities.add(generatePA(octane, fields));
                 break;
         }
         return entities;
     }
 
-    public static Collection<EntityModel> generateEntityModel(NGA nga, String entityName) throws Exception {
+    public static Collection<EntityModel> generateEntityModel(Octane octane, String entityName) throws Exception {
         Set<FieldModel> fields = new HashSet<>();
-        return generateEntityModel(nga, entityName, fields);
+        return generateEntityModel(octane, entityName, fields);
     }
 
-    public static Collection<EntityModel> generateEntityModelCollection(NGA nga, String entityName) throws Exception {
+    public static Collection<EntityModel> generateEntityModelCollection(Octane octane, String entityName) throws Exception {
         Collection<EntityModel> entities = new ArrayList<>();
 
-        entities.addAll(generateEntityModel(nga, entityName));
-        entities.addAll(generateEntityModel(nga, entityName));
-        entities.addAll(generateEntityModel(nga, entityName));
+        entities.addAll(generateEntityModel(octane, entityName));
+        entities.addAll(generateEntityModel(octane, entityName));
+        entities.addAll(generateEntityModel(octane, entityName));
 
         return entities;
     }
@@ -63,8 +63,8 @@ public class DataGenerator {
     }
 
 
-    private static EntityModel generatePA(NGA nga, Set<FieldModel> fields) throws Exception {
-        Collection<EntityModel> pas = nga.entityList("product_areas").get().execute();
+    private static EntityModel generatePA(Octane octane, Set<FieldModel> fields) throws Exception {
+        Collection<EntityModel> pas = octane.entityList("product_areas").get().execute();
         EntityModel parentEntity = CommonUtils.getEntityWithStringValue(pas, "parent", null);
         long parentId = CommonUtils.getIdFromEntityModel(parentEntity);
         Set<FieldModel> parentFields = new HashSet<>();
@@ -80,10 +80,10 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateFeature(NGA nga, Set<FieldModel> fields) throws Exception {
-        Collection<EntityModel> phases = nga.entityList("phases").get().execute();
+    private static EntityModel generateFeature(Octane octane, Set<FieldModel> fields) throws Exception {
+        Collection<EntityModel> phases = octane.entityList("phases").get().execute();
         EntityModel phase = phases.iterator().next();
-        Collection<EntityModel> themes = nga.entityList("themes").get().execute();
+        Collection<EntityModel> themes = octane.entityList("themes").get().execute();
         EntityModel theme = themes.iterator().next();
 
         FieldModel name = new StringFieldModel("name", "sdk_feature_" + UUID.randomUUID());
@@ -96,24 +96,24 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateDefect(NGA nga, Set<FieldModel> fields) throws Exception {
+    private static EntityModel generateDefect(Octane octane, Set<FieldModel> fields) throws Exception {
         Query query = new Query.QueryBuilder("subtype", Query::equalTo, "work_item_root").build();
-        Collection<EntityModel> roots = nga.entityList("work_items").get().query(query).execute();
+        Collection<EntityModel> roots = octane.entityList("work_items").get().query(query).execute();
         EntityModel root = roots.iterator().next();
         FieldModel parentField = new ReferenceFieldModel("parent", root);
 
-        Collection<EntityModel> users = nga.entityList("workspace_users").get().execute();
+        Collection<EntityModel> users = octane.entityList("workspace_users").get().execute();
         EntityModel user = users.iterator().next();
         FieldModel author = new ReferenceFieldModel("author", user);
 
         Query query2 = new Query.QueryBuilder("entity", Query::equalTo, "defect").build();
-        Collection<EntityModel> phases = nga.entityList("phases").get().query(query2).execute();
+        Collection<EntityModel> phases = octane.entityList("phases").get().query(query2).execute();
         EntityModel phase = phases.iterator().next();
         FieldModel phaseField = new ReferenceFieldModel("phase", phase);
 
         FieldModel name = new StringFieldModel("name", "sdk_defect_" + UUID.randomUUID());
 
-        Collection<EntityModel> listNodes = nga.entityList("list_nodes").get().execute();
+        Collection<EntityModel> listNodes = octane.entityList("list_nodes").get().execute();
         EntityModel severity = CommonUtils.getEntityWithStringValue(listNodes, "logical_name", "list_node.severity.low");
         FieldModel severityField = new ReferenceFieldModel("severity", severity);
 

@@ -2,7 +2,7 @@ package com.hpe.adm.nga.sdk.tests.context;
 
 
 import com.hpe.adm.nga.sdk.EntityList;
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -24,10 +24,10 @@ public class TestSwitchContext {
         String url = configuration.getString("sdk.url");
         Authorisation authorisation = AuthorisationUtils.getAuthorisation();
 
-        NGA nga = ContextUtils.getContextSiteAdmin(url, authorisation);
-        Metadata metadata = nga.metadata();
+        Octane octane = ContextUtils.getContextSiteAdmin(url, authorisation);
+        Metadata metadata = octane.metadata();
 
-        EntityList entities = nga.entityList("shared_spaces");
+        EntityList entities = octane.entityList("shared_spaces");
         Collection<EntityModel> colEntityList = entities.get().execute();
     }
 
@@ -38,10 +38,10 @@ public class TestSwitchContext {
         Authorisation authorisation = AuthorisationUtils.getAuthorisation();
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
 
-        NGA nga = ContextUtils.getContextSharedSpace(url, authorisation, sharedSpaceId);
-        Metadata metadata = nga.metadata();
+        Octane octane = ContextUtils.getContextSharedSpace(url, authorisation, sharedSpaceId);
+        Metadata metadata = octane.metadata();
 
-        EntityList entities = nga.entityList("workspaces");
+        EntityList entities = octane.entityList("workspaces");
         Collection<EntityModel> colEntityList = entities.get().execute();
     }
 
@@ -53,10 +53,10 @@ public class TestSwitchContext {
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        NGA nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
-        Metadata metadata = nga.metadata();
+        Octane octane = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
+        Metadata metadata = octane.metadata();
 
-        EntityList entities = nga.entityList("list_nodes");
+        EntityList entities = octane.entityList("list_nodes");
         Collection<EntityModel> colEntityList = entities.get().execute();
     }
 

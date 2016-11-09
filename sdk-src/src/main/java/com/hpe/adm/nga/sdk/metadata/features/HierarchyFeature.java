@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.metadata.Features;
+package com.hpe.adm.nga.sdk.metadata.features;
 
 /**
  * This class hold the HierarchyFeature object and serve all functionality concern to Hierarchy Feature

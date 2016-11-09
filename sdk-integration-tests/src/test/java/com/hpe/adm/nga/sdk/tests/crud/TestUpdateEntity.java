@@ -25,7 +25,7 @@ public class TestUpdateEntity extends TestBase {
 
         String updatedNameValue = "updatedName" + UUID.randomUUID();
         Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         int entityId = CommonUtils.getIdFromEntityModel(entityModel);
@@ -45,7 +45,7 @@ public class TestUpdateEntity extends TestBase {
     public void testUpdateEntityCollectionIdInBody() throws Exception {
 
         List<String> updatedNameValues =  DataGenerator.generateNamesForUpdate();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
@@ -81,8 +81,8 @@ public class TestUpdateEntity extends TestBase {
         updatedEndDateValue.set(Calendar.MINUTE, 0);
         updatedEndDateValue.set(Calendar.HOUR_OF_DAY, 12);
 
-        Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(nga, entityName);
-        Collection<EntityModel> entityModels = nga.entityList(entityName).create().entities(generatedDefect).execute();
+        Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(octane, entityName);
+        Collection<EntityModel> entityModels = octane.entityList(entityName).create().entities(generatedDefect).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
@@ -96,9 +96,9 @@ public class TestUpdateEntity extends TestBase {
 
         Query query = QueryUtils.getQueryForIds(entityIds);
 
-        nga.entityList(entityName).update().entities(updatedEntityCollection).query(query).execute();
+        octane.entityList(entityName).update().entities(updatedEntityCollection).query(query).execute();
 
-        Collection<EntityModel> getEntity = nga.entityList(entityName).get().query(query).execute();
+        Collection<EntityModel> getEntity = octane.entityList(entityName).get().query(query).execute();
 
         Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
     }

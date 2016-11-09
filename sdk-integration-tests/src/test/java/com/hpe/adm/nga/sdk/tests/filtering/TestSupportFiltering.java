@@ -49,7 +49,7 @@ public class TestSupportFiltering extends TestBase {
 
     private void testFiltering(String logicalOperation) throws Exception {
         Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         String entityName = CommonUtils.getValueFromEntityModel(entityModel, "name");

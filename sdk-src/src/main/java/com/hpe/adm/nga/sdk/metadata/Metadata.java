@@ -1,10 +1,10 @@
 package com.hpe.adm.nga.sdk.metadata;
 
 import com.google.gson.Gson;
-import com.hpe.adm.nga.sdk.NGARequest;
+import com.hpe.adm.nga.sdk.OctaneRequest;
 import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.exception.NgaException;
-import com.hpe.adm.nga.sdk.metadata.Features.*;
+import com.hpe.adm.nga.sdk.exception.OctaneException;
+import com.hpe.adm.nga.sdk.metadata.features.*;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.network.HttpRequest;
 import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
@@ -300,7 +300,7 @@ public class Metadata {
 	protected void handleException(Exception e) throws RuntimeException{
 		
 		ErrorModel errorModel =  new ErrorModel(e.getMessage());
-		throw new NgaException(errorModel);
+		throw new OctaneException(errorModel);
 		
 	}
 	
@@ -309,7 +309,7 @@ public class Metadata {
 	 * @author Moris oz
 	 *
 	 */
-	public  class Entity extends NGARequest<Collection<EntityMetadata>> {
+	public  class Entity extends OctaneRequest<Collection<EntityMetadata>> {
 		
 		
 		private String type = "";
@@ -366,7 +366,7 @@ public class Metadata {
 	 * @author Moris oz
 	 *
 	 */
-	public  class Field extends NGARequest<Collection<FieldMetadata>> {
+	public  class Field extends OctaneRequest<Collection<FieldMetadata>> {
 		
 		private String type = "";
 		

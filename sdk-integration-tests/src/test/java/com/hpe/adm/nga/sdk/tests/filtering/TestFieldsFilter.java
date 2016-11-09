@@ -23,7 +23,7 @@ public class TestFieldsFilter extends TestBase {
 
         List<String> filterFields = Arrays.asList("attachments");
         Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         int entityId = CommonUtils.getIdFromEntityModel(entityModel);
@@ -38,7 +38,7 @@ public class TestFieldsFilter extends TestBase {
 
         List<String> filterFields = Arrays.asList("attachments", "creation_time", "has_attachments");
         Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName, fields);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
         int entityId = CommonUtils.getIdFromEntityModel(entityModel);
@@ -52,7 +52,7 @@ public class TestFieldsFilter extends TestBase {
     public void testFieldsFilterMultipleFields() throws Exception {
 
         List<String> filterFields = Arrays.asList("done_work", "description", "expected_velocity");
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         entityList.create().entities(generatedEntity).execute();
 
         Collection<EntityModel> getEntity = entityList.get().addFields("done_work", "description", "expected_velocity").execute();

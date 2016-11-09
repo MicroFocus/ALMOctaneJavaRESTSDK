@@ -20,7 +20,7 @@ public class TestLimit extends TestBase {
     @Test
     public void testLimit() throws Exception {
 
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         entityList.create().entities(generatedEntity).execute();
 
         Collection<EntityModel> getAllEntities = entityList.get().execute();

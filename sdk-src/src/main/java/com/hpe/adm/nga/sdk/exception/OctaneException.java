@@ -4,22 +4,22 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 
 /**
  * This extends the RuntimeException objects and serve all functionality concern to
- * NGA Exceptions.
+ * Octane Exceptions.
  * @author Moris oz
  *
  */
-public class NgaException extends RuntimeException {
+public class OctaneException extends RuntimeException {
 
 		
 	private ErrorModel errorModel = null;
 	
 	/**
-	 * Creates a new NgaException object based on error model
+	 * Creates a new OctaneException object based on error model
 	 * 
 	 * @param error - error model
 	 *   
 	 */
-	public NgaException(ErrorModel  error){
+	public OctaneException(ErrorModel  error){
 		setError(error);
 	}
 	

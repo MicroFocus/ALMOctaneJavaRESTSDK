@@ -2,8 +2,6 @@ package com.hpe.adm.nga.sdk.tests.crud;
 
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
@@ -23,7 +21,7 @@ public class TestDeleteEntity extends TestBase {
 
     @Test
     public void testDeleteEntityById() throws Exception{
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
 
         EntityModel entityModel = entityModels.iterator().next();
@@ -40,7 +38,7 @@ public class TestDeleteEntity extends TestBase {
 
     @Test
     public void testDeleteEntitiesByQuery() throws Exception{
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(nga, entityName);
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 

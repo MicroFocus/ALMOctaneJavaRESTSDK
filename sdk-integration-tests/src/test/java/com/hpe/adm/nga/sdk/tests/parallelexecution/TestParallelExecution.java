@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk.tests.parallelexecution;
 
 import com.hpe.adm.nga.sdk.EntityList;
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -29,18 +29,18 @@ public class TestParallelExecution extends TestBase {
         String entityName1 = "product_areas";
         String entityName2 = "defects";
 
-        NGA nga1 = getNgaClientFirst();
-        EntityList entityList1 = nga1.entityList(entityName1);
+        Octane octane1 = getOctaneClientFirst();
+        EntityList entityList1 = octane1.entityList(entityName1);
 
-        NGA nga2 = getNgaClientSecond();
-        EntityList entityList2 = nga2.entityList(entityName2);
+        Octane octane2 = getOctaneClientSecond();
+        EntityList entityList2 = octane2.entityList(entityName2);
 
-        Collection<EntityModel> generatedEntity1 = DataGenerator.generateEntityModel(nga1, entityName1);
+        Collection<EntityModel> generatedEntity1 = DataGenerator.generateEntityModel(octane1, entityName1);
         Collection<EntityModel> entityModels1 = entityList1.create().entities(generatedEntity1).execute();
         EntityModel entityModel1 = entityModels1.iterator().next();
         int entityId1 = CommonUtils.getIdFromEntityModel(entityModel1);
 
-        Collection<EntityModel> generatedEntity2 = DataGenerator.generateEntityModel(nga2, entityName2);
+        Collection<EntityModel> generatedEntity2 = DataGenerator.generateEntityModel(octane2, entityName2);
         Collection<EntityModel> entityModels2 = entityList2.create().entities(generatedEntity2).execute();
         EntityModel entityModel2 = entityModels2.iterator().next();
         int entityId2 = CommonUtils.getIdFromEntityModel(entityModel2);
@@ -57,26 +57,26 @@ public class TestParallelExecution extends TestBase {
         } while (counter < 5);
     }
 
-    private NGA getNgaClientFirst() {
+    private Octane getOctaneClientFirst() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
         Authorisation authorisation = AuthorisationUtils.getAuthorisation();
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
-        return nga;
+        octane = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
+        return octane;
     }
 
-    private NGA getNgaClientSecond() {
+    private Octane getOctaneClientSecond() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
         Authorisation authorisation = new UserAuthorisation("rest2@hpe.com", "Welcome2");
         String sharedSpaceId = "2002";
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        nga = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
-        return nga;
+        octane = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
+        return octane;
     }
 
     private void sleepTime(int sleepTimeInSec) {

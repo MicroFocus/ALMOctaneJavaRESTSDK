@@ -2,7 +2,7 @@ package com.hpe.adm.nga.sdk.unit_tests.attachments;
 
 import static org.junit.Assert.*;
 
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.Octane;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,20 +12,19 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 public class TestAttachments {
-	private static NGA nga;
+	private static Octane octane;
 	private static EntityListService service;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		nga = new NGA(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
-		AttachmentList attachments = nga.AttachmentList();
+		octane = new Octane(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
+		AttachmentList attachments = octane.AttachmentList();
 		AttachmentList spiedAttachments = PowerMockito.spy(attachments);
 		service = (EntityListService)Whitebox.getInternalState(spiedAttachments, "entityListService");
 	}

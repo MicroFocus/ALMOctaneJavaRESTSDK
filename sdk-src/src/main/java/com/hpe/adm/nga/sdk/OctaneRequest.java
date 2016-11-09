@@ -1,12 +1,12 @@
 package com.hpe.adm.nga.sdk;
 
 /**
- * NGA request Interface 
+ * Octane request Interface
  * @author Moris oz
  *
  * @param <T>
  */
-public abstract class NGARequest<T> {
+public abstract class OctaneRequest<T> {
 
 	public abstract T execute() throws RuntimeException;
 

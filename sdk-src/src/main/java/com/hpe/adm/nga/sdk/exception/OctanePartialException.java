@@ -7,22 +7,22 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 
 /**
  * This extends the RuntimeException objects and serve all functionality concern to
- * NGA Partial Exceptions ( an exception that contain error and entities data )
+ * Octane Partial Exceptions ( an exception that contain error and entities data )
  * @author Moris oz
  *
  */
-public class NgaPartialException extends RuntimeException{
+public class OctanePartialException extends RuntimeException{
 
 	private Collection<EntityModel> entities = null;
 	private Collection<ErrorModel> errors = null;
 	
 	/**
-	 * Creates a new NgaPartialException object based on errors and entities models 
+	 * Creates a new OctanePartialException object based on errors and entities models
 	 * 
 	 * @param errorModels - error models
 	 * @param entities - entities models  
 	 */
-	public NgaPartialException(Collection<ErrorModel> errorModels,Collection<EntityModel> entities){
+	public OctanePartialException(Collection<ErrorModel> errorModels, Collection<EntityModel> entities){
 		
 		setEntitiesModels(entities);
 		setErrorModels(errorModels);

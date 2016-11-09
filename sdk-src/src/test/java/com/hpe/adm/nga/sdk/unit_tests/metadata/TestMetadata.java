@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.Octane;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.hpe.adm.nga.sdk.NGA;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -28,13 +27,13 @@ import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 public class TestMetadata {
-	private static NGA nga;
+	private static Octane octane;
 	private static Metadata metaData;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		nga = new NGA(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
-		metaData = nga.metadata();
+		octane = new Octane(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
+		metaData = octane.metadata();
 	}
 	
 	/**

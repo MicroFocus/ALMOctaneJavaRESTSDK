@@ -35,7 +35,7 @@ public class TestCrossFiltering extends TestBase {
         Query query = new Query.QueryBuilder("release", Query::equalTo,
                             new Query.QueryBuilder("id", Query::equalTo, releaseId)
                         ).build();
-        Collection<EntityModel> defects = nga.entityList("defects").get().query(query).execute();
+        Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
         long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
         Assert.assertEquals("More defects than expected in response", 1, defects.size());
         Assert.assertEquals("Wrong defect id in response", defectId, newDefectId);
@@ -46,7 +46,7 @@ public class TestCrossFiltering extends TestBase {
         Query query = new Query.QueryBuilder("work_item_has_release", Query::equalTo,
                             new Query.QueryBuilder("id", Query::equalTo, defectId)
                         ).build();
-        Collection<EntityModel> releases = nga.entityList("releases").get().query(query).execute();
+        Collection<EntityModel> releases = octane.entityList("releases").get().query(query).execute();
         long newReleaseId = CommonUtils.getIdFromEntityModel(releases.iterator().next());
         Assert.assertEquals("More releases than expected in response", 1, releases.size());
         Assert.assertEquals("Wrong release id in response", releaseId, newReleaseId);
@@ -59,7 +59,7 @@ public class TestCrossFiltering extends TestBase {
                                 new Query.QueryBuilder("id", Query::equalTo, releaseId)
                             )
                         ).build();
-        Collection<EntityModel> pas = nga.entityList("product_areas").get().query(query).execute();
+        Collection<EntityModel> pas = octane.entityList("product_areas").get().query(query).execute();
         long newPaId = CommonUtils.getIdFromEntityModel(pas.iterator().next());
         Assert.assertEquals("More PAs than expected in response", 1, pas.size());
         Assert.assertEquals("Wrong PA id in response", paId, newPaId);
@@ -72,7 +72,7 @@ public class TestCrossFiltering extends TestBase {
                                 new Query.QueryBuilder("id", Query::equalTo, paId)
                             )
                         ).build();
-        Collection<EntityModel> releases = nga.entityList("releases").get().query(query).execute();
+        Collection<EntityModel> releases = octane.entityList("releases").get().query(query).execute();
         long newReleaseId = CommonUtils.getIdFromEntityModel(releases.iterator().next());
         Assert.assertEquals("More releases than expected in response", 1, releases.size());
         Assert.assertEquals("Wrong release id in response", releaseId, newReleaseId);
@@ -81,21 +81,21 @@ public class TestCrossFiltering extends TestBase {
     @BeforeClass
     public static void initTests() throws Exception {
         Set<FieldModel> fields = new HashSet<>();
-        Collection<EntityModel> releaseEntity = DataGenerator.generateEntityModel(nga, "releases", fields);
-        Collection<EntityModel> releases = nga.entityList("releases").create().entities(releaseEntity).execute();
+        Collection<EntityModel> releaseEntity = DataGenerator.generateEntityModel(octane, "releases", fields);
+        Collection<EntityModel> releases = octane.entityList("releases").create().entities(releaseEntity).execute();
         EntityModel release = releases.iterator().next();
         releaseId = CommonUtils.getIdFromEntityModel(release);
 
         fields.add(new ReferenceFieldModel("release",release));
-        Collection<EntityModel> defectEntity = DataGenerator.generateEntityModel(nga, "defects", fields);
-        Collection<EntityModel> defects = nga.entityList("defects").create().entities(defectEntity).execute();
+        Collection<EntityModel> defectEntity = DataGenerator.generateEntityModel(octane, "defects", fields);
+        Collection<EntityModel> defects = octane.entityList("defects").create().entities(defectEntity).execute();
         EntityModel defect = defects.iterator().next();
         defectId = CommonUtils.getIdFromEntityModel(defect);
 
         fields.clear();
         fields.add(new MultiReferenceFieldModel("work_item", defects));
-        Collection<EntityModel> paEntity = DataGenerator.generateEntityModel(nga, "product_areas", fields);
-        Collection<EntityModel> pas = nga.entityList("product_areas").create().entities(paEntity).execute();
+        Collection<EntityModel> paEntity = DataGenerator.generateEntityModel(octane, "product_areas", fields);
+        Collection<EntityModel> pas = octane.entityList("product_areas").create().entities(paEntity).execute();
         paId = CommonUtils.getIdFromEntityModel(pas.iterator().next());
     }
 }

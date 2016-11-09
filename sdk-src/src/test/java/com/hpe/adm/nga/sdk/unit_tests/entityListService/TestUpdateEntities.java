@@ -2,9 +2,8 @@ package com.hpe.adm.nga.sdk.unit_tests.entityListService;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.NGA;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import org.json.JSONObject;
@@ -24,13 +23,13 @@ import static org.junit.Assert.fail;
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 public class TestUpdateEntities {
-	private static NGA nga;
+	private static Octane octane;
 	private static EntityList defects;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		nga = new NGA(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
-		defects = nga.entityList("defects");
+		octane = new Octane(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
+		defects = octane.entityList("defects");
 	}
 	
 	@Test
