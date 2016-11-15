@@ -38,7 +38,7 @@
         </snapshotRepository>
     </distributionManagement>
     <scm>
-        <developerConnection>scm:git:ssh://git@mydtbld0005.hpeswlab.net:7999/~brucesp/java-rest-sdk
+        <developerConnection>scm:git:https://github.hpe.com/ALMOctane-Hackathon/JavaRESTSDK.git
         </developerConnection>
     </scm>
     <dependencyManagement>
