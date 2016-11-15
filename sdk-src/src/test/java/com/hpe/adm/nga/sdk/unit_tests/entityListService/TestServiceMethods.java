@@ -71,12 +71,12 @@ public class TestServiceMethods{
 			String fieldsParams = (String) Whitebox.getInternalState(spiedGetEntity, "fieldsParams");
 			String orderByParam = (String) Whitebox.getInternalState(spiedGetEntity, "orderByParam");
 			long limitParam = (Long) Whitebox.getInternalState(spiedGetEntity, "limitParam");
-			long ofsetParam = (Long) Whitebox.getInternalState(spiedGetEntity, "ofsetParam");
+			long offsetParam = (Long) Whitebox.getInternalState(spiedGetEntity, "offsetParam");
 			Query queryParams = (Query) Whitebox.getInternalState(spiedGetEntity, "queryParams");						
 			
 			Method urlBuilder = service.getClass().getDeclaredMethod("urlBuilder", new Class[] {String.class, String.class, String.class, long.class, long.class, Query.class});
 			urlBuilder.setAccessible(true);
-			String url = (String)urlBuilder.invoke(service, urlDomain, fieldsParams, orderByParam, limitParam, ofsetParam, queryParams);
+			String url = (String)urlBuilder.invoke(service, urlDomain, fieldsParams, orderByParam, limitParam, offsetParam, queryParams);
 			assertEquals(expectedResult, url);
 		}
 		catch(Exception ex){
@@ -98,12 +98,12 @@ public class TestServiceMethods{
 			String fieldsParams = (String) Whitebox.getInternalState(spiedGetEntity, "fieldsParams");
 			String orderByParam = (String) Whitebox.getInternalState(spiedGetEntity, "orderByParam");
 			long limitParam = (Long) Whitebox.getInternalState(spiedGetEntity, "limitParam");
-			long ofsetParam = (Long) Whitebox.getInternalState(spiedGetEntity, "ofsetParam");
+			long offsetParam = (Long) Whitebox.getInternalState(spiedGetEntity, "offsetParam");
 			Query queryParams = (Query) Whitebox.getInternalState(spiedGetEntity, "queryParams");						
 			
 			Method urlBuilder = service.getClass().getDeclaredMethod("urlBuilder", new Class[] {String.class, String.class, String.class, long.class, long.class, Query.class});
 			urlBuilder.setAccessible(true);
-			String url = (String)urlBuilder.invoke(service, urlDomain, fieldsParams, orderByParam, limitParam, ofsetParam, queryParams);
+			String url = (String)urlBuilder.invoke(service, urlDomain, fieldsParams, orderByParam, limitParam, offsetParam, queryParams);
 			assertFalse(expectedFalseResult.equals(url));
 		}
 		catch(Exception ex){
