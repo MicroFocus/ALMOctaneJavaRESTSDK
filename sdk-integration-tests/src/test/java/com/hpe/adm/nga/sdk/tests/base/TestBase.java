@@ -50,5 +50,4 @@ public class TestBase {
             entityTypeOld = entityName;
         }
     }
-
 }

@@ -23,14 +23,14 @@ public class Octane {
 	private static final String WORKSPACES_DOMAIN_FORMAT= "workspaces/%s/"; 
 	private static final String METADATA_DOMAIN_FORMAT= "metadata";
 	private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";
-	
-	
+
 	//private memebers
 	private HttpRequestFactory requestFactory = null;
 	private String urlDomain = "";
 	public String idsharedSpaceId = null;
 	private long workSpaceId = 0;
-	
+	private HttpClient httpClient = HttpClient.getInstance();
+
 	// functions
 	public Octane(HttpRequestFactory reqFactory, String domain, String sharedSpaceId, long workId ) {
 		
@@ -51,7 +51,6 @@ public class Octane {
 		String entityListDomain =  getBaseDomainFormat() + entityName; 
 		return new EntityList(requestFactory, entityListDomain);
 	}
-	
 
 	/**
 	   * Metadata Getter
@@ -92,36 +91,25 @@ public class Octane {
 			
 		return baseDomain;
 	}
-	
+
+	public void signOut() {
+		httpClient.signOut();
+	}
+
 	/**
 	 * This class is in charge on the builder functionality 
 	 *
 	 * @author Moris Oz
 	  */
 	public static class Builder {
-
-
-		//Constants
-		private static final String OAUTH_AUTH_URL = "/authentication/sign_in";
-		private static final String SET_COOKIE = "set-cookie";
-		private static final String HPSSO_COOKIE_CSRF = "HPSSO_COOKIE_CSRF";
-		private static final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
-		private static final String HPSSO_HEADER_CSRF = "HPSSO_HEADER_CSRF";
-		private static final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
-		private static final String HPE_MQM_UI = "HPE_MQM_UI";
-		private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
-		private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
-
-
 		//Private
 		private Logger logger = LogManager.getLogger(Octane.class.getName());
 		private String hppsValue = "";
-		private HttpClient httpClient = new HttpClient();
+		private HttpClient httpClient = HttpClient.getInstance();
 		private String urlDomain = "";
 		public String idsharedSpaceId = null;
 		private long workSpaceId = 0;
 		private final Authorisation authorisation;
-
 
 		//Functions
 
@@ -211,7 +199,7 @@ public class Octane {
 			Octane objOctane = null;
 
 			HttpRequestFactory requestFactory = httpClient.getRequestFactory(urlDomain, authorisation);
-			if (httpClient.checkAuthentication()) {
+			if (httpClient.authenticate()) {
 				objOctane = new Octane(requestFactory, urlDomain, idsharedSpaceId, workSpaceId);
 			}
 

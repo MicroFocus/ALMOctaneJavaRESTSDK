@@ -23,6 +23,7 @@ public class HttpClient {
 
     //Constants
     private static final String OAUTH_AUTH_URL = "/authentication/sign_in";
+    private static final String OAUTH_SIGNOUT_URL = "/authentication/sign_out";
     private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
     private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
     private static final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
@@ -34,8 +35,19 @@ public class HttpClient {
     private com.google.api.client.http.HttpRequestFactory requestFactory;
     private String lwssoValue = "";
     private String urlDomain = "";
-
     private HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+
+    private static HttpClient httpClient = new HttpClient();
+
+    /* A private Constructor prevents any other
+     * class from instantiating.
+     */
+    private HttpClient() { }
+
+    /* Static 'instance' method */
+    public static HttpClient getInstance( ) {
+        return httpClient;
+    }
 
     /**
      * Creates an HTTP request factory using the url and authorisation.
@@ -45,14 +57,13 @@ public class HttpClient {
     public HttpRequestFactory getRequestFactory(String urlDomain, Authorisation authorisation) {
         this.urlDomain = urlDomain;
         requestFactory = HTTP_TRANSPORT
-                .createRequestFactory(request -> {
+               .createRequestFactory(request -> {
                     request.setUnsuccessfulResponseHandler(new HttpUnsuccessfulResponseHandler() {
                         @Override
                         public boolean handleResponse(com.google.api.client.http.HttpRequest httpRequest, com.google.api.client.http.HttpResponse httpResponse, boolean b) throws IOException {
                             if (httpResponse.getStatusCode() == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED) {
                                 return refreshToken();
                             }
-
                             return false;
                         }
 
@@ -63,7 +74,7 @@ public class HttpClient {
                         private boolean refreshToken() {
                             logger.debug("Session is expired, renew token and retry.");
                             GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
-                            try{
+                            try {
                                 // clear lwssoValue for re-login
                                 lwssoValue = "";
                                 logger.debug("Login to renew token.");
@@ -85,8 +96,7 @@ public class HttpClient {
                                         return true;
                                     }
                                 }
-                            }
-                            catch (Exception e){
+                            } catch (Exception e) {
                                 ErrorModel errorModel =  new ErrorModel(e.getMessage());
                                 logger.error("Error in contacting server: ", e);
                                 throw new OctaneException(errorModel);
@@ -125,7 +135,8 @@ public class HttpClient {
     /**
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
-    public boolean checkAuthentication() {
+    public boolean authenticate() {
+        lwssoValue = "";
         GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
         try{
             com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
@@ -153,14 +164,32 @@ public class HttpClient {
                     return true;
                 }
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
             ErrorModel errorModel =  new ErrorModel(e.getMessage());
             logger.error("Error in contacting server: ", e);
             throw new OctaneException(errorModel);
         }
         return false;
+    }
+
+    public void signOut() {
+        GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_SIGNOUT_URL);
+        try {
+            com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
+            logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), urlDomain + OAUTH_SIGNOUT_URL, httpRequest.getHeaders().toString()));
+            HttpResponse response = new HttpResponse(httpRequest.execute());
+            logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
+
+            if (response.isSuccessStatusCode()) {
+                HttpHeaders hdr1 = response.getHeaders();
+                updateLWSSOCookieValue(hdr1);
+            }
+        } catch (Exception e) {
+            ErrorModel errorModel =  new ErrorModel(e.getMessage());
+            logger.error("Error in contacting server: ", e);
+            throw new OctaneException(errorModel);
+        }
     }
 
     /**
@@ -175,10 +204,10 @@ public class HttpClient {
             return false;
         }
 
-            /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
-            String strCookies = strHPSSOCookieCsrf1.toString();
-            List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
-            lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();*/
+        /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
+        String strCookies = strHPSSOCookieCsrf1.toString();
+        List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
+        lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();*/
         for (String strCookie :
                 strHPSSOCookieCsrf1) {
             List<HttpCookie> cookies = HttpCookie.parse(strCookie);
