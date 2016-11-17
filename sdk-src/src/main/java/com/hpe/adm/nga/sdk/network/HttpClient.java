@@ -61,47 +61,6 @@ public class HttpClient {
                     request.setUnsuccessfulResponseHandler(new HttpUnsuccessfulResponseHandler() {
                         @Override
                         public boolean handleResponse(com.google.api.client.http.HttpRequest httpRequest, com.google.api.client.http.HttpResponse httpResponse, boolean b) throws IOException {
-                            if (httpResponse.getStatusCode() == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED) {
-                                return refreshToken();
-                            }
-                            return false;
-                        }
-
-                        /**
-                         * refresh the LWSSO token and retry
-                         * @return true if token is renewed and need retry and false otherwise
-                         */
-                        private boolean refreshToken() {
-                            logger.debug("Session is expired, renew token and retry.");
-                            GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_AUTH_URL);
-                            try {
-                                // clear lwssoValue for re-login
-                                lwssoValue = "";
-                                logger.debug("Login to renew token.");
-                                com.google.api.client.http.HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
-                                logger.debug(String.format(LOGGER_REQUEST_FORMAT,httpRequest.getRequestMethod(),urlDomain + OAUTH_AUTH_URL,httpRequest.getHeaders().toString()));
-                                HttpResponse response = new HttpResponse(httpRequest.execute());
-                                logger.debug(String.format(LOGGER_RESPONSE_FORMAT,response.getStatusCode(),response.getStatusMessage(),response.getHeaders().toString()));
-
-                                // refresh Cookies keys
-                                if (response.isSuccessStatusCode()) {
-                                    HttpHeaders hdr1 = response.getHeaders();
-                                    if (updateLWSSOCookieValue(hdr1)) {
-                                        String newCookie = LWSSO_COOKIE_KEY + "=" + lwssoValue;
-                                        request.getHeaders().setCookie(newCookie);
-                                        logger.debug("Retry with updated token.");
-                                        logger.debug(String.format(LOGGER_REQUEST_FORMAT, request.getRequestMethod(), request.getUrl().toString(), request.getHeaders().toString()));
-
-                                        // return true for retrying the origin request
-                                        return true;
-                                    }
-                                }
-                            } catch (Exception e) {
-                                ErrorModel errorModel =  new ErrorModel(e.getMessage());
-                                logger.error("Error in contacting server: ", e);
-                                throw new OctaneException(errorModel);
-                            }
-
                             return false;
                         }
                     });
