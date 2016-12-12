@@ -39,6 +39,7 @@ public class FieldMetadata {
 	private String entity_name;
 	private boolean is_user_defined;
 	private boolean visible_in_ui;
+	private boolean accessible_via_business_rules;
 	private String description;
 	private boolean can_modify_description;
 	private boolean filterable;
@@ -159,6 +160,12 @@ public class FieldMetadata {
 	 * @return
      */
 	public boolean isVisibleInUI() {return visible_in_ui;}
+
+	/**
+	 * get FieldMetadata's VisibleInUI
+	 * @return
+	 */
+	public boolean isAccessibleViaBusinessRules() {return accessible_via_business_rules;}
 
 	/**
 	 * get FieldMetadata's Description
