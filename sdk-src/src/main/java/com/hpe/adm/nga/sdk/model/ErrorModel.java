@@ -33,4 +33,9 @@ public class ErrorModel extends  EntityModel{
 		super(ERROR_DESCRIPTION_KEY,value);
 			
 	}
+
+	public String getDescription() {
+		FieldModel descriptionModel = getValue(ErrorModel.ERROR_DESCRIPTION_KEY);
+		return descriptionModel != null ? String.valueOf(getValue(ErrorModel.ERROR_DESCRIPTION_KEY).getValue()) : null;
+	}
 }

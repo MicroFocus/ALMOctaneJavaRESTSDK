@@ -38,6 +38,10 @@ public class OctaneException extends RuntimeException {
 	public void setError(ErrorModel  error){
 		errorModel = error;
 	}
-	
+
+	@Override
+	public String getMessage() {
+		return errorModel.getDescription();
+	}
 }
 
