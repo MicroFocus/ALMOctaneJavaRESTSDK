@@ -27,11 +27,11 @@ public class TestAttachments extends TestBase {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects");
         Collection<EntityModel> defectModel = octane.entityList("defects").create().entities(generatedEntity).execute();
 
-        Collection<EntityModel> expectedComments = createAttachment("owner_work_item", defectModel);
+        Collection<EntityModel> expectedAttachments = createAttachment("owner_work_item", defectModel);
 
-        Collection<EntityModel> actualComments = octane.entityList("attachments").get().execute();
+        Collection<EntityModel> actualAttachments = octane.entityList("attachments").get().addFields("owner_work_item", "name").execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedComments, actualComments));
+        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedAttachments, actualAttachments, true));
     }
 
     private Collection<EntityModel> createAttachment(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {
