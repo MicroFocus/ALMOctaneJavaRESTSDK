@@ -55,28 +55,22 @@ public class CommonUtils {
     }
 
     public static boolean isEntityAInEntityB(EntityModel entityA, EntityModel entityB) {
-        if (entityA == null) {
-            return true;
-        }
+        if (entityA == null) return true;
+        if (entityB == null) return false;
+
         Set<FieldModel> fieldsA = entityA.getValues();
-        Set<FieldModel> fieldsB = entityB.getValues();
-        boolean isMatch;
         for (FieldModel fieldA : fieldsA) {
-            if (fieldA.getClass().equals(MultiReferenceFieldModel.class) || fieldA.getClass().equals(ReferenceFieldModel.class)) {
-                continue;
-            }
-            isMatch = false;
-            for (FieldModel fieldB : fieldsB) {
-                if (fieldA.getName().equals(fieldB.getName())
-                        && (fieldA.getValue() == null
-                        || fieldA.getValue().equals(fieldB.getValue()))) {
-                    isMatch = true;
-                    break;
-                }
-            }
-            if (!isMatch) {
-                return false;
-            }
+            if (fieldA == null ||
+                    fieldA.getClass().equals(MultiReferenceFieldModel.class) ||
+                    fieldA.getClass().equals(ReferenceFieldModel.class)) continue;
+
+            FieldModel fieldB = entityB.getValue(fieldA.getName());
+            if (fieldB == null) return false;
+
+            if (!fieldA.getClass().equals(fieldB.getClass())) return false;
+
+            if (fieldA.getValue() != null &&
+                    !fieldA.getValue().equals(fieldB.getValue())) return false;
         }
         return true;
     }
