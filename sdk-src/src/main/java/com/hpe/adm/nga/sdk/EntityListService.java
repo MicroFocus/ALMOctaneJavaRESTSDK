@@ -1,5 +1,6 @@
 package com.hpe.adm.nga.sdk;
 
+import com.google.api.client.util.GenericData;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.*;
@@ -314,6 +315,20 @@ public class EntityListService {
 
 		return objField;
 	}
+
+	protected GenericData getEntityGenericData(EntityModel entityModel) {
+		Set<FieldModel> fieldModels = entityModel.getValues();
+		GenericData genericData = new GenericData();
+		fieldModels.forEach((fieldModel) -> {
+			Object fieldValue = fieldModel.getValue();
+			if(fieldValue != null && fieldValue.getClass().equals(EntityModel.class)) {
+				fieldValue = getEntityGenericData((EntityModel) fieldValue);
+			}
+			genericData.put(fieldModel.getName(), fieldValue);
+		});
+		return genericData;
+	}
+
 
 	/**
 	 * get a new jason object based on a given EntityModel list
@@ -792,12 +807,10 @@ public class EntityListService {
 			Collection<EntityModel> newEntityModels = null;
 			String url = urlBuilder(urlDomain);
 
-			JSONObject objBase = getEntitiesJSONObject(entities);
-			String strJasonEntityModel = objBase.toString();
-			
+			GenericData data = getEntityGenericData(entities.iterator().next());
 			try{
 				HttpRequest httpRequest = requestFactory.buildPostRequest(url,
-						requestFactory.generateMultiPartContent(strJasonEntityModel, inputStream, contentType, contentName));
+						requestFactory.generateMultiPartContent(data, inputStream, contentType, contentName));
 				newEntityModels = getEntitiesResponse(httpRequest);
 			}
 			catch (Exception e){

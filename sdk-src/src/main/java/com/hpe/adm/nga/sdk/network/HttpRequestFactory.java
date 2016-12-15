@@ -18,7 +18,7 @@ public class HttpRequestFactory {
     private static final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
     private static final String HTTP_MULTIPART_BOUNDARY_VALUE = "---------------------------92348603315617859231724135434";
     private static final String HTTP_MULTIPART_PART_DISPOSITION_NAME = "Content-Disposition";
-    private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"";
+    private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"; filename=\"blob\"";
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
 
@@ -143,7 +143,7 @@ public class HttpRequestFactory {
      * @param contentName - HTTP content name
      * @return - Generated HTTP content.
      */
-    public MultipartContent generateMultiPartContent(String strJasonEntityModel, InputStream inputStream, String contentType, String contentName) {
+    public MultipartContent generateMultiPartContent(Object strJasonEntityModel, InputStream inputStream, String contentType, String contentName) {
         // Add parameters
         MultipartContent content = new MultipartContent()
                 .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)

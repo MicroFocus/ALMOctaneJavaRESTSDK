@@ -8,6 +8,7 @@ import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.util.*;
@@ -21,7 +22,7 @@ public class TestAttachments extends TestBase {
         entityName = "product_areas";
     }
 
-//    @Test
+    @Test
     public void testCreateAttachmentForDefect() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects");
         Collection<EntityModel> defectModel = octane.entityList("defects").create().entities(generatedEntity).execute();
