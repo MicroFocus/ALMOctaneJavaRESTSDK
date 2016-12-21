@@ -3,17 +3,17 @@ package com.hpe.adm.nga.sdk;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.network.HttpClient;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;
 
 /**
- * This class represents the main Octane builder
+ * This class represents the main Octane context.  This can be created by using the Octane.Builder inner class.
+ * For example use Builder()...build() to get a new Octane context
  *
- * @author Moris Oz
   */
 public class Octane {
 
@@ -24,17 +24,15 @@ public class Octane {
 	private static final String METADATA_DOMAIN_FORMAT= "metadata";
 	private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";
 
-	//private memebers
-	private HttpRequestFactory requestFactory = null;
-	private String urlDomain = "";
-	public String idsharedSpaceId = null;
-	private long workSpaceId = 0;
-	private HttpClient httpClient = HttpClient.getInstance();
+	//private members
+	private final String urlDomain;
+	private final String idsharedSpaceId;
+	private final long workSpaceId;
+	private final OctaneHttpClient octaneHttpClient;
 
 	// functions
-	public Octane(HttpRequestFactory reqFactory, String domain, String sharedSpaceId, long workId ) {
-		
-		requestFactory = reqFactory;
+	protected Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId ) {
+		this.octaneHttpClient = octaneHttpClient;
 		urlDomain = domain;
 		idsharedSpaceId = sharedSpaceId;
 		workSpaceId = workId;
@@ -49,7 +47,7 @@ public class Octane {
 	public EntityList entityList(String entityName) {
 		
 		String entityListDomain =  getBaseDomainFormat() + entityName; 
-		return new EntityList(requestFactory, entityListDomain);
+		return new EntityList(octaneHttpClient, entityListDomain);
 	}
 
 	/**
@@ -59,7 +57,7 @@ public class Octane {
 	   */
 	public Metadata metadata() {
 		String metadataDomain =  getBaseDomainFormat()+METADATA_DOMAIN_FORMAT;
-		return new Metadata(requestFactory, metadataDomain) ;
+		return new Metadata(octaneHttpClient, metadataDomain) ;
 	}
 
 	/**
@@ -70,7 +68,7 @@ public class Octane {
 	public AttachmentList AttachmentList() {
 		
 		String attachmentListDomain =  getBaseDomainFormat()+ATTACHMENT_LIST_DOMAIN_FORMAT; 
-		return new AttachmentList(requestFactory, attachmentListDomain);
+		return new AttachmentList(octaneHttpClient, attachmentListDomain);
 	}
 	
 	/**
@@ -93,21 +91,18 @@ public class Octane {
 	}
 
 	public void signOut() {
-		httpClient.signOut();
+		octaneHttpClient.signOut();
 	}
 
 	/**
 	 * This class is in charge on the builder functionality 
 	 *
-	 * @author Moris Oz
 	  */
 	public static class Builder {
 		//Private
 		private Logger logger = LogManager.getLogger(Octane.class.getName());
-		private String hppsValue = "";
-		private HttpClient httpClient = HttpClient.getInstance();
 		private String urlDomain = "";
-		public String idsharedSpaceId = null;
+		private String idsharedSpaceId = null;
 		private long workSpaceId = 0;
 		private final Authorisation authorisation;
 
@@ -198,12 +193,18 @@ public class Octane {
 
 			Octane objOctane = null;
 
-			HttpRequestFactory requestFactory = httpClient.getRequestFactory(urlDomain, authorisation);
-			if (httpClient.authenticate()) {
-				objOctane = new Octane(requestFactory, urlDomain, idsharedSpaceId, workSpaceId);
+			logger.info("Building Octane context using %s", this);
+			OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain);
+			if (octaneHttpClient.authenticate(authorisation)) {
+				objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
 			}
 
 			return objOctane;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Server: %s2%s1SharedSpace: %s3Workspace: %s4", System.lineSeparator(), urlDomain, idsharedSpaceId, workSpaceId);
 		}
 	}
 }

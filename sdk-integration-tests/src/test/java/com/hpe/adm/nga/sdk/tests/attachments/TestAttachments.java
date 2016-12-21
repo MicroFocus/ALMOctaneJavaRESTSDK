@@ -39,14 +39,15 @@ public class TestAttachments extends TestBase {
 
         Set<FieldModel> fields = new HashSet<>();
         fields.add(new ReferenceFieldModel(fieldEntityType, entity));
-        FieldModel name = new StringFieldModel("name", "sdk_attachment_" + UUID.randomUUID() + ".txt");
+        final String attachmentNAme = "sdk_attachment_" + UUID.randomUUID() + ".txt";
+        FieldModel name = new StringFieldModel("name", attachmentNAme);
         fields.add(name);
         Collection<EntityModel> attachments = new ArrayList<>();
         attachments.add(new EntityModel(fields));
 
         ByteArrayInputStream bais = new ByteArrayInputStream("The first line\nThe second line".getBytes());
 
-        octane.AttachmentList().create().entities(attachments, bais, "text/plain", "text_attachment.txt").execute();
+        octane.AttachmentList().create().entities(attachments, bais, "text/plain", attachmentNAme).execute();
 
         return attachments;
     }

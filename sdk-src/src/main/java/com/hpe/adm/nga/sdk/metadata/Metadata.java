@@ -6,9 +6,9 @@ import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.metadata.features.*;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
-import com.hpe.adm.nga.sdk.network.HttpRequest;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
-import com.hpe.adm.nga.sdk.network.HttpResponse;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
+import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -57,22 +57,22 @@ public class Metadata {
 	private static final String LOGGER_RESPONSE_JASON_FORMAT = "Response_Jason: %s";
 	
 	// private members
-	private HttpRequestFactory requestFactory = null;
+	private OctaneHttpClient octaneHttpClient = null;
 	private String urlDomain = "";
 	private Logger logger = LogManager.getLogger(Metadata.class.getName());
 	
 	/**
 	 * Creates a new Metadata object
 	 * 
-	 * @param reqFactory
+	 * @param octaneHttpClient
 	 *            - Http Request Factory
 	 * @param strMetadataDomain
 	 *            - metadata Domain Name
 	 */
-	public Metadata(HttpRequestFactory reqFactory, String strMetadataDomain){
+	public Metadata(OctaneHttpClient octaneHttpClient, String strMetadataDomain){
 		
 		urlDomain = strMetadataDomain;
-		requestFactory = reqFactory;
+		this.octaneHttpClient = octaneHttpClient;
 	}
 	
 	/**
@@ -335,21 +335,16 @@ public class Metadata {
 			String url = urlDomain+ "/" + type;
 			String json = "";
 			try{
-				HttpRequest httpRequest = requestFactory.buildGetRequest(url);
-				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
-				HttpResponse response = httpRequest.execute();
-				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+				OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(url);
+				OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 				
 				if (response.isSuccessStatusCode()) {
 	
-					json = response.parseAsString();
+					json = response.getContent();
 					entitiesMetadata = getEntitiesMetadata(json);
 				}
 
 				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
-
-                // Update request factory with the latest response Cookie
-                requestFactory.initialize(httpRequest.setContent(response));
             }
 			catch (Exception e){
 				logger.debug("Fail to execute GET request.", e);
@@ -392,21 +387,17 @@ public class Metadata {
 			String json = "";
 			try{
 				 
-				HttpRequest httpRequest = requestFactory.buildGetRequest(url);
-				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
-				HttpResponse response = httpRequest.execute();
-				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+				OctaneHttpRequest octaneHttpRequest =
+						new OctaneHttpRequest.GetOctaneHttpRequest(url).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+				OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 				
 				if (response.isSuccessStatusCode()) {
 	
-					json = response.parseAsString();
+					json = response.getContent();
 					colEntitiesMetadata = getFieldMetadata(json);
 				}
 
                 logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
-
-                // Update request factory with the latest response Cookie
-                requestFactory.initialize(httpRequest.setContent(response));
             }
 			catch (Exception e){
 				

@@ -10,7 +10,7 @@ public class HttpResponseException extends com.google.api.client.http.HttpRespon
 
     /**
      * Constructor that constructs a detail message from the given HTTP response that includes the status code, status message and HTTP response content.
-     * Callers of this constructor should call HttpResponse.disconnect() after HttpResponseException is instantiated.
+     * Callers of this constructor should call OctaneHttpResponse.disconnect() after HttpResponseException is instantiated.
      * @param response - HTTP response
      */
     public HttpResponseException(com.google.api.client.http.HttpResponse response) {

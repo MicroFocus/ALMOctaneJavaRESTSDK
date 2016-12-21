@@ -28,7 +28,7 @@ public class TestUpdateEntities {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		octane = new Octane(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
+		octane = CommonMethods.getOctaneForTest();
 		defects = octane.entityList("defects");
 	}
 	

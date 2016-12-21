@@ -1,22 +1,18 @@
-package  com.hpe.adm.nga.sdk.authorisation;
-
-import com.hpe.adm.nga.sdk.network.HttpRequest;
+package com.hpe.adm.nga.sdk.authorisation;
 
 /**
- * Created by brucesp on 23/05/2016.
+ * Created by brucesp on 19-Dec-16.
  */
-public class ClientAuthorisation implements Authorisation {
+public abstract class ClientAuthorisation implements Authorisation {
 
-	private final String clientId;
-	private final String clientSecret;
+    private static final String JSON_STRING = "{\"client_id\":\"%s\",\"client_secret\":\"%s\"}";
 
-	public ClientAuthorisation(final String clientId, final String clientSecret) {
-		this.clientId = clientId;
-		this.clientSecret = clientSecret;
-	}
+    @Override
+    public final String getAuthorisationString() {
+        return String.format(JSON_STRING, getClientId(), getClientSecret());
+    }
 
-	@Override
-	public void executeAuthorisation(HttpRequest request) {
-		request.setClientAuthentication(clientId, clientSecret);
-	}
+    abstract protected String getClientId();
+
+    abstract protected String getClientSecret();
 }

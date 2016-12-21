@@ -23,7 +23,7 @@ public class ContextUtils {
     private static Octane getContext(String url, Authorisation authorisation, String sharedSpaceId, String workspaceId) {
         Octane octane = null;
         try {
-//            Octane.Builder builder = new Octane.Builder(new UserAuthorisation(userName, password)).Server(url);
+//            Octane.Builder builder = new Octane.Builder(new SimpleUserAuthorisation(userName, password)).Server(url);
             Octane.Builder builder = new Octane.Builder(authorisation).Server(url);
 
             if (!sharedSpaceId.isEmpty()) {

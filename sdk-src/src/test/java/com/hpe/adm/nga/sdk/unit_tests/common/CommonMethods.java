@@ -1,52 +1,43 @@
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import org.powermock.api.mockito.PowerMockito;
 
 import java.util.Collection;
 import java.util.Set;
 
 public class CommonMethods {
-	private final static String urlDomain = "https://mqast001pngx.saas.hpe.com";
-	private final static String sharedSpace = "21025";
-	private final static int workSpace = 1002;
-	
-	public static HttpRequestFactory getRequestfactory(){
-		final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
-		final String HPSSO_HEADER_CSRF = "HPSSO_HEADER_CSRF";
-		final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
-		final String HPE_MQM_UI ="HPE_MQM_UI";
-		return new HttpRequestFactory(new NetHttpTransport().createRequestFactory(new HttpRequestInitializer() {
-            @Override
-            public void initialize(HttpRequest request) {
-            		String lastResponseCoockie = request.getHeaders().getCookie()!=null ? request.getHeaders().getCookie() : LWSSO_COOKIE_KEY+"="+"";
-            		request.getHeaders().setCookie(lastResponseCoockie); 
-            		request.getHeaders().set(HPSSO_HEADER_CSRF,""); 
-            		request.getHeaders().set(HPE_CLIENT_TYPE, HPE_MQM_UI);
-            }
-        }));
-	}
-	
-	public static String getDomain(){
-		return urlDomain;
-	}
-	
-	public static String getSharedSpace(){
-		return sharedSpace;
-	}
-	
-	public static int getWorkSpace(){
-		return workSpace;
-	}
-	
-	
-	public static boolean isErrorAInErrorB(ErrorModel entityA, ErrorModel entityB) {
+    private final static String urlDomain = "https://mqast001pngx.saas.hpe.com";
+    private final static String sharedSpace = "21025";
+    private final static int workSpace = 1002;
+
+    public static OctaneHttpClient getOctaneHttpClient() {
+        return PowerMockito.mock(OctaneHttpClient.class);
+    }
+
+    public static Octane getOctaneForTest() {
+        return new OctaneForTest(getOctaneHttpClient(), getDomain(), getSharedSpace(), getWorkSpace());
+    }
+
+    public static String getDomain() {
+        return urlDomain;
+    }
+
+    public static String getSharedSpace() {
+        return sharedSpace;
+    }
+
+    public static int getWorkSpace() {
+        return workSpace;
+    }
+
+
+    public static boolean isErrorAInErrorB(ErrorModel entityA, ErrorModel entityB) {
         if (entityA == null) {
             return true;
         }
@@ -89,5 +80,5 @@ public class CommonMethods {
         }
         return true;
     }
-	
+
 }

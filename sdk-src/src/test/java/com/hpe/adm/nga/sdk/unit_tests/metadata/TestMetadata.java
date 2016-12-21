@@ -1,15 +1,10 @@
 package com.hpe.adm.nga.sdk.unit_tests.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.util.Collection;
-
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
+import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
+import com.hpe.adm.nga.sdk.metadata.Metadata;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,10 +14,14 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
-import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
-import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
@@ -32,7 +31,7 @@ public class TestMetadata {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		octane = new Octane(CommonMethods.getRequestfactory(), CommonMethods.getDomain(), CommonMethods.getSharedSpace() , CommonMethods.getWorkSpace());
+		octane = CommonMethods.getOctaneForTest();
 		metaData = octane.metadata();
 	}
 	

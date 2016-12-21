@@ -3,7 +3,7 @@ package com.hpe.adm.nga.sdk.tests.parallelexecution;
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authorisation.Authorisation;
-import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
+import com.hpe.adm.nga.sdk.authorisation.SimpleUserAuthorisation;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.AuthorisationUtils;
@@ -71,7 +71,7 @@ public class TestParallelExecution extends TestBase {
     private Octane getOctaneClientSecond() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authorisation authorisation = new UserAuthorisation("rest2@hpe.com", "Welcome2");
+        Authorisation authorisation = new SimpleUserAuthorisation("rest2@hpe.com", "Welcome2");
         String sharedSpaceId = "2002";
         String workspaceId = configuration.getString("sdk.workspaceId");
 

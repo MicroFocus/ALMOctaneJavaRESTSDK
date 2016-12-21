@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authorisation.UserAuthorisation;
+import com.hpe.adm.nga.sdk.authorisation.SimpleUserAuthorisation;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 
@@ -14,7 +14,7 @@ public class Demo {
 	    final String MY_APP_SECRET = "Moris4095";
 	    
 		Octane octane = (new Octane.Builder(
-    		      new UserAuthorisation(MY_APP_ID, MY_APP_SECRET)
+    		      new SimpleUserAuthorisation(MY_APP_ID, MY_APP_SECRET)
     		      )).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(21025).workSpace(1002).build();
 		
 		Metadata metadata = octane.metadata();

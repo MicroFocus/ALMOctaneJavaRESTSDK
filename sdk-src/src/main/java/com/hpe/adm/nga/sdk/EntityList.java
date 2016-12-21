@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 import java.util.Collection;
 
@@ -18,12 +18,12 @@ public class EntityList {
 	
 	/**
 	 * Creates a new EntityList object 
-	 * @param reqFactory - Http Request Factory
+	 * @param octaneHttpClient - Http Request Factory
 	 * @param strEntityListDomain - Domain Name 
 	 */
-	public EntityList(HttpRequestFactory reqFactory, String strEntityListDomain) {
+	public EntityList(OctaneHttpClient octaneHttpClient, String strEntityListDomain) {
 
-		entityListService = new EntityListService(reqFactory, strEntityListDomain);
+		entityListService = new EntityListService(octaneHttpClient, strEntityListDomain);
 		
 	}
 	
