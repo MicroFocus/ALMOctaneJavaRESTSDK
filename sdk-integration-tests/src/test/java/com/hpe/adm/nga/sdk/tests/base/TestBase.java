@@ -2,9 +2,9 @@ package com.hpe.adm.nga.sdk.tests.base;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authorisation.Authorisation;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.utils.AuthorisationUtils;
+import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
@@ -35,11 +35,11 @@ public class TestBase {
 
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authorisation authorisation = AuthorisationUtils.getAuthorisation();
+        Authentication authentication = AuthenticationUtils.getAuthentication();
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        octane = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
+        octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
         metadata = octane.metadata();
     }
 

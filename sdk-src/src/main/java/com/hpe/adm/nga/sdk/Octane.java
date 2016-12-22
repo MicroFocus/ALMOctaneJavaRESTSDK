@@ -1,7 +1,7 @@
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.authorisation.Authorisation;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
@@ -104,17 +104,17 @@ public class Octane {
 		private String urlDomain = "";
 		private String idsharedSpaceId = null;
 		private long workSpaceId = 0;
-		private final Authorisation authorisation;
+		private final Authentication authentication;
 
 		//Functions
 
 		/**
 		 * Creates a new Builder object
 		 *
-		 * @param authorisation - hold the details of Authorisation
+		 * @param authentication - hold the details of Authentication
 		 */
-		public Builder(Authorisation authorisation) {
-			this.authorisation = authorisation;
+		public Builder(Authentication authentication) {
+			this.authentication = authentication;
 		}
 
 		/**
@@ -194,7 +194,7 @@ public class Octane {
 
 			logger.info("Building Octane context using %s", this);
 			OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain);
-			if (octaneHttpClient.authenticate(authorisation)) {
+			if (octaneHttpClient.authenticate(authentication)) {
 				objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
 			}
 

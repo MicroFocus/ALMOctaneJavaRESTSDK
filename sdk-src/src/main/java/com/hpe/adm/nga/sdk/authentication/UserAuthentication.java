@@ -1,14 +1,14 @@
-package com.hpe.adm.nga.sdk.authorisation;
+package com.hpe.adm.nga.sdk.authentication;
 
 /**
  * Created by brucesp on 19-Dec-16.
  */
-public abstract class UserAuthorisation implements Authorisation{
+public abstract class UserAuthentication implements Authentication {
 
     private static final String JSON_STRING = "{\"user\":\"%s\",\"password\":\"%s\"}";
 
     @Override
-    public final String getAuthorisationString() {
+    public final String getAuthenticationString() {
         return String.format(JSON_STRING, getUserName(), getPassword());
     }
 

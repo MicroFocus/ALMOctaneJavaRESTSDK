@@ -4,7 +4,7 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.hpe.adm.nga.sdk.authorisation.Authorisation;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -45,7 +45,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final String urlDomain;
 
     /**
-     * Creates an HTTP client instance using the url and authorisation.
+     * Creates an HTTP client instance using the url and authentication.
      *
      * @param urlDomain The source URL of the Octane server
      */
@@ -72,9 +72,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
-    public boolean authenticate(Authorisation authorisation) {
+    public boolean authenticate(Authentication authentication) {
         try {
-            final ByteArrayContent content = ByteArrayContent.fromString("application/json", authorisation.getAuthorisationString());
+            final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
             HttpResponse response = executeRequest(httpRequest);
 

@@ -2,11 +2,11 @@ package com.hpe.adm.nga.sdk.tests.parallelexecution;
 
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authorisation.Authorisation;
-import com.hpe.adm.nga.sdk.authorisation.SimpleUserAuthorisation;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import com.hpe.adm.nga.sdk.utils.AuthorisationUtils;
+import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
@@ -60,22 +60,22 @@ public class TestParallelExecution extends TestBase {
     private Octane getOctaneClientFirst() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authorisation authorisation = AuthorisationUtils.getAuthorisation();
+        Authentication authentication = AuthenticationUtils.getAuthentication();
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        octane = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
+        octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
         return octane;
     }
 
     private Octane getOctaneClientSecond() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authorisation authorisation = new SimpleUserAuthorisation("rest2@hpe.com", "Welcome2");
+        Authentication authentication = new SimpleUserAuthentication("rest2@hpe.com", "Welcome2");
         String sharedSpaceId = "2002";
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        octane = ContextUtils.getContextWorkspace(url, authorisation, sharedSpaceId, workspaceId);
+        octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
         return octane;
     }
 

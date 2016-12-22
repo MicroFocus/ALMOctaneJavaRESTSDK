@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.tests.authorisation;
+package com.hpe.adm.nga.sdk.tests.authentication;
 
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * Created by leufl on 14/11/2016.
  */
-public class TestAuthorisation extends TestBase {
+public class TestAuthentication extends TestBase {
 
     @Test
     public void testSignOut() throws Exception {
