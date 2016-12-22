@@ -1,9 +1,9 @@
 package com.hpe.adm.nga.sdk.exception;
 
-import java.util.Collection;
-
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
+
+import java.util.Collection;
 
 /**
  * This extends the RuntimeException objects and serve all functionality concern to
@@ -41,7 +41,7 @@ public class OctanePartialException extends RuntimeException{
 	 * setter of collection of entities models
 	 *
 	 */
-	public void setEntitiesModels(Collection<EntityModel> entCollection){
+	private void setEntitiesModels(Collection<EntityModel> entCollection){
 		entities = entCollection;
 	}
 	
@@ -57,7 +57,7 @@ public class OctanePartialException extends RuntimeException{
 	 * setter of collection of error models
 	 *
 	 */
-	public void setErrorModels(Collection<ErrorModel> errorModels){
+	private void setErrorModels(Collection<ErrorModel> errorModels){
 		errors = errorModels;
 	}
 		

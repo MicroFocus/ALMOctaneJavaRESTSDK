@@ -75,7 +75,7 @@ public class Octane {
 	 * get the base domain based on workSpaceId and idsharedSpaceId
 	 * @return base domain
 	 */
-	protected String getBaseDomainFormat(){
+	private String getBaseDomainFormat(){
 
 		String baseDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
 		
@@ -100,7 +100,7 @@ public class Octane {
 	  */
 	public static class Builder {
 		//Private
-		private Logger logger = LogManager.getLogger(Octane.class.getName());
+		private final Logger logger = LogManager.getLogger(Octane.class.getName());
 		private String urlDomain = "";
 		private String idsharedSpaceId = null;
 		private long workSpaceId = 0;
@@ -187,9 +187,8 @@ public class Octane {
 		 * 3. Create a new Octane objects.
 		 *
 		 * @return a new Octane object
-		 * @throws RuntimeException
 		 */
-		public Octane build() throws RuntimeException {
+		public Octane build() {
 
 			Octane objOctane = null;
 

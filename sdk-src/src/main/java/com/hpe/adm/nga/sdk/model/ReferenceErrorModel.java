@@ -10,14 +10,14 @@ package com.hpe.adm.nga.sdk.model;
 public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.ReferenceError> {
 	
 	//Private 
-	ReferenceError refValue;
-	String refName;
+	private ReferenceError refValue;
+	private String refName;
 	
 	/**
 	 * Creates a new ReferenceErrorModel object
 	 * 
-	 * @param newName - Field name
-	 * @param newValue - Field Value
+	 * @param name - Field name
+	 * @param value - Field Value
 	 */
 	public ReferenceErrorModel(String name,ReferenceError value){
 		

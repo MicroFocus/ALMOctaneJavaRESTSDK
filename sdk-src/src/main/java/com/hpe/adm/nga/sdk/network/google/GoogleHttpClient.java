@@ -39,19 +39,19 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
 
-    private Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
+    private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
     private final HttpRequestFactory requestFactory;
     private String lwssoValue = "";
     private final String urlDomain;
-    private HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 
     /**
      * Creates an HTTP client instance using the url and authorisation.
      *
-     * @param urlDomain
+     * @param urlDomain The source URL of the Octane server
      */
     public GoogleHttpClient(String urlDomain) {
         this.urlDomain = urlDomain;
+        HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         requestFactory = HTTP_TRANSPORT
                 .createRequestFactory(request -> {
                     request.setResponseInterceptor(response -> {
@@ -212,7 +212,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * Retrieve new cookie from set-cookie header
      *
-     * @param headers
+     * @param headers The headers containing the cookie
      * @return true if LWSSO cookie is renewed
      */
     private boolean updateLWSSOCookieValue(HttpHeaders headers) {

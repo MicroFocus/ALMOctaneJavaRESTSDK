@@ -2,7 +2,6 @@ package com.hpe.adm.nga.sdk.metadata.features;
 
 /**
  * This class hold the SubTypesOfFeature object and serve all functionality concern to SubTypesOf Feature
- * @autho Moris oz
  *
  */
 public class SubTypesOfFeature extends Feature{
@@ -13,7 +12,7 @@ public class SubTypesOfFeature extends Feature{
 	 * get types
 	 * @return
 	 */
-	public String getType(){return type;};
+	public String getType(){return type;}
 }
 
 

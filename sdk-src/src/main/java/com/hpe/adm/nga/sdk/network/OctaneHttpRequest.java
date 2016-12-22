@@ -46,13 +46,14 @@ public abstract class OctaneHttpRequest {
     {
         private String acceptType;
 
-        protected HasAcceptOctaneHttpRequest(final String url, OctaneRequestMethod octaneRequestMethod) {
+        private HasAcceptOctaneHttpRequest(final String url, OctaneRequestMethod octaneRequestMethod) {
             super(url, octaneRequestMethod);
         }
 
          public E setAcceptType(String acceptType) {
             this.acceptType = acceptType;
-            return (E) this;
+             //noinspection unchecked
+             return (E) this;
         }
 
         public final String getAcceptType() {

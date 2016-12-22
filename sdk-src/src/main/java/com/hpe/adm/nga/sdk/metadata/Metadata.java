@@ -21,7 +21,6 @@ import java.util.stream.IntStream;
 
 /**
  * This class hold the  metadata object and serve all functionality concern to fields metadata and entity metadata
- * @autho Moris oz
  *
  */
 public class Metadata {
@@ -59,7 +58,7 @@ public class Metadata {
 	// private members
 	private OctaneHttpClient octaneHttpClient = null;
 	private String urlDomain = "";
-	private Logger logger = LogManager.getLogger(Metadata.class.getName());
+	private final Logger logger = LogManager.getLogger(Metadata.class.getName());
 	
 	/**
 	 * Creates a new Metadata object
@@ -154,7 +153,7 @@ public class Metadata {
 	 * @param jasoFeatureObj - Jason Feature object
 	 * @return Feature Object
 	 */
-	protected Feature getFeatureObject(JSONObject jasoFeatureObj){
+	private Feature getFeatureObject(JSONObject jasoFeatureObj){
 		
 		Feature feature = null;
 		String featureName = jasoFeatureObj.getString(JSON_NAME_FIELD_NAME);
@@ -212,14 +211,14 @@ public class Metadata {
 	 * @param json
 	 * @return entity metadata collection based on a given jason string
 	 */
-	protected  Collection<EntityMetadata> getEntitiesMetadata(String json)  {
+	private Collection<EntityMetadata> getEntitiesMetadata(String json)  {
 		
 		JSONTokener tokener = new JSONTokener(json);
 		JSONObject jasoObj = new JSONObject(tokener);
 		JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_FIELD_NAME);
 
 		// prepare entity collection
-		Collection<EntityMetadata> entitiesMetadata = new ArrayList<EntityMetadata>();
+		Collection<EntityMetadata> entitiesMetadata = new ArrayList<>();
 		IntStream.range(0, jasoDataArr.length()).forEach((i)->entitiesMetadata.add(getEntityMetadata(jasoDataArr.getJSONObject(i))));
 		
 		// TBD - Remove after debugging
@@ -238,14 +237,14 @@ public class Metadata {
 	 * @param json
 	 * @return fields metadata collection based on a given jason string
 	 */
-	protected  Collection<FieldMetadata> getFieldMetadata(String json) {
+	private Collection<FieldMetadata> getFieldMetadata(String json) {
 		
 		JSONTokener tokener = new JSONTokener(json);
 		JSONObject jasoObj = new JSONObject(tokener);
 		JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_FIELD_NAME);
 
 		// prepare entity collection
-		Collection<FieldMetadata> fieldsMetadata = new ArrayList<FieldMetadata>();
+		Collection<FieldMetadata> fieldsMetadata = new ArrayList<>();
 		IntStream.range(0, jasoDataArr.length()).forEach((i)->fieldsMetadata.add(new Gson().fromJson(jasoDataArr.getJSONObject(i).toString(), FieldMetadata.class)));
 		
 		// TBD - Remove after debugging
@@ -267,9 +266,9 @@ public class Metadata {
 	 * @param jasoEntityObj - Jason object
 	 * @return new EntityMetadata object
 	 */
-	protected  EntityMetadata getEntityMetadata(JSONObject jasoEntityObj)  {
+	private EntityMetadata getEntityMetadata(JSONObject jasoEntityObj)  {
 
-		Set<Feature> features = new HashSet<Feature>();
+		Set<Feature> features = new HashSet<>();
 		String name = jasoEntityObj.getString(JSON_NAME_FIELD_NAME);
 		String label = jasoEntityObj.getString(JSON_LABEL_FIELD_NAME);
 		//Boolean canModifyLabel = jasoEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
@@ -287,17 +286,16 @@ public class Metadata {
 			Feature feature = getFeatureObject(jasoFeatureObj);
 			features.add(feature);
 		}*/
-		
-		EntityMetadata entityMetadata = new EntityMetadata(name, label, false, features);
-		return entityMetadata;
+
+		// TODO: Check this
+		return new EntityMetadata(name, label, false, features);
 	}
 	
 	/**
 	 * Handle exceptions
 	 * @param e - exception
-	 * @throws RuntimeException
 	 */
-	protected void handleException(Exception e) throws RuntimeException{
+	private void handleException(Exception e){
 		
 		ErrorModel errorModel =  new ErrorModel(e.getMessage());
 		throw new OctaneException(errorModel);

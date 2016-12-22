@@ -1,6 +1,5 @@
 package com.hpe.adm.nga.sdk.network;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -25,7 +24,7 @@ public class OctaneHttpResponse {
      * @return - Returns whether received a successful HTTP status code >= 200 && < 300 (see getStatusCode()).
      */
     public boolean isSuccessStatusCode(){
-        return true;
+        return statusCode >= 200 && statusCode < 300;
     }
 //
 //    /**
@@ -48,9 +47,8 @@ public class OctaneHttpResponse {
      * Since this method returns "" for no content, a simpler check for no content is to check if getContent() is null.
      * All content is read from the input content stream rather than being limited by the Content-Length. For the character set, it follows the specification by parsing the "charset" parameter of the Content-Type header or by default "ISO-8859-1" if the parameter is missing.
      * @return - parsed string or "" for no content
-     * @throws IOException - I/O exception
      */
-    public String getContent() throws IOException{
+    public String getContent(){
         return content;
     }
 
@@ -60,9 +58,8 @@ public class OctaneHttpResponse {
      * Callers should call InputStream.close() after the returned InputStream is no longer needed.
      * disconnect() does not have to be called if the content is closed.
      * @return - input stream content of the HTTP response or null for none
-     * @throws IOException
      */
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         return inputStream;
     }
 }

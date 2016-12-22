@@ -10,14 +10,14 @@ package com.hpe.adm.nga.sdk.model;
 public class ReferenceFieldModel implements FieldModel<EntityModel> {
 	
 	//Private 
-	EntityModel refValue;
-	String refName;
+	private EntityModel refValue;
+	private String refName;
 	
 	/**
 	 * Creates a new ReferenceFieldModel object
 	 * 
-	 * @param newName - Field name
-	 * @param newValue - Field Value
+	 * @param name - Field name
+	 * @param value - Field Value
 	 */
 	public ReferenceFieldModel(String name,EntityModel value){
 		

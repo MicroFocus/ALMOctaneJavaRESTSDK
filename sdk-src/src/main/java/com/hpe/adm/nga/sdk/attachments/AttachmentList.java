@@ -149,7 +149,7 @@ public class AttachmentList {
 		
 		/**
 		 * getter of a new Get Object
-		 * @return
+		 * @return new instance of Get
 		 */
 		public Get get() {
 			return new Get();
@@ -157,7 +157,7 @@ public class AttachmentList {
 		
 		/**
 		 * getter of a new Update Object
-		 * @return
+		 * @return new instance of Update
 		 */
 		public Update update() {
 			return new Update();
@@ -165,7 +165,7 @@ public class AttachmentList {
 		
 		/**
 		 * getter of a new Delete Object
-		 * @return
+		 * @return new instance of Delete
 		 */
 		public Delete delete() {
 			return new Delete();
@@ -174,7 +174,7 @@ public class AttachmentList {
 		
 		/**
 		 * Get GetBinary object
-		 * @return
+		 * @return new instance of GetBinary
 		 */
 		public GetBinary getBinary() {
 			return new GetBinary();

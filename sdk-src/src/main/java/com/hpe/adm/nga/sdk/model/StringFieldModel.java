@@ -28,9 +28,9 @@ public class StringFieldModel implements FieldModel<String> {
 	 */
 	public String getValue()	{
 		return value;
-	};
-	
-	/**
+	}
+
+    /**
 	 * get name
 	 */
 	public String getName(){
@@ -44,5 +44,5 @@ public class StringFieldModel implements FieldModel<String> {
 		
 		name = newName;
 		value = newValue;
-	};
+	}
 }

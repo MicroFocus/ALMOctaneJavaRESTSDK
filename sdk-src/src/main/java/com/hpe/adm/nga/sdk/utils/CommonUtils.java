@@ -16,13 +16,13 @@ public class CommonUtils {
         Set<FieldModel> fieldModelSet = entityModel.getValues();
         for (FieldModel fm : fieldModelSet) {
             if (fm.getName().equals(fieldName)) {
-                if(fm.getValue() == null){
+                if (fm.getValue() == null) {
                     return null;
                 }
                 return fm.getValue().toString();
             }
         }
-        throw new RuntimeException("Field  name [" + fieldName + "] not found in entity model: "+ entityModel.toString());
+        throw new RuntimeException("Field  name [" + fieldName + "] not found in entity model: " + entityModel.toString());
     }
 
     public static int getIdFromEntityModel(EntityModel entityModel) {
@@ -32,7 +32,7 @@ public class CommonUtils {
                 return Integer.parseInt(fm.getValue().toString());
             }
         }
-        throw new RuntimeException("Field  ID not found in entity model: "+ entityModel.toString());
+        throw new RuntimeException("Field  ID not found in entity model: " + entityModel.toString());
     }
 
 
@@ -50,7 +50,12 @@ public class CommonUtils {
 
     public static EntityModel getEntityWithStringValue(Collection<EntityModel> entityModels, String fieldName, String value) {
         Collection<EntityModel> entityModelsResult = new ArrayList<>();
-        entityModels.forEach(entityModel -> {if(getValueFromEntityModel(entityModel, fieldName) == value || getValueFromEntityModel(entityModel, fieldName).equals(value)){entityModelsResult.add(entityModel);}});
+        entityModels.forEach(entityModel -> {
+            final String valueFromEntityModel = getValueFromEntityModel(entityModel, fieldName);
+            if (valueFromEntityModel != null && valueFromEntityModel.equals(value)) {
+                entityModelsResult.add(entityModel);
+            }
+        });
         return entityModelsResult.iterator().next();
     }
 
@@ -74,12 +79,12 @@ public class CommonUtils {
             if (!fieldA.getClass().equals(fieldB.getClass())) return false;
 
             if (fieldA.getValue() != null) {
-                if(!fieldA.getClass().equals(ReferenceFieldModel.class)) {
-                    if(!fieldA.getValue().equals(fieldB.getValue())) return false;
+                if (!fieldA.getClass().equals(ReferenceFieldModel.class)) {
+                    if (!fieldA.getValue().equals(fieldB.getValue())) return false;
                 } else {
-                    if(fieldB.getValue() == null) return false;
-                    if(!refsEqual(((ReferenceFieldModel)fieldA).getValue(),
-                            ((ReferenceFieldModel)fieldB).getValue())) return false;
+                    if (fieldB.getValue() == null) return false;
+                    if (!refsEqual(((ReferenceFieldModel) fieldA).getValue(),
+                            ((ReferenceFieldModel) fieldB).getValue())) return false;
                 }
             }
         }
@@ -87,19 +92,16 @@ public class CommonUtils {
     }
 
     private static boolean refsEqual(EntityModel refA, EntityModel refB) {
-        if(refA == null) return refB == null;
-        if(refB == null) return false;
+        if (refA == null) return refB == null;
+        if (refB == null) return false;
         FieldModel idA = refA.getValue("id");
         FieldModel idB = refB.getValue("id");
         FieldModel typeA = refA.getValue("type");
         FieldModel typeB = refB.getValue("type");
         FieldModel subtypeA = refA.getValue("subtype");
         FieldModel subtypeB = refB.getValue("subtype");
-        if(idA == null || idB == null || idA.getValue() == null || idB.getValue() == null ||
-                !idA.getValue().equals(idB.getValue())) return false;
-        return typeA != null && typeB != null && typeA.getValue() != null && typeA.getValue().equals(typeB.getValue()) ||
-                subtypeA != null && typeB != null && subtypeA.getValue() != null && subtypeA.getValue().equals(typeB.getValue()) ||
-                subtypeB != null && typeA != null && subtypeB.getValue() != null && subtypeB.getValue().equals(typeA.getValue());
+        return !(idA == null || idB == null || idA.getValue() == null || idB.getValue() == null ||
+                !idA.getValue().equals(idB.getValue())) && (typeA != null && typeB != null && typeA.getValue() != null && typeA.getValue().equals(typeB.getValue()) || subtypeA != null && typeB != null && subtypeA.getValue() != null && subtypeA.getValue().equals(typeB.getValue()) || subtypeB != null && typeA != null && subtypeB.getValue() != null && subtypeB.getValue().equals(typeA.getValue()));
     }
 
     public static boolean isCollectionAInCollectionB(Collection<EntityModel> collectionA, Collection<EntityModel> collectionB) {

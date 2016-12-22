@@ -10,7 +10,7 @@ public class LongFieldModel implements FieldModel<Long> {
 	
 	//Private 
 		private String name = "";
-		private Long value = Long.valueOf(0);
+		private Long value = 0L;
 		
 		/**
 		 * Creates a new LongFieldModel object
@@ -28,9 +28,9 @@ public class LongFieldModel implements FieldModel<Long> {
 		 */
 		public Long getValue()	{
 			return value;
-		};
-		
-		/**
+		}
+
+    /**
 		 * get Field's name
 		 */
 		public String getName(){
@@ -44,7 +44,7 @@ public class LongFieldModel implements FieldModel<Long> {
 			
 			name = newName;
 			value = newValue;
-		};
-	
-	
+		}
+
+
 }
