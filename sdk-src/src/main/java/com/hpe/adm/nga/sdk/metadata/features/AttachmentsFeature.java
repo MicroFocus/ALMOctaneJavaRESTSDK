@@ -3,7 +3,6 @@ package com.hpe.adm.nga.sdk.metadata.features;
 
 /**
  * This class hold the AttachmentsFeature object and serve all functionality concern to Attachments Feature
- * @autho Moris oz
  *
  */
 public class AttachmentsFeature extends Feature{

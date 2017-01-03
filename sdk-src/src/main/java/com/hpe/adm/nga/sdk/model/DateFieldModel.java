@@ -30,9 +30,9 @@ public class DateFieldModel implements FieldModel<Date> {
 		 */
 		public Date getValue()	{
 			return value;
-		};
-		
-		/**
+		}
+
+	/**
 		 * get Field's name
 		 */
 		public String getName(){
@@ -46,7 +46,7 @@ public class DateFieldModel implements FieldModel<Date> {
 			
 			name = newName;
 			value = newValue;
-		};
-	
-	
+		}
+
+
 }

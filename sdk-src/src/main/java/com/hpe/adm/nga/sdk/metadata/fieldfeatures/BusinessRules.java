@@ -3,8 +3,8 @@ package com.hpe.adm.nga.sdk.metadata.fieldfeatures;
 /**
  * Created by ngthien on 8/3/2016.
  */
-public class BusinessRules {
-    private final String name = "business_rules";
+class BusinessRules {
+    private static final String name = "business_rules";
     private boolean show_in_action;
     private boolean show_in_condition;
 

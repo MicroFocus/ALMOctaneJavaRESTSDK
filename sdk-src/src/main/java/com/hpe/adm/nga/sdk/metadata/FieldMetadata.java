@@ -32,7 +32,7 @@ public class FieldMetadata {
 	}
 	
 	// Private
-	private final String type = "field_metadata";
+	private static final String type = "field_metadata";
 	private String name;
 	private String label;
 	private boolean can_modify_label;
@@ -79,11 +79,13 @@ public class FieldMetadata {
 		String type;
 		String logical_name;
 		
-		public String[] getTypes(){return types;};
-		public String  getType(){return type;};
-		public String  logicalName(){return logical_name;};
-		
-		
+		public String[] getTypes(){return types;}
+
+		public String  getType(){return type;}
+
+		public String  logicalName(){return logical_name;}
+
+
 	}
 	
 	/**
@@ -96,9 +98,10 @@ public class FieldMetadata {
 		private boolean multiple;
 		private Target[] targets;
 		
-		public boolean isMultiple(){return multiple;};
-		public Target[] getTargets(){return targets;};
-		
+		public boolean isMultiple(){return multiple;}
+
+		public Target[] getTargets(){return targets;}
+
 	}
 
 	/**
@@ -111,37 +114,37 @@ public class FieldMetadata {
 	 * get FieldMetadata's name
 	 * @return
 	 */
-	public String getName(){return name;};
-	
+	public String getName(){return name;}
+
 	/**
 	 * get FieldMetadata's Entity Name
 	 * @return
 	 */
-	public String getEntityName(){return entity_name;};
-	
+	public String getEntityName(){return entity_name;}
+
 	/**
 	 * get FieldMetadata's Filterable state
 	 * @return
 	 */
-	public boolean isFilterable(){return filterable;};
-	
+	public boolean isFilterable(){return filterable;}
+
 	/**
 	 * get FieldMetadata's Editable state
 	 * @return
 	 */
-	public boolean isEditable(){return editable;};
+	public boolean isEditable(){return editable;}
 
 	/**
 	 * get FieldMetadata's ReturnByDefault state
 	 * @return
 	 */
-	public boolean isReturnByDefault(){return returned_by_default;};
-	
+	public boolean isReturnByDefault(){return returned_by_default;}
+
 	/**
 	 * get FieldMetadata's Label 
 	 * @return
 	 */
-	public String getLabel(){return label;};
+	public String getLabel(){return label;}
 
 	/**
 	 * get FieldMetadata's CanModifyLabel
@@ -189,7 +192,7 @@ public class FieldMetadata {
 	 * get FieldMetadata's Sortable state 
 	 * @return
 	 */
-	public boolean isSortable(){return sortable;};
+	public boolean isSortable(){return sortable;}
 
 	/**
 	 * get FieldMetadata's Auditable state
@@ -237,37 +240,37 @@ public class FieldMetadata {
 	 * get FieldMetadata's Required state 
 	 * @return
 	 */
-	public boolean isRequired(){return required;};
+	public boolean isRequired(){return required;}
 
 	/**
 	 * get FieldMetadata's Sanitization state 
 	 * @return
 	 */
-	public String getSanitization(){return sanitization;};
+	public String getSanitization(){return sanitization;}
 
 	/**
 	 * get FieldMetadata's Unique state 
 	 * @return
 	 */
-	public boolean isUnique(){return unique;};
+	public boolean isUnique(){return unique;}
 
 	/**
 	 * get FieldMetadata's field Type
 	 * @return
 	 */
-	public FieldType getFieldType(){return field_type;};
-	
+	public FieldType getFieldType(){return field_type;}
+
 	/**
 	 * get FieldMetadata's Field Type data
 	 * @return
 	 */
-	public FieldTypeData getFieldTypedata(){return field_type_data;};
-	
+	public FieldTypeData getFieldTypedata(){return field_type_data;}
+
 	/**
 	 * get FieldMetadata's Max Length
 	 * @return
 	 */
-	public int getMaxLength(){return max_length;};
+	public int getMaxLength(){return max_length;}
 
 	/**
 	 * get FieldMetadata's CanModifyRequired

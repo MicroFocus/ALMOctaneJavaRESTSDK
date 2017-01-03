@@ -21,7 +21,7 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<EntityMod
 		 * Creates a new MultiReferenceFieldModel object
 		 * 
 		 * @param newName - Field name
-		 * @param newValue - Field Value
+		 * @param value - Field Value
 		 */
 		public MultiReferenceFieldModel(String newName,Collection<EntityModel> value){
 			
@@ -33,9 +33,9 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<EntityMod
 		 */
 		public Collection<EntityModel> getValue(){
 			return data;
-		};
-		
-		/**
+		}
+
+    /**
 		 * get name
 		 */
 		public String getName(){
@@ -59,8 +59,7 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<EntityMod
 			
 			name = newName;
 			data = value;
-		};
-		
-				
-		
+		}
+
+
 }

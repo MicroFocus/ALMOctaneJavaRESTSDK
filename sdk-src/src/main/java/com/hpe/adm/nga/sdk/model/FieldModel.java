@@ -8,8 +8,8 @@ package com.hpe.adm.nga.sdk.model;
  */
 public interface FieldModel<T> {
 	
-	public T getValue();
-	public void setValue(String name,T value);
-	public String getName();
+	T getValue();
+	void setValue(String name, T value);
+	String getName();
 	
 }

@@ -28,9 +28,9 @@ public class BooleanFieldModel implements FieldModel<Boolean> {
 		 */
 		public Boolean getValue()	{
 			return value;
-		};
-		
-		/**
+		}
+
+	/**
 		 * get Field's name
 		 */
 		public String getName(){
@@ -44,7 +44,7 @@ public class BooleanFieldModel implements FieldModel<Boolean> {
 			
 			name = newName;
 			value = newValue;
-		};
-	
-	
+		}
+
+
 }

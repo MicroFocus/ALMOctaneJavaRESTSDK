@@ -31,7 +31,7 @@ public class TestAttachments extends TestBase {
 
         Collection<EntityModel> actualAttachments = octane.entityList("attachments").get().addFields("owner_work_item", "name").execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedAttachments, actualAttachments, true));
+        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedAttachments, actualAttachments, false));
     }
 
     private Collection<EntityModel> createAttachment(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {
@@ -39,14 +39,15 @@ public class TestAttachments extends TestBase {
 
         Set<FieldModel> fields = new HashSet<>();
         fields.add(new ReferenceFieldModel(fieldEntityType, entity));
-        FieldModel name = new StringFieldModel("name", "sdk_attachment_" + UUID.randomUUID() + ".txt");
+        final String attachmentNAme = "sdk_attachment_" + UUID.randomUUID() + ".txt";
+        FieldModel name = new StringFieldModel("name", attachmentNAme);
         fields.add(name);
         Collection<EntityModel> attachments = new ArrayList<>();
         attachments.add(new EntityModel(fields));
 
         ByteArrayInputStream bais = new ByteArrayInputStream("The first line\nThe second line".getBytes());
 
-        octane.AttachmentList().create().entities(attachments, bais, "text/plain", "text_attachment.txt").execute();
+        octane.AttachmentList().create().entities(attachments, bais, "text/plain", attachmentNAme).execute();
 
         return attachments;
     }

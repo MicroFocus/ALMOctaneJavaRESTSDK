@@ -3,7 +3,6 @@ package com.hpe.adm.nga.sdk.unit_tests.model;
 
 import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.model.*;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.json.JSONObject;
 import org.junit.After;
@@ -33,7 +32,7 @@ public class TestModel {
 	public static void initializeOnCreate(){	
 		set = new HashSet<FieldModel>();
 		try {
-			service = new EntityListService(CommonMethods.getRequestfactory(), "");
+			service = new EntityListService(CommonMethods.getOctaneHttpClient(), "");
 			getEntityJSONObject = service.getClass().getDeclaredMethod("getEntityJSONObject", new Class[] {EntityModel.class});
 			getEntityJSONObject.setAccessible(true);
 		} catch(Exception ex){

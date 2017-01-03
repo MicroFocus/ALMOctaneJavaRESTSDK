@@ -57,12 +57,10 @@ public class EntityModel {
      * getter of single field
      *
      * @param key the fieldName
-     * @param <T> fieldModel type
      * @return the field of specified field name
      */
-    public <T extends FieldModel> T getValue(String key) {
-        T fieldModel = (T) data.get(key);
-        return fieldModel;
+    public FieldModel getValue(String key) {
+        return data.get(key);
     }
 
     /**
@@ -79,7 +77,7 @@ public class EntityModel {
 
     /**
      * setter of single field, update if field exists
-     * @param fieldModel
+     * @param fieldModel the single field to update
      */
     public void setValue(FieldModel fieldModel) {
         data.put(fieldModel.getName(), fieldModel);

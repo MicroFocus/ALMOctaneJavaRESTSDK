@@ -35,7 +35,7 @@ public class OctaneException extends RuntimeException {
 	 * set a new error model
 	 * @param error - error model
 	 */
-	public void setError(ErrorModel  error){
+	private void setError(ErrorModel error){
 		errorModel = error;
 	}
 

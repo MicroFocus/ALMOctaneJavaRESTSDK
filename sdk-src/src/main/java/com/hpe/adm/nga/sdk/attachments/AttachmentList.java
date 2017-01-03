@@ -3,7 +3,7 @@ package com.hpe.adm.nga.sdk.attachments;
 import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.OctaneRequest;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -18,12 +18,12 @@ public class AttachmentList {
 	
 	/**
 	 * Creates a new AttachmentList object
-	 * @param reqFactory - Octane request factory
+	 * @param octaneHttpClient - Octane request factory
 	 * @param attachmentListDomain - domain of attachmentList
 	 */
-	public AttachmentList(HttpRequestFactory reqFactory, String attachmentListDomain) {
+	public AttachmentList(OctaneHttpClient octaneHttpClient, String attachmentListDomain) {
 		
-		entityListService = new EntityListService(reqFactory, attachmentListDomain);
+		entityListService = new EntityListService(octaneHttpClient, attachmentListDomain);
 	}
 	
 	/**
@@ -149,7 +149,7 @@ public class AttachmentList {
 		
 		/**
 		 * getter of a new Get Object
-		 * @return
+		 * @return new instance of Get
 		 */
 		public Get get() {
 			return new Get();
@@ -157,7 +157,7 @@ public class AttachmentList {
 		
 		/**
 		 * getter of a new Update Object
-		 * @return
+		 * @return new instance of Update
 		 */
 		public Update update() {
 			return new Update();
@@ -165,7 +165,7 @@ public class AttachmentList {
 		
 		/**
 		 * getter of a new Delete Object
-		 * @return
+		 * @return new instance of Delete
 		 */
 		public Delete delete() {
 			return new Delete();
@@ -174,7 +174,7 @@ public class AttachmentList {
 		
 		/**
 		 * Get GetBinary object
-		 * @return
+		 * @return new instance of GetBinary
 		 */
 		public GetBinary getBinary() {
 			return new GetBinary();

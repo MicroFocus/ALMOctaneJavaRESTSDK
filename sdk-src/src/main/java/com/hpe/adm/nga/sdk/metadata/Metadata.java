@@ -6,9 +6,9 @@ import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.metadata.features.*;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
-import com.hpe.adm.nga.sdk.network.HttpRequest;
-import com.hpe.adm.nga.sdk.network.HttpRequestFactory;
-import com.hpe.adm.nga.sdk.network.HttpResponse;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
+import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -21,7 +21,6 @@ import java.util.stream.IntStream;
 
 /**
  * This class hold the  metadata object and serve all functionality concern to fields metadata and entity metadata
- * @autho Moris oz
  *
  */
 public class Metadata {
@@ -57,22 +56,22 @@ public class Metadata {
 	private static final String LOGGER_RESPONSE_JASON_FORMAT = "Response_Jason: %s";
 	
 	// private members
-	private HttpRequestFactory requestFactory = null;
+	private OctaneHttpClient octaneHttpClient = null;
 	private String urlDomain = "";
-	private Logger logger = LogManager.getLogger(Metadata.class.getName());
+	private final Logger logger = LogManager.getLogger(Metadata.class.getName());
 	
 	/**
 	 * Creates a new Metadata object
 	 * 
-	 * @param reqFactory
+	 * @param octaneHttpClient
 	 *            - Http Request Factory
 	 * @param strMetadataDomain
 	 *            - metadata Domain Name
 	 */
-	public Metadata(HttpRequestFactory reqFactory, String strMetadataDomain){
+	public Metadata(OctaneHttpClient octaneHttpClient, String strMetadataDomain){
 		
 		urlDomain = strMetadataDomain;
-		requestFactory = reqFactory;
+		this.octaneHttpClient = octaneHttpClient;
 	}
 	
 	/**
@@ -154,7 +153,7 @@ public class Metadata {
 	 * @param jasoFeatureObj - Jason Feature object
 	 * @return Feature Object
 	 */
-	protected Feature getFeatureObject(JSONObject jasoFeatureObj){
+	private Feature getFeatureObject(JSONObject jasoFeatureObj){
 		
 		Feature feature = null;
 		String featureName = jasoFeatureObj.getString(JSON_NAME_FIELD_NAME);
@@ -212,14 +211,14 @@ public class Metadata {
 	 * @param json
 	 * @return entity metadata collection based on a given jason string
 	 */
-	protected  Collection<EntityMetadata> getEntitiesMetadata(String json)  {
+	private Collection<EntityMetadata> getEntitiesMetadata(String json)  {
 		
 		JSONTokener tokener = new JSONTokener(json);
 		JSONObject jasoObj = new JSONObject(tokener);
 		JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_FIELD_NAME);
 
 		// prepare entity collection
-		Collection<EntityMetadata> entitiesMetadata = new ArrayList<EntityMetadata>();
+		Collection<EntityMetadata> entitiesMetadata = new ArrayList<>();
 		IntStream.range(0, jasoDataArr.length()).forEach((i)->entitiesMetadata.add(getEntityMetadata(jasoDataArr.getJSONObject(i))));
 		
 		// TBD - Remove after debugging
@@ -238,14 +237,14 @@ public class Metadata {
 	 * @param json
 	 * @return fields metadata collection based on a given jason string
 	 */
-	protected  Collection<FieldMetadata> getFieldMetadata(String json) {
+	private Collection<FieldMetadata> getFieldMetadata(String json) {
 		
 		JSONTokener tokener = new JSONTokener(json);
 		JSONObject jasoObj = new JSONObject(tokener);
 		JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_FIELD_NAME);
 
 		// prepare entity collection
-		Collection<FieldMetadata> fieldsMetadata = new ArrayList<FieldMetadata>();
+		Collection<FieldMetadata> fieldsMetadata = new ArrayList<>();
 		IntStream.range(0, jasoDataArr.length()).forEach((i)->fieldsMetadata.add(new Gson().fromJson(jasoDataArr.getJSONObject(i).toString(), FieldMetadata.class)));
 		
 		// TBD - Remove after debugging
@@ -267,9 +266,9 @@ public class Metadata {
 	 * @param jasoEntityObj - Jason object
 	 * @return new EntityMetadata object
 	 */
-	protected  EntityMetadata getEntityMetadata(JSONObject jasoEntityObj)  {
+	private EntityMetadata getEntityMetadata(JSONObject jasoEntityObj)  {
 
-		Set<Feature> features = new HashSet<Feature>();
+		Set<Feature> features = new HashSet<>();
 		String name = jasoEntityObj.getString(JSON_NAME_FIELD_NAME);
 		String label = jasoEntityObj.getString(JSON_LABEL_FIELD_NAME);
 		//Boolean canModifyLabel = jasoEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
@@ -287,17 +286,16 @@ public class Metadata {
 			Feature feature = getFeatureObject(jasoFeatureObj);
 			features.add(feature);
 		}*/
-		
-		EntityMetadata entityMetadata = new EntityMetadata(name, label, false, features);
-		return entityMetadata;
+
+		// TODO: Check this
+		return new EntityMetadata(name, label, false, features);
 	}
 	
 	/**
 	 * Handle exceptions
 	 * @param e - exception
-	 * @throws RuntimeException
 	 */
-	protected void handleException(Exception e) throws RuntimeException{
+	private void handleException(Exception e){
 		
 		ErrorModel errorModel =  new ErrorModel(e.getMessage());
 		throw new OctaneException(errorModel);
@@ -335,21 +333,16 @@ public class Metadata {
 			String url = urlDomain+ "/" + type;
 			String json = "";
 			try{
-				HttpRequest httpRequest = requestFactory.buildGetRequest(url);
-				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
-				HttpResponse response = httpRequest.execute();
-				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+				OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(url);
+				OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 				
 				if (response.isSuccessStatusCode()) {
 	
-					json = response.parseAsString();
+					json = response.getContent();
 					entitiesMetadata = getEntitiesMetadata(json);
 				}
 
 				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
-
-                // Update request factory with the latest response Cookie
-                requestFactory.initialize(httpRequest.setContent(response));
             }
 			catch (Exception e){
 				logger.debug("Fail to execute GET request.", e);
@@ -392,21 +385,17 @@ public class Metadata {
 			String json = "";
 			try{
 				 
-				HttpRequest httpRequest = requestFactory.buildGetRequest(url);
-				logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), url,httpRequest.getHeaders().toString()));
-				HttpResponse response = httpRequest.execute();
-				logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(),response.getHeaders().toString()));
+				OctaneHttpRequest octaneHttpRequest =
+						new OctaneHttpRequest.GetOctaneHttpRequest(url).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+				OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 				
 				if (response.isSuccessStatusCode()) {
 	
-					json = response.parseAsString();
+					json = response.getContent();
 					colEntitiesMetadata = getFieldMetadata(json);
 				}
 
                 logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
-
-                // Update request factory with the latest response Cookie
-                requestFactory.initialize(httpRequest.setContent(response));
             }
 			catch (Exception e){
 				

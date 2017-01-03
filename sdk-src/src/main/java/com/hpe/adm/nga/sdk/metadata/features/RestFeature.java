@@ -3,7 +3,6 @@ package com.hpe.adm.nga.sdk.metadata.features;
 
 /**
  * This class hold the RestFeature object and serve all functionality concern to rest Feature
- * @autho Moris oz
  *
  */
 public class RestFeature extends Feature{
