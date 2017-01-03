@@ -52,7 +52,8 @@ public class CommonUtils {
         Collection<EntityModel> entityModelsResult = new ArrayList<>();
         entityModels.forEach(entityModel -> {
             final String valueFromEntityModel = getValueFromEntityModel(entityModel, fieldName);
-            if (valueFromEntityModel != null && valueFromEntityModel.equals(value)) {
+            if ((valueFromEntityModel != null && valueFromEntityModel.equals(value)) ||
+                    (value == valueFromEntityModel)) {
                 entityModelsResult.add(entityModel);
             }
         });

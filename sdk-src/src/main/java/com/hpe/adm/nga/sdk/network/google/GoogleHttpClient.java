@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * HTTP Client
+ * HTTP Client using Google's API
+ *
+ * This will be refactored in future releases to enable the use of different underlying APIs
  * <p>
  * Created by leufl on 2/11/2016.
  */
@@ -29,8 +31,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
     private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
     private static final String SET_COOKIE = "set-cookie";
-    private static final String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
-    private static final String HPE_REST_API_TECH_PREVIEW = "HPE_REST_API_TECH_PREVIEW";
     private static final String HTTP_MEDIA_TYPE_MULTIPART_NAME = "multipart/form-data";
     private static final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
     private static final String HTTP_MULTIPART_BOUNDARY_VALUE = "---------------------------92348603315617859231724135434";
@@ -49,7 +49,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
      *
      * @param urlDomain The source URL of the Octane server
      */
-    public GoogleHttpClient(String urlDomain) {
+    public GoogleHttpClient(final String urlDomain, final String clientTypeHeader) {
         this.urlDomain = urlDomain;
         HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         requestFactory = HTTP_TRANSPORT
@@ -65,7 +65,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         request.getHeaders().setCookie(LWSSO_COOKIE_KEY + "=" + lwssoValue);
                     }
 
-                    request.getHeaders().set(HPE_CLIENT_TYPE, HPE_REST_API_TECH_PREVIEW);
+                    if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
+                        request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
+                    }
                 });
     }
 

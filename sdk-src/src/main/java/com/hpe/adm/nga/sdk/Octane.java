@@ -193,7 +193,7 @@ public class Octane {
 			Octane objOctane = null;
 
 			logger.info("Building Octane context using %s", this);
-			OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain);
+			OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain, authentication.getClientHeader());
 			if (octaneHttpClient.authenticate(authentication)) {
 				objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
 			}

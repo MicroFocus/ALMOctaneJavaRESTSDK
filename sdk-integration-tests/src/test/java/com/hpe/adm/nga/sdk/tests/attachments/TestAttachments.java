@@ -31,7 +31,7 @@ public class TestAttachments extends TestBase {
 
         Collection<EntityModel> actualAttachments = octane.entityList("attachments").get().addFields("owner_work_item", "name").execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedAttachments, actualAttachments, true));
+        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedAttachments, actualAttachments, false));
     }
 
     private Collection<EntityModel> createAttachment(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {
