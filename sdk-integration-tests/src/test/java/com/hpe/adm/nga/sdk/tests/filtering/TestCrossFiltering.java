@@ -1,10 +1,7 @@
 package com.hpe.adm.nga.sdk.tests.filtering;
 
 import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
@@ -20,11 +17,10 @@ import java.util.Set;
 /**
  * Created by Guy Guetta on 02/05/2016.
  */
-@Ignore
+
 public class TestCrossFiltering extends TestBase {
     private static long defectId;
     private static long releaseId;
-    private static long paId;
 
     public TestCrossFiltering() {
         entityName = "releases";
@@ -43,39 +39,39 @@ public class TestCrossFiltering extends TestBase {
 
     @Test
     public void simpleCrossFilterReverse() throws Exception {
-        Query query = new Query.QueryBuilder("work_item_has_release", Query::equalTo,
-                            new Query.QueryBuilder("id", Query::equalTo, defectId)
-                        ).build();
-        Collection<EntityModel> releases = octane.entityList("releases").get().query(query).execute();
-        long newReleaseId = CommonUtils.getIdFromEntityModel(releases.iterator().next());
-        Assert.assertEquals("More releases than expected in response", 1, releases.size());
-        Assert.assertEquals("Wrong release id in response", releaseId, newReleaseId);
+        Query query = new Query.QueryBuilder("release", Query::equalTo,
+                new Query.QueryBuilder("id", Query::equalTo, releaseId),true
+        ).build();
+        Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
+        long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+        Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
     }
 
+    @Ignore
     @Test
     public void crossFilterTwoHopes() throws Exception {
-        Query query = new Query.QueryBuilder("work_item", Query::equalTo,
+        Query query = new Query.QueryBuilder("id", Query::equalTo,
                             new Query.QueryBuilder("release", Query::equalTo,
                                 new Query.QueryBuilder("id", Query::equalTo, releaseId)
                             )
                         ).build();
-        Collection<EntityModel> pas = octane.entityList("product_areas").get().query(query).execute();
-        long newPaId = CommonUtils.getIdFromEntityModel(pas.iterator().next());
-        Assert.assertEquals("More PAs than expected in response", 1, pas.size());
-        Assert.assertEquals("Wrong PA id in response", paId, newPaId);
+        Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
+        long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+        Assert.assertEquals("More defects than expected in response", 1, defects.size());
+        Assert.assertEquals("Wrong defect id in response", defectId, newDefectId);
     }
 
+    @Ignore
     @Test
     public void crossFilterTwoHopesReverse() throws Exception {
-        Query query = new Query.QueryBuilder("work_item_has_release", Query::equalTo,
-                            new Query.QueryBuilder("product_areas", Query::equalTo,
-                                new Query.QueryBuilder("id", Query::equalTo, paId)
-                            )
+        Query query = new Query.QueryBuilder("id", Query::equalTo,
+                new Query.QueryBuilder("release", Query::equalTo,
+                        new Query.QueryBuilder("id", Query::equalTo, releaseId), true
+                )
                         ).build();
-        Collection<EntityModel> releases = octane.entityList("releases").get().query(query).execute();
-        long newReleaseId = CommonUtils.getIdFromEntityModel(releases.iterator().next());
-        Assert.assertEquals("More releases than expected in response", 1, releases.size());
-        Assert.assertEquals("Wrong release id in response", releaseId, newReleaseId);
+        Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
+        long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+        Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
     }
 
     @BeforeClass
@@ -91,11 +87,5 @@ public class TestCrossFiltering extends TestBase {
         Collection<EntityModel> defects = octane.entityList("defects").create().entities(defectEntity).execute();
         EntityModel defect = defects.iterator().next();
         defectId = CommonUtils.getIdFromEntityModel(defect);
-
-        fields.clear();
-        fields.add(new MultiReferenceFieldModel("work_item", defects));
-        Collection<EntityModel> paEntity = DataGenerator.generateEntityModel(octane, "product_areas", fields);
-        Collection<EntityModel> pas = octane.entityList("product_areas").create().entities(paEntity).execute();
-        paId = CommonUtils.getIdFromEntityModel(pas.iterator().next());
     }
 }
