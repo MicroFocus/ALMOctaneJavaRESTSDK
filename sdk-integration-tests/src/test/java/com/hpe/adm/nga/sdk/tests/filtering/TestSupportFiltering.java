@@ -1,6 +1,7 @@
 package com.hpe.adm.nga.sdk.tests.filtering;
 
 import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.QueryMethod;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
@@ -64,17 +65,17 @@ public class TestSupportFiltering extends TestBase {
     private Query getQuery(String entityName, String logicalOperation) {
         switch (logicalOperation) {
             case "EQ":
-                return new Query.QueryBuilder("name", Query::equalTo, entityName).build();
+                return Query.statement("name", QueryMethod.EqualTo, entityName).build();
             case "LT":
-                return new Query.QueryBuilder("name", Query::lessThan, "z_" + entityName).build();
+                return Query.statement("name", QueryMethod.LessThan, "z_" + entityName).build();
             case "GT":
-                return new Query.QueryBuilder("name", Query::greaterThan, "a_" + entityName).build();
+                return Query.statement("name", QueryMethod.GreaterThan, "a_" + entityName).build();
             case "LE":
-                return new Query.QueryBuilder("name", Query::lessThanOrEqualTo, entityName).build();
+                return Query.statement("name", QueryMethod.LessThanOrEqualTo, entityName).build();
             case "GE":
-                return new Query.QueryBuilder("name", Query::greaterThanOrEqualTo, entityName).build();
+                return Query.statement("name", QueryMethod.GreaterThanOrEqualTo, entityName).build();
             default:
-                return new Query();
+                return null;
         }
     }
 }

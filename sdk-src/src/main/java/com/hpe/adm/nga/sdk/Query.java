@@ -12,17 +12,34 @@ public class Query {
 
     private String queryString = "";
 
-    // constant
-    private static final String DATE_TIME_ISO_FORMAT 	            = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-    private static final String DATE_TIME_UTC_ZONE_NAME 	        = "UTC";
+    /**
+     * Negates the given query string
+     * @param queryString - input query string
+     * @return resulting string after negation
+     */
+    private static String negate(String queryString) {
+        return "!" + queryString;
+    }
 
-    private static final String COMPARISON_OPERATOR_EQUALS 			= "EQ";
-    private static final String COMPARISON_OPERATOR_LESS			= "LT";
-    private static final String COMPARISON_OPERATOR_GREATER 		= "GT";
-    private static final String COMPARISON_OPERATOR_LESS_EQUALS  	= "LE";
-    private static final String COMPARISON_OPERATOR_GREATER_EQUALS 	= "GE";
+    /**
+     * QueryBuilder Statement
+     * @param fieldName - field name
+     * @param method - comparison function to use
+     * @param fieldValue - value to compare with
+     */
+    public static QueryBuilder statement(String fieldName, QueryMethod method, Object fieldValue) {
+        return new QueryBuilder(method.getAction().apply(fieldName, fieldValue));
+    }
 
-    public Query() {}
+    /**
+     * QueryBuilder not
+     * @param fieldName - field name
+     * @param method - comparison function to use
+     * @param fieldValue - value to compare with
+     */
+    public static QueryBuilder not(String fieldName, QueryMethod method, Object fieldValue) {
+        return new QueryBuilder(negate(method.getAction().apply(fieldName, fieldValue)));
+    }
 
     /**
      * Constructor
@@ -40,145 +57,54 @@ public class Query {
         return queryString;
     }
 
-    /**
-     * Mutator method of query string
-     * @param queryString - query string
-     */
-    private void setQueryString(String queryString) {
-        this.queryString = queryString;
-    }
-
-    /**
-     * Appends new query to the existing one
-     * @param queryString - query string
-     */
-    private void addQueryString(String queryString) {
-        this.queryString += queryString;
-    }
-
-    /**
-     * Generates a query string for "equal to" comparison
-     * @param field - field name
-     * @param value - value to compare the field with
-     * @return query string
-     */
-    public static String equalTo(String field, Object value) {
-        return "(" + field + " " + COMPARISON_OPERATOR_EQUALS + " " + toString(value) + ")";
-    }
-
-    /**
-     * Generates a query string for "less than" comparison
-     * @param field - field name
-     * @param value - value to compare the field with
-     * @return query string
-     */
-    public static String lessThan(String field, Object value) {
-        return "(" + field + " " + COMPARISON_OPERATOR_LESS + " " + toString(value) + ")";
-    }
-
-    /**
-     * Generates a query string for "greater than" comparison
-     * @param field - field name
-     * @param value - value to compare the field with
-     * @return query string
-     */
-    public static String greaterThan(String field, Object value) {
-        return "(" + field + " " + COMPARISON_OPERATOR_GREATER + " " + toString(value) + ")";
-    }
-
-    /**
-     * Generates a query string for "less than or equal to" comparison
-     * @param field - field name
-     * @param value - value to compare the field with
-     * @return query string
-     */
-    public static String lessThanOrEqualTo(String field, Object value) {
-        return "(" + field + " " + COMPARISON_OPERATOR_LESS_EQUALS + " " + toString(value) + ")";
-    }
-
-    /**
-     * Generates a query string for "greater than or equal to" comparison
-     * @param field - field name
-     * @param value - value to compare the field with
-     * @return query string
-     */
-    public static String greaterThanOrEqualTo(String field, Object value) {
-        return "(" + field + " " + COMPARISON_OPERATOR_GREATER_EQUALS + " " + toString(value) + ")";
-    }
-
-    /**
-     * Generates a string representation of a given Object
-     * @param value - Object to convert
-     * @return string representation
-     */
-    private static String toString(Object value) {
-        if( value == null) {
-            return "{null}";
-        } else if (value.getClass() == Date.class) {
-            SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
-            TimeZone utc = TimeZone.getTimeZone(DATE_TIME_UTC_ZONE_NAME);
-            sdf.setTimeZone(utc);
-            return "'" + sdf.format(value) + "'";
-        } else if (value.getClass() == String.class) {
-            return "'" +  value.toString() + "'";
-        } else if (value.getClass() == QueryBuilder.class) {
-            return  "{" + ((QueryBuilder)value).getQueryString() +  "}" ;
-        } else {
-            return value.toString();
-        }
-    }
-
     public static class QueryBuilder {
 
-        String queryString = "";
+        private String queryString = "";
 
-        /**
-         * QueryBuilder constructor
-         * @param fieldName - field name
-         * @param function - comparison function to use
-         * @param fieldValue - value to compare with
-         */
-        public QueryBuilder(String fieldName, BiFunction<String, Object, String> function, Object fieldValue) {
-            this(fieldName, function, fieldValue, false);
+        private QueryBuilder(String queryString) {
+            this.queryString = queryString;
         }
 
         /**
-         * QueryBuilder constructor
-         * @param fieldName - field name
-         * @param function - comparison function to use
-         * @param fieldValue - value to compare with
-         * @param isNegate - a boolean value indicating if the function should be negated or not
+         * Accessor method for the query builder string.
+         * @return query builder's string
          */
-        public QueryBuilder(String fieldName, BiFunction<String, Object, String> function, Object fieldValue, boolean isNegate) {
-            queryString = function.apply(fieldName, fieldValue);
-            if (isNegate)
-                queryString = negate(queryString);
+        private String getQueryString() {
+            return queryString;
         }
+
+        /**
+         * Builds a query from the current builder
+         * @return builded query
+         */
+        public Query build() {
+            return new Query(this);
+        }
+
+
 
         /**
          * Generates a builder by applying the logical "and" operator between the current builder and the resulting operation of the input values.
          * @param fieldName - field name
-         * @param function - comparison function to use
+         * @param method - comparison function to use
          * @param fieldValue - value to compare with
          * @return resulting builder
          */
-        public QueryBuilder and(String fieldName, BiFunction<String, Object, String> function, Object fieldValue) {
-            return and(fieldName, function, fieldValue, false);
-        }
-
-        /**
-         * Generates a builder by applying the logical "and" operator between the current builder and the resulting operation of the input values.
-         * @param fieldName - field name
-         * @param function - comparison function to use
-         * @param fieldValue - value to compare with
-         * @param isNegate - a boolean value indicating if the function should be negated or not
-         * @return resulting builder
-         */
-        public QueryBuilder and(String fieldName, BiFunction<String, Object, String> function, Object fieldValue, boolean isNegate) {
-            String rightQueryString = function.apply(fieldName, fieldValue);
-            if (isNegate)
-                rightQueryString = negate(rightQueryString);
+        public QueryBuilder and(String fieldName, QueryMethod method, Object fieldValue) {
+            String rightQueryString = method.getAction().apply(fieldName, fieldValue);
             queryString += ";" + rightQueryString;
+            return this;
+        }
+
+        /**
+         * Generates a builder by applying the logical "and" operator between the current builder and the resulting operation of the input values after negation.
+         * @param fieldName - field name
+         * @param method - comparison function to use
+         * @param fieldValue - value to compare with
+         * @return resulting builder
+         */
+        public QueryBuilder andNot(String fieldName, QueryMethod method, Object fieldValue) {
+            queryString += ";" + negate(method.getAction().apply(fieldName, fieldValue));
             return this;
         }
 
@@ -193,29 +119,37 @@ public class Query {
         }
 
         /**
-         * Generates a builder by applying the logical "or" operator between the current builder and the resulting operation of the input values.
-         * @param fieldName - field name
-         * @param function - comparison function to use
-         * @param fieldValue - value to compare with
+         * Generates a builder by applying the logical "and" operator between the current builder and the input builder after negation.
+         * @param qb - query builder
          * @return resulting builder
          */
-        public QueryBuilder or(String fieldName, BiFunction<String, Object, String> function, Object fieldValue) {
-            return or(fieldName, function, fieldValue, false);
+        public QueryBuilder andNot(QueryBuilder qb) {
+            queryString += ";" + negate(qb.getQueryString());
+            return this;
         }
 
         /**
          * Generates a builder by applying the logical "or" operator between the current builder and the resulting operation of the input values.
          * @param fieldName - field name
-         * @param function - comparison function to use
+         * @param method - comparison function to use
          * @param fieldValue - value to compare with
-         * @param isNegate - a boolean value indicating if the function should be negated or not
          * @return resulting builder
          */
-        public QueryBuilder or(String fieldName, BiFunction<String, Object, String> function, Object fieldValue, boolean isNegate) {
-            String rightQueryString = function.apply(fieldName, fieldValue);
-            if (isNegate)
-                rightQueryString = negate(rightQueryString);
+        public QueryBuilder or(String fieldName, QueryMethod method, Object fieldValue) {
+            String rightQueryString = method.getAction().apply(fieldName, fieldValue);
             queryString += "||" + rightQueryString;
+            return this;
+        }
+
+        /**
+         * Generates a builder by applying the logical "or" operator between the current builder and the resulting operation of the input values after negation.
+         * @param fieldName - field name
+         * @param method - comparison function to use
+         * @param fieldValue - value to compare with
+         * @return resulting builder
+         */
+        public QueryBuilder orNot(String fieldName, QueryMethod method, Object fieldValue) {
+            queryString += "||" + negate(method.getAction().apply(fieldName, fieldValue));
             return this;
         }
 
@@ -230,28 +164,15 @@ public class Query {
         }
 
         /**
-         * Accessor method for the query builder string.
-         * @return query builder's string
+         * Generates a builder by applying the logical "or" operator between the current builder and the input builder after negation.
+         * @param qb - query builder
+         * @return resulting builder
          */
-        public String getQueryString() {
-            return queryString;
-        }
-
-        /**
-         * Builds a query from the current builder
-         * @return builded query
-         */
-        public Query build() {
-            return new Query(this);
-        }
-
-        /**
-         * Negates the given query string
-         * @param queryString - input query string
-         * @return resulting string after negation
-         */
-        private String negate(String queryString) {
-            return "!" + queryString;
+        public QueryBuilder orNot(QueryBuilder qb) {
+            queryString += "||" + negate(qb.getQueryString());
+            return this;
         }
     }
+
+
 }
