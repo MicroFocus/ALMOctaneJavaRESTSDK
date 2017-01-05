@@ -2,6 +2,7 @@ package com.hpe.adm.nga.sdk.utils.generator;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.QueryMethod;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 
@@ -110,7 +111,7 @@ public class DataGenerator {
     }
 
     private static EntityModel generateDefect(Octane octane, Set<FieldModel> fields) throws Exception {
-        Query query = new Query.QueryBuilder("subtype", Query::equalTo, "work_item_root").build();
+        Query query = Query.statement("subtype", QueryMethod.EqualTo, "work_item_root").build();
         Collection<EntityModel> roots = octane.entityList("work_items").get().query(query).execute();
         EntityModel root = roots.iterator().next();
         FieldModel parentField = new ReferenceFieldModel("parent", root);
@@ -119,7 +120,7 @@ public class DataGenerator {
         EntityModel user = users.iterator().next();
         FieldModel author = new ReferenceFieldModel("author", user);
 
-        Query query2 = new Query.QueryBuilder("entity", Query::equalTo, "defect").build();
+        Query query2 = Query.statement("entity", QueryMethod.EqualTo, "defect").build();
         Collection<EntityModel> phases = octane.entityList("phases").get().query(query2).execute();
         EntityModel phase = phases.iterator().next();
         FieldModel phaseField = new ReferenceFieldModel("phase", phase);

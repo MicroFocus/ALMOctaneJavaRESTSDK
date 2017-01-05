@@ -1,6 +1,7 @@
 package com.hpe.adm.nga.sdk.tests.filtering;
 
 import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.QueryMethod;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
@@ -41,8 +42,8 @@ public class TestCrossFiltering extends TestBase {
 
     @Test
     public void simpleCrossFilter() throws Exception {
-        Query query = new Query.QueryBuilder("release", Query::equalTo,
-                            new Query.QueryBuilder("id", Query::equalTo, releaseId)
+        Query query = Query.statement("release", QueryMethod.EqualTo,
+                (Query.statement("id",QueryMethod.EqualTo, releaseId))
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
         long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
@@ -52,8 +53,8 @@ public class TestCrossFiltering extends TestBase {
 
     @Test
     public void simpleCrossFilterReverse() throws Exception {
-        Query query = new Query.QueryBuilder("release", Query::equalTo,
-                new Query.QueryBuilder("id", Query::equalTo, releaseId),true
+        Query query = Query.statement("release", QueryMethod.EqualTo,
+                Query.not("id", QueryMethod.EqualTo, releaseId)
         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
         long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
@@ -63,9 +64,9 @@ public class TestCrossFiltering extends TestBase {
     @Ignore
     @Test
     public void crossFilterTwoHopes() throws Exception {
-        Query query = new Query.QueryBuilder("id", Query::equalTo,
-                            new Query.QueryBuilder("release", Query::equalTo,
-                                new Query.QueryBuilder("id", Query::equalTo, releaseId)
+        Query query = Query.statement("id", QueryMethod.EqualTo,
+                            Query.statement("release", QueryMethod.EqualTo,
+                                Query.statement("id", QueryMethod.EqualTo, releaseId)
                             )
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
@@ -77,9 +78,9 @@ public class TestCrossFiltering extends TestBase {
     @Ignore
     @Test
     public void crossFilterTwoHopesReverse() throws Exception {
-        Query query = new Query.QueryBuilder("id", Query::equalTo,
-                new Query.QueryBuilder("release", Query::equalTo,
-                        new Query.QueryBuilder("id", Query::equalTo, releaseId), true
+        Query query = Query.statement("id", QueryMethod.EqualTo,
+                Query.not("release", QueryMethod.EqualTo,
+                        Query.statement("id", QueryMethod.EqualTo, releaseId)
                 )
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();

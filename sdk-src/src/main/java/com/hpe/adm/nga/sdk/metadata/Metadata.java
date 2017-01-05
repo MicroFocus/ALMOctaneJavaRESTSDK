@@ -3,6 +3,7 @@ package com.hpe.adm.nga.sdk.metadata;
 import com.google.gson.Gson;
 import com.hpe.adm.nga.sdk.OctaneRequest;
 import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.QueryMethod;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.metadata.features.*;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
@@ -107,7 +108,7 @@ public class Metadata {
 		
 		String quaryList =  entitiesList
 	            .stream()
-	            .map(s -> new Query.QueryBuilder(QUERY_NAME_FIELD_NAME, Query::equalTo, s).getQueryString())
+	            .map(s ->  Query.statement(QUERY_NAME_FIELD_NAME, QueryMethod.EqualTo, s).build().getQueryString())
 	            .collect(Collectors.joining("||"));
 		
 		// TBD - Remove after debugging
@@ -154,7 +155,7 @@ public class Metadata {
 		List<String> entitiesList =  Arrays.asList(entities);
 		String quaryList =  entitiesList
 	            .stream()
-	            .map(s -> new Query.QueryBuilder(QUERY_ENTITY_NAME_FIELD_NAME, Query::equalTo, s).getQueryString())
+	            .map(s ->  Query.statement(QUERY_ENTITY_NAME_FIELD_NAME, QueryMethod.EqualTo, s).build().getQueryString())
 	            .collect(Collectors.joining("||"));
 	
 		

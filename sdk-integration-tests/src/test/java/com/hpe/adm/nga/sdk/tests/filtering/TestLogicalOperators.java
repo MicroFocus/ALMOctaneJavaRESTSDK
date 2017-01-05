@@ -1,6 +1,7 @@
 package com.hpe.adm.nga.sdk.tests.filtering;
 
 import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.QueryMethod;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
@@ -40,7 +41,7 @@ public class TestLogicalOperators extends TestBase {
 
     @Test
     public void testQueryWithOr () throws Exception {
-        Query query = new Query.QueryBuilder("id", Query::equalTo, defectIds.get(0)).or("id", Query::equalTo, defectIds.get(1)).build();
+        Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).or("id", QueryMethod.EqualTo, defectIds.get(1)).build();
         Collection<EntityModel> getEntity = entityList.get().query(query).execute();
         Assert.assertEquals("Wrong amount of defects in response",2,getEntity.size());
         Assert.assertTrue("Wrong defect id in response", defectIds.containsAll(CommonUtils.getIdFromEntityModelCollection(getEntity)));
@@ -49,7 +50,7 @@ public class TestLogicalOperators extends TestBase {
 
     @Test
     public void testQueryWithAnd () throws Exception {
-        Query query = new Query.QueryBuilder("id", Query::equalTo, defectIds.get(0)).and("name", Query::equalTo, defectNames.get(0)).build();
+        Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).build();
         Collection<EntityModel> getEntity = entityList.get().query(query).execute();
         Assert.assertEquals("Wrong amount of defects in response", 1,getEntity.size());
         Assert.assertEquals("Wrong defect id in response", defectIds.get(0),CommonUtils.getIdFromEntityModelCollection(getEntity).get(0));
@@ -57,7 +58,7 @@ public class TestLogicalOperators extends TestBase {
 
     @Test
     public void testQueryWithAndPlusOr () throws Exception {
-        Query query1 = new Query.QueryBuilder("id", Query::equalTo, defectIds.get(0)).and("name", Query::equalTo, defectNames.get(0)).or("id", Query::equalTo, defectIds.get(1)).and("name", Query::equalTo, defectNames.get(1)).build();
+        Query query1 = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).or("id", QueryMethod.EqualTo, defectIds.get(1)).and("name", QueryMethod.EqualTo, defectNames.get(1)).build();
         Collection<EntityModel> getEntity = entityList.get().query(query1).execute();
         Assert.assertEquals("Wrong amount of defects in response", 2,getEntity.size());
         Assert.assertTrue("Wrong defect id in response", defectIds.containsAll(CommonUtils.getIdFromEntityModelCollection(getEntity)));
