@@ -81,6 +81,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
                         request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
                     }
+
+                    request.setReadTimeout(60000);
                 });
     }
 
