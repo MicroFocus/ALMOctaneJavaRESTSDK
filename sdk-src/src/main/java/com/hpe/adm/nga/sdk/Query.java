@@ -1,10 +1,5 @@
 package com.hpe.adm.nga.sdk;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.function.BiFunction;
-
 /**
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
