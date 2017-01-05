@@ -57,8 +57,11 @@ public class TestCrossFiltering extends TestBase {
                 Query.not("id", QueryMethod.EqualTo, releaseId)
         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
-        long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
-        Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
+        // it could be that there are no other defects.  So if defects is empty that's also good
+        if (defects != null && defects.size() > 0) {
+            long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+            Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
+        }
     }
 
     @Ignore
