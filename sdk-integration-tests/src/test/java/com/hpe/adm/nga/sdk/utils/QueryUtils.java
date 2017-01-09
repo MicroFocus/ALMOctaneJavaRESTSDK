@@ -1,12 +1,5 @@
-package com.hpe.adm.nga.sdk.utils;
-
-import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.Query.QueryBuilder;
-import com.hpe.adm.nga.sdk.QueryMethod;
-
-import java.util.List;
-
-/**
+/*
+ *
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +12,16 @@ import java.util.List;
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ */
+package com.hpe.adm.nga.sdk.utils;
+
+import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.Query.QueryBuilder;
+import com.hpe.adm.nga.sdk.QueryMethod;
+
+import java.util.List;
+
+/**
  *
  * Created by Guy Guetta on 21/04/2016.
  */

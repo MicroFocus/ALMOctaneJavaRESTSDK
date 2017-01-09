@@ -1,14 +1,5 @@
-package com.hpe.adm.nga.sdk.unit_tests.common;
-
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
-
-import java.util.Collection;
-import java.util.Set;
-
-/**
+/*
+ *
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,9 +12,17 @@ import java.util.Set;
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- *
- * Created by brucesp on 03-Jan-17.
  */
+package com.hpe.adm.nga.sdk.unit_tests.common;
+
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.FieldModel;
+import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
+import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
+
+import java.util.Collection;
+import java.util.Set;
+
 public class CommonUtils {
 
     public static boolean isEntityAInEntityB(EntityModel entityA, EntityModel entityB) {
