@@ -35,7 +35,6 @@ import java.util.stream.IntStream;
 
 
 /**
- *
  * This class represents the entity context and carries out the actual server requests.  It builds the correct URL as
  * appropriate
  */
@@ -52,7 +51,7 @@ public class EntityListService {
     private static final String ORDER_BY_PARAM_FORMAT = "order_by=%s";
     private static final String QUERY_PARAM_FORMAT = "query=\"%s\"";
     private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
-    private static final String LOGGER_RESPONSE_JASON_FORMAT = "Response_Jason: %s";
+    private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
     private static final long HTTPS_CONFLICT_STATUS_CODE = 409;
     private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = " field scheme is invalid";
     private static final String REGEX_DATE_FORMAT = "\\d{4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z";
@@ -68,7 +67,7 @@ public class EntityListService {
     // **** public Functions ***
 
     /**
-     * Creates a new EntityList object
+     * Creates a new EntityListService object.  This represents an entity collection
      *
      * @param octaneHttpClient - Http Client
      * @param entityListDomain - Domain Name
@@ -136,19 +135,19 @@ public class EntityListService {
     /**
      * TBD - Remove after testing
      */
-    public Collection<EntityModel> testGetEntityModels(String jason) {
+    public Collection<EntityModel> testGetEntityModels(String json) {
 
 
-        JSONObject jasonObj = new JSONObject(jason);
-        JSONArray jasoDataArr = jasonObj.getJSONArray(JSON_DATA_NAME);
+        JSONObject jsonObj = new JSONObject(json);
+        JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_NAME);
         Collection<EntityModel> entityModels = new ArrayList<>();
-        IntStream.range(0, jasoDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jasoDataArr.getJSONObject(i))));
+        IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
 
         // TBD - remove after debugging
         /*Set<FieldModel> setFieldModel = null;
-        for (int i = 0; i < jasoDataArr.length(); i++) {
-			JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
-			EntityModel entityModel = getEntityModel(jasoEntityObj);
+        for (int i = 0; i < jsonDataArr.length(); i++) {
+			JSONObject jsonEntityObj = jsonDataArr.getJSONObject(i);
+			EntityModel entityModel = getEntityModel(jsonEntityObj);
 			entityModels.add(entityModel);
 		}*/
 
@@ -160,7 +159,12 @@ public class EntityListService {
      * A utility class for building a URIs with various components, based on the
      * given domain name and the global quarry parameters of entity list.
      *
-     * @param urlDomain - domain name
+     * @param urlDomain    - domain name
+     * @param fieldsParams - the fields that have been requested
+     * @param orderByParam - the fields that the entities will be ordered by
+     * @param limitParam  - The number to limit by
+     * @param offsetParam - The page number
+     * @param queryParams - The query object to be used
      * @return url string ready to transmit
      */
     private String urlBuilder(String urlDomain, String fieldsParams, String orderByParam, long limitParam, long offsetParam, Query queryParams) {
@@ -228,24 +232,24 @@ public class EntityListService {
     }
 
     /**
-     * get a entity model collection based on a given jason string
+     * get a entity model collection based on a given json string
      *
      * @param json The JSON to parse
-     * @return entity model collection based on a given jason string
+     * @return entity model collection based on a given json string
      */
     private Collection<EntityModel> getEntities(String json) {
 
         JSONTokener tokener = new JSONTokener(json);
-        JSONObject jasoObj = new JSONObject(tokener);
-        JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_NAME);
+        JSONObject jsonObj = new JSONObject(tokener);
+        JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_NAME);
         Collection<EntityModel> entityModels = new ArrayList<>();
-        IntStream.range(0, jasoDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jasoDataArr.getJSONObject(i))));
+        IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
 
 
         // TBD - remove after debugging
-        /*for (int i = 0; i < jasoDataArr.length(); i++) {
-            JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
-			EntityModel entityModel = getEntityModel(jasoEntityObj);
+        /*for (int i = 0; i < jsonDataArr.length(); i++) {
+            JSONObject jsonEntityObj = jsonDataArr.getJSONObject(i);
+			EntityModel entityModel = getEntityModel(jsonEntityObj);
 			entityModels.add(entityModel);
 		}*/
 
@@ -294,10 +298,10 @@ public class EntityListService {
 
 
     /**
-     * get a new jason object based on a given EntityModel object
+     * get a new json object based on a given EntityModel object
      *
      * @param entityModel the given entity model object
-     * @return new jason object based on a given EntityModel object
+     * @return new json object based on a given EntityModel object
      */
     private JSONObject getEntityJSONObject(EntityModel entityModel) {
 
@@ -307,7 +311,7 @@ public class EntityListService {
 
         // TBD - Remove after debugging
         /*for (Iterator iterator2 = fieldModels.iterator(); iterator2.hasNext();) {
-			FieldModel fieldModel = (FieldModel) iterator2.next();
+            FieldModel fieldModel = (FieldModel) iterator2.next();
 			Object fieldValue = getFieldValue(fieldModel);
 			objField.put(fieldModel.getName(), fieldValue);
 		}*/
@@ -316,10 +320,10 @@ public class EntityListService {
     }
 
     /**
-     * get a new jason object based on a given EntityModel list
+     * get a new json object based on a given EntityModel list
      *
      * @param entitiesModels - Collection of entities models
-     * @return new jason object conatin entities data
+     * @return new json object conatin entities data
      */
     private JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels) {
 
@@ -331,7 +335,7 @@ public class EntityListService {
         entitiesModels.forEach((i) -> objEntities.put(getEntityJSONObject(i)));
 
         // TBD- Remove after debugging
-		/*for (Iterator iterator1 = entitiesModels.iterator(); iterator1.hasNext();) {
+        /*for (Iterator iterator1 = entitiesModels.iterator(); iterator1.hasNext();) {
 			EntityModel entityModel = (EntityModel) iterator1.next();
 			Set<FieldModel> setFieldModel = entityModel.getValue();
 			JSONObject objField = getEntityJSONObject(entityModel);
@@ -343,22 +347,22 @@ public class EntityListService {
     }
 
     /**
-     * get a new EntityModel object based on jason object
+     * get a new EntityModel object based on json object
      *
-     * @param jasonEntityObj - Jason object
+     * @param jsonEntityObj - json object
      * @return new EntityModel object
      */
-    private EntityModel getEntityModel(JSONObject jasonEntityObj) {
+    private EntityModel getEntityModel(JSONObject jsonEntityObj) {
 
         Set<FieldModel> fieldModels = new HashSet<>();
-        Iterator<?> keys = jasonEntityObj.keys();
+        Iterator<?> keys = jsonEntityObj.keys();
         EntityModel entityModel;
 
         while (keys.hasNext()) {
 
             FieldModel fldModel = null;
             String strKey = (String) keys.next();
-            Object aObj = jasonEntityObj.get(strKey);
+            Object aObj = jsonEntityObj.get(strKey);
             if (aObj == JSONObject.NULL) {
                 fldModel = new ReferenceFieldModel(strKey, null);
             } else if (aObj instanceof Long || aObj instanceof Integer) {
@@ -369,14 +373,14 @@ public class EntityListService {
                 fldModel = new BooleanFieldModel(strKey, Boolean.parseBoolean(aObj.toString()));
             } else if (aObj instanceof JSONObject) {
 
-                JSONObject fieldObject = jasonEntityObj.getJSONObject(strKey);
+                JSONObject fieldObject = jsonEntityObj.getJSONObject(strKey);
 
                 if (!fieldObject.isNull(JSON_DATA_NAME)) {
 
                     Collection<EntityModel> entities = getEntities(aObj.toString());
                     fldModel = new MultiReferenceFieldModel(strKey, entities);
                 } else {
-                    EntityModel ref = getEntityModel(jasonEntityObj.getJSONObject(strKey));
+                    EntityModel ref = getEntityModel(jsonEntityObj.getJSONObject(strKey));
                     fldModel = new ReferenceFieldModel(strKey, ref);
                 }
 
@@ -408,25 +412,25 @@ public class EntityListService {
 
 
     /**
-     * Get Error models based on a given error jason string
+     * Get Error models based on a given error json string
      *
-     * @param jason - jason string with error information
+     * @param json - json string with error information
      * @return collection of error models
      */
-    private Collection<ErrorModel> getErrorModels(String jason) {
+    private Collection<ErrorModel> getErrorModels(String json) {
 
-        JSONTokener tokener = new JSONTokener(jason);
-        JSONObject jasoObj = new JSONObject(tokener);
-        JSONArray jasoErrArr = jasoObj.getJSONArray(JSON_ERRORS_NAME);
+        JSONTokener tokener = new JSONTokener(json);
+        JSONObject jsonObj = new JSONObject(tokener);
+        JSONArray jsonErrArr = jsonObj.getJSONArray(JSON_ERRORS_NAME);
         Collection<ErrorModel> ErrModels = new ArrayList<>();
-        IntStream.range(0, jasoErrArr.length()).forEach((i) -> ErrModels.add(getErrorModelFromJason(jasoErrArr.getJSONObject(i).toString())));
+        IntStream.range(0, jsonErrArr.length()).forEach((i) -> ErrModels.add(getErrorModelFromjson(jsonErrArr.getJSONObject(i).toString())));
 
         // TBD- Remove after debug
         // prepare entity collection
 		/*Collection<ErrorModel> ErrModels = new ArrayList<ErrorModel>();
-		for (int i = 0; i < jasoErrArr.length(); i++) {
-			JSONObject jasoErrObj = jasoErrArr.getJSONObject(i);
-			ErrorModel errorModel = getErrorModel(jasoErrObj.toString());
+		for (int i = 0; i < jsonErrArr.length(); i++) {
+			JSONObject jsonErrObj = jsonErrArr.getJSONObject(i);
+			ErrorModel errorModel = getErrorModel(jsonErrObj.toString());
 			ErrModels.add(errorModel);
 		}*/
 
@@ -434,30 +438,30 @@ public class EntityListService {
     }
 
     /**
-     * Get Error model based on a given error jason string
+     * Get Error model based on a given error json string
      *
-     * @param jason - jason string with error information
+     * @param json - json string with error information
      * @return error model
      */
-    private ErrorModel getErrorModelFromJason(String jason) {
+    private ErrorModel getErrorModelFromjson(String json) {
 
-        JSONTokener tokener = new JSONTokener(jason);
-        JSONObject jasoErrObj = new JSONObject(tokener);
+        JSONTokener tokener = new JSONTokener(json);
+        JSONObject jsonErrObj = new JSONObject(tokener);
 
         Set<FieldModel> fieldModels = new HashSet<>();
-        Iterator<?> keys = jasoErrObj.keys();
+        Iterator<?> keys = jsonErrObj.keys();
 
         while (keys.hasNext()) {
 
             String strKey = (String) keys.next();
-            Object aObj = jasoErrObj.get(strKey);
+            Object aObj = jsonErrObj.get(strKey);
 
             FieldModel fldModel;
 
             if (aObj == JSONObject.NULL) {
                 fldModel = new ReferenceErrorModel(strKey, null);
             } else if (aObj instanceof JSONObject || aObj == JSONObject.NULL) {
-                EntityModel ref = getEntityModel(jasoErrObj.getJSONObject(strKey));
+                EntityModel ref = getEntityModel(jsonErrObj.getJSONObject(strKey));
                 fldModel = new ReferenceFieldModel(strKey, ref);
             } else {
 
@@ -487,7 +491,7 @@ public class EntityListService {
         OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
         String json = response.getContent();
-        logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
+        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
 
         if (response.isSuccessStatusCode() && json != null && !json.isEmpty()) {
             newEntityModels = getEntities(json);
@@ -510,12 +514,12 @@ public class EntityListService {
         OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
         String json = response.getContent();
-        logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
+        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
         if (response.isSuccessStatusCode() && (json != null && !json.isEmpty())) {
 
             JSONTokener tokener = new JSONTokener(json);
-            JSONObject jasoObj = new JSONObject(tokener);
-            newEntityModel = getEntityModel(jasoObj);
+            JSONObject jsonObj = new JSONObject(tokener);
+            newEntityModel = getEntityModel(jsonObj);
         }
 
         return newEntityModel;
@@ -539,7 +543,7 @@ public class EntityListService {
                 Collection<ErrorModel> errorModels = getErrorModels(httpResponseException.getContent());
                 throw new OctanePartialException(errorModels, entities);
             } else {
-                ErrorModel errorModel = getErrorModelFromJason(httpResponseException.getContent());
+                ErrorModel errorModel = getErrorModelFromjson(httpResponseException.getContent());
                 throw new OctaneException(errorModel);
             }
         } else {
@@ -682,11 +686,11 @@ public class EntityListService {
             Collection<EntityModel> newEntityModels = null;
             String url = urlBuilder(urlDomain, queryParams);
             JSONObject objBase = getEntitiesJSONObject(entityModels);
-            String jasonEntityModel = objBase.toString();
+            String jsonEntityModel = objBase.toString();
 
             try {
                 OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.PutOctaneHttpRequest(url,
-                        OctaneHttpRequest.JSON_CONTENT_TYPE, jasonEntityModel)
+                        OctaneHttpRequest.JSON_CONTENT_TYPE, jsonEntityModel)
                         .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
                 newEntityModels = getEntitiesResponse(octaneHttpRequest);
 
@@ -734,8 +738,8 @@ public class EntityListService {
         private Collection<EntityModel> entityModels = null;
 
         /**
-         * 1. build Entity Jason Object from Collection<EntityModel> 2. Post
-         * Request execution with jason data 3. Parse response to a new
+         * 1. build Entity Json Object from Collection<EntityModel> 2. Post
+         * Request execution with json data 3. Parse response to a new
          * Collection<EntityModel> object
          */
         @Override
@@ -744,10 +748,10 @@ public class EntityListService {
             Collection<EntityModel> newEntityModels = null;
             String url = urlBuilder(urlDomain);
             JSONObject objBase = getEntitiesJSONObject(entityModels);
-            String strJasonEntityModel = objBase.toString();
+            String strJsonEntityModel = objBase.toString();
             try {
                 OctaneHttpRequest octaneHttpRequest =
-                        new OctaneHttpRequest.PostOctaneHttpRequest(url, OctaneHttpRequest.JSON_CONTENT_TYPE, strJasonEntityModel)
+                        new OctaneHttpRequest.PostOctaneHttpRequest(url, OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
                                 .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
                 newEntityModels = getEntitiesResponse(octaneHttpRequest);
             } catch (Exception e) {
@@ -759,7 +763,7 @@ public class EntityListService {
         }
 
         /**
-         * Post a multipart request - A request made of a jason data and file upload:
+         * Post a multipart request - A request made of a json data and file upload:
          * 1. Construct multipart data
          * 2. get response
          *
@@ -903,7 +907,7 @@ public class EntityListService {
 
 
             /**
-             * 1. Get Request execution with jason data 2. Parse response to a
+             * 1. Get Request execution with json data 2. Parse response to a
              * new Collection<EntityModel> object
              */
             @Override
@@ -977,7 +981,7 @@ public class EntityListService {
             private EntityModel entityModel;
 
             /**
-             * 1. Update Request execution with jason data 2. Parse response to
+             * 1. Update Request execution with json data 2. Parse response to
              * a new EntityModel object
              */
             @Override
@@ -986,12 +990,12 @@ public class EntityListService {
                 EntityModel newEntityModel = null;
                 String domain = urlDomain + "/" + String.valueOf(iEntityId);
                 JSONObject objBase = getEntityJSONObject(entityModel);
-                String jasonEntityModel = objBase.toString();
+                String jsonEntityModel = objBase.toString();
 
                 try {
                     OctaneHttpRequest octaneHttpRequest =
                             new OctaneHttpRequest.PutOctaneHttpRequest(domain, OctaneHttpRequest.JSON_CONTENT_TYPE,
-                                    jasonEntityModel)
+                                    jsonEntityModel)
                                     .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
 
                     newEntityModel = getEntityResponse(octaneHttpRequest);
@@ -1022,7 +1026,7 @@ public class EntityListService {
         public class Delete extends OctaneRequest<EntityModel> {
 
             /**
-             * 1. Get Request execution with jason data 2. Parse response to a
+             * 1. Get Request execution with json data 2. Parse response to a
              * new Collection<EntityModel> object
              */
             @Override

@@ -121,8 +121,8 @@ public class EntityList {
     /**
      * TBD - Remove after testing
      */
-    public Collection<EntityModel> testGetEntityModels(String jason) {
+    public Collection<EntityModel> testGetEntityModels(String json) {
 
-        return entityListService.testGetEntityModels(jason);
+        return entityListService.testGetEntityModels(json);
     }
 }

@@ -65,9 +65,7 @@ public class Metadata {
 	private static final String FEATURE_PHASES_ENTITY_NAME = "phases";
 	private static final String FEATURE_AUDITING_ENTITY_NAME = "auditing";
 	private static final String LOGGER_INVALID_FEATURE_FORMAT = ": not a valid feature";
-	private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
-	private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";	
-	private static final String LOGGER_RESPONSE_JASON_FORMAT = "Response_Jason: %s";
+	private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
 	
 	// private members
 	private OctaneHttpClient octaneHttpClient = null;
@@ -163,54 +161,54 @@ public class Metadata {
 	}
 	
 	/**
-	 * Get Feature Object based on the feature jason object
-	 * @param jasoFeatureObj - Jason Feature object
+	 * Get Feature Object based on the feature json object
+	 * @param jsonFeatureObj - Json Feature object
 	 * @return Feature Object
 	 */
-	private Feature getFeatureObject(JSONObject jasoFeatureObj){
+	private Feature getFeatureObject(JSONObject jsonFeatureObj){
 		
 		Feature feature = null;
-		String featureName = jasoFeatureObj.getString(JSON_NAME_FIELD_NAME);
+		String featureName = jsonFeatureObj.getString(JSON_NAME_FIELD_NAME);
 		
 		switch (featureName) {
 			case FEATURE_REST_NAME: 
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), RestFeature.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), RestFeature.class);
             break;
 			case FEATURE_MAILING_NAME:  
-        		feature = new Gson().fromJson(jasoFeatureObj.toString(), MailingFeature.class);
+        		feature = new Gson().fromJson(jsonFeatureObj.toString(), MailingFeature.class);
             break;
 			case FEATURE_HAS_ATTACHMENTS_NAME:  
-		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), AttachmentsFeature.class);
+		 		feature = new Gson().fromJson(jsonFeatureObj.toString(), AttachmentsFeature.class);
             break;
 			case FEATURE_HAS_COMMENTS_NAME:
-		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), CommentsFeature.class);
+		 		feature = new Gson().fromJson(jsonFeatureObj.toString(), CommentsFeature.class);
             break;
 			case FEATURE_BUSINESS_RULES_NAME:  
-		 		feature = new Gson().fromJson(jasoFeatureObj.toString(), BusinessRulesFeature.class);
+		 		feature = new Gson().fromJson(jsonFeatureObj.toString(), BusinessRulesFeature.class);
             break;
 			case FEATURE_SUBTYPES_NAME:  
-        		feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesFeature.class);
+        		feature = new Gson().fromJson(jsonFeatureObj.toString(), SubTypesFeature.class);
             break;
 			case FEATURE_SUBTYPE_OF_NAME: 
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), SubTypesOfFeature.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), SubTypesOfFeature.class);
             break;
 			case FEATURE_HIERARCHY_NAME:
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), HierarchyFeature.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), HierarchyFeature.class);
             break;
 			case FEATURE_UDF_ENTITY_NAME:
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), UdfFearture.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), UdfFearture.class);
 				break;
 			case FEATURE_ORDERING_ENTITY_NAME:
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), OrderingFeature.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), OrderingFeature.class);
 				break;
 			case FEATURE_GROUPING_ENTITY_NAME:
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), GroupingFeature.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), GroupingFeature.class);
 				break;
 			case FEATURE_PHASES_ENTITY_NAME:
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), PhasesFeature.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), PhasesFeature.class);
 				break;
 			case FEATURE_AUDITING_ENTITY_NAME:
-				feature = new Gson().fromJson(jasoFeatureObj.toString(), AuditingFeature.class);
+				feature = new Gson().fromJson(jsonFeatureObj.toString(), AuditingFeature.class);
 				break;
 			default:
 				logger.debug(featureName + LOGGER_INVALID_FEATURE_FORMAT);
@@ -221,24 +219,24 @@ public class Metadata {
 	}
 	
 	/**
-	 * get a entities metadata collection based on a given jason string
+	 * get a entities metadata collection based on a given json string
 	 * @param json
-	 * @return entity metadata collection based on a given jason string
+	 * @return entity metadata collection based on a given json string
 	 */
 	private Collection<EntityMetadata> getEntitiesMetadata(String json)  {
 		
 		JSONTokener tokener = new JSONTokener(json);
-		JSONObject jasoObj = new JSONObject(tokener);
-		JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_FIELD_NAME);
+		JSONObject jsonObj = new JSONObject(tokener);
+		JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_FIELD_NAME);
 
 		// prepare entity collection
 		Collection<EntityMetadata> entitiesMetadata = new ArrayList<>();
-		IntStream.range(0, jasoDataArr.length()).forEach((i)->entitiesMetadata.add(getEntityMetadata(jasoDataArr.getJSONObject(i))));
+		IntStream.range(0, jsonDataArr.length()).forEach((i)->entitiesMetadata.add(getEntityMetadata(jsonDataArr.getJSONObject(i))));
 		
 		// TBD - Remove after debugging
-		/*for (int i = 0; i < jasoDataArr.length(); i++) {
-			JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
-			EntityMetadata entityModel = getEntityMetadata(jasoEntityObj);
+		/*for (int i = 0; i < jsonDataArr.length(); i++) {
+			JSONObject jsonEntityObj = jsonDataArr.getJSONObject(i);
+			EntityMetadata entityModel = getEntityMetadata(jsonEntityObj);
 			entitiesMetadata.add(entityModel);
 
 		}*/
@@ -247,26 +245,26 @@ public class Metadata {
 	}
 	
 	/**
-	 * get a fields metadata collection based on a given jason string
+	 * get a fields metadata collection based on a given json string
 	 * @param json
-	 * @return fields metadata collection based on a given jason string
+	 * @return fields metadata collection based on a given json string
 	 */
 	private Collection<FieldMetadata> getFieldMetadata(String json) {
 		
 		JSONTokener tokener = new JSONTokener(json);
-		JSONObject jasoObj = new JSONObject(tokener);
-		JSONArray jasoDataArr = jasoObj.getJSONArray(JSON_DATA_FIELD_NAME);
+		JSONObject jsonObj = new JSONObject(tokener);
+		JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_FIELD_NAME);
 
 		// prepare entity collection
 		Collection<FieldMetadata> fieldsMetadata = new ArrayList<>();
-		IntStream.range(0, jasoDataArr.length()).forEach((i)->fieldsMetadata.add(new Gson().fromJson(jasoDataArr.getJSONObject(i).toString(), FieldMetadata.class)));
+		IntStream.range(0, jsonDataArr.length()).forEach((i)->fieldsMetadata.add(new Gson().fromJson(jsonDataArr.getJSONObject(i).toString(), FieldMetadata.class)));
 		
 		// TBD - Remove after debugging
 		/*Collection<FieldMetadata> fieldsMetadata = new ArrayList<FieldMetadata>();
 		
-		for (int i = 0; i < jasoDataArr.length(); i++) {
-			JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
-			FieldMetadata fieldMetadata = new Gson().fromJson(jasoEntityObj.toString(), FieldMetadata.class);
+		for (int i = 0; i < jsonDataArr.length(); i++) {
+			JSONObject jsonEntityObj = jsonDataArr.getJSONObject(i);
+			FieldMetadata fieldMetadata = new Gson().fromJson(jsonEntityObj.toString(), FieldMetadata.class);
 			fieldsMetadata.add(fieldMetadata);
 
 		}*/
@@ -276,28 +274,28 @@ public class Metadata {
 		
 	
 	/**
-	 * get a new EntityMetadata object based on jason object
-	 * @param jasoEntityObj - Jason object
+	 * get a new EntityMetadata object based on json object
+	 * @param jsonEntityObj - Json object
 	 * @return new EntityMetadata object
 	 */
-	private EntityMetadata getEntityMetadata(JSONObject jasoEntityObj)  {
+	private EntityMetadata getEntityMetadata(JSONObject jsonEntityObj)  {
 
 		Set<Feature> features = new HashSet<>();
-		String name = jasoEntityObj.getString(JSON_NAME_FIELD_NAME);
-		String label = jasoEntityObj.getString(JSON_LABEL_FIELD_NAME);
-		//Boolean canModifyLabel = jasoEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
-		JSONArray jasonFeatures = jasoEntityObj.getJSONArray(JSON_FEATURES_FIELD_NAME);
-		IntStream.range(0, jasonFeatures.length()).forEach((i)-> {
-			Feature featureObject = getFeatureObject(jasonFeatures.getJSONObject(i));
+		String name = jsonEntityObj.getString(JSON_NAME_FIELD_NAME);
+		String label = jsonEntityObj.getString(JSON_LABEL_FIELD_NAME);
+		//Boolean canModifyLabel = jsonEntityObj.getBoolean(JSON_CAN_MODIFY_LABEL_FIELD_NAME);
+		JSONArray jsonFeatures = jsonEntityObj.getJSONArray(JSON_FEATURES_FIELD_NAME);
+		IntStream.range(0, jsonFeatures.length()).forEach((i)-> {
+			Feature featureObject = getFeatureObject(jsonFeatures.getJSONObject(i));
 			if (featureObject != null) {
 				features.add(featureObject);
 			}
 		});
 		
 		// TBD - Remove after debugging
-		/*for (int i = 0; i < jasonFeatures.length(); i++) {
-			JSONObject jasoFeatureObj = jasonFeatures.getJSONObject(i);
-			Feature feature = getFeatureObject(jasoFeatureObj);
+		/*for (int i = 0; i < jsonFeatures.length(); i++) {
+			JSONObject jsonFeatureObj = jsonFeatures.getJSONObject(i);
+			Feature feature = getFeatureObject(jsonFeatureObj);
 			features.add(feature);
 		}*/
 
@@ -356,7 +354,7 @@ public class Metadata {
 					entitiesMetadata = getEntitiesMetadata(json);
 				}
 
-				logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
+				logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
             }
 			catch (Exception e){
 				logger.debug("Fail to execute GET request.", e);
@@ -409,7 +407,7 @@ public class Metadata {
 					colEntitiesMetadata = getFieldMetadata(json);
 				}
 
-                logger.debug(String.format(LOGGER_RESPONSE_JASON_FORMAT, json));
+                logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
             }
 			catch (Exception e){
 				
