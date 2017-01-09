@@ -1,8 +1,5 @@
-package com.hpe.adm.nga.sdk.network;
-
-import java.io.InputStream;
-
-/**
+/*
+ *
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +12,12 @@ import java.io.InputStream;
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ */
+package com.hpe.adm.nga.sdk.network;
+
+import java.io.InputStream;
+
+/**
  *
  * HTTP response.
  * Callers should call disconnect() when the HTTP response object is no longer needed. However, disconnect() does not have to be called if the response stream is properly closed.

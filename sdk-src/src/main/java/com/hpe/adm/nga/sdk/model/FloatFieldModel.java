@@ -1,6 +1,5 @@
-package com.hpe.adm.nga.sdk.model;
-
-/**
+/*
+ *
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,6 +12,10 @@ package com.hpe.adm.nga.sdk.model;
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ */
+package com.hpe.adm.nga.sdk.model;
+
+/**
  *
  * Created by ngthien on 8/3/2016.
  */

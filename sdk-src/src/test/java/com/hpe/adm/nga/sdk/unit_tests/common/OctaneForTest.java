@@ -1,9 +1,5 @@
-package com.hpe.adm.nga.sdk.unit_tests.common;
-
-import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-
-/**
+/*
+ *
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,9 +12,12 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- *
- * Created by brucesp on 21-Dec-16.
  */
+package com.hpe.adm.nga.sdk.unit_tests.common;
+
+import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+
 class OctaneForTest extends Octane{
     OctaneForTest(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
         super(octaneHttpClient, domain, sharedSpaceId, workId);
