@@ -19,7 +19,9 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  *
- * This class hold the field metadata object and serve all functionality concern to metadata of fields
+ * This class hold the field metadata object and serve all functionality concern to metadata of fields.
+ * See the entity metadata REST API documentation for more information.  The information that is returned in field metadata
+ * is static and therefore there are type-safe methods that can be used to return the correct information
  * @author Moris oz
  *
  */

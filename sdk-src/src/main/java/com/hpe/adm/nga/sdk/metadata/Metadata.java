@@ -36,10 +36,21 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- *
- * This class hold the  metadata object and serve all functionality concern to fields metadata and entity metadata
- *
- */
+ *<p>
+ * This class hold the  metadata object and serves all functionality concern to fields metadata and entity metadata.
+ * <br/>
+ * The REST API metadata is split into two: entities and fields.  For each context the correct method used:
+ * <br>
+ *</p>
+ * <p><code>[server_url]/metadata/entities</code> use {@link #entities()}</p>
+ * <p><code>[server_url]/metadata/fields</code> use {@link #fields()}</p>
+ * <p>In addition you can use the API to retrieve specific entities and fields.  For example:</p>
+ * <p><code>[server_url]/metadata/entities?query="name EQ 'story'"</code> use {@link #entities(String...)} with "story" as the parameter</p>
+ * <p><code>[server_url]/metadata/fields?query="entity_name EQ 'pipeline'"</code> use {@link #fields(String...)} with "pipeline" as the parameter</p>
+ * <p>Metadata can only be read (HTTP GET) so after the correct method is called the <code>execute()</code> method should be used.</p>
+ * @see EntityMetadata for more information about entity metadata
+ * @see FieldMetadata for more information about field metadata
+ * */
 public class Metadata {
 
 	// constant
@@ -127,7 +138,7 @@ public class Metadata {
 	
 	/**
 	 * Get metadata field object
-	 * @return
+	 * @return new field object
 	 */
 	public Field fields(){
 		
@@ -136,8 +147,8 @@ public class Metadata {
 	
 	/**
 	 * Get metadata field object based on given field names
-	 * @param entities
-	 * @return
+	 * @param entities list of entities that will be returned
+	 * @return an object containing field metadata
 	 */
 	public Field fields(String...entities){
 		
