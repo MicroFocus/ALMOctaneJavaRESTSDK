@@ -27,8 +27,8 @@ import java.util.Collection;
 import java.util.Set;
 
 public class CommonMethods {
-    private final static String urlDomain = "https://mqast001pngx.saas.hpe.com";
-    private final static String sharedSpace = "21025";
+    private final static String urlDomain = "http://localhost:8080";
+    private final static String sharedSpace = "1001";
     private final static int workSpace = 1002;
 
     public static OctaneHttpClient getOctaneHttpClient() {

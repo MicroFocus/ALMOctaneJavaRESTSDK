@@ -114,16 +114,6 @@ public class Metadata {
 	            .map(s ->  Query.statement(QUERY_NAME_FIELD_NAME, QueryMethod.EqualTo, s).build().getQueryString())
 	            .collect(Collectors.joining("||"));
 		
-		// TBD - Remove after debugging
-		/*Query quaryEntities =  new Query();
-		String quaryList = "" ;	
-		for (String value : entities) {
-			
-			quaryEntities = new Query.Field(QUERY_NAME_FIELD_NAME).equal(value).build();
-			quaryList = quaryList + quaryEntities.getQueryString() + "||";
-		}
-		quaryList = quaryList.substring(0,quaryList.length()-2);*/
-				
 		return new Entity(TYPE_NAME_ENTITIES_QUERY_FORMAT + quaryList + "\"");
 	}
 	
@@ -143,18 +133,7 @@ public class Metadata {
 	 */
 	public Field fields(String...entities){
 		
-		
-		
-		// TBD - remove after debugging
-		/*String quaryList = "";	
-		Query quaryFields =  new Query();
-		for (String value : entities) {
-			
-			quaryFields = new Query.Field(QUERY_ENTITY_NAME_FIELD_NAME).equal(value).build();
-			quaryList = quaryList + quaryFields.getQueryString() + "||";
-		}
-		quaryList = quaryList.substring(0,quaryList.length()-2);*/
-		
+
 		List<String> entitiesList =  Arrays.asList(entities);
 		String quaryList =  entitiesList
 	            .stream()
@@ -238,14 +217,6 @@ public class Metadata {
 		Collection<EntityMetadata> entitiesMetadata = new ArrayList<>();
 		IntStream.range(0, jasoDataArr.length()).forEach((i)->entitiesMetadata.add(getEntityMetadata(jasoDataArr.getJSONObject(i))));
 		
-		// TBD - Remove after debugging
-		/*for (int i = 0; i < jasoDataArr.length(); i++) {
-			JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
-			EntityMetadata entityModel = getEntityMetadata(jasoEntityObj);
-			entitiesMetadata.add(entityModel);
-
-		}*/
-		
 		return entitiesMetadata;
 	}
 	
@@ -263,17 +234,7 @@ public class Metadata {
 		// prepare entity collection
 		Collection<FieldMetadata> fieldsMetadata = new ArrayList<>();
 		IntStream.range(0, jasoDataArr.length()).forEach((i)->fieldsMetadata.add(new Gson().fromJson(jasoDataArr.getJSONObject(i).toString(), FieldMetadata.class)));
-		
-		// TBD - Remove after debugging
-		/*Collection<FieldMetadata> fieldsMetadata = new ArrayList<FieldMetadata>();
-		
-		for (int i = 0; i < jasoDataArr.length(); i++) {
-			JSONObject jasoEntityObj = jasoDataArr.getJSONObject(i);
-			FieldMetadata fieldMetadata = new Gson().fromJson(jasoEntityObj.toString(), FieldMetadata.class);
-			fieldsMetadata.add(fieldMetadata);
 
-		}*/
-		
 		return fieldsMetadata;
 	}
 		
@@ -297,13 +258,6 @@ public class Metadata {
 			}
 		});
 		
-		// TBD - Remove after debugging
-		/*for (int i = 0; i < jasonFeatures.length(); i++) {
-			JSONObject jasoFeatureObj = jasonFeatures.getJSONObject(i);
-			Feature feature = getFeatureObject(jasoFeatureObj);
-			features.add(feature);
-		}*/
-
 		// TODO: Check this
 		return new EntityMetadata(name, label, false, features);
 	}
