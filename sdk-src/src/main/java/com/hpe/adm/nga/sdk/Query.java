@@ -68,6 +68,14 @@ public class Query {
         return queryString;
     }
 
+    /**
+     * @return  a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        return queryString;
+    }
+
     public static class QueryBuilder {
 
         private String queryString = "";
