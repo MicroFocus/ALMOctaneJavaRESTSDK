@@ -24,10 +24,15 @@ import java.io.InputStream;
 import java.util.Collection;
 
 /**
+ *<p>
+ * The object that represents attachments in the REST API.  Attachments contain both the binary data and the metadata
+ * surrounding them. See the REST API documentation for further information as to how to use attachments.
+ * </p>
+ * <p>
+ *     Attachments have different functionality depending on whether they are being created, updated, read or deleted.
+ *     <br/>
  *
- * This class hold the AttachmentList objects
- * Created by Moris on 23/02/2016.
- *
+ * </p>
  */
 public class AttachmentList {
 
