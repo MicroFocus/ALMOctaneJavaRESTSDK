@@ -21,8 +21,7 @@ import java.util.Set;
  *
  * This class hold the ErrorModel objects and server as an error data holder
  * entities.
- * 
- * @author moris oz
+ *
  *
  */
 public class ErrorModel extends  EntityModel{

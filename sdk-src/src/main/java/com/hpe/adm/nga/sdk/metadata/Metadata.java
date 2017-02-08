@@ -330,7 +330,6 @@ public class Metadata {
 	
 	/**
 	 * This class hold the entity metadata object
-	 * @author Moris oz
 	 *
 	 */
 	public  class Entity extends OctaneRequest<Collection<EntityMetadata>> {
@@ -382,7 +381,6 @@ public class Metadata {
 	
 	/**
 	 * This class hold the field metadata object
-	 * @author Moris oz
 	 *
 	 */
 	public  class Field extends OctaneRequest<Collection<FieldMetadata>> {

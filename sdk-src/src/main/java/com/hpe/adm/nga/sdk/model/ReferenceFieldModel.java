@@ -19,8 +19,7 @@ package com.hpe.adm.nga.sdk.model;
 /**
  *
  * This class hold the ReferenceFieldModel objects and serve as a ReferenceField type FieldModel data holder 
- * 
- * @author moris oz
+ *
  *
  */
 public class ReferenceFieldModel implements FieldModel<EntityModel> {

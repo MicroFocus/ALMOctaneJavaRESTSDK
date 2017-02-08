@@ -21,7 +21,6 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
  *
  * This extends the RuntimeException objects and serve all functionality concern to
  * Octane Exceptions.
- * @author Moris oz
  *
  */
 public class OctaneException extends RuntimeException {

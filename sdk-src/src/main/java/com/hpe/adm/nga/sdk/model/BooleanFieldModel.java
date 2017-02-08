@@ -17,9 +17,7 @@ package com.hpe.adm.nga.sdk.model;
 
 /**
  *
- * This class hold the BooleanFieldModel objects and serve as a Boolean type FieldModel data holder 
- * 
- * @author moris oz
+ * This class hold the BooleanFieldModel objects and serve as a Boolean type FieldModel data holder
  *
  */
 public class BooleanFieldModel implements FieldModel<Boolean> {

@@ -21,8 +21,7 @@ import java.util.Collection;
 /**
  *
  * This class hold the MultiReferenceFieldModel objects and serve as a multi reference type FieldModel data holder 
- * 
- * @author moris oz
+ *
  *
  */
 public class MultiReferenceFieldModel implements FieldModel<Collection<EntityModel>> {

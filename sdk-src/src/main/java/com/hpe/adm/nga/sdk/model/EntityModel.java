@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  * This class hold the EntityModel objects and server as an entity data holder
  * entities.
  *
- * @author moris oz
  */
 public class EntityModel {
 

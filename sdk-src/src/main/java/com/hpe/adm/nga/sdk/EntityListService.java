@@ -568,7 +568,6 @@ public class EntityListService {
      * This class hold the Get objects and serve all functions concern to REST
      * Get.
      *
-     * @author Moris Oz
      */
     public class Get extends OctaneRequest<Collection<EntityModel>> {
 
@@ -667,7 +666,6 @@ public class EntityListService {
      * This class hold the Update objects and serve all functions concern to
      * REST put.
      *
-     * @author moris oz
      */
     public class Update extends OctaneRequest<Collection<EntityModel>> {
 
@@ -731,7 +729,6 @@ public class EntityListService {
      * This class hold the Update objects and serve all functions concern to
      * REST Post.
      *
-     * @author Moris Oz
      */
     public class Create extends OctaneRequest<Collection<EntityModel>> {
 
@@ -807,7 +804,6 @@ public class EntityListService {
      * This class hold the Delete objects and serve all functions concern to
      * REST delete.
      *
-     * @author Moris Oz
      */
     public class Delete extends OctaneRequest<Collection<EntityModel>> {
 
@@ -851,7 +847,6 @@ public class EntityListService {
     /**
      * This class hold the Entities object(An object that represent one Entity )
      *
-     * @author Moris Oz
      */
     public class Entities {
 
@@ -899,7 +894,6 @@ public class EntityListService {
         /**
          * This class hold the Get object of one entity
          *
-         * @author Moris Oz
          */
         public class Get extends OctaneRequest<EntityModel> {
 
@@ -974,7 +968,6 @@ public class EntityListService {
         /**
          * This class hold the Update object of one entity
          *
-         * @author Moris Oz
          */
         public class Update extends OctaneRequest<EntityModel> {
 
@@ -1021,7 +1014,6 @@ public class EntityListService {
         /**
          * This class hold the Delete object of one entity
          *
-         * @author Moris Oz
          */
         public class Delete extends OctaneRequest<EntityModel> {
 

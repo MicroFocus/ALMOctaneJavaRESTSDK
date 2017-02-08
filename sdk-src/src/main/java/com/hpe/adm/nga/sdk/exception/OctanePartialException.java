@@ -24,7 +24,6 @@ import java.util.Collection;
  *
  * This extends the RuntimeException objects and serve all functionality concern to
  * Octane Partial Exceptions ( an exception that contain error and entities data )
- * @author Moris oz
  *
  */
 public class OctanePartialException extends RuntimeException{

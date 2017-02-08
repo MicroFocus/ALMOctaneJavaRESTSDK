@@ -46,7 +46,6 @@ public class HierarchyFeature extends Feature{
 
 	/**
 	 * Root Data structure
-	 * @author Moris Oz
 	 *
 	 */
 	public static class Root {

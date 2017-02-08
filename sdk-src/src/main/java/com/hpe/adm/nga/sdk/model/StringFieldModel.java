@@ -18,8 +18,7 @@ package com.hpe.adm.nga.sdk.model;
 /**
  *
  * This class hold the StringFieldModel objects and serve as a string type FieldModel data holder 
- * 
- * @author moris oz
+ *
  *
  */
 public class StringFieldModel implements FieldModel<String> {

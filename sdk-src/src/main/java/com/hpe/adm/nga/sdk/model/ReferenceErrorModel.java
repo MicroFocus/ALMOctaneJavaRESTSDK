@@ -19,8 +19,7 @@ package com.hpe.adm.nga.sdk.model;
 /**
  *
  * This class hold the ReferenceErrorModel objects and serve as a ReferenceError type FieldModel data holder 
- * 
- * @author moris oz
+ *
  *
  */
 public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.ReferenceError> {
@@ -65,7 +64,6 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 	
 	/**
 	 * data structure for referenceError
-	 * @author moris oz
 	 *
 	 */
 	public static class ReferenceError  {

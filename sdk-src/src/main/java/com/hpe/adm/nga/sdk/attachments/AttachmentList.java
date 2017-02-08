@@ -92,7 +92,6 @@ public class AttachmentList {
 	/**
 	 * This class hold the Get objects and serve all functions concern to REST
 	 * Get.
-	 * @author Moris oz
 	 *
 	 */
 	public class Get extends OctaneRequest<Collection<EntityModel>> {
@@ -112,7 +111,6 @@ public class AttachmentList {
 	/**
 	 * This class hold the Create objects and serve all functions concern to REST
 	 * Get.
-	 * @author Moris oz
 	 *
 	 */
 	public class Create extends OctaneRequest<Collection<EntityModel>> {
@@ -154,7 +152,6 @@ public class AttachmentList {
 	
 	/**
 	 * This class hold the Attachments objects (handle a unique Attachment model )
-	 * @author Moris oz
 	 *
 	 */
 	public class Attachments {
@@ -204,7 +201,6 @@ public class AttachmentList {
 		
 		/**
 		 * This class hold the GetBinary objects (handle the binary data of a unique Attachment model )
-		 * @author Moris oz
 		 *
 		 */
 		public class GetBinary extends OctaneRequest<InputStream> {
@@ -222,8 +218,7 @@ public class AttachmentList {
 		}
 		
 		/**
-		 *  This class hold the Get objects 
-		 * @author moris oz
+		 *  This class hold the Get objects
 		 *
 		 */
 		public class Get extends OctaneRequest<EntityModel> {
@@ -243,8 +238,7 @@ public class AttachmentList {
 		}
 		
 		/**
-		 *  This class hold the Update objects 
-		 * @author moris oz
+		 *  This class hold the Update objects
 		 *
 		 */
 		public class Update extends OctaneRequest<EntityModel> {
@@ -275,8 +269,7 @@ public class AttachmentList {
 		}
 		
 		/**
-		 * This class hold the Delete objects 
-		 * @author moris oz
+		 * This class hold the Delete objects
 		 *
 		 */
 		public  class Delete extends OctaneRequest<EntityModel> {
