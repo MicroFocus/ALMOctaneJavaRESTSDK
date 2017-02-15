@@ -527,8 +527,7 @@ public class EntityListService {
 
         /**
          * 1. Request Get Execution
-         * 2. Parse response to a new Collection
-         * <EntityModel> object
+         * 2. Parse response to a new Collection object
          */
         @Override
         public Collection<EntityModel> execute() throws RuntimeException {
@@ -562,7 +561,7 @@ public class EntityListService {
         /**
          * Add Limit parameter
          *
-         * @param limit
+         * @param limit The entity limit
          * @return Get Object with new limit parameter
          */
         public Get limit(int limit) {
@@ -574,7 +573,7 @@ public class EntityListService {
         /**
          * Add offset parameter
          *
-         * @param offset
+         * @param offset The entity limit offset
          * @return Get Object with new offset parameter
          */
         public Get offset(int offset) {
@@ -585,7 +584,7 @@ public class EntityListService {
         /**
          * Add OrderBy parameters
          *
-         * @param orderBy
+         * @param orderBy The string which determines how the entities should be ordered
          * @param asc     - true=ascending/false=descending
          * @return Get Object with new OrderBy parameters
          */
@@ -598,8 +597,8 @@ public class EntityListService {
         }
 
         /**
-         * @param query
-         * @return
+         * @param query The query to use
+         * @return The object
          */
         public Get query(Query query) {
 
@@ -620,9 +619,7 @@ public class EntityListService {
 
         /**
          * 1. Request Update Execution
-         * 2. Parse response to a new Collection
-         * <p>
-         * <EntityModel> object
+         * 2. Parse response to a new Collection object
          */
         @Override
         public Collection<EntityModel> execute() throws RuntimeException {
@@ -661,7 +658,7 @@ public class EntityListService {
         /**
          * Set new entities collection
          *
-         * @param entities
+         * @param entities The entities which will be updated
          * @return create Object with new entities collection
          */
         public Update entities(Collection<EntityModel> entities) {
@@ -681,9 +678,9 @@ public class EntityListService {
         private Collection<EntityModel> entityModels = null;
 
         /**
-         * 1. build Entity Json Object from Collection<EntityModel> 2. Post
+         * 1. build Entity Json Object  2. Post
          * Request execution with json data 3. Parse response to a new
-         * Collection<EntityModel> object
+         * object
          */
         @Override
         public Collection<EntityModel> execute() throws RuntimeException {
@@ -712,6 +709,8 @@ public class EntityListService {
          *
          * @param entities    - new entities data to create
          * @param inputStream - file stream
+         * @param contentName The name of the content
+         * @param contentType The type of the content
          * @return - response - collection of entity models which have been created
          */
         public Collection<EntityModel> executeMultipart(Collection<EntityModel> entities, InputStream inputStream, String contentType, String contentName) {
@@ -736,7 +735,7 @@ public class EntityListService {
         /**
          * Set new entities collection
          *
-         * @param entities
+         * @param entities The entities which will be created
          * @return create Object with new entities collection
          */
         public Create entities(Collection<EntityModel> entities) {
@@ -801,7 +800,7 @@ public class EntityListService {
         /**
          * Set entityId parameter
          *
-         * @param entityId
+         * @param entityId The entity id
          */
         public Entities(int entityId) {
             iEntityId = entityId;
@@ -810,7 +809,7 @@ public class EntityListService {
         /**
          * getter of a Get object with specific entity
          *
-         * @return
+         * @return The Get object
          */
         public Get get() {
 
@@ -820,7 +819,7 @@ public class EntityListService {
         /**
          * getter of a Update object with specific entity
          *
-         * @return
+         * @return The Update object
          */
         public Update update() {
 
@@ -830,7 +829,7 @@ public class EntityListService {
         /**
          * getter of a Create object with specific entity
          *
-         * @return
+         * @return The Delete object
          */
         public Delete delete() {
 
@@ -848,7 +847,7 @@ public class EntityListService {
 
             /**
              * 1. Get Request execution with json data 2. Parse response to a
-             * new Collection<EntityModel> object
+             * new EntityModel object
              */
             @Override
             public EntityModel execute() throws RuntimeException {
@@ -901,7 +900,7 @@ public class EntityListService {
             /**
              * Set Fields Parameters
              *
-             * @param fields
+             * @param fields An array or comma separated list of fields to be retrieved
              * @return a new Get object with new Fields Parameters
              */
             public Get addFields(String... fields) {
@@ -948,7 +947,7 @@ public class EntityListService {
             /**
              * set a new entity for updating
              *
-             * @param entityModel
+             * @param entityModel The entity model to be updated
              * @return an update object with new entity
              */
             public Update entity(EntityModel entityModel) {
@@ -965,7 +964,7 @@ public class EntityListService {
 
             /**
              * 1. Get Request execution with json data 2. Parse response to a
-             * new Collection<EntityModel> object
+             * new EntityModel object
              */
             @Override
             public EntityModel execute() throws RuntimeException {

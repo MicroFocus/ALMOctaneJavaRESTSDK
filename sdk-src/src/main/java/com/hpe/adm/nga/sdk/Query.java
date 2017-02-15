@@ -29,12 +29,12 @@ package com.hpe.adm.nga.sdk;
  *   </p>
  *   <p>
  *       For example:
- *       <br/>
+ *       <br>
  *       To build a query such as {@code name eq 'entity_name'} the following code is used:
- *       <br/><code>Query.statement("name", QueryMethod.EqualTo, "entity_name");</code><br/>
- *       <br/>
+ *       <br><code>Query.statement("name", QueryMethod.EqualTo, "entity_name");</code><br>
+ *       <br>
  *       To negate this statement such as {@code !name eq 'entity_name'} the following code is used:
- *       <br/><code>Query.not("name", QueryMethod.EqualTo, "entity_name");</code><br/>
+ *       <br><code>Query.not("name", QueryMethod.EqualTo, "entity_name");</code><br>
  *   </p>
  *   <p>
  *       These statements produce a {@code QueryBuilder} object.  By calling the {@link QueryBuilder#build()} method this creates a {@code Query object} which can then
@@ -43,7 +43,7 @@ package com.hpe.adm.nga.sdk;
  *   <p>
  *       {@code Query} objects can be chained together (and/or) by using the correct methods such as {@link QueryBuilder#and(QueryBuilder)} or
  *       {@link QueryBuilder#orNot(String, QueryMethod, Object)}
- *       <br/>
+ *       <br>
  *       {@link QueryBuilder#build()} should be called once the entire query has been built
  *   </p>
  */
@@ -65,6 +65,7 @@ public class Query {
      * @param fieldName - field name
      * @param method - comparison function to use
      * @param fieldValue - value to compare with
+     * @return The new object that can be used to build the query
      */
     public static QueryBuilder statement(String fieldName, QueryMethod method, Object fieldValue) {
         return new QueryBuilder(method.getAction().apply(fieldName, fieldValue));
@@ -75,6 +76,7 @@ public class Query {
      * @param fieldName - field name
      * @param method - comparison function to use
      * @param fieldValue - value to compare with
+     * @return The new object that can be used to build the query
      */
     public static QueryBuilder not(String fieldName, QueryMethod method, Object fieldValue) {
         return new QueryBuilder(negate(method.getAction().apply(fieldName, fieldValue)));

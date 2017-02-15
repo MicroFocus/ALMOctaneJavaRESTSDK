@@ -32,6 +32,7 @@ public interface OctaneHttpClient {
     String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
 
     /**
+     * @param authentication The object that is used to authenticate
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
     boolean authenticate(Authentication authentication);

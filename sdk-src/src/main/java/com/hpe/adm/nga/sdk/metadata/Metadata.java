@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
 /**
  *<p>
  * This class hold the  metadata object and serves all functionality concern to fields metadata and entity metadata.
- * <br/>
+ * <br>
  * The REST API metadata is split into two: entities and fields.  For each context the correct method used:
  * <br>
  *</p>
@@ -111,6 +111,7 @@ public class Metadata {
 	
 	/**
 	 * Get metadata entity object based on given entities names
+	 * @param entities A comma separated array of entities that will be created to the context
 	 * @return new metadata entity object
 	 */
 	public Entity entities(String...entities){
@@ -213,7 +214,7 @@ public class Metadata {
 	
 	/**
 	 * get a entities metadata collection based on a given json string
-	 * @param json
+	 * @param json The json to parse into metadata
 	 * @return entity metadata collection based on a given json string
 	 */
 	private Collection<EntityMetadata> getEntitiesMetadata(String json)  {
@@ -231,7 +232,7 @@ public class Metadata {
 	
 	/**
 	 * get a fields metadata collection based on a given json string
-	 * @param json
+	 * @param json the json to parse
 	 * @return fields metadata collection based on a given json string
 	 */
 	private Collection<FieldMetadata> getFieldMetadata(String json) {
@@ -303,7 +304,7 @@ public class Metadata {
 		
 		/**
 		 * Get Request execution of metadata's entity info
-		 * Collection<EntityModel> object
+		 * Collection object
 		 */
 		@Override
 		public Collection<EntityMetadata> execute() throws RuntimeException {
@@ -353,7 +354,7 @@ public class Metadata {
 		
 		/**
 		 * Get Request execution of metadata's field info
-		 * Collection<EntityModel> object
+		 * Collection object
 		 */
 		@Override
 		public Collection<FieldMetadata> execute() throws RuntimeException {

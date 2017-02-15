@@ -28,7 +28,7 @@ public class RestFeature extends Feature{
 	
 	/**
 	 * get url
-	 * @return
+	 * @return The url of the rest feature
 	 */
 	public String getUrl(){
 		return url;
@@ -36,7 +36,7 @@ public class RestFeature extends Feature{
 	
 	/**
 	 * get supported methods
-	 * @return
+	 * @return the supported methods (GET, POST, PUT, DELETE)
 	 */
 	public String[] getMethods(){
 		return methods;

@@ -121,205 +121,205 @@ public class FieldMetadata {
 
 	/**
 	 * get Type
-	 * @return
+	 * @return type
      */
 	public String getType() {return type;}
 
 	/**
 	 * get FieldMetadata's name
-	 * @return
+	 * @return name
 	 */
 	public String getName(){return name;}
 
 	/**
 	 * get FieldMetadata's Entity Name
-	 * @return
+	 * @return entity name
 	 */
 	public String getEntityName(){return entity_name;}
 
 	/**
 	 * get FieldMetadata's Filterable state
-	 * @return
+	 * @return is filterable
 	 */
 	public boolean isFilterable(){return filterable;}
 
 	/**
 	 * get FieldMetadata's Editable state
-	 * @return
+	 * @return is editable
 	 */
 	public boolean isEditable(){return editable;}
 
 	/**
 	 * get FieldMetadata's ReturnByDefault state
-	 * @return
+	 * @return is this field returned by default
 	 */
 	public boolean isReturnByDefault(){return returned_by_default;}
 
 	/**
 	 * get FieldMetadata's Label 
-	 * @return
+	 * @return the field's label
 	 */
 	public String getLabel(){return label;}
 
 	/**
 	 * get FieldMetadata's CanModifyLabel
-	 * @return
+	 * @return the field's canmodify label
      */
 	public boolean canModifyLabel() {return can_modify_label;}
 
 	/**
 	 * get FieldMetadata's UserDefined
-	 * @return
+	 * @return whether the field is user defined
      */
 	public boolean isUserDefined() {return is_user_defined;}
 
 	/**
 	 * get FieldMetadata's VisibleInUI
-	 * @return
+	 * @return whether thr field is visible in UI
      */
 	public boolean isVisibleInUI() {return visible_in_ui;}
 
 	/**
 	 * get FieldMetadata's VisibleInUI
-	 * @return
+	 * @return whether the field is accessible by business rules
 	 */
 	public boolean isAccessibleViaBusinessRules() {return accessible_via_business_rules;}
 
 	/**
 	 * get FieldMetadata's Description
-	 * @return
+	 * @return the field's description
      */
 	public String getDescription() {return description;}
 
 	/**
 	 * get FieldMetadata's CanModifyDescription
-	 * @return
+	 * @return whether the description can be modified
      */
 	public boolean canMofidyDescription() {return can_modify_description;}
 
 	/**
 	 * get FieldMetadata's Groupable state
-	 * @return
+	 * @return whether the field is groupable
      */
 	public boolean isGroupable() {return groupable;}
 
 	/**
 	 * get FieldMetadata's Sortable state 
-	 * @return
+	 * @return whether the field is sortable
 	 */
 	public boolean isSortable(){return sortable;}
 
 	/**
 	 * get FieldMetadata's Auditable state
-	 * @return
+	 * @return whether the field is auditable
      */
 	public boolean getAuditable() {return auditable;}
 
 	/**
 	 * get FieldMetadata's CanModifyAuditable
-	 * @return
+	 * @return whether the audit label can be modified
      */
 	public boolean canModifyAuditable() {return can_modify_auditable;}
 
 	/**
 	 * get FieldMetadata's field features
-	 * @return
+	 * @return a list of all features
      */
 	public Object[] getFieldFeatures() {return field_features;}
 
 	/**
 	 * get FieldMetadata's format
-	 * @return
+	 * @return the format of the field
      */
 	public String getFormat() {return format;}
 
 	/**
 	 * get FieldMetadata's min value
-	 * @return
+	 * @return the min value (if relevant)
      */
 	public Number getMinValue() {return min_value;}
 
 	/**
 	 * get FieldMetadata's max value
-	 * @return
+	 * @return the max value (if relevant)
      */
 	public Number getMaxValue() {return max_value;}
 
 	/**
 	 * get FieldMetadata's final state
-	 * @return
+	 * @return the final status
      */
 	public boolean isFinal() {return isFinal;}
 
 	/**
 	 * get FieldMetadata's Required state 
-	 * @return
+	 * @return whether the field is required
 	 */
 	public boolean isRequired(){return required;}
 
 	/**
 	 * get FieldMetadata's Sanitization state 
-	 * @return
+	 * @return whether the field is sanitized
 	 */
 	public String getSanitization(){return sanitization;}
 
 	/**
 	 * get FieldMetadata's Unique state 
-	 * @return
+	 * @return whether the field is unique
 	 */
 	public boolean isUnique(){return unique;}
 
 	/**
 	 * get FieldMetadata's field Type
-	 * @return
+	 * @return the type of the field
 	 */
 	public FieldType getFieldType(){return field_type;}
 
 	/**
 	 * get FieldMetadata's Field Type data
-	 * @return
+	 * @return the typedata of the field
 	 */
 	public FieldTypeData getFieldTypedata(){return field_type_data;}
 
 	/**
 	 * get FieldMetadata's Max Length
-	 * @return
+	 * @return the max length
 	 */
 	public int getMaxLength(){return max_length;}
 
 	/**
 	 * get FieldMetadata's CanModifyRequired
-	 * @return
+	 * @return whether the required can be modified
      */
 	public boolean canModifyRequired() {return can_modify_required;}
 
 	/**
 	 * get FieldMetadata's CanModifyFormat
-	 * @return
+	 * @return whether the format can be modified
 	 */
 	public boolean canModifyFormat() {return can_modify_format;}
 
 	/**
 	 * get FieldMetadata's CanModifyMaxLength
-	 * @return
+	 * @return whether the max length can be modified
 	 */
 	public boolean canModifyMaxLength() {return can_modify_max_length;}
 
 	/**
 	 * get FieldMetadata's CanModifyUnique
-	 * @return
+	 * @return whether the uniqueness can be modified
 	 */
 	public boolean canModifyUnique() {return can_modify_unique;}
 
 	/**
 	 * get FieldMetadata's CanModifyEditable
-	 * @return
+	 * @return whether the editibility can be modified
 	 */
 	public boolean canModifyEditable() {return can_modify_editable;}
 
 	/**
 	 * get FieldMetadata's CanModifySanitization
-	 * @return
+	 * @return whether the sanitization can be modified
 	 */
 	public boolean canModifySanitization() {return can_modify_sanitization;}
 }

@@ -62,7 +62,7 @@ public class OctanePartialException extends RuntimeException{
 	
 	/**
 	 * getter of collection of error models
-	 * @return
+	 * @return the error models
 	 */
 	public Collection<ErrorModel> getErrorModels(){
 		return errors;

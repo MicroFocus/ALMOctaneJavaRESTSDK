@@ -53,6 +53,7 @@ public class EntityModel {
      * Creates a new EntityModel object with solo string field
      *
      * @param value - a collection of field models
+     * @param key The key to the model
      */
     public EntityModel(String key, String value) {
         this();

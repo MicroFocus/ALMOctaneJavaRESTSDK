@@ -26,17 +26,17 @@ import java.util.UUID;
 
 /**
  * This class represents the main Octane context.  This context represents the following:
- * <br/>
+ * <br>
  * <ul>
  * <li>Octane server</li>
  * <li>Sharedspace id</li>
  * <li>Workspace id</li>
  * <li>Authentication object</li>
  * </ul>
- * <br/>
+ * <br>
  * <p>
  * This represents the following URL in the Octane REST API:
- * <br/>
+ * <br>
  * {@code
  * <p>
  * server_url:port/api/shared_spaces/[sharedspace_id]/workspaces/[workspace_id]
@@ -108,7 +108,7 @@ public class Octane {
 
     /**
      * Creates a new AttachmentList object.  This returns the context for attachments.  This is equivalent to
-     * <br/>
+     * <br>
      *  <code>[workspace_url/attachments</code>
      *
      * @return A new AttachmentList object that holds the attachments context
@@ -147,12 +147,12 @@ public class Octane {
 
     /**
      * This class is used to create an {@link Octane} instance.  It is initialised using the correct {@link Authentication}
-     * <br/>
+     * <br>
      * The <code>Builder</code> class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
      * necessary to add a sharedspace or workspace and will work with entities under that context.
-     * <br/>
+     * <br>
      * Use the workspace and sharedspace methods only once otherwise the behaviour cannot be guaranteed!
-     * <br/>
+     * <br>
      * Once the correct context has been built up use the {@link #build()} method to create the <code>Octane</code> instance
      */
     public static class Builder {
@@ -215,7 +215,7 @@ public class Octane {
 
         /**
          * Sets the domain and the port.  The domain should include the full http scheme (http/https)
-         * <br/>
+         * <br>
          * eg <code>http://octane.server.com</code>
          *
          * @param domain - domain name including http scheme
@@ -232,7 +232,7 @@ public class Octane {
 
         /**
          * Sets the domain and the port.  The domain should include the full http scheme (http/https)
-         * <br/>
+         * <br>
          * eg <code>http://octane.server.com</code>
          *
          * @param domain - domain name including http scheme
@@ -250,7 +250,6 @@ public class Octane {
          * The main build procedure which creates the {@link Octane} object and authenticates against the server
          *
          * @return a new Octane instance which has the set context and is correctly authenticated
-         * @throws Exception if there was some issue such as communication or with authentication
          */
         public Octane build() {
 

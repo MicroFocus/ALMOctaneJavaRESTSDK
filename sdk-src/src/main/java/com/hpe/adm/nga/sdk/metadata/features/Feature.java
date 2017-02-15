@@ -26,7 +26,7 @@ public class Feature {
 	
 	/**
 	 * get feature name
-	 * @return
+	 * @return The name of the feature
 	 */
 	public String getName(){
 		return name;
@@ -34,7 +34,7 @@ public class Feature {
 	
 	/**
 	 * set feature name
-	 * @param newName
+	 * @param newName The name of the feature
 	 */
 	public void setName(String newName){
 		name = newName; 

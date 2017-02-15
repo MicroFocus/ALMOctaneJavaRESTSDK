@@ -28,19 +28,19 @@ public class HierarchyFeature extends Feature{
 	
 	/**
 	 * get Child Types
-	 * @return
+	 * @return an array of child types
 	 */
 	public String[] getChildTypes(){return child_types;}
 
     /**
 	 * get Parent Types
-	 * @return
+	 * @return an array of parent types
 	 */
 	public String[] getParentTypes(){return parent_types;}
 
 	/**
 	 * get Root Types
-	 * @return
+	 * @return the root type
 	 */
 	public Root getRootEnt(){return root;}
 
@@ -54,13 +54,13 @@ public class HierarchyFeature extends Feature{
 		
 		/**
 		 * get type
-		 * @return
+		 * @return the type of the root
 		 */
 		public String getType(){return type;}
 
 		/**
 		 * get id
-		 * @return
+		 * @return the id of the root
 		 */
 		public String getId(){return id;}
 	}

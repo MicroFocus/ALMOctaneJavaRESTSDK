@@ -26,7 +26,7 @@ public class SubTypesOfFeature extends Feature{
 	
 	/**
 	 * get types
-	 * @return
+	 * @return the type of subtype
 	 */
 	public String getType(){return type;}
 }

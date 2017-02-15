@@ -36,8 +36,8 @@ public class OctaneHttpResponse {
         this.inputStream = inputStream;
     }
 
-      /**
-     * @return - Returns whether received a successful HTTP status code >= 200 && < 300 (see getStatusCode()).
+    /**
+     * @return - Returns whether received a successful HTTP status code
      */
     public boolean isSuccessStatusCode(){
         return statusCode >= 200 && statusCode < 300;

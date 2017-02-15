@@ -64,6 +64,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * Creates an HTTP client instance using the url and authentication.
      *
      * @param urlDomain The source URL of the Octane server
+     * @param clientTypeHeader The special client type that can be sent to the API
      */
     public GoogleHttpClient(final String urlDomain, final String clientTypeHeader) {
         this.urlDomain = urlDomain;

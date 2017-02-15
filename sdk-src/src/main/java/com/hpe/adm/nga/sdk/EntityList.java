@@ -15,10 +15,7 @@
  */
 package com.hpe.adm.nga.sdk;
 
-import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-
-import java.util.Collection;
 
 /**
  * <p>

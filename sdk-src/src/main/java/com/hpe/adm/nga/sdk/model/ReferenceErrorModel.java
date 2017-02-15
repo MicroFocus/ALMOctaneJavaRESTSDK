@@ -84,8 +84,8 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 				
 		/**
 		 * set value
-		 * @param id
-		 * @param type
+		 * @param id the entity id
+		 * @param type the entity type
 		 */
 		public void setValues(long id,String type){
 			
@@ -95,7 +95,7 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 		
 		/**
 		 * get id
-		 * @return
+		 * @return entity id
 		 */
 		public long getId(){
 			return entity_id;
@@ -103,7 +103,7 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 		
 		/**
 		 * get type
-		 * @return
+		 * @return entity type
 		 */
 		public String gettype(){
 			return entity_type;
