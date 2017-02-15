@@ -133,29 +133,6 @@ public class EntityListService {
     }
 
     /**
-     * TBD - Remove after testing
-     */
-    public Collection<EntityModel> testGetEntityModels(String json) {
-
-
-        JSONObject jsonObj = new JSONObject(json);
-        JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_NAME);
-        Collection<EntityModel> entityModels = new ArrayList<>();
-        IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
-
-        // TBD - remove after debugging
-        /*Set<FieldModel> setFieldModel = null;
-        for (int i = 0; i < jsonDataArr.length(); i++) {
-			JSONObject jsonEntityObj = jsonDataArr.getJSONObject(i);
-			EntityModel entityModel = getEntityModel(jsonEntityObj);
-			entityModels.add(entityModel);
-		}*/
-
-        return entityModels;
-    }
-
-
-    /**
      * A utility class for building a URIs with various components, based on the
      * given domain name and the global quarry parameters of entity list.
      *
@@ -246,13 +223,6 @@ public class EntityListService {
         IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
 
 
-        // TBD - remove after debugging
-        /*for (int i = 0; i < jsonDataArr.length(); i++) {
-            JSONObject jsonEntityObj = jsonDataArr.getJSONObject(i);
-			EntityModel entityModel = getEntityModel(jsonEntityObj);
-			entityModels.add(entityModel);
-		}*/
-
         return entityModels;
     }
 
@@ -309,13 +279,6 @@ public class EntityListService {
         JSONObject objField = new JSONObject();
         fieldModels.forEach((i) -> objField.put(i.getName(), getFieldValue(i)));
 
-        // TBD - Remove after debugging
-        /*for (Iterator iterator2 = fieldModels.iterator(); iterator2.hasNext();) {
-            FieldModel fieldModel = (FieldModel) iterator2.next();
-			Object fieldValue = getFieldValue(fieldModel);
-			objField.put(fieldModel.getName(), fieldValue);
-		}*/
-
         return objField;
     }
 
@@ -325,7 +288,7 @@ public class EntityListService {
      * @param entitiesModels - Collection of entities models
      * @return new json object conatin entities data
      */
-    private JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels) {
+    JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels) {
 
         JSONObject objBase = new JSONObject();
         JSONArray objEntities = new JSONArray();
@@ -333,14 +296,6 @@ public class EntityListService {
         objBase.put(JSON_TOTAL_COUNT_NAME, entitiesModels.size());
         objBase.put(JSON_EXCEEDS_TOTAL_COUNT_NAME, false);
         entitiesModels.forEach((i) -> objEntities.put(getEntityJSONObject(i)));
-
-        // TBD- Remove after debugging
-        /*for (Iterator iterator1 = entitiesModels.iterator(); iterator1.hasNext();) {
-			EntityModel entityModel = (EntityModel) iterator1.next();
-			Set<FieldModel> setFieldModel = entityModel.getValue();
-			JSONObject objField = getEntityJSONObject(entityModel);
-			objEntities.put(objField);
-		}*/
 
         return objBase;
 
@@ -352,7 +307,7 @@ public class EntityListService {
      * @param jsonEntityObj - json object
      * @return new EntityModel object
      */
-    private EntityModel getEntityModel(JSONObject jsonEntityObj) {
+    EntityModel getEntityModel(JSONObject jsonEntityObj) {
 
         Set<FieldModel> fieldModels = new HashSet<>();
         Iterator<?> keys = jsonEntityObj.keys();
@@ -424,15 +379,6 @@ public class EntityListService {
         JSONArray jsonErrArr = jsonObj.getJSONArray(JSON_ERRORS_NAME);
         Collection<ErrorModel> ErrModels = new ArrayList<>();
         IntStream.range(0, jsonErrArr.length()).forEach((i) -> ErrModels.add(getErrorModelFromjson(jsonErrArr.getJSONObject(i).toString())));
-
-        // TBD- Remove after debug
-        // prepare entity collection
-		/*Collection<ErrorModel> ErrModels = new ArrayList<ErrorModel>();
-		for (int i = 0; i < jsonErrArr.length(); i++) {
-			JSONObject jsonErrObj = jsonErrArr.getJSONObject(i);
-			ErrorModel errorModel = getErrorModel(jsonErrObj.toString());
-			ErrModels.add(errorModel);
-		}*/
 
         return ErrModels;
     }

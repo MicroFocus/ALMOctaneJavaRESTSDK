@@ -97,6 +97,14 @@ public class Query {
     }
 
     /**
+     * @return  a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        return queryString;
+    }
+
+    /**
      * Object that is used to build {@link Query} objects.
      * @see Query for more information
      */

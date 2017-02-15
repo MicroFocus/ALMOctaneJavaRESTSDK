@@ -20,7 +20,7 @@ import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
+import com.hpe.adm.nga.sdk.CommonUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -55,16 +55,15 @@ public class TestCreateEntities {
 		EntityList spiedDefects = PowerMockito.spy(defects);
 		EntityListService service = (EntityListService)Whitebox.getInternalState(spiedDefects, "entityListService");							
 		
-		try{	
-			Collection<EntityModel> entityModelsIn = spiedDefects.testGetEntityModels(jsonCreateString);
+		try{
+			Collection<EntityModel> entityModelsIn = CommonUtils.testGetEntityModels(jsonCreateString,service);
+
 			spiedCreateEntity.entities(entityModelsIn);
 			
 			Collection<EntityModel> internalModels = (Collection<EntityModel>) Whitebox.getInternalState(spiedCreateEntity, "entityModels");
-			Method getEntitiesJSONObject = service.getClass().getDeclaredMethod("getEntitiesJSONObject", new Class[] {Collection.class});
-			getEntitiesJSONObject.setAccessible(true);
-			JSONObject jsonEntity = (JSONObject)getEntitiesJSONObject.invoke(service, internalModels);
+			JSONObject jsonEntity = CommonUtils.getEntitiesJSONObject(internalModels,service);
 
-			Collection<EntityModel> entityModelsOut = spiedDefects.testGetEntityModels(jsonEntity.toString());
+			Collection<EntityModel> entityModelsOut = CommonUtils.testGetEntityModels(jsonEntity.toString(),service);
 			Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModelsIn, entityModelsOut));
 		}
 		catch(Exception ex){
@@ -72,4 +71,6 @@ public class TestCreateEntities {
 		}
 		
 	}
+
+
 }
