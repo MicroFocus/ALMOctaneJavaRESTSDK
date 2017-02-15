@@ -21,8 +21,10 @@ import java.util.Collection;
 
 /**
  *
- * This class hold the entity metadata object and serve all functionality concern to metadata of entities
- * @author Moris oz
+ * This class hold the entity metadata object and serve all functionality concern to metadata of entities.
+ * <br>
+ * See the entity metadata REST API documentation for more information.  By calling {@link #features()} a collection of
+ * features is returned
  *
  */
 public class EntityMetadata {
@@ -38,7 +40,8 @@ public class EntityMetadata {
 	 * 
 	 * @param name - Metadata name
 	 * @param newFeatures - Metadata features
-	 *           
+	 * @param canModifyLabel Whether the label can be modified
+	 * @param label The label
 	 */
 	public EntityMetadata(String name, String label, boolean canModifyLabel, Collection<Feature> newFeatures){
 		

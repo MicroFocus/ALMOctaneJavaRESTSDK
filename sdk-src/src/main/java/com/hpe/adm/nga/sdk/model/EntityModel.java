@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  * This class hold the EntityModel objects and server as an entity data holder
  * entities.
  *
- * @author moris oz
  */
 public class EntityModel {
 
@@ -54,6 +53,7 @@ public class EntityModel {
      * Creates a new EntityModel object with solo string field
      *
      * @param value - a collection of field models
+     * @param key The key to the model
      */
     public EntityModel(String key, String value) {
         this();

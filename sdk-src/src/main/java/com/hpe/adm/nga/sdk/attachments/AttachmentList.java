@@ -24,10 +24,13 @@ import java.io.InputStream;
 import java.util.Collection;
 
 /**
- *
- * This class hold the AttachmentList objects
- * Created by Moris on 23/02/2016.
- *
+ *<p>
+ * The object that represents attachments in the REST API.  Attachments contain both the binary data and the metadata
+ * surrounding them. See the REST API documentation for further information as to how to use attachments.
+ * </p>
+ * <p>
+ *     Attachments have different functionality depending on whether they are being created, updated, read or deleted.
+ * </p>
  */
 public class AttachmentList {
 
@@ -87,7 +90,6 @@ public class AttachmentList {
 	/**
 	 * This class hold the Get objects and serve all functions concern to REST
 	 * Get.
-	 * @author Moris oz
 	 *
 	 */
 	public class Get extends OctaneRequest<Collection<EntityModel>> {
@@ -107,7 +109,6 @@ public class AttachmentList {
 	/**
 	 * This class hold the Create objects and serve all functions concern to REST
 	 * Get.
-	 * @author Moris oz
 	 *
 	 */
 	public class Create extends OctaneRequest<Collection<EntityModel>> {
@@ -132,6 +133,8 @@ public class AttachmentList {
 		 * Setter of new entities to create and file to upload
 		 * @param entities - new entities to create
 		 * @param stream - file stream
+		 * @param type The content type
+		 * @param name The content name
 		 * @return - An Object with new data
 		 */
 		public Create entities(Collection<EntityModel> entities, InputStream stream, String type, String name ) {
@@ -149,7 +152,6 @@ public class AttachmentList {
 	
 	/**
 	 * This class hold the Attachments objects (handle a unique Attachment model )
-	 * @author Moris oz
 	 *
 	 */
 	public class Attachments {
@@ -199,7 +201,6 @@ public class AttachmentList {
 		
 		/**
 		 * This class hold the GetBinary objects (handle the binary data of a unique Attachment model )
-		 * @author Moris oz
 		 *
 		 */
 		public class GetBinary extends OctaneRequest<InputStream> {
@@ -217,8 +218,7 @@ public class AttachmentList {
 		}
 		
 		/**
-		 *  This class hold the Get objects 
-		 * @author moris oz
+		 *  This class hold the Get objects
 		 *
 		 */
 		public class Get extends OctaneRequest<EntityModel> {
@@ -238,8 +238,7 @@ public class AttachmentList {
 		}
 		
 		/**
-		 *  This class hold the Update objects 
-		 * @author moris oz
+		 *  This class hold the Update objects
 		 *
 		 */
 		public class Update extends OctaneRequest<EntityModel> {
@@ -258,7 +257,7 @@ public class AttachmentList {
 			
 			/**
 			 * Getter of an Update object with new Entity Model
-			 * @param entModel
+			 * @param entModel The entityModel
 			 * @return -an Update object with new Entity Model
 			 */
 			public Update entity(EntityModel entModel) {
@@ -270,8 +269,7 @@ public class AttachmentList {
 		}
 		
 		/**
-		 * This class hold the Delete objects 
-		 * @author moris oz
+		 * This class hold the Delete objects
 		 *
 		 */
 		public  class Delete extends OctaneRequest<EntityModel> {

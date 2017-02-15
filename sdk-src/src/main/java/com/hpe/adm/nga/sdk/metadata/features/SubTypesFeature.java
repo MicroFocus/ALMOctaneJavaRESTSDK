@@ -27,13 +27,13 @@ public class SubTypesFeature extends Feature{
 
 	/**
 	 * get types
-	 * @return
+	 * @return an array of subtypes
 	 */
 	public String[] getTypes(){return types;}
 
     /**
 	 * get editable
-	 * @return
+	 * @return whether this is editable
      */
 	public boolean getEditable() { return editable; }
 }

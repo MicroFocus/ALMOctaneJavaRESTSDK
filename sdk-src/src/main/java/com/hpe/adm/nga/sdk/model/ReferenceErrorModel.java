@@ -19,8 +19,7 @@ package com.hpe.adm.nga.sdk.model;
 /**
  *
  * This class hold the ReferenceErrorModel objects and serve as a ReferenceError type FieldModel data holder 
- * 
- * @author moris oz
+ *
  *
  */
 public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.ReferenceError> {
@@ -65,7 +64,6 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 	
 	/**
 	 * data structure for referenceError
-	 * @author moris oz
 	 *
 	 */
 	public static class ReferenceError  {
@@ -86,8 +84,8 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 				
 		/**
 		 * set value
-		 * @param id
-		 * @param type
+		 * @param id the entity id
+		 * @param type the entity type
 		 */
 		public void setValues(long id,String type){
 			
@@ -97,7 +95,7 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 		
 		/**
 		 * get id
-		 * @return
+		 * @return entity id
 		 */
 		public long getId(){
 			return entity_id;
@@ -105,7 +103,7 @@ public class ReferenceErrorModel implements FieldModel<ReferenceErrorModel.Refer
 		
 		/**
 		 * get type
-		 * @return
+		 * @return entity type
 		 */
 		public String gettype(){
 			return entity_type;

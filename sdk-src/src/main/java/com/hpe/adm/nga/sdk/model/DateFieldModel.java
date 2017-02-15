@@ -20,8 +20,7 @@ import java.util.Date;
 /**
  *
  * This class hold the DateFieldModel objects and serve as a Date type FieldModel data holder 
- * 
- * @author moris oz
+ *
  *
  */
 public class DateFieldModel implements FieldModel<Date> {

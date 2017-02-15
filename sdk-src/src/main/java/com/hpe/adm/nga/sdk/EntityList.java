@@ -15,73 +15,102 @@
  */
 package com.hpe.adm.nga.sdk;
 
-import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
-import java.util.Collection;
-
 /**
- *
- * This class hold the entities objects and serve all functionality concern to entities.
- * 
- * @author moris oz
+ * <p>
+ * Creates a new EntityList object.  This can be used to get one entity (using the {@link #at(int) method}
+ * or a collection of entities.
+ * </p>
+ * <p>
+ *     Depending on the HTTP method that is required the correct method should be used
+ * </p>
  *
  */
 public class EntityList {
 
 	private EntityListService entityListService = null;
-	
-	
-	/**
-	 * Creates a new EntityList object 
-	 * @param octaneHttpClient - Http Request Factory
-	 * @param strEntityListDomain - Domain Name 
-	 */
+
+    /**
+     * Creates a new {@link EntityList} instance with the entity collection name and the client to be used
+     *
+     * @param octaneHttpClient    - The client that is used for REST communication
+     * @param strEntityListDomain - The entity collection name
+     */
 	public EntityList(OctaneHttpClient octaneHttpClient, String strEntityListDomain) {
 
 		entityListService = new EntityListService(octaneHttpClient, strEntityListDomain);
 		
 	}
-	
-	/**
-	 * getter of an Entities object ( Entities object handle a unique entity model ) 
-	 * @param entityId - entity id
-	 * @return a new Entities object with specific id
-	 */
+
+    /**
+     * Returns an entity context.  This is the same as setting the context to:
+     * <br>
+     * <code>[octane_url]/entity/entity_id</code>
+     * <br>
+     * This does not yet make a call to the server as the HTTP method has not been set
+     * @param entityId - The id of the entity
+     * @return the entity context that can be used further to carry out the call to the server
+     */
 	public EntityListService.Entities at(int entityId) {
 		return entityListService.at(entityId);
 	}
-	
-	/**
-	 * getter of an Get object of EntityList ( EntityList object handle a collection of entity models  )
-	 * @return a new Get object 
-	 */
+
+    /**
+     * Returns a context that will be used to <code>GET</code> from the server.  Because this is a collection no
+     * id is sent.  This is the same  as setting the context to:
+     * <br>
+     * <code>[octane_url]/entity</code>
+     * <br>
+     * This does not yet make a call to the server but sets the context
+     *
+     * @return a context to the entity collection that will be used for GET
+     */
 	public EntityListService.Get get() {
 		
 		return entityListService.get();
 	}
-	
-	/**
-	 * getter of an Update object of EntityList ( EntityList object handle a collection of entity models  )
-	 * @return a new Update object 
-	 */
+
+    /**
+     * Returns a context that will be used to <code>PUT</code> from the server.  Because this is a collection no
+     * id is sent.  This is the same  as setting the context to:
+     * <br>
+     * <code>[octane_url]/entity</code>
+     * <br>
+     * This does not yet make a call to the server but sets the context
+     *
+     * @return a context to the entity collection that will be used for PUT
+     */
 	public EntityListService.Update update() {
 		
 		return entityListService.update();
 	}
-	
-	/**
-	 * getter of an Create object of EntityList ( EntityList object handle a collection of entity models
-	 * @return a new Create object 
-	 */
+
+    /**
+     * Returns a context that will be used to <code>POST</code> from the server.  Because this is a collection no
+     * id is sent.  This is the same  as setting the context to:
+     * <br>
+     * <code>[octane_url]/entity</code>
+     * <br>
+     * This does not yet make a call to the server but sets the context
+     *
+     * @return a context to the entity collection that will be used for POST
+     */
 	public EntityListService.Create create() {
 
 		return entityListService.create();
 	}
-	/**
-	 * getter of an Delete object of EntityList ( EntityList object handle a collection of entity models
-	 * @return a new Delete object 
-	 */
+
+    /**
+     * Returns a context that will be used to <code>DELETE</code> from the server.  Because this is a collection no
+     * id is sent.  This is the same  as setting the context to:
+     * <br>
+     * <code>[octane_url]/entity</code>
+     * <br>
+     * This does not yet make a call to the server but sets the context
+     *
+     * @return a context to the entity collection that will be used for DELETE
+     */
 	public EntityListService.Delete delete() {
 		return entityListService.delete();
 	}

@@ -18,8 +18,7 @@ package com.hpe.adm.nga.sdk.model;
 /**
  *
  * Interface of FieldModel
- * 
- * @author moris oz
+ *
  *
  */
 public interface FieldModel<T> {

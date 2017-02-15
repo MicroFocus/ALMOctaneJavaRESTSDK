@@ -18,8 +18,7 @@ package com.hpe.adm.nga.sdk.model;
 /**
  *
  * This class hold the LongFieldModel objects and serve as a long type FieldModel data holder 
- * 
- * @author moris oz
+ *
  *
  */
 public class LongFieldModel implements FieldModel<Long> {

@@ -1,18 +1,17 @@
-/*
- *
- *    Copyright 2017 Hewlett-Packard Development Company, L.P.
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+/*    Copyright 2017 Hewlett-Packard Development Company, L.P.
+*    Licensed under the Apache License, Version 2.0 (the "License");
+*    you may not use this file except in compliance with the License.
+*    You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+*    Unless required by applicable law or agreed to in writing, software
+*    distributed under the License is distributed on an "AS IS" BASIS,
+*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*    See the License for the specific language governing permissions and
+*    limitations under the License.
+*/
+
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
@@ -26,200 +25,248 @@ import org.apache.logging.log4j.Logger;
 import java.util.UUID;
 
 /**
- *
- * This class represents the main Octane context.  This can be created by using the Octane.Builder inner class.
- * For example use Builder()...build() to get a new Octane context
- *
-  */
+ * This class represents the main Octane context.  This context represents the following:
+ * <br>
+ * <ul>
+ * <li>Octane server</li>
+ * <li>Sharedspace id</li>
+ * <li>Workspace id</li>
+ * <li>Authentication object</li>
+ * </ul>
+ * <br>
+ * <p>
+ * This represents the following URL in the Octane REST API:
+ * <br>
+ * {@code
+ * <p>
+ * server_url:port/api/shared_spaces/[sharedspace_id]/workspaces/[workspace_id]
+ * }
+ * </p>
+ * <p>
+ * The <code>Octane</code> class is instantialized using the {@link Octane.Builder} class.  Once that instance has been
+ * obtained the Octane context can be used to create further entity, metadata, attachment contexts or to sign out of the server.
+ * </p>
+ * <p>
+ * The Octane instance can be reused to create different contexts
+ * </p>
+ */
 public class Octane {
 
-	//Constants
-	private static final String SITE_ADMIN_DOMAIN_FORMAT= "/api/siteadmin/";
-	private static final String SHARED_SPACES_DOMAIN_FORMAT= "%s/api/shared_spaces/%s/"; 
-	private static final String WORKSPACES_DOMAIN_FORMAT= "workspaces/%s/"; 
-	private static final String METADATA_DOMAIN_FORMAT= "metadata";
-	private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";
+    //Constants
+    private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/";
+    private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
+    private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
+    private static final String METADATA_DOMAIN_FORMAT = "metadata";
+    private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";
 
-	//private members
-	private final String urlDomain;
-	private final String idsharedSpaceId;
-	private final long workSpaceId;
-	private final OctaneHttpClient octaneHttpClient;
+    //private members
+    private final String urlDomain;
+    private final String idsharedSpaceId;
+    private final long workSpaceId;
+    private final OctaneHttpClient octaneHttpClient;
 
-	// functions
-	protected Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId ) {
-		this.octaneHttpClient = octaneHttpClient;
-		urlDomain = domain;
-		idsharedSpaceId = sharedSpaceId;
-		workSpaceId = workId;
-	}
+    // functions
+    protected Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
+        this.octaneHttpClient = octaneHttpClient;
+        urlDomain = domain;
+        idsharedSpaceId = sharedSpaceId;
+        workSpaceId = workId;
+    }
 
-	/**
-	   * EntityList Getter
-	   * 
-	   * @param entityName - Entity Name
-	   * @return  A new EntityList object that list of entities 
-	   */
-	public EntityList entityList(String entityName) {
-		
-		String entityListDomain =  getBaseDomainFormat() + entityName; 
-		return new EntityList(octaneHttpClient, entityListDomain);
-	}
+    /**
+     * <p>
+     * Creates a new EntityList context.  The entity name should be the collection name of the entity.
+     * For example <code>defects, tests, releases</code>
+     * </p>
+     * This method creates a new separate entity context each time that can be reused or used in parallel
+     * <p>
+     *
+     * @param entityName - The name of the entity as a collection
+     * @return A new EntityList object that list of entities
+     */
+    public EntityList entityList(String entityName) {
 
-	/**
-	   * Metadata Getter
-	   * 
-	   * @return  A new Metadata object that hold the metadata
-	   */
-	public Metadata metadata() {
-		String metadataDomain =  getBaseDomainFormat()+METADATA_DOMAIN_FORMAT;
-		return new Metadata(octaneHttpClient, metadataDomain) ;
-	}
+        String entityListDomain = getBaseDomainFormat() + entityName;
+        return new EntityList(octaneHttpClient, entityListDomain);
+    }
 
-	/**
-	   * AttachmentList Getter
-	   * 
-	   * @return  A new AttachmentList object that hold the Attachments
-	   */
-	public AttachmentList AttachmentList() {
-		
-		String attachmentListDomain =  getBaseDomainFormat()+ATTACHMENT_LIST_DOMAIN_FORMAT; 
-		return new AttachmentList(octaneHttpClient, attachmentListDomain);
-	}
-	
-	/**
-	 * get the base domain based on workSpaceId and idsharedSpaceId
-	 * @return base domain
-	 */
-	private String getBaseDomainFormat(){
+    /**
+     * Creates a new Metadata object.  This represents the following URL:
+     * <p>
+     *     <code>[workspace_url/metadata</code>
+     * </p>
+     * <p>
+     *     This can then be used further to get metadata information from the server
+     * </p>
+     *
+     * @return A new Metadata object that holds the metadata context
+     */
+    public Metadata metadata() {
+        String metadataDomain = getBaseDomainFormat() + METADATA_DOMAIN_FORMAT;
+        return new Metadata(octaneHttpClient, metadataDomain);
+    }
 
-		String baseDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
-		
-		if (idsharedSpaceId!=null && !idsharedSpaceId.isEmpty())
-		{
-			baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT,urlDomain, idsharedSpaceId);
-			
-			if (workSpaceId!=0)
-				baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT,String.valueOf(workSpaceId));
-		}
-			
-		return baseDomain;
-	}
+    /**
+     * Creates a new AttachmentList object.  This returns the context for attachments.  This is equivalent to
+     * <br>
+     *  <code>[workspace_url/attachments</code>
+     *
+     * @return A new AttachmentList object that holds the attachments context
+     */
+    public AttachmentList AttachmentList() {
 
-	public void signOut() {
-		octaneHttpClient.signOut();
-	}
+        String attachmentListDomain = getBaseDomainFormat() + ATTACHMENT_LIST_DOMAIN_FORMAT;
+        return new AttachmentList(octaneHttpClient, attachmentListDomain);
+    }
 
-	/**
-	 * This class is in charge on the builder functionality 
-	 *
-	  */
-	public static class Builder {
-		//Private
-		private final Logger logger = LogManager.getLogger(Octane.class.getName());
-		private String urlDomain = "";
-		private String idsharedSpaceId = null;
-		private long workSpaceId = 0;
-		private final Authentication authentication;
+    /**
+     * get the base domain based on workSpaceId and idsharedSpaceId
+     *
+     * @return base domain
+     */
+    private String getBaseDomainFormat() {
 
-		//Functions
+        String baseDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
 
-		/**
-		 * Creates a new Builder object
-		 *
-		 * @param authentication - hold the details of Authentication
-		 */
-		public Builder(Authentication authentication) {
-			this.authentication = authentication;
-		}
+        if (idsharedSpaceId != null && !idsharedSpaceId.isEmpty()) {
+            baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain, idsharedSpaceId);
 
-		/**
-		 * Setter of the sharedSpace id ( UUID )
-		 *
-		 * @param ssID - sharedSpace id
-		 * @return Builder object with new sharedSpace id
-		 */
-		public Builder sharedSpace(UUID ssID) {
+            if (workSpaceId != 0)
+                baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT, String.valueOf(workSpaceId));
+        }
 
-			idsharedSpaceId = ssID.toString();
-			return this;
-		}
+        return baseDomain;
+    }
 
-		/**
-		 * Setter of the sharedSpace id ( long )
-		 *
-		 * @param ssID - sharedSpace id
-		 * @return Builder object with new sharedSpace id
-		 */
-		public Builder sharedSpace(long ssID) {
+    /**
+     * Signs out of the Octane server.  Any cookies that are held are deleted
+     */
+    public void signOut() {
+        octaneHttpClient.signOut();
+    }
 
-			idsharedSpaceId = String.valueOf(ssID);
-			return this;
-		}
+    /**
+     * This class is used to create an {@link Octane} instance.  It is initialised using the correct {@link Authentication}
+     * <br>
+     * The <code>Builder</code> class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
+     * necessary to add a sharedspace or workspace and will work with entities under that context.
+     * <br>
+     * Use the workspace and sharedspace methods only once otherwise the behaviour cannot be guaranteed!
+     * <br>
+     * Once the correct context has been built up use the {@link #build()} method to create the <code>Octane</code> instance
+     */
+    public static class Builder {
+        //Private
+        private final Logger logger = LogManager.getLogger(Octane.class.getName());
+        private String urlDomain = "";
+        private String idsharedSpaceId = null;
+        private long workSpaceId = 0;
+        private final Authentication authentication;
 
-		/**
-		 * Setter of the workSpace id
-		 *
-		 * @param lId - workSpace id
-		 * @return Builder object with new workSpace id
-		 */
-		public Builder workSpace(long lId) {
+        //Functions
 
-			workSpaceId = lId;
-			return this;
-		}
+        /**
+         * Creates a new Builder object using the correct authentication
+         *
+         * @param authentication - Authentication object.  Cannot be null
+         * @throws NullPointerException if the authentication object is null
+         */
+        public Builder(Authentication authentication) {
+            assert authentication != null;
+            this.authentication = authentication;
+        }
 
-		/**
-		 * Setter of the Server domain name and port
-		 *
-		 * @param domain - domain name
-		 * @param port   - port number
-		 * @return Builder object with new Server domain info
-		 */
-		public Builder Server(String domain, int port) {
+        /**
+         * Sets the shared_space id to be a UUID object
+         *
+         * @param ssID - sharedSpace id
+         * @return this instance
+         * @throws NullPointerException if ssID is null
+         */
+        public Builder sharedSpace(UUID ssID) {
 
-			urlDomain = domain + ":" + String.valueOf(port);
+            idsharedSpaceId = ssID.toString();
+            return this;
+        }
 
-			return this;
-		}
+        /**
+         * Sets the shared_space id to be a long
+         *
+         * @param ssID - sharedSpace id
+         * @return this instance
+         */
+        public Builder sharedSpace(long ssID) {
 
-		/**
-		 * Setter of the Server domain name
-		 *
-		 * @param domain - domain name
-		 * @return Builder object with new Server domain name
-		 */
-		public Builder Server(String domain) {
+            idsharedSpaceId = String.valueOf(ssID);
+            return this;
+        }
 
-			urlDomain = domain;
+        /**
+         * Sets the workspace id to be a long
+         *
+         * @param lId - workSpace id
+         * @return this instance
+         */
+        public Builder workSpace(long lId) {
 
-			return this;
-		}
+            workSpaceId = lId;
+            return this;
+        }
 
-		/**
-		 * The main build procedure which create the Octane objects,based on this steps :
-		 * 1. Build an HTTP request
-		 * 2. Handle response - Initialize Cookies keys
-		 * 3. Create a new Octane objects.
-		 *
-		 * @return a new Octane object
-		 */
-		public Octane build() {
+        /**
+         * Sets the domain and the port.  The domain should include the full http scheme (http/https)
+         * <br>
+         * eg <code>http://octane.server.com</code>
+         *
+         * @param domain - domain name including http scheme
+         * @param port   - port number
+         * @return this object
+         * @throws NullPointerException if the domain is null
+         */
+        public Builder Server(String domain, int port) {
 
-			Octane objOctane = null;
+            urlDomain = domain + ":" + String.valueOf(port);
 
-			logger.info("Building Octane context using %s", this);
-			OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain, authentication.getClientHeader());
-			if (octaneHttpClient.authenticate(authentication)) {
-				objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
-			}
+            return this;
+        }
 
-			return objOctane;
-		}
+        /**
+         * Sets the domain and the port.  The domain should include the full http scheme (http/https)
+         * <br>
+         * eg <code>http://octane.server.com</code>
+         *
+         * @param domain - domain name including http scheme
+         * @return this object
+         * @throws NullPointerException if the domain is null
+         */
+        public Builder Server(String domain) {
 
-		@Override
-		public String toString() {
-			return String.format("Server: %s2%s1SharedSpace: %s3Workspace: %s4", System.lineSeparator(), urlDomain, idsharedSpaceId, workSpaceId);
-		}
-	}
+            urlDomain = domain;
+
+            return this;
+        }
+
+        /**
+         * The main build procedure which creates the {@link Octane} object and authenticates against the server
+         *
+         * @return a new Octane instance which has the set context and is correctly authenticated
+         */
+        public Octane build() {
+
+            Octane objOctane = null;
+
+            logger.info("Building Octane context using %s", this);
+            OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain, authentication.getClientHeader());
+            if (octaneHttpClient.authenticate(authentication)) {
+                objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
+            }
+
+            return objOctane;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Server: %s2%s1SharedSpace: %s3Workspace: %s4", System.lineSeparator(), urlDomain, idsharedSpaceId, workSpaceId);
+        }
+    }
 }

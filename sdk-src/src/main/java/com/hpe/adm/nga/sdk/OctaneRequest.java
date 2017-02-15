@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +15,17 @@
 package com.hpe.adm.nga.sdk;
 
 /**
+ * An abstract representation of a request
  *
- * Octane request Interface
- * @author Moris oz
- *
- * @param <T>
+ * @param <T> The type of model that the request is returning.  For example {@link com.hpe.adm.nga.sdk.model.EntityModel}
  */
 public abstract class OctaneRequest<T> {
 
+	/**
+	 * Executes a call to the Octane server
+	 * @return instance of T from the server
+	 * @throws RuntimeException A problem occurred during runtime
+	 */
 	public abstract T execute() throws RuntimeException;
 
 }

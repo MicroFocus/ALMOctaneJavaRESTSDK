@@ -11,6 +11,7 @@
     <modules>
         <module>sdk-src</module>
         <module>sdk-integration-tests</module>
+        <module>sdk-usage-examples</module>
     </modules>
     <properties>
         <log4j.version>2.5</log4j.version>
@@ -125,6 +126,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.10.4</version>
                 </plugin>
             </plugins>
         </pluginManagement>
