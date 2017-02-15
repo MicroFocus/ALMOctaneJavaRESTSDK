@@ -24,5 +24,7 @@ from the root directory.
 In order to create javadoc run the following maven command from the `sdk-src` directory:
 
 ```
-some type of maven command
+mvn javadoc:javadoc
 ```
+
+This will create a javadoc site in the `sdk-src/target/site/apidocs` directory
