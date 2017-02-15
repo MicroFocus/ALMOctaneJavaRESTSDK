@@ -24,12 +24,12 @@ import java.util.Collection;
 public class Demo {
 
 	public static void main(String[] args) {
-		final String MY_APP_ID = "moris@korentec.co.il";
-	    final String MY_APP_SECRET = "Moris4095";
+		final String MY_APP_ID = "mymail@mail.com";
+	    final String MY_APP_SECRET = "mysecret";
 	    
 		Octane octane = (new Octane.Builder(
     		      new SimpleUserAuthentication(MY_APP_ID, MY_APP_SECRET)
-    		      )).Server("https://mqast001pngx.saas.hpe.com").sharedSpace(21025).workSpace(1002).build();
+    		      )).Server("http://localhost:8080").sharedSpace(1001).workSpace(1002).build();
 		
 		Metadata metadata = octane.metadata();
 		// all entities

@@ -86,11 +86,5 @@ public class EntityList {
 		return entityListService.delete();
 	}
 
-	/**
-	 * TBD - Remove after testing
-	 */
-	public Collection<EntityModel> testGetEntityModels(String jason)  {
 
-		return entityListService.testGetEntityModels(jason);
-	}
 }
