@@ -1,0 +1,118 @@
+package com.hpe.adm.nga.sdk.examples;
+
+import com.hpe.adm.nga.sdk.*;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.FieldModel;
+
+import java.util.Collection;
+import java.util.Set;
+
+/**
+ * Demonstrates how to manipulate entities
+ * Created by brucesp on 03-Jan-17.
+ */
+
+public class EntityExample {
+
+    /**
+     * Used as a placeholder.  The assumption is that there is a valid instance of the Octane context
+     */
+    private final Octane octane = null;
+
+    /**
+     * We are going to assume that we are manipulating defects
+     * Replace this with any entity type
+     */
+    private static final String ENTITY = "defects";
+
+    private final EntityList entityList;
+
+    public EntityExample() {
+        // we are going to set the entity context to be defects.  If you want to create a new entity context - just
+        // change this and a new instance will be created
+        entityList = octane.entityList(ENTITY);
+    }
+
+    /**
+     * Returns the entity ID 2010
+     */
+    public void getEntity() {
+        // the context of the entity list is set to ID 2010.
+        final EntityListService.Entities entity = entityList.at(2010);
+        // we are going to use this to GET the entity
+        final EntityListService.Entities.Get get = entity.get();
+        // this actually executes the REST request and gets the entity
+        final EntityModel entityModel = get.execute();
+
+        // the entity model can now be manipulated.  There will be only one since we are getting just one entity
+        // so for example we can get the name field
+        final FieldModel nameField = entityModel.getValue("name");
+
+        // and get its value.  Currently this is an Object since the SDK is not type aware
+        final Object value = nameField.getValue();
+
+        // we can also get all the fields as a set and iterate
+        final Set<FieldModel> values = entityModel.getValues();
+    }
+
+    /**
+     * Returns all entities of this type (defect)
+     */
+    public void getAllEntities() {
+        // the context is for all entities
+        final EntityListService.Get get = entityList.get();
+
+        // we execute the get.  This returns a collection; this can be queried as with one entity
+        final Collection<EntityModel> entityModels = get.execute();
+
+        // we can also add various parameters to the get
+        // limit the number of entities to 10
+        get.limit(10);
+        // start the offset at 11
+        get.offset(11);
+
+        // we ony want the fields "name" and "type"
+        get.addFields("name", "type");
+
+        // we want to order by ID (ascending)
+        get.addOrderBy("id", true);
+    }
+
+    /**
+     * Here we add queries
+     */
+    public void getAllEntitiesWithQuery() {
+        // the context is for all entities
+        final EntityListService.Get get = entityList.get();
+
+        // build query which is the equivalent to "id eq 2"
+        final Query.QueryBuilder idQueryBuilder = Query.statement("id", QueryMethod.EqualTo, 2);
+        // build the query which can then be used
+        final Query query = idQueryBuilder.build();
+
+        // add to the above query so that it will be "id eq 2; name eq "defect""
+        final Query.QueryBuilder queryBuilder = idQueryBuilder.and("name", QueryMethod.EqualTo, "defect");
+        // then build it
+        queryBuilder.build();
+
+        // show cross filter
+    }
+
+    /**
+     * Cross filter query
+     * <p>
+     * GET .../defects?query="user_tags EQ {id EQ 1001;(id EQ 5000000||id EQ 7000000)}"
+     */
+    public void getCrossFilterQuery() {
+        // the context is for all entities
+        final EntityListService.Get get = entityList.get();
+
+        final Query.QueryBuilder statement = Query.statement("user_tags", QueryMethod.EqualTo,
+                Query.statement("id", QueryMethod.EqualTo, 1001)
+                        .and(Query.statement("id", QueryMethod.EqualTo, 5000000)
+                                .or(Query.statement("id", QueryMethod.EqualTo, 7000000))));
+
+        // finally build it and create the Query object
+        statement.build();
+    }
+}

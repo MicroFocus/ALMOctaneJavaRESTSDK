@@ -11,6 +11,7 @@
     <modules>
         <module>sdk-src</module>
         <module>sdk-integration-tests</module>
+        <module>sdk-usage-examples</module>
     </modules>
     <properties>
         <log4j.version>2.5</log4j.version>
