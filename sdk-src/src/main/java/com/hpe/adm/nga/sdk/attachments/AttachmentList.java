@@ -30,8 +30,6 @@ import java.util.Collection;
  * </p>
  * <p>
  *     Attachments have different functionality depending on whether they are being created, updated, read or deleted.
- *     <br/>
- *
  * </p>
  */
 public class AttachmentList {
@@ -135,6 +133,8 @@ public class AttachmentList {
 		 * Setter of new entities to create and file to upload
 		 * @param entities - new entities to create
 		 * @param stream - file stream
+		 * @param type The content type
+		 * @param name The content name
 		 * @return - An Object with new data
 		 */
 		public Create entities(Collection<EntityModel> entities, InputStream stream, String type, String name ) {
@@ -257,7 +257,7 @@ public class AttachmentList {
 			
 			/**
 			 * Getter of an Update object with new Entity Model
-			 * @param entModel
+			 * @param entModel The entityModel
 			 * @return -an Update object with new Entity Model
 			 */
 			public Update entity(EntityModel entModel) {

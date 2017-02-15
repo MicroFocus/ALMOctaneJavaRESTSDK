@@ -24,7 +24,7 @@ public abstract class OctaneRequest<T> {
 	/**
 	 * Executes a call to the Octane server
 	 * @return instance of T from the server
-	 * @throws RuntimeException
+	 * @throws RuntimeException A problem occurred during runtime
 	 */
 	public abstract T execute() throws RuntimeException;
 

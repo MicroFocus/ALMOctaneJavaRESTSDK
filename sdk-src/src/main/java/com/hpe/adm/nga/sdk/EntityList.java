@@ -48,9 +48,9 @@ public class EntityList {
 
     /**
      * Returns an entity context.  This is the same as setting the context to:
-     * <br/>
+     * <br>
      * <code>[octane_url]/entity/entity_id</code>
-     * <br/>
+     * <br>
      * This does not yet make a call to the server as the HTTP method has not been set
      * @param entityId - The id of the entity
      * @return the entity context that can be used further to carry out the call to the server
@@ -62,9 +62,9 @@ public class EntityList {
     /**
      * Returns a context that will be used to <code>GET</code> from the server.  Because this is a collection no
      * id is sent.  This is the same  as setting the context to:
-     * <br/>
+     * <br>
      * <code>[octane_url]/entity</code>
-     * <br/>
+     * <br>
      * This does not yet make a call to the server but sets the context
      *
      * @return a context to the entity collection that will be used for GET
@@ -77,9 +77,9 @@ public class EntityList {
     /**
      * Returns a context that will be used to <code>PUT</code> from the server.  Because this is a collection no
      * id is sent.  This is the same  as setting the context to:
-     * <br/>
+     * <br>
      * <code>[octane_url]/entity</code>
-     * <br/>
+     * <br>
      * This does not yet make a call to the server but sets the context
      *
      * @return a context to the entity collection that will be used for PUT
@@ -92,9 +92,9 @@ public class EntityList {
     /**
      * Returns a context that will be used to <code>POST</code> from the server.  Because this is a collection no
      * id is sent.  This is the same  as setting the context to:
-     * <br/>
+     * <br>
      * <code>[octane_url]/entity</code>
-     * <br/>
+     * <br>
      * This does not yet make a call to the server but sets the context
      *
      * @return a context to the entity collection that will be used for POST
@@ -107,9 +107,9 @@ public class EntityList {
     /**
      * Returns a context that will be used to <code>DELETE</code> from the server.  Because this is a collection no
      * id is sent.  This is the same  as setting the context to:
-     * <br/>
+     * <br>
      * <code>[octane_url]/entity</code>
-     * <br/>
+     * <br>
      * This does not yet make a call to the server but sets the context
      *
      * @return a context to the entity collection that will be used for DELETE
