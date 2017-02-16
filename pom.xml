@@ -193,6 +193,7 @@
         <profile>
             <id>build-deployment</id>
             <build>
+<pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -216,6 +217,7 @@
                                 <id>attach-sources</id>
                                 <goals>
                                     <goal>jar</goal>
+				    <goal>test-jar</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -235,6 +237,7 @@
                         </executions>
                     </plugin>
                 </plugins>
+</pluginManagement>
             </build>
         </profile>
     </profiles>
