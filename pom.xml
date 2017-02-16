@@ -3,11 +3,42 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.hpe.adm.nga.sdk</groupId>
     <artifactId>sdk-root</artifactId>
     <packaging>pom</packaging>
-    <version>12.53.18-SNAPSHOT</version>
+    <version>12.53.16</version>
+
+    <name>HPE ALM Octane REST API SDK</name>
+    <description>The Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP</description>
+    <url>https://github.com/HPSoftware/ALMOctaneJavaRESTSDK</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/HPSoftware/ALMOctaneJavaRESTSDK</url>
+        <connection>scm:git:https://github.com/HPSoftware/ALMOctaneJavaRESTSDK.git</connection>
+        <developerConnection>scm:git:ssh://github.com:HPSoftware/ALMOctaneJavaRESTSDK.git</developerConnection>
+    </scm>
+
+    <organization>
+        <name>Hewlett Packard Enterprise</name>
+        <url>http://www.hpe.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Spencer Bruce</name>
+            <email>spencerbruce@hpe.com</email>
+            <organization>HPE</organization>
+        </developer>
+    </developers>
+
     <modules>
         <module>sdk-src</module>
         <module>sdk-integration-tests</module>
@@ -27,21 +58,10 @@
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <maven-release.version>2.5.3</maven-release.version>
         <maven-surefire.version>2.19.1</maven-surefire.version>
+        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
+        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
     </properties>
-    <distributionManagement>
-        <repository>
-            <id>mqm-prod</id>
-            <url>http://mydtbld0051.hpeswlab.net:8081/nexus/content/repositories/mqm-prod/</url>
-        </repository>
-        <snapshotRepository>
-            <id>mqm-snapshots</id>
-            <url>http://mydtbld0051.hpeswlab.net:8081/nexus/content/repositories/mqm-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-    <scm>
-        <developerConnection>scm:git:https://github.hpe.com/ALMOctane-Hackathon/JavaRESTSDK.git
-        </developerConnection>
-    </scm>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -130,7 +150,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.4</version>
+                    <version>${maven-javadoc-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -168,6 +188,53 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>build-deployment</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven-source-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
     </profiles>

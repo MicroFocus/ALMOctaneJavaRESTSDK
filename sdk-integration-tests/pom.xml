@@ -5,7 +5,7 @@
     <parent>
         <artifactId>sdk-root</artifactId>
         <groupId>com.hpe.adm.nga.sdk</groupId>
-        <version>12.53.18-SNAPSHOT</version>
+        <version>12.53.16</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,6 +40,21 @@
             <properties>
                 <skip-integration-tests>false</skip-integration-tests>
             </properties>
+        </profile>
+        <profile>
+            <id>build-deployment</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
     <build>
