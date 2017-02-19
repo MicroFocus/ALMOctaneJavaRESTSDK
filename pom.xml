@@ -131,12 +131,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-<distributionManagement>
-  <snapshotRepository>
-    <id>sonatype-nexus-snapshots</id>
-    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-  </snapshotRepository>
-</distributionManagement>
     <build>
         <pluginManagement>
             <plugins>
@@ -162,24 +156,13 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release.version}</version>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release</releaseProfiles>
-                    <goals>deploy</goals>
-                </configuration>
-            </plugin>
 <plugin>
   <groupId>org.sonatype.plugins</groupId>
   <artifactId>nexus-staging-maven-plugin</artifactId>
   <version>1.6.7</version>
   <extensions>true</extensions>
   <configuration>
-     <serverId>ossrh</serverId>
+     <serverId>release-repository</serverId>
      <nexusUrl>https://oss.sonatype.org/</nexusUrl>
      <autoReleaseAfterClose>true</autoReleaseAfterClose>
   </configuration>
@@ -187,6 +170,18 @@
 
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>release-repository</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshot-repository</id>
+            <name>Maven2 Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
     <profiles>
         <profile>
             <id>coverage</id>
