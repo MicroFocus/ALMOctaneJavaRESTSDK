@@ -33,7 +33,7 @@ public abstract class OctaneHttpRequest {
         POST_BINARY
     }
 
-    public static final String JSON_CONTENT_TYPE = "application/json";
+    public static final String JSON_CONTENT_TYPE = "application/json; charset=UTF-8";
     public static final String OCTET_STREAM_CONTENT_TYPE = "application/octet-stream";
 
     private final String requestUrl;

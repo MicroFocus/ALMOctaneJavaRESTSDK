@@ -27,6 +27,7 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,10 +56,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
 
+    private static final String TOKEN_EXIPIRED_ERROR_CODE = "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT";
+
     private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
     private final HttpRequestFactory requestFactory;
     private String lwssoValue = "";
     private final String urlDomain;
+    private Authentication lastUsedAuthentication;
 
     /**
      * Creates an HTTP client instance using the url and authentication.
@@ -99,6 +103,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
             HttpResponse response = executeRequest(httpRequest);
 
+            lastUsedAuthentication = authentication;
+
             // Initialize Cookies keys
             return response.isSuccessStatusCode();
         } catch (Exception e) {
@@ -126,8 +132,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
     }
 
-    @Override
-    public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest) {
+    /**
+     * Convert the abstract {@link OctaneHttpRequest}Request object to a specific {@link HttpRequest} for the google http client
+     * @param octaneHttpRequest input {@link OctaneHttpRequest}
+     * @return {@link HttpRequest}
+     */
+    private HttpRequest convertOctaneRequestToGoogleHttpRequest(OctaneHttpRequest octaneHttpRequest){
         final HttpRequest httpRequest;
         try {
             switch (octaneHttpRequest.getOctaneRequestMethod()) {
@@ -163,17 +173,48 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     break;
                 }
                 default: {
-                    throw new IllegalArgumentException("request method not known!");
+                    throw new IllegalArgumentException("Request method not known!");
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException("Problem creating httprequest", e);
         }
+        return httpRequest;
+    }
 
+    @Override
+    public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest){
+        return execute(octaneHttpRequest, true);
+    }
+
+    /**
+     * This method can be used internally to retry the request in case of auth token timeout
+     * Careful, this method calls itself recursively to retry the request
+     * @param octaneHttpRequest abstract request, has to be converted into a specific implementation of http request
+     * @param retryOnHttpResponseException if set to true, the method calls itself recursively if it encounters an HttpResponseException
+     * @return OctaneHttpResponse
+     */
+    private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, boolean retryOnHttpResponseException){
+
+        final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
         final HttpResponse httpResponse;
+
         try {
             httpResponse = executeRequest(httpRequest);
             return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
+
+        } catch (HttpResponseException e) {
+            if(retryOnHttpResponseException && isTokenExpired(e) && lastUsedAuthentication !=null){
+                logger.debug("Auth token timed out, re-logging...");
+                //try re-logging
+                authenticate(lastUsedAuthentication);
+
+                //Try the same request again, don't retry this time
+                return execute(octaneHttpRequest, false);
+            } else {
+                throw new RuntimeException("Problem executing httprequest", e);
+            }
+
         } catch (IOException e) {
             throw new RuntimeException("Problem executing httprequest", e);
         }
@@ -190,7 +231,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         HttpResponse response = httpRequest.execute();
         logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(), response.getHeaders().toString()));
-
         return response;
     }
 
@@ -228,6 +268,25 @@ public class GoogleHttpClient implements OctaneHttpClient {
         part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, octaneHttpRequest.getBinaryContentName())));
         content.addPart(part2);
         return content;
+    }
+
+    /**
+     * Try to determine whether exception was thrown because the auth token has expired server side
+     * This can happen if no request is made for a longer period of time,
+     * the token will expire if @method updateLWSSOCookieValue is not called regularly
+     * @param exception HttpResponseException throw by google http client
+     * @return true if the exception was because of a token timeout, false otherwise
+     */
+    private boolean isTokenExpired(HttpResponseException exception){
+        JSONObject statusMessageJson;
+        try{
+            statusMessageJson = new JSONObject(exception.getStatusMessage());
+        } catch (Exception e){
+            logger.debug("Failed to parse HttpResponseException getStatusMessage as JSON, isTokenExpired returning false, exception: " + e );
+            return false;
+        }
+
+        return statusMessageJson.has("errorCode") && TOKEN_EXIPIRED_ERROR_CODE.equals(statusMessageJson.getString("errorCode"));
     }
 
     /**
