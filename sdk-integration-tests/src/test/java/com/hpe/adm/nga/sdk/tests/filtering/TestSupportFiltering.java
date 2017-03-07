@@ -67,7 +67,7 @@ public class TestSupportFiltering extends TestBase {
     private void testFiltering(String logicalOperation) throws Exception {
         Set<FieldModel> fields = new HashSet<>();
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
-        Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
+        Collection<EntityModel> entityModels = DataGenerator.getAllDataForEntities(entityList.create().entities(generatedEntity).execute(),octane,entityName);
         EntityModel entityModel = entityModels.iterator().next();
         String entityName = CommonUtils.getValueFromEntityModel(entityModel, "name");
 

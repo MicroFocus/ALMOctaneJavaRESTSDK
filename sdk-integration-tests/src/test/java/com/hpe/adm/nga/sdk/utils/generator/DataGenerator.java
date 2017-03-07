@@ -55,6 +55,14 @@ public class DataGenerator {
         }
         return entities;
     }
+    public static Collection<EntityModel> getAllDataForEntities(Collection<EntityModel> entities, Octane octane, String entityType){
+        Collection<EntityModel> entitiesWithData = new ArrayList<>();
+        for(EntityModel entityModel : entities){
+            EntityModel entityModelWithData =  octane.entityList(entityType).at(Integer.parseInt(CommonUtils.getValueFromEntityModel(entityModel, "id"))).get().execute();
+            entitiesWithData.add(entityModelWithData);
+        }
+        return entitiesWithData;
+    }
 
     public static Collection<EntityModel> generateEntityModel(Octane octane, String entityName) throws Exception {
         Set<FieldModel> fields = new HashSet<>();
