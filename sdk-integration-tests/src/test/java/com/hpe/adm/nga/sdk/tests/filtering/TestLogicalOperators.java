@@ -17,7 +17,8 @@ package com.hpe.adm.nga.sdk.tests.filtering;
 
 import com.hpe.adm.nga.sdk.Query;
 import com.hpe.adm.nga.sdk.QueryMethod;
-import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
@@ -71,9 +72,9 @@ public class TestLogicalOperators extends TestBase {
     public static void setUp()throws Exception{
         Set<FieldModel> fields = new HashSet<>();
         Collection<EntityModel> generatedEntity1 = DataGenerator.generateEntityModel(octane, "defects", fields);
-        Collection<EntityModel> createdEntities = octane.entityList("defects").create().entities(generatedEntity1).execute();
+        Collection<EntityModel> createdEntities = DataGenerator.getAllDataForEntities(octane.entityList("defects").create().entities(generatedEntity1).execute(),octane,"defects");
         Collection<EntityModel> generatedEntity2 = DataGenerator.generateEntityModel(octane, "defects", fields);
-        Collection<EntityModel> createdEntities2 = octane.entityList("defects").create().entities(generatedEntity2).execute();
+        Collection<EntityModel> createdEntities2 = DataGenerator.getAllDataForEntities(octane.entityList("defects").create().entities(generatedEntity2).execute(),octane,"defects");
         createdEntities.addAll(createdEntities2);
         defectIds.addAll(CommonUtils.getIdFromEntityModelCollection(createdEntities));
         defectNames.addAll(CommonUtils.getValuesFromEntityModelCollection(createdEntities,"name"));
