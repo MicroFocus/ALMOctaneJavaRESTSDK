@@ -15,8 +15,8 @@
  */
 package com.hpe.adm.nga.sdk.utils;
 
+import com.hpe.adm.nga.sdk.AuthenticationProvider;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
 
 /**
  *
@@ -24,22 +24,22 @@ import com.hpe.adm.nga.sdk.authentication.Authentication;
  */
 public class ContextUtils {
 
-    public static Octane getContextSiteAdmin(String url, Authentication authentication) {
-        return getContext(url, authentication, "", "");
+    public static Octane getContextSiteAdmin(String url, AuthenticationProvider authenticationProvider) {
+        return getContext(url, authenticationProvider, "", "");
     }
 
-    public static Octane getContextSharedSpace(String url, Authentication authentication, String sharedSpaceId) {
-        return getContext(url, authentication, sharedSpaceId, "");
+    public static Octane getContextSharedSpace(String url, AuthenticationProvider authenticationProvider, String sharedSpaceId) {
+        return getContext(url, authenticationProvider, sharedSpaceId, "");
     }
 
-    public static Octane getContextWorkspace(String url, Authentication authentication, String sharedSpaceId, String workspaceId) {
-        return getContext(url, authentication, sharedSpaceId, workspaceId);
+    public static Octane getContextWorkspace(String url, AuthenticationProvider authenticationProvider, String sharedSpaceId, String workspaceId) {
+        return getContext(url, authenticationProvider, sharedSpaceId, workspaceId);
     }
 
-    private static Octane getContext(String url, Authentication authentication, String sharedSpaceId, String workspaceId) {
-        Octane octane = null;
+    private static Octane getContext(String url, AuthenticationProvider authenticationProvider, String sharedSpaceId, String workspaceId) {
+        Octane octane;
         try {
-            Octane.Builder builder = new Octane.Builder(authentication).Server(url);
+            Octane.Builder builder = new Octane.Builder(authenticationProvider).Server(url);
 
             if (!sharedSpaceId.isEmpty()) {
                 builder = builder.sharedSpace(Long.valueOf(sharedSpaceId));

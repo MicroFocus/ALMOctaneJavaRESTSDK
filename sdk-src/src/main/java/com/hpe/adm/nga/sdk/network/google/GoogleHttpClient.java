@@ -19,6 +19,7 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.hpe.adm.nga.sdk.AuthenticationProvider;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
@@ -62,16 +63,15 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final HttpRequestFactory requestFactory;
     private String lwssoValue = "";
     private final String urlDomain;
-    private Authentication lastUsedAuthentication;
+    private AuthenticationProvider authenticationProvider;
 
-    /**
-     * Creates an HTTP client instance using the url and authentication.
-     *
-     * @param urlDomain The source URL of the Octane server
-     * @param clientTypeHeader The special client type that can be sent to the API
-     */
-    public GoogleHttpClient(final String urlDomain, final String clientTypeHeader) {
+    public GoogleHttpClient(final String urlDomain, AuthenticationProvider authenticationProvider) {
         this.urlDomain = urlDomain;
+        this.authenticationProvider = authenticationProvider;
+
+        Authentication authentication = authenticationProvider.getAuthentication();
+        String clientTypeHeader = authentication.getClientHeader();
+
         HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         requestFactory = HTTP_TRANSPORT
                 .createRequestFactory(request -> {
@@ -92,18 +92,25 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
                     request.setReadTimeout(60000);
                 });
+
+        //authenticate();
+    }
+
+    @Override
+    public void setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
+        //authenticate();
     }
 
     /**
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
-    public boolean authenticate(Authentication authentication) {
+    public boolean authenticate() {
+        Authentication authentication = authenticationProvider.getAuthentication();
         try {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
             HttpResponse response = executeRequest(httpRequest);
-
-            lastUsedAuthentication = authentication;
 
             // Initialize Cookies keys
             return response.isSuccessStatusCode();
@@ -204,10 +211,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
             return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
 
         } catch (HttpResponseException e) {
-            if(retryOnHttpResponseException && isTokenExpired(e) && lastUsedAuthentication !=null){
+            if(retryOnHttpResponseException && isTokenExpired(e)){
                 logger.debug("Auth token timed out, re-logging...");
                 //try re-logging
-                authenticate(lastUsedAuthentication);
+                authenticate();
 
                 //Try the same request again, don't retry this time
                 return execute(octaneHttpRequest, false);

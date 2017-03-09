@@ -21,6 +21,6 @@ import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 public class QuickExample {
 
     public static void main (String [] args) throws Exception {
-        Octane octane = new Octane.Builder(new SimpleUserAuthentication("sa@nga", "Welcome1")).build();
+        Octane octane = new Octane.Builder(() -> new SimpleUserAuthentication("sa@nga", "Welcome1")).build();
     }
 }

@@ -15,14 +15,14 @@
  */
 package com.hpe.adm.nga.sdk.tests.base;
 
+import com.hpe.adm.nga.sdk.AuthenticationProvider;
 import com.hpe.adm.nga.sdk.EntityList;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
+import com.hpe.adm.nga.sdk.utils.XmlAuthenticationProvider;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
@@ -31,11 +31,15 @@ import org.junit.BeforeClass;
  * Created by Guy Guetta on 12/04/2016.
  */
 public class TestBase {
+
     protected static Octane octane;
     protected static String entityName = "";
     private static String entityTypeOld = "";
+
     protected static EntityList entityList;
     protected static Metadata metadata;
+
+    private static AuthenticationProvider authenticationProvider = new XmlAuthenticationProvider();
 
     static {
         // for local execution
@@ -51,11 +55,10 @@ public class TestBase {
 
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authentication authentication = AuthenticationUtils.getAuthentication();
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         String workspaceId = configuration.getString("sdk.workspaceId");
 
-        octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
+        octane = ContextUtils.getContextWorkspace(url, authenticationProvider, sharedSpaceId, workspaceId);
         metadata = octane.metadata();
     }
 

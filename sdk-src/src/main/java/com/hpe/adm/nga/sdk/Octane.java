@@ -161,19 +161,19 @@ public class Octane {
         private String urlDomain = "";
         private String idsharedSpaceId = null;
         private long workSpaceId = 0;
-        private final Authentication authentication;
+        private final AuthenticationProvider authenticationProvider;
 
         //Functions
-
         /**
-         * Creates a new Builder object using the correct authentication
-         *
-         * @param authentication - Authentication object.  Cannot be null
-         * @throws NullPointerException if the authentication object is null
+         * Sets the {@link AuthenticationProvider} object the SDK will use each time it has to perform authentication with the server
+         * Be careful with your {@link AuthenticationProvider} instance lifecycle,
+         * as the SDK might try to call {@link AuthenticationProvider#getAuthentication()} method
+         * when needed
+         * @param authenticationProvider an implementation of {@link AuthenticationProvider}
          */
-        public Builder(Authentication authentication) {
-            assert authentication != null;
-            this.authentication = authentication;
+        public Builder(AuthenticationProvider authenticationProvider) {
+            assert authenticationProvider != null;
+            this.authenticationProvider = authenticationProvider;
         }
 
         /**
@@ -252,16 +252,13 @@ public class Octane {
          * @return a new Octane instance which has the set context and is correctly authenticated
          */
         public Octane build() {
-
-            Octane objOctane = null;
-
             logger.info("Building Octane context using %s", this);
-            OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain, authentication.getClientHeader());
-            if (octaneHttpClient.authenticate(authentication)) {
-                objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
-            }
+            OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain, authenticationProvider);
 
-            return objOctane;
+            if(octaneHttpClient.authenticate()){
+                return new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
+            }
+            return null;
         }
 
         @Override

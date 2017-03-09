@@ -36,7 +36,7 @@ public class CreateContextExample {
         Authentication userPassAuthentication = new SimpleUserAuthentication("user", "password");
 
         // get instance of Octane Builder
-        final Octane.Builder octaneBuilder = new Octane.Builder(clientAuthentication);
+        final Octane.Builder octaneBuilder = new Octane.Builder(() -> clientAuthentication);
 
         // now we can add the server
         octaneBuilder.Server("http://server.com:3232");
