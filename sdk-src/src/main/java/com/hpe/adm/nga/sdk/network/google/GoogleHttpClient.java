@@ -21,6 +21,7 @@ import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.hpe.adm.nga.sdk.AuthenticationProvider;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.AuthenticationUtil;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -233,7 +234,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         final HttpContent content = httpRequest.getContent();
         if (content != null) {
             content.writeTo(byteArrayOutputStream);
-            logger.debug("Content: " + byteArrayOutputStream.toString());
+            logger.debug("Content: " + AuthenticationUtil.removeAuthDataForLogger(byteArrayOutputStream.toString()));
         }
 
         HttpResponse response = httpRequest.execute();
