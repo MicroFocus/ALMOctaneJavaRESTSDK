@@ -18,8 +18,10 @@ package com.hpe.adm.nga.sdk.authentication;
 
 /**
  *
- * Interface of Authentication , hold contract functions.
- *
+ * Interface of Authentication , hold contract functions. <br>
+ * Provided implementations: {@link SimpleUserAuthentication}, {@link ClientAuthentication} <br>
+ * Note that the default implementations keep the credentials in memory. <br>
+ * It is recommended that you implement {@link #getAuthenticationString() getAuthenticationString} so that the credentials are not stored in memory.
  */
 public interface Authentication {
 
