@@ -19,7 +19,6 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.hpe.adm.nga.sdk.AuthenticationProvider;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.AuthenticationUtil;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
@@ -62,14 +61,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final HttpRequestFactory requestFactory;
     private String lwssoValue = "";
     private final String urlDomain;
-    private AuthenticationProvider authenticationProvider;
+    private Authentication lastUsedAuthentication;
 
-    public GoogleHttpClient(final String urlDomain, AuthenticationProvider authenticationProvider) {
+    public GoogleHttpClient(final String urlDomain) {
         this.urlDomain = urlDomain;
-        this.authenticationProvider = authenticationProvider;
 
-        Authentication authentication = authenticationProvider.getAuthentication();
-        String clientTypeHeader = authentication.getClientHeader();
+        //String clientTypeHeader = authentication.getClientHeader();
 
         HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         requestFactory = HTTP_TRANSPORT
@@ -85,34 +82,27 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         request.getHeaders().setCookie(LWSSO_COOKIE_KEY + "=" + lwssoValue);
                     }
 
-                    if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
-                        request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
+                    if(lastUsedAuthentication != null) {
+                        String clientTypeHeader = lastUsedAuthentication.getClientHeader();
+                        if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
+                            request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
+                        }
                     }
-
                     request.setReadTimeout(60000);
                 });
 
         //authenticate();
     }
 
-    @Override
-    public void setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
-        this.authenticationProvider = authenticationProvider;
-        //authenticate();
-    }
-
     /**
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
-    public boolean authenticate() {
-        if(authenticationProvider == null){
-            throw new OctaneException(new ErrorModel("OctaneHttpClient AuthenticationProvider was not set"));
-        }
-
-        Authentication authentication = authenticationProvider.getAuthentication();
+    public boolean authenticate(Authentication authentication) {
+        lastUsedAuthentication = authentication;
         try {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
+
             HttpResponse response = executeRequest(httpRequest);
 
             // Initialize Cookies keys
@@ -140,8 +130,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
             logger.error("Error in contacting server: ", e);
             throw new OctaneException(errorModel);
         }
-
-        authenticationProvider = null;
     }
 
     /**
@@ -225,7 +213,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     try {
                         //NOTE: if the credentials are somehow invalidated after your Octane objects has been created,
                         // this will retry authentication @code retryCount times, even if the @method authenticate() throws the exception
-                        authenticate();
+                        authenticate(lastUsedAuthentication);
                     } catch (OctaneException ex){
                         logger.debug("Exception while retrying authentication: " + ex.getMessage() + ", retries left: " + retryCount);
                     }
@@ -247,6 +235,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final HttpContent content = httpRequest.getContent();
         if (content != null) {
+
+            //httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)
+
             content.writeTo(byteArrayOutputStream);
             logger.debug("Content: " + AuthenticationUtil.removeAuthDataForLogger(byteArrayOutputStream.toString()));
         }

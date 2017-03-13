@@ -15,7 +15,7 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
-import com.hpe.adm.nga.sdk.AuthenticationProvider;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
 
 /**
  *
@@ -32,23 +32,13 @@ public interface OctaneHttpClient {
     String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
 
     /**
-     * Sets the {@link AuthenticationProvider} object the HTTP client will use each time it has to perform authentication with the server
-     * Be careful with your {@link AuthenticationProvider} instance lifecycle,
-     * as the HTTP client might try to call {@link AuthenticationProvider#getAuthentication()} method
-     * when needed
-     * @param authenticationProvider an implementation of {@link AuthenticationProvider}
+     * Authenticate with the Octane server using an implementation of the {@link Authentication} class
+     * @return true if the authentication was successful, false otherwise
      */
-    void setAuthenticationProvider(AuthenticationProvider authenticationProvider);
+    boolean authenticate(Authentication authentication);
 
     /**
-     * Attempts to use the {@link AuthenticationProvider} class to authenticate with the Octane server
-     * @throws com.hpe.adm.nga.sdk.exception.OctaneException if the authentication provider was not set
-     * @return true if authentication successful, false otherwise
-     */
-    boolean authenticate();
-
-    /**
-     * Signs out and removes cookies, the authentication provider is set to null
+     * Signs out and removes cookies
      */
     void signOut();
 
