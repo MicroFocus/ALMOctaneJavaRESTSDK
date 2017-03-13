@@ -107,7 +107,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             // Initialize Cookies keys
             return response.isSuccessStatusCode();
         } catch (Exception e) {
-
+            lastUsedAuthentication = null; //not reusable
             ErrorModel errorModel = new ErrorModel(e.getMessage());
             logger.error("Error in contacting server: ", e);
             throw new OctaneException(errorModel);
@@ -207,7 +207,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
                 //Attempt to re-authenticate in case of auth issue
                 if(e.getStatusCode() == 401 || e.getStatusCode() == 403) {
-                    logger.debug("Auth token timed out, re-logging...");
+                    logger.debug("Auth token invalid, trying to re-authenticate");
 
                     try {
                         //NOTE: if the credentials are somehow invalidated after your Octane objects has been created,
@@ -312,5 +312,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
 
         return renewed;
+    }
+
+    public static int getHttpRequestRetryCount() {
+        return HTTP_REQUEST_RETRY_COUNT;
     }
 }
