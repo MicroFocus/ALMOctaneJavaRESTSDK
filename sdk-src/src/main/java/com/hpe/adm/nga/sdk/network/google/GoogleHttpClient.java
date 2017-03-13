@@ -29,7 +29,6 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -57,8 +56,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"; filename=\"blob\"";
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
-
-    private static final String TOKEN_EXIPIRED_ERROR_CODE = "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT";
+    private static final int HTTP_REQUEST_RETRY_COUNT = 2;
 
     private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
     private final HttpRequestFactory requestFactory;
@@ -107,6 +105,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
     public boolean authenticate() {
+        if(authenticationProvider == null){
+            throw new OctaneException(new ErrorModel("OctaneHttpClient AuthenticationProvider was not set"));
+        }
+
         Authentication authentication = authenticationProvider.getAuthentication();
         try {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
@@ -138,6 +140,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
             logger.error("Error in contacting server: ", e);
             throw new OctaneException(errorModel);
         }
+
+        authenticationProvider = null;
     }
 
     /**
@@ -192,17 +196,17 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     @Override
     public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest){
-        return execute(octaneHttpRequest, true);
+        return execute(octaneHttpRequest, HTTP_REQUEST_RETRY_COUNT);
     }
 
     /**
      * This method can be used internally to retry the request in case of auth token timeout
      * Careful, this method calls itself recursively to retry the request
      * @param octaneHttpRequest abstract request, has to be converted into a specific implementation of http request
-     * @param retryOnHttpResponseException if set to true, the method calls itself recursively if it encounters an HttpResponseException
+     * @param retryCount number of times the method should retry the request if it encounters an HttpResponseException
      * @return OctaneHttpResponse
      */
-    private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, boolean retryOnHttpResponseException){
+    private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, int retryCount){
 
         final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
         final HttpResponse httpResponse;
@@ -212,13 +216,23 @@ public class GoogleHttpClient implements OctaneHttpClient {
             return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
 
         } catch (HttpResponseException e) {
-            if(retryOnHttpResponseException && isTokenExpired(e)){
-                logger.debug("Auth token timed out, re-logging...");
-                //try re-logging
-                authenticate();
+            if(retryCount > 0){
+
+                //Attempt to re-authenticate in case of auth issue
+                if(e.getStatusCode() == 401 || e.getStatusCode() == 403) {
+                    logger.debug("Auth token timed out, re-logging...");
+
+                    try {
+                        //NOTE: if the credentials are somehow invalidated after your Octane objects has been created,
+                        // this will retry authentication @code retryCount times, even if the @method authenticate() throws the exception
+                        authenticate();
+                    } catch (OctaneException ex){
+                        logger.debug("Exception while retrying authentication: " + ex.getMessage() + ", retries left: " + retryCount);
+                    }
+                }
 
                 //Try the same request again, don't retry this time
-                return execute(octaneHttpRequest, false);
+                return execute(octaneHttpRequest, --retryCount);
             } else {
                 throw new RuntimeException("Problem executing httprequest", e);
             }
@@ -276,25 +290,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
         part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, octaneHttpRequest.getBinaryContentName())));
         content.addPart(part2);
         return content;
-    }
-
-    /**
-     * Try to determine whether exception was thrown because the auth token has expired server side
-     * This can happen if no request is made for a longer period of time,
-     * the token will expire if @method updateLWSSOCookieValue is not called regularly
-     * @param exception HttpResponseException throw by google http client
-     * @return true if the exception was because of a token timeout, false otherwise
-     */
-    private boolean isTokenExpired(HttpResponseException exception){
-        JSONObject statusMessageJson;
-        try{
-            statusMessageJson = new JSONObject(exception.getStatusMessage());
-        } catch (Exception e){
-            logger.debug("Failed to parse HttpResponseException getStatusMessage as JSON, isTokenExpired returning false, exception: " + e );
-            return false;
-        }
-
-        return statusMessageJson.has("errorCode") && TOKEN_EXIPIRED_ERROR_CODE.equals(statusMessageJson.getString("errorCode"));
     }
 
     /**

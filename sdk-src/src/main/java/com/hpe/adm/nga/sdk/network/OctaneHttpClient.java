@@ -48,7 +48,7 @@ public interface OctaneHttpClient {
     boolean authenticate();
 
     /**
-     * Signs out and removes cookies, the authentication provider is not affected
+     * Signs out and removes cookies, the authentication provider is set to null
      */
     void signOut();
 
