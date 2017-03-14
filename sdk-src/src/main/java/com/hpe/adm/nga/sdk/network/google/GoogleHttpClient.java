@@ -54,7 +54,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"; filename=\"blob\"";
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
-    private static final int HTTP_REQUEST_RETRY_COUNT = 2;
+    private static final int HTTP_REQUEST_RETRY_COUNT = 1;
 
     private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
     private final HttpRequestFactory requestFactory;
@@ -214,16 +214,17 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         // this will retry authentication @code retryCount times, even if the @method authenticate() throws the exception
                         authenticate(lastUsedAuthentication);
                     } catch (OctaneException ex){
-                        logger.debug("Exception while retrying authentication: " + ex.getMessage() + ", retries left: " + retryCount);
+                        logger.debug("Exception while retrying authentication: " + ex.getMessage());
                     }
                 }
+
+                logger.debug("Retrying request, retries left: " + retryCount);
 
                 //Try the same request again, don't retry this time
                 return execute(octaneHttpRequest, --retryCount);
             } else {
                 throw new RuntimeException("Problem executing httprequest", e);
             }
-
         } catch (IOException e) {
             throw new RuntimeException("Problem executing httprequest", e);
         }

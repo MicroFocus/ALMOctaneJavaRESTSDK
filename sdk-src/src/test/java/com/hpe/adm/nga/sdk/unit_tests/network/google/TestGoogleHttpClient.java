@@ -16,7 +16,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.powermock.api.mockito.PowerMockito.*;
-import static org.powermock.api.mockito.PowerMockito.doThrow;
 
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
@@ -29,21 +28,17 @@ public class TestGoogleHttpClient {
     private static HttpResponseException forbiddenException
             = new HttpResponseException.Builder(401, "Unauthorized", new HttpHeaders()).build();
 
-    /**
-     * Needed because the http client has to create a valid http request object
-     */
-    private static final String VALID_URL = "http://domain.com/path";
-
     @Test
     public void testRequestRetry() throws Exception {
 
         GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient(""));
 
+        doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
+
         doThrow(forbiddenException)
                 .when(googleHttpClientSpy, "executeRequest", Matchers.any(HttpRequest.class));
 
-
-        OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest(VALID_URL);
+        OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("");
 
         try {
             googleHttpClientSpy.execute(request);
@@ -58,6 +53,11 @@ public class TestGoogleHttpClient {
                 googleHttpClientSpy,
                 times(GoogleHttpClient.getHttpRequestRetryCount() + 1))
                 .invoke("execute", any(), anyInt());
+
+
+
+
+
     }
 
 
