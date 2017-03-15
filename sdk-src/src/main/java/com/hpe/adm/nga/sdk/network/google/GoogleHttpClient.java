@@ -62,35 +62,35 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final String urlDomain;
     private Authentication lastUsedAuthentication;
 
+    /**
+     * Request initializer called on every request made by the requestFactory
+     */
+    private HttpRequestInitializer requestInitializer = request -> {
+        request.setResponseInterceptor(response -> {
+            // retrieve new LWSSO in response if any
+            HttpHeaders responseHeaders = response.getHeaders();
+            updateLWSSOCookieValue(responseHeaders);
+        });
+
+        request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
+
+        if (lwssoValue != null && !lwssoValue.isEmpty()) {
+            request.getHeaders().setCookie(LWSSO_COOKIE_KEY + "=" + lwssoValue);
+        }
+
+        if(lastUsedAuthentication != null) {
+            String clientTypeHeader = lastUsedAuthentication.getClientHeader();
+            if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
+                request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
+            }
+        }
+        request.setReadTimeout(60000);
+    };
+
     public GoogleHttpClient(final String urlDomain) {
         this.urlDomain = urlDomain;
-
-        //String clientTypeHeader = authentication.getClientHeader();
-
         HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-        requestFactory = HTTP_TRANSPORT
-                .createRequestFactory(request -> {
-                    request.setResponseInterceptor(response -> {
-                        // retrieve new LWSSO in response if any
-                        HttpHeaders responseHeaders = response.getHeaders();
-                        updateLWSSOCookieValue(responseHeaders);
-                    });
-                    request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
-
-                    if (lwssoValue != null && !lwssoValue.isEmpty()) {
-                        request.getHeaders().setCookie(LWSSO_COOKIE_KEY + "=" + lwssoValue);
-                    }
-
-                    if(lastUsedAuthentication != null) {
-                        String clientTypeHeader = lastUsedAuthentication.getClientHeader();
-                        if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
-                            request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
-                        }
-                    }
-                    request.setReadTimeout(60000);
-                });
-
-        //authenticate();
+        requestFactory = HTTP_TRANSPORT.createRequestFactory(requestInitializer);
     }
 
     /**
@@ -220,7 +220,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
                 logger.debug("Retrying request, retries left: " + retryCount);
 
-                //Try the same request again, don't retry this time
+                //Try the same request again
                 return execute(octaneHttpRequest, --retryCount);
             } else {
                 throw new RuntimeException("Problem executing httprequest", e);
