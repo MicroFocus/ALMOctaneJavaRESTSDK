@@ -255,7 +255,7 @@ public class Octane {
 
             Octane objOctane = null;
 
-            logger.info("Building Octane context using %s", this);
+            logger.info("Building Octane context using {}", this);
             OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain);
             if (octaneHttpClient.authenticate(authentication)) {
                 objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
@@ -266,7 +266,11 @@ public class Octane {
 
         @Override
         public String toString() {
-            return String.format("Server: %s2%s1SharedSpace: %s3Workspace: %s4", System.lineSeparator(), urlDomain, idsharedSpaceId, workSpaceId);
+            return "Builder{" +
+                    "urlDomain='" + urlDomain + '\'' +
+                    ", idsharedSpaceId='" + idsharedSpaceId + '\'' +
+                    ", workSpaceId=" + workSpaceId +
+                    '}';
         }
     }
 }

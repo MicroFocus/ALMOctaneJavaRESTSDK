@@ -35,17 +35,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *
  * HTTP Client using Google's API
- *
- * This will be refactored in future releases to enable the use of different underlying APIs
- * <p>
- * Created by leufl on 2/11/2016.
+ * <p>This will be refactored in future releases to enable the use of different underlying APIs<p>
  */
 public class GoogleHttpClient implements OctaneHttpClient {
 
-    private static final String LOGGER_REQUEST_FORMAT = "Request: %s - %s - %s";
-    private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
+    private static final String LOGGER_REQUEST_FORMAT = "Request: {} - {} - {}";
+    private static final String LOGGER_RESPONSE_FORMAT = "Response: {} - {} - {}";
+
     private static final String SET_COOKIE = "set-cookie";
     private static final String HTTP_MEDIA_TYPE_MULTIPART_NAME = "multipart/form-data";
     private static final String HTTP_MULTIPART_BOUNDARY_NAME = "boundary";
@@ -78,7 +75,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             request.getHeaders().setCookie(LWSSO_COOKIE_KEY + "=" + lwssoValue);
         }
 
-        if(lastUsedAuthentication != null) {
+        if (lastUsedAuthentication != null) {
             String clientTypeHeader = lastUsedAuthentication.getClientHeader();
             if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
                 request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
@@ -109,7 +106,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         } catch (Exception e) {
             lastUsedAuthentication = null; //not reusable
             ErrorModel errorModel = new ErrorModel(e.getMessage());
-            logger.error("Error in contacting server: ", e);
+            logger.error("Error in contacting server: {}, ", e.getMessage());
             throw new OctaneException(errorModel);
         }
     }
@@ -133,10 +130,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     /**
      * Convert the abstract {@link OctaneHttpRequest}Request object to a specific {@link HttpRequest} for the google http client
+     *
      * @param octaneHttpRequest input {@link OctaneHttpRequest}
      * @return {@link HttpRequest}
      */
-    private HttpRequest convertOctaneRequestToGoogleHttpRequest(OctaneHttpRequest octaneHttpRequest){
+    private HttpRequest convertOctaneRequestToGoogleHttpRequest(OctaneHttpRequest octaneHttpRequest) {
         final HttpRequest httpRequest;
         try {
             switch (octaneHttpRequest.getOctaneRequestMethod()) {
@@ -182,18 +180,19 @@ public class GoogleHttpClient implements OctaneHttpClient {
     }
 
     @Override
-    public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest){
+    public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest) {
         return execute(octaneHttpRequest, HTTP_REQUEST_RETRY_COUNT);
     }
 
     /**
      * This method can be used internally to retry the request in case of auth token timeout
      * Careful, this method calls itself recursively to retry the request
+     *
      * @param octaneHttpRequest abstract request, has to be converted into a specific implementation of http request
-     * @param retryCount number of times the method should retry the request if it encounters an HttpResponseException
+     * @param retryCount        number of times the method should retry the request if it encounters an HttpResponseException
      * @return OctaneHttpResponse
      */
-    private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, int retryCount){
+    private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, int retryCount) {
 
         final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
         final HttpResponse httpResponse;
@@ -216,19 +215,18 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         // this will retry authentication @code retryCount times, even if the @method authenticate() throws the exception
                         authenticate(lastUsedAuthentication);
                     } catch (OctaneException ex) {
-                        logger.debug("Exception while retrying authentication: " + ex.getMessage());
+                        logger.debug("Exception while retrying authentication: {}", ex.getMessage());
                     }
 
                     //Only retry if you've actually handled the exception in some way
                     //Retrying a 400 bad request makes no sense without some kind of handling
-                    logger.debug("Retrying request, retries left: " + retryCount);
+                    logger.debug("Retrying request, retries left: {}", retryCount);
                     return execute(octaneHttpRequest, --retryCount);
                 }
             }
 
-
-            logger.debug("The request was retried " + (HTTP_REQUEST_RETRY_COUNT - retryCount)
-                    + " time(s), the exception could not be handled");
+            logger.debug("The request was retried {} time(s), the exception could not be handled",
+                            HTTP_REQUEST_RETRY_COUNT - retryCount);
 
             throw new RuntimeException("Problem executing httprequest", e);
 
@@ -238,21 +236,21 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     }
 
-    private HttpResponse executeRequest (final HttpRequest httpRequest) throws IOException {
-        logger.debug(String.format(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl(), httpRequest.getHeaders().toString()));
+    private HttpResponse executeRequest(final HttpRequest httpRequest) throws IOException {
+        logger.debug(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(), httpRequest.getHeaders().toString());
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final HttpContent content = httpRequest.getContent();
         if (content != null) {
             content.writeTo(byteArrayOutputStream);
 
             //Do not print the body of the sign in request
-            if(!httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)){
+            if (!httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)) {
                 logger.debug("Content: " + byteArrayOutputStream.toString());
             }
         }
 
         HttpResponse response = httpRequest.execute();
-        logger.debug(String.format(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(), response.getHeaders().toString()));
+        logger.debug(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(), response.getHeaders().toString());
         return response;
     }
 
