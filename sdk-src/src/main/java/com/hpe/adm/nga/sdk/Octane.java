@@ -266,11 +266,7 @@ public class Octane {
 
         @Override
         public String toString() {
-            return "Builder{" +
-                    "urlDomain='" + urlDomain + '\'' +
-                    ", idsharedSpaceId='" + idsharedSpaceId + '\'' +
-                    ", workSpaceId=" + workSpaceId +
-                    '}';
+            return String.format("Server: %s SharedSpace: %s Workspace: %s", urlDomain, idsharedSpaceId, workSpaceId);
         }
     }
 }
