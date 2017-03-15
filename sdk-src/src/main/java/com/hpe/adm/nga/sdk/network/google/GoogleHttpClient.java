@@ -201,33 +201,41 @@ public class GoogleHttpClient implements OctaneHttpClient {
         try {
             httpResponse = executeRequest(httpRequest);
             return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
-
         } catch (HttpResponseException e) {
-            if(retryCount > 0){
 
+            //Try to handle the exception
+            if (retryCount > 0) {
+
+                //Try to handle 401/403 exceptions
                 //Attempt to re-authenticate in case of auth issue
-                if(e.getStatusCode() == 401 || e.getStatusCode() == 403) {
+                if (e.getStatusCode() == 401 || e.getStatusCode() == 403) {
                     logger.debug("Auth token invalid, trying to re-authenticate");
 
                     try {
                         //NOTE: if the credentials are somehow invalidated after your Octane objects has been created,
                         // this will retry authentication @code retryCount times, even if the @method authenticate() throws the exception
                         authenticate(lastUsedAuthentication);
-                    } catch (OctaneException ex){
+                    } catch (OctaneException ex) {
                         logger.debug("Exception while retrying authentication: " + ex.getMessage());
                     }
+
+                    //Only retry if you've actually handled the exception in some way
+                    //Retrying a 400 bad request makes no sense without some kind of handling
+                    logger.debug("Retrying request, retries left: " + retryCount);
+                    return execute(octaneHttpRequest, --retryCount);
                 }
-
-                logger.debug("Retrying request, retries left: " + retryCount);
-
-                //Try the same request again
-                return execute(octaneHttpRequest, --retryCount);
-            } else {
-                throw new RuntimeException("Problem executing httprequest", e);
             }
+
+
+            logger.debug("The request was retried " + (HTTP_REQUEST_RETRY_COUNT - retryCount)
+                    + " time(s), the exception could not be handled");
+
+            throw new RuntimeException("Problem executing httprequest", e);
+
         } catch (IOException e) {
             throw new RuntimeException("Problem executing httprequest", e);
         }
+
     }
 
     private HttpResponse executeRequest (final HttpRequest httpRequest) throws IOException {
