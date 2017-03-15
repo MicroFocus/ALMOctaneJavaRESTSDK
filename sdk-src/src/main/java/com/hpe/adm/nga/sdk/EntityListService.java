@@ -29,6 +29,7 @@ import org.json.JSONTokener;
 
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -346,7 +347,7 @@ public class EntityListService {
 
                     DateFormat df = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
                     try {
-                        Date result = df.parse(aObj.toString());
+                        Date result = getDateInLocalTimeZoneFromUTC(df.parse(aObj.toString()));
                         fldModel = new DateFieldModel(strKey, result);
                     } catch (Exception ex) {
                         logger.debug(aObj + LOGGER_INVALID_DATE_SCHEME_FORMAT);
@@ -363,6 +364,23 @@ public class EntityListService {
 
         entityModel = new EntityModel(fieldModels);
         return entityModel;
+    }
+
+    private Date getDateInLocalTimeZoneFromUTC(Date date){
+        //Get the time info and add the server timezone
+        TimeZone serverTimeZone = TimeZone.getTimeZone("UTC");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+        String strDateString = formatter.format(date);
+        strDateString+=" "+serverTimeZone.getID();
+        //change to local time zone
+        formatter.setTimeZone(TimeZone.getDefault());
+        formatter.applyPattern("dd MMM yyyy HH:mm:ss z");
+        Date scheduleTime = null;
+        try {
+            scheduleTime =  formatter.parse(strDateString);
+        } catch (ParseException e) {}
+
+        return scheduleTime;
     }
 
 
