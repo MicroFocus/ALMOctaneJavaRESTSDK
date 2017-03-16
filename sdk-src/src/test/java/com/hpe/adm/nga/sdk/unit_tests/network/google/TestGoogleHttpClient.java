@@ -3,14 +3,17 @@ package com.hpe.adm.nga.sdk.unit_tests.network.google;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponseException;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -34,6 +37,8 @@ public class TestGoogleHttpClient {
         GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient(""));
 
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
+        doReturn(true).when(googleHttpClientSpy, "authenticate", any(Authentication.class));
+        Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
 
         doThrow(forbiddenException)
                 .when(googleHttpClientSpy, "executeRequest", Matchers.any(HttpRequest.class));
@@ -53,13 +58,5 @@ public class TestGoogleHttpClient {
                 googleHttpClientSpy,
                 times(GoogleHttpClient.getHttpRequestRetryCount() + 1))
                 .invoke("execute", any(), anyInt());
-
-
-
-
-
     }
-
-
-
 }
