@@ -120,6 +120,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             if (response.isSuccessStatusCode()) {
                 HttpHeaders hdr1 = response.getHeaders();
                 updateLWSSOCookieValue(hdr1);
+                lastUsedAuthentication = null;
             }
         } catch (Exception e) {
             ErrorModel errorModel = new ErrorModel(e.getMessage());
@@ -207,7 +208,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
                 //Try to handle 401/403 exceptions
                 //Attempt to re-authenticate in case of auth issue
-                if (e.getStatusCode() == 401 || e.getStatusCode() == 403) {
+                if ((e.getStatusCode() == 401 || e.getStatusCode() == 403) && lastUsedAuthentication != null) {
                     logger.debug("Auth token invalid, trying to re-authenticate");
 
                     try {
