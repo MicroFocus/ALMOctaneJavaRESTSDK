@@ -35,6 +35,6 @@ public class TestAuthentication extends TestBase {
         try {
             Collection<EntityModel> defectModel = octane.entityList("stories").get().execute();
             Assert.fail("Sign out failed.");
-        } catch (OctaneException e) { }
+        } catch (OctaneException e) {}
     }
 }
