@@ -18,7 +18,6 @@ package com.hpe.adm.nga.sdk.examples;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
-import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 
 /**
  * Creates a simple context
@@ -27,27 +26,34 @@ import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
  */
 public class CreateContextExample {
 
+    public static void main (String [] args){
+        new CreateContextExample().createContext();
+    }
+
     public void createContext() {
         // two types of authentication
         // 1) API Ket
-        Authentication clientAuthentication = new SimpleClientAuthentication("client_id", "client_secret");
+        Authentication clientAuthentication = new SimpleClientAuthentication("sa@nga", "Welcome1");
 
         // 2) User/pass
-        Authentication userPassAuthentication = new SimpleUserAuthentication("user", "password");
+        //Authentication userPassAuthentication = new SimpleUserAuthentication("user", "password");
 
         // get instance of Octane Builder
         final Octane.Builder octaneBuilder = new Octane.Builder(clientAuthentication);
 
         // now we can add the server
-        octaneBuilder.Server("http://server.com:3232");
+        octaneBuilder.Server("http://myd-vm10632.hpeswlab.net:8081");
         // the sharedspace
-        octaneBuilder.sharedSpace(323213231);
+        octaneBuilder.sharedSpace(1001);
         // the workspace
-        octaneBuilder.workSpace(32313);
+        octaneBuilder.workSpace(1002);
 
         // finally we build the context and get an Octane instance:
 
         Octane octane = octaneBuilder.build();
+
+       // octane.entityList("defects").get().limit(2).execute();
+        octane.entityList("defects").get().execute();
     }
 
 }

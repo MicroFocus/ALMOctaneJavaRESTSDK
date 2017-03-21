@@ -26,8 +26,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -40,7 +43,6 @@ public class TestModel {
 	private static Set<FieldModel> set;
 	private String expectedResult;
 	private String gotResult;
-	private static SimpleDateFormat dateFormat;
 	
 	@BeforeClass
 	public static void initializeOnCreate(){	
@@ -52,7 +54,6 @@ public class TestModel {
 		} catch(Exception ex){
 			fail("Failed with exception: " + ex);
 		}
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 	
 	@Before
@@ -157,8 +158,8 @@ public class TestModel {
 	
 	@Test
 	public void testEntityModelWithDateField() {
-		Date now = new Date();
-		expectedResult = "{\"field\":\"" + dateFormat.format(now)+ "\"}";
+		ZonedDateTime now = ZonedDateTime.now();
+		expectedResult = "{\"field\":\"" + now.toString() + "\"}";
 		set.add(new DateFieldModel("field", now));		
 		model = new EntityModel(set);
 		try{
@@ -185,8 +186,8 @@ public class TestModel {
 	
 	@Test
 	public void testComplexEntityModel(){
-		Date now = new Date();
-		expectedResult = "{\"longField\":200,\"RefField\":{\"falseValue\":false,\"trueValue\":true},\"dateField\":\"" + dateFormat.format(now) + "\",\"stringField\":\"first\",\"multiRefField\":{\"exceeds_total_count\":false,\"data\":[{\"falseValue\":false,\"trueValue\":true},{\"falseValue\":false,\"trueValue\":true}],\"total_count\":2},\"boolField\":true}";
+		ZonedDateTime now = ZonedDateTime.now();
+		expectedResult = "{\"longField\":200,\"RefField\":{\"falseValue\":false,\"trueValue\":true},\"dateField\":\"" + now.toString() + "\",\"stringField\":\"first\",\"multiRefField\":{\"exceeds_total_count\":false,\"data\":[{\"falseValue\":false,\"trueValue\":true},{\"falseValue\":false,\"trueValue\":true}],\"total_count\":2},\"boolField\":true}";
 		
 		Set<FieldModel> refSet = new HashSet<>();
 		refSet.add(new BooleanFieldModel("trueValue", true));

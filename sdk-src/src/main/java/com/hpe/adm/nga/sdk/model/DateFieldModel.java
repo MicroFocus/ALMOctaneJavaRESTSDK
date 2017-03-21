@@ -15,19 +15,23 @@
  */
 package com.hpe.adm.nga.sdk.model;
 
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  *
- * This class hold the DateFieldModel objects and serve as a Date type FieldModel data holder 
+ * This class holds the DateFieldModel objects and serves as a ZonedDateTime type FieldModel data holder.  Note according to
+ * the Octane server specification all dates are stored in the UTC time zone.  Therefore when sending information to the
+ * server the timezone is converted to UTC (whilst keeping the same instant).  All dates that are returned are in the UTC
+ * time zone and it is up to the consumer to convert to the correct time zone if necessary
  *
  *
  */
-public class DateFieldModel implements FieldModel<Date> {
+public class DateFieldModel implements FieldModel<ZonedDateTime> {
 	
 	//Private 
 		private String name = "";
-		private Date value = null;
+		private ZonedDateTime value = null;
 		
 		/**
 		 * Creates a new DateFieldModel object
@@ -35,15 +39,15 @@ public class DateFieldModel implements FieldModel<Date> {
 		 * @param newName - Field name
 		 * @param newValue - Field Value
 		 */
-		public DateFieldModel(String newName,Date newValue){
+		public DateFieldModel(String newName,ZonedDateTime newValue){
 			
 			setValue(newName,newValue);
 		}
 		
 		/**
-		 * get value
+		 * get the date in the UTC time zone
 		 */
-		public Date getValue()	{
+		public ZonedDateTime getValue()	{
 			return value;
 		}
 
@@ -55,12 +59,12 @@ public class DateFieldModel implements FieldModel<Date> {
 		}
 		
 		/**
-		 * set Field's name/value
+		 * set Field's name/value.  The timezone will be converted to UTC upon being sent to the server
 		 */
-		public void setValue(String newName,Date newValue){
+		public void setValue(String newName,ZonedDateTime newValue){
 			
 			name = newName;
-			value = newValue;
+			value = newValue.withZoneSameInstant(ZoneId.of("Z"));
 		}
 
 

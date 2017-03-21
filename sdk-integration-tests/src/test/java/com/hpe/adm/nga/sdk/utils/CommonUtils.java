@@ -15,12 +15,13 @@
  */
 package com.hpe.adm.nga.sdk.utils;
 
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
+import com.hpe.adm.nga.sdk.model.*;
 
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -96,7 +97,10 @@ public class CommonUtils {
             if (!fieldA.getClass().equals(fieldB.getClass())) return false;
 
             if (fieldA.getValue() != null) {
-                if (!fieldA.getClass().equals(ReferenceFieldModel.class)) {
+                if (fieldA.getClass().equals(DateFieldModel.class)){
+                    if (!((ZonedDateTime)fieldA.getValue()).isEqual(((ZonedDateTime)fieldB.getValue()))) return false;
+                }
+                else if (!fieldA.getClass().equals(ReferenceFieldModel.class)) {
                     if (!fieldA.getValue().equals(fieldB.getValue())) return false;
                 } else {
                     if (fieldB.getValue() == null) return false;

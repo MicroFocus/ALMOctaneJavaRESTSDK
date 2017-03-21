@@ -28,9 +28,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -56,9 +54,6 @@ public class EntityListService {
     private static final long HTTPS_CONFLICT_STATUS_CODE = 409;
     private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = " field scheme is invalid";
     private static final String REGEX_DATE_FORMAT = "\\d{4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z";
-    private static final String DATE_TIME_ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-    private static final String LOGGER_INVALID_DATE_SCHEME_FORMAT = " date scheme is invalid";
-
 
     // private members
     private final String urlDomain;
@@ -250,15 +245,6 @@ public class EntityListService {
             Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
             fieldValue = getEntitiesJSONObject(entities);
 
-        } else if (fieldModel.getClass() == DateFieldModel.class) {
-
-            DateFormat df = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
-            try {
-                fieldValue = df.format(fieldModel.getValue());
-            } catch (Exception ex) {
-                logger.debug(fieldModel.getValue().toString() + LOGGER_INVALID_DATE_SCHEME_FORMAT);
-            }
-
         } else {
 
             fieldValue = fieldModel.getValue();
@@ -345,13 +331,9 @@ public class EntityListService {
                 boolean isMatch = aObj.toString().matches(REGEX_DATE_FORMAT);
                 if (isMatch) {
 
-                    DateFormat df = new SimpleDateFormat(DATE_TIME_ISO_FORMAT);
-                    try {
-                        Date result = getDateInLocalTimeZoneFromUTC(df.parse(aObj.toString()));
-                        fldModel = new DateFieldModel(strKey, result);
-                    } catch (Exception ex) {
-                        logger.debug(aObj + LOGGER_INVALID_DATE_SCHEME_FORMAT);
-                    }
+                    final ZonedDateTime zonedDateTime = ZonedDateTime.parse(aObj.toString());
+                    fldModel = new DateFieldModel(strKey, zonedDateTime);
+
                 } else {
                     fldModel = new StringFieldModel(strKey, aObj.toString());
                 }
@@ -365,24 +347,6 @@ public class EntityListService {
         entityModel = new EntityModel(fieldModels);
         return entityModel;
     }
-
-    private Date getDateInLocalTimeZoneFromUTC(Date date){
-        //Get the time info and add the server timezone
-        TimeZone serverTimeZone = TimeZone.getTimeZone("UTC");
-        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
-        String strDateString = formatter.format(date);
-        strDateString+=" "+serverTimeZone.getID();
-        //change to local time zone
-        formatter.setTimeZone(TimeZone.getDefault());
-        formatter.applyPattern("dd MMM yyyy HH:mm:ss z");
-        Date scheduleTime = null;
-        try {
-            scheduleTime =  formatter.parse(strDateString);
-        } catch (ParseException e) {}
-
-        return scheduleTime;
-    }
-
 
     /**
      * Get Error models based on a given error json string

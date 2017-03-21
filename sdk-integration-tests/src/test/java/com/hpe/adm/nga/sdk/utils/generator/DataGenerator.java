@@ -24,6 +24,7 @@ import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -153,8 +154,8 @@ public class DataGenerator {
     private static EntityModel generateRelease() throws ParseException {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_release_" + UUID.randomUUID());
-        FieldModel startDate = new DateFieldModel("start_date", DATE_FORMAT.parse("2015-03-14T12:00:00Z"));
-        FieldModel endDate = new DateFieldModel("end_date", DATE_FORMAT.parse("2016-03-14T12:00:00Z"));
+        FieldModel startDate = new DateFieldModel("start_date", ZonedDateTime.parse("2015-03-14T12:00:00Z"));
+        FieldModel endDate = new DateFieldModel("end_date", ZonedDateTime.parse("2016-03-14T12:00:00Z"));
         fields.add(name);
         fields.add(startDate);
         fields.add(endDate);
@@ -164,7 +165,7 @@ public class DataGenerator {
     private static EntityModel generateMilestone() throws ParseException {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_milestone_" + UUID.randomUUID());
-        FieldModel date = new DateFieldModel("date", DATE_FORMAT.parse("2016-03-17T12:00:00Z"));
+        FieldModel date = new DateFieldModel("date", ZonedDateTime.parse("2016-03-17T12:00:00Z"));
         fields.add(name);
         fields.add(date);
         return new EntityModel(fields);

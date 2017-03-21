@@ -16,7 +16,10 @@
 package com.hpe.adm.nga.sdk.tests.crud;
 
 import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.model.DateFieldModel;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.FieldModel;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
@@ -24,10 +27,11 @@ import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
- *
  * Created by Guy Guetta on 21/04/2016.
  */
 public class TestUpdateEntity extends TestBase {
@@ -37,7 +41,7 @@ public class TestUpdateEntity extends TestBase {
     }
 
     @Test
-    public void testUpdateEntityById() throws Exception{
+    public void testUpdateEntityById() throws Exception {
 
         String updatedNameValue = "updatedName" + UUID.randomUUID();
         Set<FieldModel> fields = new HashSet<>();
@@ -60,13 +64,13 @@ public class TestUpdateEntity extends TestBase {
     @Test
     public void testUpdateEntityCollectionIdInBody() throws Exception {
 
-        List<String> updatedNameValues =  DataGenerator.generateNamesForUpdate();
+        List<String> updatedNameValues = DataGenerator.generateNamesForUpdate();
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
-        for(int i = 0; i < entityIds.size(); i++) {
+        for (int i = 0; i < entityIds.size(); i++) {
             Set<FieldModel> fields = new HashSet<>();
             StringFieldModel nameField = new StringFieldModel("name", updatedNameValues.get(i));
             StringFieldModel id = new StringFieldModel("id", entityIds.get(i).toString());
@@ -91,11 +95,7 @@ public class TestUpdateEntity extends TestBase {
 
         String entityName = "releases";
 
-        Calendar updatedEndDateValue =  Calendar.getInstance();
-        updatedEndDateValue.set(Calendar.MILLISECOND, 0);
-        updatedEndDateValue.set(Calendar.SECOND, 0);
-        updatedEndDateValue.set(Calendar.MINUTE, 0);
-        updatedEndDateValue.set(Calendar.HOUR_OF_DAY, 12);
+        ZonedDateTime updatedEndDateValue = ZonedDateTime.now().withHour(12).withMinute(0).withSecond(0).withNano(0).withZoneSameLocal(ZoneId.of("Z"));
 
         Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = octane.entityList(entityName).create().entities(generatedDefect).execute();
@@ -103,7 +103,7 @@ public class TestUpdateEntity extends TestBase {
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
 
-        DateFieldModel nameField = new DateFieldModel("end_date", updatedEndDateValue.getTime());
+        DateFieldModel nameField = new DateFieldModel("end_date", updatedEndDateValue);
         Set<FieldModel> fields = new HashSet<>();
 
         fields.add(nameField);
