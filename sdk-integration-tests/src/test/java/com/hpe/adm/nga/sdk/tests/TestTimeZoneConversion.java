@@ -41,7 +41,5 @@ public class TestTimeZoneConversion extends TestBase {
 
         Assert.assertEquals(TIME_DIFFERENCE, ChronoUnit.HOURS.between(serverZuluTimeDate, mockZuluDateTime));
         Assert.assertEquals(TIME_DIFFERENCE, ChronoUnit.HOURS.between(convertedLocalDateTime, mockLocalDateTime));
-        System.out.println(serverZuluTimeDate.withZoneSameInstant(ZoneOffset.ofHours(1)));
-        System.out.println(serverZuluTimeDate.withZoneSameInstant(ZoneId.of("America/Los_Angeles")));
     }
 }
