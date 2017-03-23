@@ -33,16 +33,14 @@ import java.util.Set;
 public class EntityExample {
 
     /**
-     * Used as a placeholder.  The assumption is that there is a valid instance of the Octane context
-     */
-    private final Octane octane = null;
-
-    /**
      * We are going to assume that we are manipulating defects
      * Replace this with any entity type
      */
     private static final String ENTITY = "defects";
-
+    /**
+     * Used as a placeholder.  The assumption is that there is a valid instance of the Octane context
+     */
+    private final Octane octane = null;
     private final EntityList entityList;
 
     public EntityExample() {
@@ -75,6 +73,8 @@ public class EntityExample {
 
     /**
      * All the dates that are returned by the SDK are in Zulu time (UTC)
+     * Because the SDK uses the java 1.8 time library there is an easy way to convert the time into whatever time zone you want
+     * This method show an example on how you can do that for the creation time of an entity.
      */
     public void convertServerZuluTimeToLocalTime() {
         // the context of the entity list is set to ID 2010.
@@ -96,7 +96,7 @@ public class EntityExample {
 
         // One hour Offset
         ZonedDateTime oneHourOffsetDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneOffset.ofHours(1));
-        
+
         //America/Los_Angeles
         ZonedDateTime americaDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneId.of("America/Los_Angeles"));
     }
