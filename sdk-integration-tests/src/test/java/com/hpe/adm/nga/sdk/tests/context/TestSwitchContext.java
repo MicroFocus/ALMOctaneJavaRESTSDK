@@ -34,7 +34,7 @@ import java.util.Collection;
  */
 public class TestSwitchContext {
 
-//    @Test
+    //    @Test
     public void contextSiteAdmin() throws Exception {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");

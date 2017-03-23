@@ -32,13 +32,13 @@ public interface OctaneHttpClient {
     String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
 
     /**
-     * @param authentication The object that is used to authenticate
-     * @return - Returns true if the authentication succeeded, false otherwise.
+     * Authenticate with the Octane server using an implementation of the {@link Authentication} class
+     * @return true if the authentication was successful, false otherwise
      */
     boolean authenticate(Authentication authentication);
 
     /**
-     * signs out and removes cookies
+     * Signs out and removes cookies
      */
     void signOut();
 
