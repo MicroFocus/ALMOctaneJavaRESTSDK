@@ -19,6 +19,9 @@ import com.hpe.adm.nga.sdk.*;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Set;
 
@@ -68,6 +71,30 @@ public class EntityExample {
 
         // we can also get all the fields as a set and iterate
         final Set<FieldModel> values = entityModel.getValues();
+    }
+
+    /**
+     * All the dates that are returned by the SDK are in Zulu time (UTC)
+     */
+    public void convertServerZuluTimeToLocalTime() {
+        // the context of the entity list is set to ID 2010.
+        final EntityListService.Entities entity = entityList.at(2010);
+        // we are going to use this to GET the entity
+        final EntityListService.Entities.Get get = entity.get();
+        // this actually executes the REST request and gets the entity
+        final EntityModel entityModel = get.execute();
+
+        // as an example we will take the creation time for this entity
+        final FieldModel creationTimeField = entityModel.getValue("creation_time");
+        // for the Date and Time the SDK uses the java.time library.
+        ZonedDateTime serverZuluTimeDate = (ZonedDateTime) creationTimeField.getValue();
+        // After you have the time in Zulu time (UTC) you can convert it in whatever time zone you what
+        // LOCAL TIME
+        ZonedDateTime convertedLocalDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneId.systemDefault());
+        // One hour Offset
+        ZonedDateTime oneHourOffsetDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneOffset.ofHours(1));
+        //America/Los_Angeles
+        ZonedDateTime americaDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneId.of("America/Los_Angeles");
     }
 
     /**
