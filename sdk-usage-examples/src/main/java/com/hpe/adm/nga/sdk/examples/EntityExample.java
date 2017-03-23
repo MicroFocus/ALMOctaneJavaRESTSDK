@@ -86,15 +86,19 @@ public class EntityExample {
 
         // as an example we will take the creation time for this entity
         final FieldModel creationTimeField = entityModel.getValue("creation_time");
+
         // for the Date and Time the SDK uses the java.time library.
         ZonedDateTime serverZuluTimeDate = (ZonedDateTime) creationTimeField.getValue();
+
         // After you have the time in Zulu time (UTC) you can convert it in whatever time zone you what
         // LOCAL TIME
         ZonedDateTime convertedLocalDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneId.systemDefault());
+
         // One hour Offset
         ZonedDateTime oneHourOffsetDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneOffset.ofHours(1));
+        
         //America/Los_Angeles
-        ZonedDateTime americaDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneId.of("America/Los_Angeles");
+        ZonedDateTime americaDateTime = serverZuluTimeDate.withZoneSameInstant(ZoneId.of("America/Los_Angeles"));
     }
 
     /**
