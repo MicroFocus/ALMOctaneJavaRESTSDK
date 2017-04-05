@@ -54,15 +54,15 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
 
     private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
-    private final HttpRequestFactory requestFactory;
-    private String lwssoValue = "";
-    private final String urlDomain;
-    private Authentication lastUsedAuthentication;
+    protected HttpRequestFactory requestFactory;
+    protected String lwssoValue = "";
+    protected final String urlDomain;
+    protected Authentication lastUsedAuthentication;
 
     /**
      * Request initializer called on every request made by the requestFactory
      */
-    private HttpRequestInitializer requestInitializer = request -> {
+    protected HttpRequestInitializer requestInitializer = request -> {
         request.setResponseInterceptor(response -> {
             // retrieve new LWSSO in response if any
             HttpHeaders responseHeaders = response.getHeaders();

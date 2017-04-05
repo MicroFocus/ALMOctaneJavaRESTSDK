@@ -49,7 +49,9 @@ package com.hpe.adm.nga.sdk;
  */
 public class Query {
 
-    private String queryString = "";
+    protected String queryString = "";
+
+    protected Query() {}
 
     /**
      * Negates the given query string

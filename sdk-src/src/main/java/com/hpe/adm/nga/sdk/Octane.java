@@ -158,10 +158,10 @@ public class Octane {
     public static class Builder {
         //Private
         private final Logger logger = LogManager.getLogger(Octane.class.getName());
-        private String urlDomain = "";
-        private String idsharedSpaceId = null;
-        private long workSpaceId = 0;
-        private final Authentication authentication;
+        protected String urlDomain = "";
+        protected String idsharedSpaceId = null;
+        protected long workSpaceId = 0;
+        protected final Authentication authentication;
 
         //Functions
 
@@ -256,12 +256,16 @@ public class Octane {
             Octane objOctane = null;
 
             logger.info("Building Octane context using {}", this);
-            OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain);
+            OctaneHttpClient octaneHttpClient = createOctaneHttpClient();
             if (octaneHttpClient.authenticate(authentication)) {
                 objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
             }
 
             return objOctane;
+        }
+
+        protected OctaneHttpClient createOctaneHttpClient(){
+            return new GoogleHttpClient(urlDomain);
         }
 
         @Override
