@@ -22,6 +22,8 @@ import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 /**
@@ -93,10 +95,10 @@ public class Octane {
     /**
      * Creates a new Metadata object.  This represents the following URL:
      * <p>
-     *     <code>[workspace_url/metadata</code>
+     * <code>[workspace_url/metadata</code>
      * </p>
      * <p>
-     *     This can then be used further to get metadata information from the server
+     * This can then be used further to get metadata information from the server
      * </p>
      *
      * @return A new Metadata object that holds the metadata context
@@ -109,7 +111,7 @@ public class Octane {
     /**
      * Creates a new AttachmentList object.  This returns the context for attachments.  This is equivalent to
      * <br>
-     *  <code>[workspace_url/attachments</code>
+     * <code>[workspace_url/attachments</code>
      *
      * @return A new AttachmentList object that holds the attachments context
      */
@@ -156,6 +158,9 @@ public class Octane {
      * Once the correct context has been built up use the {@link #build()} method to create the <code>Octane</code> instance
      */
     public static class Builder {
+
+        public static final String OCTANE_HTTP_CLIENT_CLASS_NAME = "octaneHttpClientClassName";
+
         //Private
         private final Logger logger = LogManager.getLogger(Octane.class.getName());
         protected String urlDomain = "";
@@ -264,8 +269,47 @@ public class Octane {
             return objOctane;
         }
 
-        protected OctaneHttpClient createOctaneHttpClient(){
-            return new GoogleHttpClient(urlDomain);
+        /**
+         * The implementation used for the {@link OctaneHttpClient} can be configured using the
+         * "{@value #OCTANE_HTTP_CLIENT_CLASS_NAME}" system property. <br>
+         * The value of this property has to be the fully qualified name of a class which implements {@link OctaneHttpClient}. <br>
+         * The implementation must have a single argument constructor with a String parameter.
+         * The urlDomain value given to the builder is passed to the {@link OctaneHttpClient} through this constructor.
+         * @return
+         */
+        private OctaneHttpClient createOctaneHttpClient() {
+            String octaneHttpClientClassName = System.getProperty(OCTANE_HTTP_CLIENT_CLASS_NAME);
+
+            if (octaneHttpClientClassName != null) {
+                logger.info("Creating OctaneHttpClient using implementation {}", octaneHttpClientClassName);
+                //Use reflection to instantiate the class
+                Class<OctaneHttpClient> clazz;
+                try {
+                    clazz = (Class<OctaneHttpClient>) Class.forName(octaneHttpClientClassName);
+                } catch (ClassNotFoundException e) {
+                    logger.error(e);
+                    throw new RuntimeException("Failed to find class with name: " + octaneHttpClientClassName, e);
+                }
+
+                Constructor<?> ctor;
+                try {
+                    ctor = clazz.getConstructor(String.class);
+                } catch (NoSuchMethodException e) {
+                    logger.error(e);
+                    throw new RuntimeException(
+                            "Failed to instantiate class " + octaneHttpClientClassName + "," +
+                                    " does not have a single string argument constructor", e);
+                }
+
+                try {
+                    return (OctaneHttpClient) ctor.newInstance(urlDomain);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    logger.error(e);
+                    throw new RuntimeException("Failed to instantiate class " + octaneHttpClientClassName, e);
+                }
+            } else {
+                return new GoogleHttpClient(urlDomain);
+            }
         }
 
         @Override
