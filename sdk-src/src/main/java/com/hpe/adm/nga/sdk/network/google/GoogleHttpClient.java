@@ -135,7 +135,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @param octaneHttpRequest input {@link OctaneHttpRequest}
      * @return {@link HttpRequest}
      */
-    private HttpRequest convertOctaneRequestToGoogleHttpRequest(OctaneHttpRequest octaneHttpRequest) {
+    protected HttpRequest convertOctaneRequestToGoogleHttpRequest(OctaneHttpRequest octaneHttpRequest) {
         final HttpRequest httpRequest;
         try {
             switch (octaneHttpRequest.getOctaneRequestMethod()) {
@@ -180,6 +180,16 @@ public class GoogleHttpClient implements OctaneHttpClient {
         return httpRequest;
     }
 
+    /**
+     * Convert google implementation of {@link HttpResponse} to an implementation abstract {@link OctaneHttpResponse}
+     * @param httpResponse
+     * @return
+     * @throws IOException
+     */
+    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) throws IOException {
+        return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
+    }
+
     @Override
     public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest) {
         return execute(octaneHttpRequest, HTTP_REQUEST_RETRY_COUNT);
@@ -200,7 +210,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         try {
             httpResponse = executeRequest(httpRequest);
-            return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
+            return convertHttpResponseToOctaneHttpResponse(httpResponse);
         } catch (HttpResponseException e) {
 
             //Try to handle the exception
