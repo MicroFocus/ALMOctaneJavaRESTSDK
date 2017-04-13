@@ -241,12 +241,20 @@ public class Query {
         }
 
         /**
-         * Wrap current builder content into a parenthesis
+         * Wraps current builder content into a parenthesis
          * @return
          */
-        public QueryBuilder parenthesis() {
+        private QueryBuilder parenthesis() {
             queryString = "(" + queryString + ")";
             return this;
+        }
+
+        /**
+         * Wraps current builder content into a parenthesis
+         * @return enclose the inner query of the QueryBuilder in parenthesis
+         */
+        public static QueryBuilder parenthesis(QueryBuilder queryBuilder) {
+            return queryBuilder.parenthesis();
         }
     }
 
