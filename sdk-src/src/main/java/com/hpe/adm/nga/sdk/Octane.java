@@ -163,10 +163,10 @@ public class Octane {
 
         //Private
         private final Logger logger = LogManager.getLogger(Octane.class.getName());
-        protected String urlDomain = "";
-        protected String idsharedSpaceId = null;
-        protected long workSpaceId = 0;
-        protected final Authentication authentication;
+        private String urlDomain = "";
+        private String idsharedSpaceId = null;
+        private long workSpaceId = 0;
+        private final Authentication authentication;
 
         //Functions
 
