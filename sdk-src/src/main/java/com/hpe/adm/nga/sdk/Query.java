@@ -16,36 +16,35 @@
 package com.hpe.adm.nga.sdk;
 
 /**
- *
  * <p>
- *   The class to build complex queries.  An instance of this class is created using the {@link #statement(String, QueryMethod, Object)} or
- *   {@link #not(String, QueryMethod, Object)} methods.
- *   </p>
- *   <p>
- *   See the REST API documentation for information as to how to build queries.  This API supports building queries in a simplified Builder pattern
- *   </p>
- *   <p>
- *       Each query statement consists of the field name, query method and the object of the query.  The object can be a simple primitive or a further {@code Query} object
- *   </p>
- *   <p>
- *       For example:
- *       <br>
- *       To build a query such as {@code name eq 'entity_name'} the following code is used:
- *       <br><code>Query.statement("name", QueryMethod.EqualTo, "entity_name");</code><br>
- *       <br>
- *       To negate this statement such as {@code !name eq 'entity_name'} the following code is used:
- *       <br><code>Query.not("name", QueryMethod.EqualTo, "entity_name");</code><br>
- *   </p>
- *   <p>
- *       These statements produce a {@code QueryBuilder} object.  By calling the {@link QueryBuilder#build()} method this creates a {@code Query object} which can then
- *       be used in conjunction with entity or other contexts
- *   </p>
- *   <p>
- *       {@code Query} objects can be chained together (and/or) by using the correct methods such as {@link QueryBuilder#and(QueryBuilder)} or
- *       {@link QueryBuilder#orNot(String, QueryMethod, Object)}
- *       <br>
- *       {@link QueryBuilder#build()} should be called once the entire query has been built
- *   </p>
+ * The class to build complex queries.  An instance of this class is created using the {@link #statement(String, QueryMethod, Object)} or
+ * {@link #not(String, QueryMethod, Object)} methods.
+ * </p>
+ * <p>
+ * See the REST API documentation for information as to how to build queries.  This API supports building queries in a simplified Builder pattern
+ * </p>
+ * <p>
+ * Each query statement consists of the field name, query method and the object of the query.  The object can be a simple primitive or a further {@code Query} object
+ * </p>
+ * <p>
+ * For example:
+ * <br>
+ * To build a query such as {@code name eq 'entity_name'} the following code is used:
+ * <br><code>Query.statement("name", QueryMethod.EqualTo, "entity_name");</code><br>
+ * <br>
+ * To negate this statement such as {@code !name eq 'entity_name'} the following code is used:
+ * <br><code>Query.not("name", QueryMethod.EqualTo, "entity_name");</code><br>
+ * </p>
+ * <p>
+ * These statements produce a {@code QueryBuilder} object.  By calling the {@link QueryBuilder#build()} method this creates a {@code Query object} which can then
+ * be used in conjunction with entity or other contexts
+ * </p>
+ * <p>
+ * {@code Query} objects can be chained together (and/or) by using the correct methods such as {@link QueryBuilder#and(QueryBuilder)} or
+ * {@link QueryBuilder#orNot(String, QueryMethod, Object)}
+ * <br>
+ * {@link QueryBuilder#build()} should be called once the entire query has been built
+ * </p>
  */
 public class Query {
 
@@ -53,6 +52,7 @@ public class Query {
 
     /**
      * Negates the given query string
+     *
      * @param queryString - input query string
      * @return resulting string after negation
      */
@@ -62,8 +62,9 @@ public class Query {
 
     /**
      * QueryBuilder Statement
-     * @param fieldName - field name
-     * @param method - comparison function to use
+     *
+     * @param fieldName  - field name
+     * @param method     - comparison function to use
      * @param fieldValue - value to compare with
      * @return The new object that can be used to build the query
      */
@@ -73,8 +74,9 @@ public class Query {
 
     /**
      * QueryBuilder not
-     * @param fieldName - field name
-     * @param method - comparison function to use
+     *
+     * @param fieldName  - field name
+     * @param method     - comparison function to use
      * @param fieldValue - value to compare with
      * @return The new object that can be used to build the query
      */
@@ -84,6 +86,7 @@ public class Query {
 
     /**
      * Constructor
+     *
      * @param builder - the query builder to use for building the query
      */
     private Query(QueryBuilder builder) {
@@ -92,6 +95,7 @@ public class Query {
 
     /**
      * Accessor method of query string
+     *
      * @return query string
      */
     public String getQueryString() {
@@ -99,7 +103,7 @@ public class Query {
     }
 
     /**
-     * @return  a string representation of the object.
+     * @return a string representation of the object.
      */
     @Override
     public String toString() {
@@ -108,6 +112,7 @@ public class Query {
 
     /**
      * Object that is used to build {@link Query} objects.
+     *
      * @see Query for more information
      */
     public static class QueryBuilder {
@@ -120,6 +125,7 @@ public class Query {
 
         /**
          * Accessor method for the query builder string.
+         *
          * @return query builder's string
          */
         private String getQueryString() {
@@ -128,6 +134,7 @@ public class Query {
 
         /**
          * Builds a query from the current builder
+         *
          * @return builded query
          */
         public Query build() {
@@ -135,11 +142,11 @@ public class Query {
         }
 
 
-
         /**
          * Generates a builder by applying the logical "and" operator between the current builder and the resulting operation of the input values.
-         * @param fieldName - field name
-         * @param method - comparison function to use
+         *
+         * @param fieldName  - field name
+         * @param method     - comparison function to use
          * @param fieldValue - value to compare with
          * @return resulting builder
          */
@@ -151,8 +158,9 @@ public class Query {
 
         /**
          * Generates a builder by applying the logical "and" operator between the current builder and the resulting operation of the input values after negation.
-         * @param fieldName - field name
-         * @param method - comparison function to use
+         *
+         * @param fieldName  - field name
+         * @param method     - comparison function to use
          * @param fieldValue - value to compare with
          * @return resulting builder
          */
@@ -163,6 +171,7 @@ public class Query {
 
         /**
          * Generates a builder by applying the logical "and" operator between the current builder and the input builder.
+         *
          * @param qb - query builder
          * @return resulting builder
          */
@@ -173,6 +182,7 @@ public class Query {
 
         /**
          * Generates a builder by applying the logical "and" operator between the current builder and the input builder after negation.
+         *
          * @param qb - query builder
          * @return resulting builder
          */
@@ -183,8 +193,9 @@ public class Query {
 
         /**
          * Generates a builder by applying the logical "or" operator between the current builder and the resulting operation of the input values.
-         * @param fieldName - field name
-         * @param method - comparison function to use
+         *
+         * @param fieldName  - field name
+         * @param method     - comparison function to use
          * @param fieldValue - value to compare with
          * @return resulting builder
          */
@@ -196,8 +207,9 @@ public class Query {
 
         /**
          * Generates a builder by applying the logical "or" operator between the current builder and the resulting operation of the input values after negation.
-         * @param fieldName - field name
-         * @param method - comparison function to use
+         *
+         * @param fieldName  - field name
+         * @param method     - comparison function to use
          * @param fieldValue - value to compare with
          * @return resulting builder
          */
@@ -208,6 +220,7 @@ public class Query {
 
         /**
          * Generates a builder by applying the logical "or" operator between the current builder and the input builder.
+         *
          * @param qb - query builder
          * @return resulting builder
          */
@@ -218,12 +231,30 @@ public class Query {
 
         /**
          * Generates a builder by applying the logical "or" operator between the current builder and the input builder after negation.
+         *
          * @param qb - query builder
          * @return resulting builder
          */
         public QueryBuilder orNot(QueryBuilder qb) {
             queryString += "||" + negate(qb.getQueryString());
             return this;
+        }
+
+        /**
+         * Wraps current builder content into a parenthesis
+         * @return
+         */
+        private QueryBuilder parenthesis() {
+            queryString = "(" + queryString + ")";
+            return this;
+        }
+
+        /**
+         * Wraps current builder content into a parenthesis
+         * @return enclose the inner query of the QueryBuilder in parenthesis
+         */
+        public static QueryBuilder parenthesis(QueryBuilder queryBuilder) {
+            return queryBuilder.parenthesis();
         }
     }
 
