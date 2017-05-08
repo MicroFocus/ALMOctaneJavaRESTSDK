@@ -84,10 +84,16 @@ public class OctaneUrl {
 
     @Override
     public String toString() {
+        String url = baseUrl;
+
         //Append paths
-        String url = baseUrl + getPaths().stream().collect(Collectors.joining(PATH_SEPARATOR));
+        if(getPaths().size()>0){
+            url += getPaths().stream().collect(Collectors.joining(PATH_SEPARATOR));
+        }
+
         //Append query params
         url = queryParams.size() > 0 ? url + "?" + createQueryString()  : url;
+
         return url;
     }
 }
