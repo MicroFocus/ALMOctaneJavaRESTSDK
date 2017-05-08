@@ -65,7 +65,7 @@ public class Octane {
     private final String urlDomain;
     private final String idsharedSpaceId;
     private final long workSpaceId;
-    private final OctaneHttpClient octaneHttpClient;
+    protected final OctaneHttpClient octaneHttpClient;
 
     // functions
     protected Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
@@ -126,7 +126,7 @@ public class Octane {
      *
      * @return base domain
      */
-    private String getBaseDomainFormat() {
+    protected String getBaseDomainFormat() {
 
         String baseDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
 

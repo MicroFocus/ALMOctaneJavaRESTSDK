@@ -44,11 +44,6 @@ public class EntityListService {
     private static final String JSON_ERRORS_NAME = "errors";
     private static final String JSON_TOTAL_COUNT_NAME = "total_count";
     private static final String JSON_EXCEEDS_TOTAL_COUNT_NAME = "exceeds_total_count";
-    private static final String LIMIT_PARAM_FORMAT = "limit=%d&";
-    private static final String OFFSET_PARAM_FORMAT = "offset=%d&";
-    private static final String FIELDS_PARAM_FORMAT = "fields=%s";
-    private static final String ORDER_BY_PARAM_FORMAT = "order_by=%s";
-    private static final String QUERY_PARAM_FORMAT = "query=\"%s\"";
     private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
     private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
     private static final long HTTPS_CONFLICT_STATUS_CODE = 409;
@@ -59,6 +54,7 @@ public class EntityListService {
     private final String urlDomain;
     private final OctaneHttpClient octaneHttpClient;
     private final Logger logger = LogManager.getLogger(EntityListService.class.getName());
+
 
     // **** public Functions ***
 
@@ -92,7 +88,6 @@ public class EntityListService {
      * @return a new Get object
      */
     public Get get() {
-
         return new Get();
     }
 
@@ -103,7 +98,6 @@ public class EntityListService {
      * @return a new Update object
      */
     public Update update() {
-
         return new Update();
     }
 
@@ -114,7 +108,6 @@ public class EntityListService {
      * @return a new Create object
      */
     public Create create() {
-
         return new Create();
     }
 
@@ -129,95 +122,17 @@ public class EntityListService {
     }
 
     /**
-     * A utility class for building a URIs with various components, based on the
-     * given domain name and the global quarry parameters of entity list.
-     *
-     * @param urlDomain    - domain name
-     * @param fieldsParams - the fields that have been requested
-     * @param orderByParam - the fields that the entities will be ordered by
-     * @param limitParam  - The number to limit by
-     * @param offsetParam - The page number
-     * @param queryParams - The query object to be used
-     * @return url string ready to transmit
-     */
-    private String urlBuilder(String urlDomain, String fieldsParams, String orderByParam, long limitParam, long offsetParam, Query queryParams) {
-
-        // Construct url paramters
-        fieldsParams = (fieldsParams != null && !fieldsParams.isEmpty())
-                ? String.format(FIELDS_PARAM_FORMAT, fieldsParams) : "";
-        fieldsParams = (fieldsParams != null && !fieldsParams.isEmpty())
-                ? fieldsParams.substring(0, fieldsParams.length() - 1) + "&" : "";
-        String limitParamString = limitParam >= 0 ? String.format(LIMIT_PARAM_FORMAT, limitParam) : "";
-        String offsetParamString = offsetParam >= 0 ? String.format(OFFSET_PARAM_FORMAT, offsetParam) : "";
-        orderByParam = (orderByParam != null && !orderByParam.isEmpty())
-                ? String.format(ORDER_BY_PARAM_FORMAT, orderByParam) : "";
-        orderByParam = (orderByParam != null && !orderByParam.isEmpty())
-                ? orderByParam.substring(0, orderByParam.length() - 1) + "&" : "";
-        String queryParamsString = queryParams != null ? String.format(QUERY_PARAM_FORMAT, queryParams.getQueryString())
-                : "";
-        String params = fieldsParams + limitParamString + offsetParamString + orderByParam + queryParamsString;
-        params = !params.isEmpty() && params.charAt(params.length() - 1) == '&'
-                ? params.substring(0, params.length() - 1) : params;
-        params = params.isEmpty() ? "" : "?" + params;
-
-        return urlDomain + params;
-
-    }
-
-    /**
-     * A utility class for building a URIs with various components, based on the
-     * given domain name and the global quarry parameters of entity list.
-     *
-     * @param urlDomain    - domain name
-     * @param queryParams- query parameters
-     * @return url string ready to transmit
-     */
-    private String urlBuilder(String urlDomain, Query queryParams) {
-
-
-        return urlBuilder(urlDomain, "", "", Long.MIN_VALUE, Long.MIN_VALUE, queryParams);
-
-    }
-
-    /**
-     * A utility class for building a URIs with various components, based on the
-     * given domain name and the global quarry parameters of entity list.
-     *
-     * @param urlDomain    - domain name
-     * @param fieldsParams - field parameters
-     * @return url string ready to transmit
-     */
-    private String urlBuilder(String urlDomain, String fieldsParams) {
-
-        return urlBuilder(urlDomain, fieldsParams, "", Long.MIN_VALUE, Long.MIN_VALUE, null);
-    }
-
-    /**
-     * A utility class for building a URIs with various components, based on the
-     * given domain name and the global quarry parameters of entity list.
-     *
-     * @param urlDomain - domain name
-     * @return url string ready to transmit
-     */
-    private String urlBuilder(String urlDomain) {
-        return urlBuilder(urlDomain, (Query) null);
-
-    }
-
-    /**
      * get a entity model collection based on a given json string
      *
      * @param json The JSON to parse
      * @return entity model collection based on a given json string
      */
     private Collection<EntityModel> getEntities(String json) {
-
         JSONTokener tokener = new JSONTokener(json);
         JSONObject jsonObj = new JSONObject(tokener);
         JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_NAME);
         Collection<EntityModel> entityModels = new ArrayList<>();
         IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
-
 
         return entityModels;
     }
@@ -495,15 +410,10 @@ public class EntityListService {
     /**
      * This class hold the Get objects and serve all functions concern to REST
      * Get.
-     *
      */
     public class Get extends OctaneRequest<Collection<EntityModel>> {
 
-        private String fieldsParams = "";
-        private String orderByParam = "";
-        private long limitParam = Long.MIN_VALUE;
-        private long offsetParam = Long.MIN_VALUE;
-        private Query queryParams = null;
+        protected OctaneUrl octaneUrl = new OctaneUrl(urlDomain);
 
         // Public
 
@@ -513,18 +423,13 @@ public class EntityListService {
          */
         @Override
         public Collection<EntityModel> execute() throws RuntimeException {
-
-
             Collection<EntityModel> newEntityModels = null;
-            String url = urlBuilder(urlDomain, fieldsParams, orderByParam, limitParam, offsetParam, queryParams);
             try {
-                OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(url).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+                OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneUrl.toString()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
                 newEntityModels = getEntitiesResponse(octaneHttpRequest);
             } catch (Exception e) {
-
                 handleException(e, false);
             }
-
             return newEntityModels;
         }
 
@@ -535,8 +440,7 @@ public class EntityListService {
          * @return Get Object with new Fields parameters
          */
         public Get addFields(String... fields) {
-
-            fieldsParams += String.join(",", (CharSequence[]) fields) + ",";
+            octaneUrl.addFieldsParam(fields);
             return this;
         }
 
@@ -547,8 +451,7 @@ public class EntityListService {
          * @return Get Object with new limit parameter
          */
         public Get limit(int limit) {
-
-            limitParam = limit;
+            octaneUrl.setLimitParam(limit);
             return this;
         }
 
@@ -559,7 +462,7 @@ public class EntityListService {
          * @return Get Object with new offset parameter
          */
         public Get offset(int offset) {
-            offsetParam = offset;
+            octaneUrl.setOffsetParam(offset);
             return this;
         }
 
@@ -571,10 +474,7 @@ public class EntityListService {
          * @return Get Object with new OrderBy parameters
          */
         public Get addOrderBy(String orderBy, boolean asc) {
-
-            String ascString = asc ? "" : "-";
-
-            orderByParam += ascString + String.join(",", orderBy) + ",";
+            octaneUrl.setOrderByParam(orderBy, asc);
             return this;
         }
 
@@ -583,8 +483,7 @@ public class EntityListService {
          * @return The object
          */
         public Get query(Query query) {
-
-            queryParams = query;
+            octaneUrl.setDqlQueryParam(query);
             return this;
         }
     }
@@ -592,12 +491,11 @@ public class EntityListService {
     /**
      * This class hold the Update objects and serve all functions concern to
      * REST put.
-     *
      */
     public class Update extends OctaneRequest<Collection<EntityModel>> {
 
         private Collection<EntityModel> entityModels = null;
-        private Query queryParams = null;
+        protected OctaneUrl octaneUrl = new OctaneUrl(urlDomain);
 
         /**
          * 1. Request Update Execution
@@ -607,12 +505,11 @@ public class EntityListService {
         public Collection<EntityModel> execute() throws RuntimeException {
 
             Collection<EntityModel> newEntityModels = null;
-            String url = urlBuilder(urlDomain, queryParams);
             JSONObject objBase = getEntitiesJSONObject(entityModels);
             String jsonEntityModel = objBase.toString();
-
             try {
-                OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.PutOctaneHttpRequest(url,
+                OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.PutOctaneHttpRequest(
+                        octaneUrl.toString(),
                         OctaneHttpRequest.JSON_CONTENT_TYPE, jsonEntityModel)
                         .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
                 newEntityModels = getEntitiesResponse(octaneHttpRequest);
@@ -633,7 +530,7 @@ public class EntityListService {
          * @return Update object with new query parameters
          */
         public Update query(Query query) {
-            queryParams = query;
+            octaneUrl.setDqlQueryParam(query);
             return this;
         }
 
@@ -653,11 +550,11 @@ public class EntityListService {
     /**
      * This class hold the Update objects and serve all functions concern to
      * REST Post.
-     *
      */
     public class Create extends OctaneRequest<Collection<EntityModel>> {
 
         private Collection<EntityModel> entityModels = null;
+        protected OctaneUrl octaneUrl = new OctaneUrl(urlDomain);
 
         /**
          * 1. build Entity Json Object  2. Post
@@ -668,12 +565,11 @@ public class EntityListService {
         public Collection<EntityModel> execute() throws RuntimeException {
 
             Collection<EntityModel> newEntityModels = null;
-            String url = urlBuilder(urlDomain);
             JSONObject objBase = getEntitiesJSONObject(entityModels);
             String strJsonEntityModel = objBase.toString();
             try {
                 OctaneHttpRequest octaneHttpRequest =
-                        new OctaneHttpRequest.PostOctaneHttpRequest(url, OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
+                        new OctaneHttpRequest.PostOctaneHttpRequest(octaneUrl.toString(), OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
                                 .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
                 newEntityModels = getEntitiesResponse(octaneHttpRequest);
             } catch (Exception e) {
@@ -698,13 +594,11 @@ public class EntityListService {
         public Collection<EntityModel> executeMultipart(Collection<EntityModel> entities, InputStream inputStream, String contentType, String contentName) {
 
             Collection<EntityModel> newEntityModels = null;
-            String url = urlBuilder(urlDomain);
 
             JSONObject data = getEntityJSONObject(entities.iterator().next());
             try {
-
                 OctaneHttpRequest octaneHttpRequest =
-                        new OctaneHttpRequest.PostBinaryOctaneHttpRequest(url, inputStream, data.toString(), contentName, contentType)
+                        new OctaneHttpRequest.PostBinaryOctaneHttpRequest(octaneUrl.toString(), inputStream, data.toString(), contentName, contentType)
                                 .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
                 newEntityModels = getEntitiesResponse(octaneHttpRequest);
             } catch (Exception e) {
@@ -730,11 +624,10 @@ public class EntityListService {
     /**
      * This class hold the Delete objects and serve all functions concern to
      * REST delete.
-     *
      */
     public class Delete extends OctaneRequest<Collection<EntityModel>> {
 
-        private Query queryParams = null;
+        protected OctaneUrl octaneUrl = new OctaneUrl(urlDomain);
 
         /**
          * Execute a Delete request
@@ -744,18 +637,16 @@ public class EntityListService {
         @Override
         public Collection<EntityModel> execute() throws RuntimeException {
 
-            Collection<EntityModel> newEntityModels = null;
-            String url = urlBuilder(urlDomain, queryParams);
-
+            Collection<EntityModel> deletedEntityModels = null;
             try {
-                OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(url);
-                newEntityModels = getEntitiesResponse(octaneHttpRequest);
+                OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneUrl.toString());
+                deletedEntityModels = getEntitiesResponse(octaneHttpRequest);
             } catch (Exception e) {
 
                 handleException(e, false);
             }
 
-            return newEntityModels;
+            return deletedEntityModels;
 
         }
 
@@ -766,14 +657,13 @@ public class EntityListService {
          * @return a Delete Object with new Query parameters
          */
         public Delete query(Query query) {
-            queryParams = query;
+            octaneUrl.setDqlQueryParam(query);
             return this;
         }
     }
 
     /**
      * This class hold the Entities object(An object that represent one Entity )
-     *
      */
     public class Entities {
 
@@ -794,7 +684,6 @@ public class EntityListService {
          * @return The Get object
          */
         public Get get() {
-
             return new Get();
         }
 
@@ -804,7 +693,6 @@ public class EntityListService {
          * @return The Update object
          */
         public Update update() {
-
             return new Update();
         }
 
@@ -814,18 +702,20 @@ public class EntityListService {
          * @return The Delete object
          */
         public Delete delete() {
-
             return new Delete();
         }
 
         /**
          * This class hold the Get object of one entity
-         *
          */
         public class Get extends OctaneRequest<EntityModel> {
 
-            private String fieldsParams = "";
+            protected OctaneUrl octaneUrl;
 
+            public Get(){
+                octaneUrl = new OctaneUrl(urlDomain);
+                octaneUrl.addPath(String.valueOf(iEntityId));
+            }
 
             /**
              * 1. Get Request execution with json data 2. Parse response to a
@@ -835,11 +725,10 @@ public class EntityListService {
             public EntityModel execute() throws RuntimeException {
 
                 EntityModel newEntityModel = null;
-                String domain = urlDomain + "/" + String.valueOf(iEntityId);
-                String url = urlBuilder(domain, fieldsParams);
                 try {
-                    OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(url)
-                            .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+                    OctaneHttpRequest octaneHttpRequest =
+                            new OctaneHttpRequest.GetOctaneHttpRequest(octaneUrl.toString())
+                                    .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
                     newEntityModel = getEntityResponse(octaneHttpRequest);
                 } catch (Exception e) {
 
@@ -856,13 +745,9 @@ public class EntityListService {
              * @return - Stream with binary data
              */
             public InputStream executeBinary() {
-
                 InputStream inputStream = null;
-                String domain = urlDomain + "/" + String.valueOf(iEntityId);
-                String url = urlBuilder(domain, fieldsParams);
-
                 try {
-                    OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(url)
+                    OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneUrl.toString())
                             .setAcceptType(OctaneHttpRequest.OCTET_STREAM_CONTENT_TYPE);
                     OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
@@ -886,19 +771,23 @@ public class EntityListService {
              * @return a new Get object with new Fields Parameters
              */
             public Get addFields(String... fields) {
-
-                fieldsParams += String.join(",", (CharSequence[]) fields) + ",";
+                octaneUrl.addFieldsParam(fields);
                 return this;
             }
         }
 
         /**
          * This class hold the Update object of one entity
-         *
          */
         public class Update extends OctaneRequest<EntityModel> {
 
             private EntityModel entityModel;
+            protected OctaneUrl octaneUrl;
+
+            public Update(){
+                octaneUrl = new OctaneUrl(urlDomain);
+                octaneUrl.addPath(String.valueOf(iEntityId));
+            }
 
             /**
              * 1. Update Request execution with json data 2. Parse response to
@@ -908,13 +797,13 @@ public class EntityListService {
             public EntityModel execute() {
 
                 EntityModel newEntityModel = null;
-                String domain = urlDomain + "/" + String.valueOf(iEntityId);
                 JSONObject objBase = getEntityJSONObject(entityModel);
                 String jsonEntityModel = objBase.toString();
 
                 try {
                     OctaneHttpRequest octaneHttpRequest =
-                            new OctaneHttpRequest.PutOctaneHttpRequest(domain, OctaneHttpRequest.JSON_CONTENT_TYPE,
+                            new OctaneHttpRequest.PutOctaneHttpRequest(octaneUrl.toString(),
+                                    OctaneHttpRequest.JSON_CONTENT_TYPE,
                                     jsonEntityModel)
                                     .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
 
@@ -940,9 +829,15 @@ public class EntityListService {
 
         /**
          * This class hold the Delete object of one entity
-         *
          */
         public class Delete extends OctaneRequest<EntityModel> {
+
+            protected OctaneUrl octaneUrl;
+
+            public Delete(){
+                octaneUrl = new OctaneUrl(urlDomain);
+                octaneUrl.addPath(String.valueOf(iEntityId));
+            }
 
             /**
              * 1. Get Request execution with json data 2. Parse response to a
@@ -950,18 +845,14 @@ public class EntityListService {
              */
             @Override
             public EntityModel execute() throws RuntimeException {
-
                 EntityModel newEntityModel = null;
-                String domain = urlDomain + "/" + String.valueOf(iEntityId);
-                String url = urlBuilder(domain);
                 try {
-                    OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(url);
+                    OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneUrl.toString());
                     newEntityModel = getEntityResponse(octaneHttpRequest);
                 } catch (Exception e) {
 
                     handleException(e, false);
                 }
-
                 return newEntityModel;
 
             }

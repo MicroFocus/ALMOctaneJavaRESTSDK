@@ -29,7 +29,9 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
  */
 public class EntityList {
 
-	private EntityListService entityListService = null;
+	protected EntityListService entityListService = null;
+
+	protected EntityList(){};
 
     /**
      * Creates a new {@link EntityList} instance with the entity collection name and the client to be used
@@ -38,9 +40,7 @@ public class EntityList {
      * @param strEntityListDomain - The entity collection name
      */
 	public EntityList(OctaneHttpClient octaneHttpClient, String strEntityListDomain) {
-
 		entityListService = new EntityListService(octaneHttpClient, strEntityListDomain);
-		
 	}
 
     /**
@@ -67,7 +67,6 @@ public class EntityList {
      * @return a context to the entity collection that will be used for GET
      */
 	public EntityListService.Get get() {
-		
 		return entityListService.get();
 	}
 
