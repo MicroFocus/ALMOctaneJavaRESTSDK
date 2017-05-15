@@ -15,12 +15,12 @@
  */
 package com.hpe.adm.nga.sdk.unit_tests.entityListService;
 
-import com.hpe.adm.nga.sdk.EntityList;
-import com.hpe.adm.nga.sdk.EntityListService;
+import com.hpe.adm.nga.sdk.CommonUtils;
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.entities.CreateEntities;
+import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
-import com.hpe.adm.nga.sdk.CommonUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -31,7 +31,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 
 import static org.junit.Assert.fail;
@@ -51,19 +50,17 @@ public class TestCreateEntities {
 		final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"moris2\"}],\"total_count\":1}";
 		
 		EntityList defects = octane.entityList("defects");
-		EntityListService.Create spiedCreateEntity = PowerMockito.spy(defects.create());
-		EntityList spiedDefects = PowerMockito.spy(defects);
-		EntityListService service = (EntityListService)Whitebox.getInternalState(spiedDefects, "entityListService");							
+		CreateEntities spiedCreateEntity = PowerMockito.spy(defects.create());
 		
 		try{
-			Collection<EntityModel> entityModelsIn = CommonUtils.testGetEntityModels(jsonCreateString,service);
+			Collection<EntityModel> entityModelsIn = CommonUtils.testGetEntityModels(jsonCreateString);
 
 			spiedCreateEntity.entities(entityModelsIn);
 			
 			Collection<EntityModel> internalModels = (Collection<EntityModel>) Whitebox.getInternalState(spiedCreateEntity, "entityModels");
-			JSONObject jsonEntity = CommonUtils.getEntitiesJSONObject(internalModels,service);
+			JSONObject jsonEntity = CommonUtils.getEntitiesJSONObject(internalModels);
 
-			Collection<EntityModel> entityModelsOut = CommonUtils.testGetEntityModels(jsonEntity.toString(),service);
+			Collection<EntityModel> entityModelsOut = CommonUtils.testGetEntityModels(jsonEntity.toString());
 			Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModelsIn, entityModelsOut));
 		}
 		catch(Exception ex){

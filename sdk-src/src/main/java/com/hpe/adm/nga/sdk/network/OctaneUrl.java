@@ -1,16 +1,18 @@
-package com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk.network;
 
+
+import com.hpe.adm.nga.sdk.query.Query;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class OctaneUrl {
+public final class OctaneUrl {
 
-    public static final String LIMIT_PARAM_NAME = "limit";
-    public static final String OFFSET_PARAM_NAME = "offset";
-    public static final String FIELDS_PARAM_NAME = "fields";
-    public static final String ORDER_BY_PARAM_NAME = "order_by";
-    public static final String QUERY_PARAM_NAME = "query";
+    private static final String LIMIT_PARAM_NAME = "limit";
+    private static final String OFFSET_PARAM_NAME = "offset";
+    private static final String FIELDS_PARAM_NAME = "fields";
+    private static final String ORDER_BY_PARAM_NAME = "order_by";
+    private static final String QUERY_PARAM_NAME = "query";
 
     private static final String PATH_SEPARATOR = "/";
 
@@ -18,28 +20,28 @@ public class OctaneUrl {
     private Map<String, String> queryParams = new HashMap<>();
     private List<String> paths = new ArrayList<>();
 
-    public OctaneUrl(String baseUrl){
+    OctaneUrl(String baseUrl){
         this.baseUrl = baseUrl;
     }
 
-    public void addPath(String path){
+    void addPath(String path){
         String[] subPaths =  path.split(PATH_SEPARATOR);
         paths.addAll(Arrays.asList(subPaths));
     }
 
-    public List<String> getPaths(){
+    private List<String> getPaths(){
         return paths;
     }
 
-    public boolean hasParam(String paramName){
+    private boolean hasParam(String paramName){
         return queryParams.containsKey(paramName);
     }
 
-    public void setParam(String paramName, String paramValue){
+    private void setParam(String paramName, String paramValue){
         queryParams.put(paramName, paramValue);
     }
 
-    public String getParam(String paramName){
+    private String getParam(String paramName){
         return queryParams.get(paramName);
     }
 

@@ -16,6 +16,7 @@
 package com.hpe.adm.nga.sdk.unit_tests.entityListService;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.entities.GetEntities;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -27,9 +28,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.hpe.adm.nga.sdk.EntityList;
-import com.hpe.adm.nga.sdk.EntityListService;
-import com.hpe.adm.nga.sdk.Query;
+import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.EntityListService;
+import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
@@ -52,7 +53,7 @@ public class TestServiceMethods{
 
 	private EntityListService service = null;
 	private EntityListService spiedService = null;
-	private EntityListService.Get spiedGetEntity = null;
+	private GetEntities spiedGetEntity = null;
 	private static Octane octane;
 	
 	@BeforeClass

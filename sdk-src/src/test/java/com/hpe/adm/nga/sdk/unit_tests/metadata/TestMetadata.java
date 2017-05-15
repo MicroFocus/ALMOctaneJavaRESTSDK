@@ -16,9 +16,7 @@
 package com.hpe.adm.nga.sdk.unit_tests.metadata;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
-import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
-import com.hpe.adm.nga.sdk.metadata.Metadata;
+import com.hpe.adm.nga.sdk.metadata.*;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -56,7 +54,7 @@ public class TestMetadata {
 	@Test
 	public void testAllEntitiesType(){
 		final String expectedResult = "entities";
-		Metadata.Entity spiedEnt = PowerMockito.spy(metaData.entities());
+		Entity spiedEnt = PowerMockito.spy(metaData.entities());
 		String entType = (String)Whitebox.getInternalState(spiedEnt, "type");
 		assertEquals(expectedResult, entType);
 		
@@ -69,7 +67,7 @@ public class TestMetadata {
 	@Test
 	public void testSpecificEntitiesType(){
 		final String expectedResult = "entities?query=\"(name EQ 'ent1')||(name EQ 'ent2')\"";
-		Metadata.Entity spiedEnt = PowerMockito.spy(metaData.entities("ent1", "ent2"));
+		Entity spiedEnt = PowerMockito.spy(metaData.entities("ent1", "ent2"));
 		String entType = (String)Whitebox.getInternalState(spiedEnt, "type");
 		assertEquals(expectedResult, entType);
 	}
@@ -81,7 +79,7 @@ public class TestMetadata {
 	@Test
 	public void testAllFieldsType(){
 		final String expectedResult = "fields";
-		Metadata.Field spiedEnt = PowerMockito.spy(metaData.fields());
+		Field spiedEnt = PowerMockito.spy(metaData.fields());
 		String entType = (String)Whitebox.getInternalState(spiedEnt, "type");
 		assertEquals(expectedResult, entType);
 		
@@ -94,7 +92,7 @@ public class TestMetadata {
 	@Test
 	public void testSpecificFieldsType(){
 		final String expectedResult = "fields?query=\"(entity_name EQ 'field1')||(entity_name EQ 'field2')\"";
-		Metadata.Field spiedEnt = PowerMockito.spy(metaData.fields("field1", "field2"));
+		Field spiedEnt = PowerMockito.spy(metaData.fields("field1", "field2"));
 		String entType = (String)Whitebox.getInternalState(spiedEnt, "type");
 		assertEquals(expectedResult, entType);
 	}

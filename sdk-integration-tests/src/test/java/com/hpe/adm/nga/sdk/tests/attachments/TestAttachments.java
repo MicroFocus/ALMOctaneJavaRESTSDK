@@ -43,28 +43,25 @@ public class TestAttachments extends TestBase {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects");
         Collection<EntityModel> defectModel = octane.entityList("defects").create().entities(generatedEntity).execute();
 
-        Collection<EntityModel> expectedAttachments = createAttachment("owner_work_item", defectModel);
+        EntityModel expectedAttachments = createAttachment("owner_work_item", defectModel.iterator().next());
 
         Collection<EntityModel> actualAttachments = octane.entityList("attachments").get().addFields("owner_work_item", "name").execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedAttachments, actualAttachments, false));
+        Assert.assertTrue( CommonUtils.isEntityAInEntityB(expectedAttachments, actualAttachments.iterator().next()));
     }
 
-    private Collection<EntityModel> createAttachment(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {
-        EntityModel entity = entityModels.iterator().next();
-
+    private EntityModel createAttachment(String fieldEntityType, EntityModel entity) throws Exception {
         Set<FieldModel> fields = new HashSet<>();
         fields.add(new ReferenceFieldModel(fieldEntityType, entity));
         final String attachmentNAme = "sdk_attachment_" + UUID.randomUUID() + ".txt";
         FieldModel name = new StringFieldModel("name", attachmentNAme);
         fields.add(name);
-        Collection<EntityModel> attachments = new ArrayList<>();
-        attachments.add(new EntityModel(fields));
 
         ByteArrayInputStream bais = new ByteArrayInputStream("The first line\nThe second line".getBytes());
 
-        octane.AttachmentList().create().entities(attachments, bais, "text/plain", attachmentNAme).execute();
+        final EntityModel attachment = new EntityModel(fields);
+        octane.AttachmentList().create().attachment(attachment, bais, "text/plain", attachmentNAme).execute();
 
-        return attachments;
+        return attachment;
     }
 }

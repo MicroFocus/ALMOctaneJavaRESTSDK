@@ -16,14 +16,12 @@ package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 /**
@@ -58,17 +56,16 @@ public class Octane {
     private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/";
     private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
     private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
-    private static final String METADATA_DOMAIN_FORMAT = "metadata";
-    private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";
+    private static final Logger logger = LogManager.getLogger(Octane.class.getName());
 
     //private members
     private final String urlDomain;
     private final String idsharedSpaceId;
     private final long workSpaceId;
-    protected final OctaneHttpClient octaneHttpClient;
+    private final OctaneHttpClient octaneHttpClient;
 
     // functions
-    protected Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
+    private Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
         this.octaneHttpClient = octaneHttpClient;
         urlDomain = domain;
         idsharedSpaceId = sharedSpaceId;
@@ -87,9 +84,7 @@ public class Octane {
      * @return A new EntityList object that list of entities
      */
     public EntityList entityList(String entityName) {
-
-        String entityListDomain = getBaseDomainFormat() + entityName;
-        return new EntityList(octaneHttpClient, entityListDomain);
+        return getOctaneClassFactory().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
     }
 
     /**
@@ -104,8 +99,7 @@ public class Octane {
      * @return A new Metadata object that holds the metadata context
      */
     public Metadata metadata() {
-        String metadataDomain = getBaseDomainFormat() + METADATA_DOMAIN_FORMAT;
-        return new Metadata(octaneHttpClient, metadataDomain);
+        return new Metadata(octaneHttpClient, getBaseDomainFormat());
     }
 
     /**
@@ -116,9 +110,7 @@ public class Octane {
      * @return A new AttachmentList object that holds the attachments context
      */
     public AttachmentList AttachmentList() {
-
-        String attachmentListDomain = getBaseDomainFormat() + ATTACHMENT_LIST_DOMAIN_FORMAT;
-        return new AttachmentList(octaneHttpClient, attachmentListDomain);
+        return new AttachmentList(octaneHttpClient, getBaseDomainFormat());
     }
 
     /**
@@ -158,9 +150,6 @@ public class Octane {
      * Once the correct context has been built up use the {@link #build()} method to create the <code>Octane</code> instance
      */
     public static class Builder {
-
-        public static final String OCTANE_HTTP_CLIENT_CLASS_NAME = "octaneHttpClientClassName";
-
         //Private
         private final Logger logger = LogManager.getLogger(Octane.class.getName());
         private String urlDomain = "";
@@ -269,52 +258,38 @@ public class Octane {
             return objOctane;
         }
 
-        /**
-         * The implementation used for the {@link OctaneHttpClient} can be configured using the
-         * "{@value #OCTANE_HTTP_CLIENT_CLASS_NAME}" system property. <br>
-         * The value of this property has to be the fully qualified name of a class which implements {@link OctaneHttpClient}. <br>
-         * The implementation must have a single argument constructor with a String parameter.
-         * The urlDomain value given to the builder is passed to the {@link OctaneHttpClient} through this constructor.
-         * @return
-         */
         private OctaneHttpClient createOctaneHttpClient() {
-            String octaneHttpClientClassName = System.getProperty(OCTANE_HTTP_CLIENT_CLASS_NAME);
-
-            if (octaneHttpClientClassName != null) {
-                logger.info("Creating OctaneHttpClient using implementation {}", octaneHttpClientClassName);
-                //Use reflection to instantiate the class
-                Class<OctaneHttpClient> clazz;
-                try {
-                    clazz = (Class<OctaneHttpClient>) Class.forName(octaneHttpClientClassName);
-                } catch (ClassNotFoundException e) {
-                    logger.error(e);
-                    throw new RuntimeException("Failed to find class with name: " + octaneHttpClientClassName, e);
-                }
-
-                Constructor<?> ctor;
-                try {
-                    ctor = clazz.getConstructor(String.class);
-                } catch (NoSuchMethodException e) {
-                    logger.error(e);
-                    throw new RuntimeException(
-                            "Failed to instantiate class " + octaneHttpClientClassName + "," +
-                                    " does not have a single string argument constructor", e);
-                }
-
-                try {
-                    return (OctaneHttpClient) ctor.newInstance(urlDomain);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    logger.error(e);
-                    throw new RuntimeException("Failed to instantiate class " + octaneHttpClientClassName, e);
-                }
-            } else {
-                return new GoogleHttpClient(urlDomain);
-            }
+            return getOctaneClassFactory().getOctaneHttpClient(urlDomain);
         }
 
         @Override
         public String toString() {
             return String.format("Server: %s SharedSpace: %s Workspace: %s", urlDomain, idsharedSpaceId, workSpaceId);
+        }
+    }
+
+    public static OctaneClassFactory getOctaneClassFactory() {
+        final String octaneClassFactoryClassName = System.getProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
+
+        if (octaneClassFactoryClassName != null) {
+            logger.info("Creating OctaneClassFactory using implementation {}", octaneClassFactoryClassName);
+            //Use reflection to instantiate the class
+            Class<OctaneClassFactory> clazz;
+            try {
+                clazz = (Class<OctaneClassFactory>) Class.forName(octaneClassFactoryClassName);
+            } catch (ClassNotFoundException e) {
+                logger.error(e);
+                throw new RuntimeException("Failed to find class with name: " + octaneClassFactoryClassName, e);
+            }
+
+            try {
+                return clazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                logger.error(e);
+                throw new RuntimeException("Failed to instantiate class " + octaneClassFactoryClassName, e);
+            }
+        } else {
+            return DefaultOctaneClassFactory.getInstance();
         }
     }
 }

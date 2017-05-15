@@ -16,11 +16,15 @@
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.OctaneClassFactory;
+import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
+import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 
 import java.util.Collection;
@@ -31,12 +35,9 @@ public class CommonMethods {
     private final static String sharedSpace = "1001";
     private final static int workSpace = 1002;
 
-    public static OctaneHttpClient getOctaneHttpClient() {
-        return PowerMockito.mock(OctaneHttpClient.class);
-    }
-
     public static Octane getOctaneForTest() {
-        return new OctaneForTest(getOctaneHttpClient(), getDomain(), getSharedSpace(), getWorkSpace());
+        System.setProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME, TestOctaneClassFactory.class.getName());
+        return new Octane.Builder(new SimpleUserAuthentication("user", "password")).Server(getDomain()).sharedSpace(Long.parseLong(getSharedSpace())).workSpace(getWorkSpace()).build();
     }
 
     public static String getDomain() {
@@ -96,4 +97,18 @@ public class CommonMethods {
         return true;
     }
 
+    public static final class TestOctaneClassFactory implements OctaneClassFactory {
+
+        @Override
+        public OctaneHttpClient getOctaneHttpClient(String urlDomain) {
+            final OctaneHttpClient octaneHttpClient = PowerMockito.mock(OctaneHttpClient.class);
+            PowerMockito.when(octaneHttpClient.authenticate(Mockito.any())).thenReturn(true);
+            return octaneHttpClient;
+        }
+
+        @Override
+        public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
+            return new EntityList(octaneHttpClient, baseDomain, entityName);
+        }
+    }
 }

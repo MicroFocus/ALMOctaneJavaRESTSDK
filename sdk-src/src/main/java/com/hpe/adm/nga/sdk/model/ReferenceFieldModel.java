@@ -40,14 +40,14 @@ public class ReferenceFieldModel implements FieldModel<EntityModel> {
 	}
 	
 	/**
-	 * Get Value
+	 * GetEntities Value
 	 */
 	public EntityModel getValue(){
 		return refValue ;
 	}
 	
 	/**
-	 * Get name
+	 * GetEntities name
 	 */
 	public String getName(){
 		return refName;

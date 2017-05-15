@@ -15,7 +15,7 @@
  */
 package com.hpe.adm.nga.sdk;
 
-import com.hpe.adm.nga.sdk.EntityListService;
+import com.hpe.adm.nga.sdk.entities.EntityListService;
 import com.hpe.adm.nga.sdk.model.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -96,20 +96,20 @@ public class CommonUtils {
                 !idA.getValue().equals(idB.getValue())) && (typeA != null && typeB != null && typeA.getValue() != null && typeA.getValue().equals(typeB.getValue()) || subtypeA != null && typeB != null && subtypeA.getValue() != null && subtypeA.getValue().equals(typeB.getValue()) || subtypeB != null && typeA != null && subtypeB.getValue() != null && subtypeB.getValue().equals(typeA.getValue()));
     }
 
-    public static Collection<EntityModel> testGetEntityModels(String jason,EntityListService service) throws Exception{
+    public static Collection<EntityModel> testGetEntityModels(String jason) throws Exception{
 
 
         JSONObject jasonObj = new JSONObject(jason);
         JSONArray jasoDataArr = jasonObj.getJSONArray(JSON_DATA_NAME);
         Collection<EntityModel> entityModels = new ArrayList<>();
-        IntStream.range(0, jasoDataArr.length()).forEach((i) -> {entityModels.add(service.getEntityModel(jasoDataArr.getJSONObject(i)));
+        IntStream.range(0, jasoDataArr.length()).forEach((i) -> {entityModels.add(ModelParser.getInstance().getEntityModel(jasoDataArr.getJSONObject(i)));
 
         });
 
         return entityModels;
     }
-    public static JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels,EntityListService service){
-        return service.getEntitiesJSONObject(entitiesModels);
+    public static JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels){
+        return ModelParser.getInstance().getEntitiesJSONObject(entitiesModels);
     }
 
 }

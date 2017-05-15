@@ -21,9 +21,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.Query.QueryBuilder;
-import com.hpe.adm.nga.sdk.QueryMethod;
+import com.hpe.adm.nga.sdk.query.Query;
+import com.hpe.adm.nga.sdk.query.Query.QueryBuilder;
+import com.hpe.adm.nga.sdk.query.QueryMethod;
 import org.junit.BeforeClass;
 import org.junit.Test;
 public class TestQuery {

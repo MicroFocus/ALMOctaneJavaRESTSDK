@@ -1,6 +1,7 @@
 package com.hpe.adm.nga.sdk.unit_tests.customhttpclient;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -14,7 +15,7 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
  * Test using a custom implementation of {@link OctaneHttpClient}
- * by setting the "{@value Octane.Builder#OCTANE_HTTP_CLIENT_CLASS_NAME}" system propery.
+ * by setting the "{@value OctaneClassFactory#OCTANE_HTTP_CLIENT_CLASS_NAME}" system propery.
  */
 public class TestCustomOctaneHttpClient {
 
@@ -24,7 +25,7 @@ public class TestCustomOctaneHttpClient {
         String octaneHttpClientClassName = "com.hpe.adm.nga.sdk.unit_tests.customhttpclient.DummyOctaneHttpClient";
 
         System.getProperties().setProperty(
-                Octane.Builder.OCTANE_HTTP_CLIENT_CLASS_NAME,
+                OctaneClassFactory.OCTANE_HTTP_CLIENT_CLASS_NAME,
                 octaneHttpClientClassName);
 
 
@@ -37,7 +38,7 @@ public class TestCustomOctaneHttpClient {
                         .build()
         );
 
-        //Get the inner octane http client from the octane object
+        //GetEntities the inner octane http client from the octane object
         OctaneHttpClient octaneHttpClient = Whitebox.getInternalState(octane, "octaneHttpClient");
 
         // Check if the random string passed to the builder
@@ -54,7 +55,7 @@ public class TestCustomOctaneHttpClient {
                 0);
 
         //Unset the system property
-        System.getProperties().remove(Octane.Builder.OCTANE_HTTP_CLIENT_CLASS_NAME);
+        System.getProperties().remove(OctaneClassFactory.OCTANE_HTTP_CLIENT_CLASS_NAME);
     }
 
 }

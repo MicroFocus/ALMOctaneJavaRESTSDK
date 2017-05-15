@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk.query;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

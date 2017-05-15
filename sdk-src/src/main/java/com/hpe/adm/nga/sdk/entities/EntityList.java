@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk.entities;
 
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
@@ -31,16 +31,14 @@ public class EntityList {
 
 	protected EntityListService entityListService = null;
 
-	protected EntityList(){};
-
     /**
      * Creates a new {@link EntityList} instance with the entity collection name and the client to be used
-     *
-     * @param octaneHttpClient    - The client that is used for REST communication
-     * @param strEntityListDomain - The entity collection name
-     */
-	public EntityList(OctaneHttpClient octaneHttpClient, String strEntityListDomain) {
-		entityListService = new EntityListService(octaneHttpClient, strEntityListDomain);
+     *  @param octaneHttpClient    - The client that is used for REST communication
+     * @param baseDomain - The entity collection name
+	 * @param entityName
+	 */
+	public EntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
+		entityListService = new EntityListService(octaneHttpClient, baseDomain + entityName);
 	}
 
     /**
@@ -66,7 +64,7 @@ public class EntityList {
      *
      * @return a context to the entity collection that will be used for GET
      */
-	public EntityListService.Get get() {
+	public GetEntities get() {
 		return entityListService.get();
 	}
 
@@ -80,7 +78,7 @@ public class EntityList {
      *
      * @return a context to the entity collection that will be used for PUT
      */
-	public EntityListService.Update update() {
+	public UpdateEntities update() {
 		
 		return entityListService.update();
 	}
@@ -95,7 +93,7 @@ public class EntityList {
      *
      * @return a context to the entity collection that will be used for POST
      */
-	public EntityListService.Create create() {
+	public CreateEntities create() {
 
 		return entityListService.create();
 	}
@@ -110,7 +108,7 @@ public class EntityList {
      *
      * @return a context to the entity collection that will be used for DELETE
      */
-	public EntityListService.Delete delete() {
+	public DeleteEntities delete() {
 		return entityListService.delete();
 	}
 

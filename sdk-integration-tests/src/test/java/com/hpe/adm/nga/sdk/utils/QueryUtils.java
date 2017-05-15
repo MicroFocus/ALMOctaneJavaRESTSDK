@@ -15,9 +15,8 @@
  */
 package com.hpe.adm.nga.sdk.utils;
 
-import com.hpe.adm.nga.sdk.Query;
-import com.hpe.adm.nga.sdk.Query.QueryBuilder;
-import com.hpe.adm.nga.sdk.QueryMethod;
+import com.hpe.adm.nga.sdk.query.Query;
+import com.hpe.adm.nga.sdk.query.QueryMethod;
 
 import java.util.List;
 

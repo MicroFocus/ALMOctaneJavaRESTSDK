@@ -15,7 +15,6 @@
  */
 package com.hpe.adm.nga.sdk.unit_tests.attachments;
 
-import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
@@ -33,20 +32,19 @@ import static org.junit.Assert.assertEquals;
 @RunWith(PowerMockRunner.class)
 public class TestAttachments {
 	private static Octane octane;
-	private static EntityListService service;
+	private static AttachmentList spiedAttachments;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		octane = CommonMethods.getOctaneForTest();
 		AttachmentList attachments = octane.AttachmentList();
-		AttachmentList spiedAttachments = PowerMockito.spy(attachments);
-		service = (EntityListService)Whitebox.getInternalState(spiedAttachments, "entityListService");
+		spiedAttachments = PowerMockito.spy(attachments);
 	}
 	
 	@Test
 	public void testCorrectUrl(){
 		String expectedResult =  CommonMethods.getDomain() + "/api/shared_spaces/" + CommonMethods.getSharedSpace() + "/workspaces/" + CommonMethods.getWorkSpace() + "/attachments";
-		String internalUrl = (String)Whitebox.getInternalState(service, "urlDomain");
+		String internalUrl = (String)Whitebox.getInternalState(spiedAttachments, "attachmentListDomain");
 		assertEquals(expectedResult, internalUrl);		
 	}
 }

@@ -15,7 +15,7 @@
  */
 package com.hpe.adm.nga.sdk.tests.parallelexecution;
 
-import com.hpe.adm.nga.sdk.EntityList;
+import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;

@@ -16,16 +16,13 @@
 package com.hpe.adm.nga.sdk.unit_tests.model;
 
 
-import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.model.*;
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -38,8 +35,6 @@ import static org.junit.Assert.fail;
 
 public class TestModel {
 
-    private static Method getEntityJSONObject;
-    private static EntityListService service;
     private static Set<FieldModel> set;
     private EntityModel model;
     private String expectedResult;
@@ -48,13 +43,6 @@ public class TestModel {
     @BeforeClass
     public static void initializeOnCreate() {
         set = new HashSet<FieldModel>();
-        try {
-            service = new EntityListService(CommonMethods.getOctaneHttpClient(), "");
-            getEntityJSONObject = service.getClass().getDeclaredMethod("getEntityJSONObject", new Class[]{EntityModel.class});
-            getEntityJSONObject.setAccessible(true);
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
     }
 
     @Before
@@ -74,7 +62,7 @@ public class TestModel {
         set.add(new BooleanFieldModel("falseValue", false));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -90,7 +78,7 @@ public class TestModel {
         set.add(new StringFieldModel("thirdValue", "third"));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -109,7 +97,7 @@ public class TestModel {
         set.add(new ReferenceFieldModel("secondRef", refModel));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -136,7 +124,7 @@ public class TestModel {
 
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -150,7 +138,7 @@ public class TestModel {
         set.add(new LongFieldModel("secondField", new Long(200)));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -164,7 +152,7 @@ public class TestModel {
         set.add(new DateFieldModel("field", now));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -178,7 +166,7 @@ public class TestModel {
         set.add(new LongFieldModel("secondField", new Long(651651651)));
         ErrorModel model = new ErrorModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -216,7 +204,7 @@ public class TestModel {
         set.add(new BooleanFieldModel("boolField", true));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -229,7 +217,7 @@ public class TestModel {
         model = new EntityModel();
         model.setValue(new BooleanFieldModel("trueValue", true));
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -244,7 +232,7 @@ public class TestModel {
         model = new EntityModel(fieldSet);
         model.setValue(new BooleanFieldModel("trueValue", true));
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
