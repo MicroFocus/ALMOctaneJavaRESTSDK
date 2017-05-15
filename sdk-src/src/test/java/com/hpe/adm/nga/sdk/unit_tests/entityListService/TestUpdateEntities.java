@@ -16,7 +16,6 @@
 package com.hpe.adm.nga.sdk.unit_tests.entityListService;
 
 import com.hpe.adm.nga.sdk.entities.EntityList;
-import com.hpe.adm.nga.sdk.entities.EntityListService;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.entities.UpdateEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -53,7 +52,7 @@ public class TestUpdateEntities {
 		// test single entity
 		UpdateEntity spiedUpdateEntity = PowerMockito.spy(defects.at(1002).update());
 		EntityList spiedDefects = PowerMockito.spy(defects);
-		EntityListService service = (EntityListService)Whitebox.getInternalState(spiedDefects, "entityListService");											
+		EntityList service = (EntityList)Whitebox.getInternalState(spiedDefects, "entityListService");
 		
 		try{	
 			// convert string to json object

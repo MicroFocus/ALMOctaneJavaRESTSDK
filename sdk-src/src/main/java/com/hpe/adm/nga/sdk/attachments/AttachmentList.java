@@ -58,7 +58,7 @@ public class AttachmentList {
     }
 
     /**
-     * getter of AttachmentList UpdateEntities object ( same functionality as EntityListService.UpdateEntities )
+     * getter of AttachmentList UpdateEntities object ( same functionality as EntityList.UpdateEntities )
      *
      * @return - new AttachmentList UpdateEntities object
      */
@@ -76,7 +76,7 @@ public class AttachmentList {
     }
 
     /**
-     * getter of AttachmentList DeleteEntities object ( same functionality as EntityListService.DeleteEntities )
+     * getter of AttachmentList DeleteEntities object ( same functionality as EntityList.DeleteEntities )
      *
      * @return - new AttachmentList UpdateEntities object
      */
@@ -100,7 +100,7 @@ public class AttachmentList {
     public class Attachments {
 
         private final int iEntityId;
-        private final EntityListService.Entities entities;
+        private final EntityList.Entities entities;
 
         /**
          * Creates a new Attachments object

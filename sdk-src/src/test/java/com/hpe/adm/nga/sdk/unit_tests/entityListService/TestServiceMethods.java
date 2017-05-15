@@ -29,7 +29,6 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.hpe.adm.nga.sdk.entities.EntityList;
-import com.hpe.adm.nga.sdk.entities.EntityListService;
 import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
@@ -51,8 +50,8 @@ import static org.junit.Assert.*;
 @RunWith(PowerMockRunner.class)
 public class TestServiceMethods{
 
-	private EntityListService service = null;
-	private EntityListService spiedService = null;
+	private EntityList service = null;
+	private EntityList spiedService = null;
 	private GetEntities spiedGetEntity = null;
 	private static Octane octane;
 	
@@ -67,7 +66,7 @@ public class TestServiceMethods{
 		EntityList defects = octane.entityList("defects");
 		spiedGetEntity = PowerMockito.spy(defects.get());
 		EntityList spiedDefects = PowerMockito.spy(defects);
-		service = (EntityListService)Whitebox.getInternalState(spiedDefects, "entityListService");					
+		service = (EntityList)Whitebox.getInternalState(spiedDefects, "entityListService");
 		spiedService = PowerMockito.spy(service);
 		
 	}

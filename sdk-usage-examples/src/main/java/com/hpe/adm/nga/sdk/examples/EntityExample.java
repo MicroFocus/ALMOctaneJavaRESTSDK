@@ -17,7 +17,6 @@ package com.hpe.adm.nga.sdk.examples;
 
 import com.hpe.adm.nga.sdk.*;
 import com.hpe.adm.nga.sdk.entities.EntityList;
-import com.hpe.adm.nga.sdk.entities.EntityListService;
 import com.hpe.adm.nga.sdk.entities.GetEntities;
 import com.hpe.adm.nga.sdk.entities.GetEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -60,7 +59,7 @@ public class EntityExample {
      */
     public void getEntity() {
         // the context of the entity list is set to ID 2010.
-        final EntityListService.Entities entity = entityList.at(2010);
+        final EntityList.Entities entity = entityList.at(2010);
         // we are going to use this to GET the entity
         final GetEntity get = entity.get();
         // this actually executes the REST request and gets the entity
@@ -84,7 +83,7 @@ public class EntityExample {
      */
     public void convertServerZuluTimeToLocalTime() {
         // the context of the entity list is set to ID 2010.
-        final EntityListService.Entities entity = entityList.at(2010);
+        final EntityList.Entities entity = entityList.at(2010);
         // we are going to use this to GET the entity
         final GetEntity get = entity.get();
         // this actually executes the REST request and gets the entity

@@ -69,6 +69,6 @@ final class DefaultOctaneClassFactory implements OctaneClassFactory{
 
     @Override
     public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
-        return new EntityList(octaneHttpClient, baseDomain, entityName);
+        return new EntityList(octaneHttpClient, baseDomain +  entityName);
     }
 }

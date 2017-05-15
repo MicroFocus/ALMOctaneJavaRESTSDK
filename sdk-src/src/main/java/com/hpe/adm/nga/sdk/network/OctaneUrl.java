@@ -37,7 +37,7 @@ public final class OctaneUrl {
         return queryParams.containsKey(paramName);
     }
 
-    private void setParam(String paramName, String paramValue){
+    public void setParam(String paramName, String paramValue){
         queryParams.put(paramName, paramValue);
     }
 

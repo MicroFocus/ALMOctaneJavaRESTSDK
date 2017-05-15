@@ -15,7 +15,6 @@
  */
 package com.hpe.adm.nga.sdk;
 
-import com.hpe.adm.nga.sdk.entities.EntityListService;
 import com.hpe.adm.nga.sdk.model.*;
 import org.json.JSONArray;
 import org.json.JSONObject;

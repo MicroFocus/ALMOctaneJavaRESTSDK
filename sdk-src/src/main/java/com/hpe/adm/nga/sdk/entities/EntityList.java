@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright 2017 Hewlett-Packard Development Company, L.P.
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,100 +16,129 @@ package com.hpe.adm.nga.sdk.entities;
 
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
+
 /**
- * <p>
- * Creates a new EntityList object.  This can be used to get one entity (using the {@link #at(int) method}
- * or a collection of entities.
- * </p>
- * <p>
- *     Depending on the HTTP method that is required the correct method should be used
- * </p>
- *
+ * This class represents the entity context and carries out the actual server requests.  It builds the correct URL as
+ * appropriate
  */
 public class EntityList {
 
-	protected EntityListService entityListService = null;
+    // private members
+    protected final String urlDomain;
+    protected final OctaneHttpClient octaneHttpClient;
+
+
+    // **** public Functions ***
 
     /**
-     * Creates a new {@link EntityList} instance with the entity collection name and the client to be used
-     *  @param octaneHttpClient    - The client that is used for REST communication
-     * @param baseDomain - The entity collection name
-	 * @param entityName
-	 */
-	public EntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
-		entityListService = new EntityListService(octaneHttpClient, baseDomain + entityName);
-	}
-
-    /**
-     * Returns an entity context.  This is the same as setting the context to:
-     * <br>
-     * <code>[octane_url]/entity/entity_id</code>
-     * <br>
-     * This does not yet make a call to the server as the HTTP method has not been set
-     * @param entityId - The id of the entity
-     * @return the entity context that can be used further to carry out the call to the server
-     */
-	public EntityListService.Entities at(int entityId) {
-		return entityListService.at(entityId);
-	}
-
-    /**
-     * Returns a context that will be used to <code>GET</code> from the server.  Because this is a collection no
-     * id is sent.  This is the same  as setting the context to:
-     * <br>
-     * <code>[octane_url]/entity</code>
-     * <br>
-     * This does not yet make a call to the server but sets the context
+     * Creates a new EntityList object.  This represents an entity collection
      *
-     * @return a context to the entity collection that will be used for GET
+     * @param octaneHttpClient - Http Client
+     * @param entityListDomain - Domain Name
      */
-	public GetEntities get() {
-		return entityListService.get();
-	}
+    public EntityList(OctaneHttpClient octaneHttpClient, String entityListDomain) {
+
+        urlDomain = entityListDomain;
+        this.octaneHttpClient = octaneHttpClient;
+    }
 
     /**
-     * Returns a context that will be used to <code>PUT</code> from the server.  Because this is a collection no
-     * id is sent.  This is the same  as setting the context to:
-     * <br>
-     * <code>[octane_url]/entity</code>
-     * <br>
-     * This does not yet make a call to the server but sets the context
+     * getter of an Entities object ( Entities object handle a unique entity
+     * model )
      *
-     * @return a context to the entity collection that will be used for PUT
+     * @param entityId - entity id
+     * @return a new Entities object with specific id
      */
-	public UpdateEntities update() {
-		
-		return entityListService.update();
-	}
+    public Entities at(int entityId) {
+        return new Entities(entityId);
+    }
 
     /**
-     * Returns a context that will be used to <code>POST</code> from the server.  Because this is a collection no
-     * id is sent.  This is the same  as setting the context to:
-     * <br>
-     * <code>[octane_url]/entity</code>
-     * <br>
-     * This does not yet make a call to the server but sets the context
+     * getter of an GetEntities object of EntityList ( EntityList object handle a
+     * collection of entity models )
      *
-     * @return a context to the entity collection that will be used for POST
+     * @return a new GetEntities object
      */
-	public CreateEntities create() {
-
-		return entityListService.create();
-	}
+    public GetEntities get() {
+        return new GetEntities(octaneHttpClient, urlDomain);
+    }
 
     /**
-     * Returns a context that will be used to <code>DELETE</code> from the server.  Because this is a collection no
-     * id is sent.  This is the same  as setting the context to:
-     * <br>
-     * <code>[octane_url]/entity</code>
-     * <br>
-     * This does not yet make a call to the server but sets the context
+     * getter of an UpdateEntities object of EntityList ( EntityList object handle a
+     * collection of entity models )
      *
-     * @return a context to the entity collection that will be used for DELETE
+     * @return a new UpdateEntities object
      */
-	public DeleteEntities delete() {
-		return entityListService.delete();
-	}
+    public UpdateEntities update() {
+        return new UpdateEntities(octaneHttpClient, urlDomain);
+    }
 
+    /**
+     * getter of an CreateEntities object of EntityList ( EntityList object handle a
+     * collection of entity models
+     *
+     * @return a new CreateEntities object
+     */
+    public CreateEntities create() {
+        return new CreateEntities(octaneHttpClient, urlDomain);
+    }
+
+    /**
+     * getter of an DeleteEntities object of EntityList ( EntityList object handle a
+     * collection of entity models
+     *
+     * @return a new DeleteEntities object
+     */
+    public DeleteEntities delete() {
+        return new DeleteEntities(octaneHttpClient, urlDomain);
+    }
+
+
+    // **** Classes ***
+
+    /**
+     * This class hold the Entities object(An object that represent one Entity )
+     */
+    public class Entities {
+
+        private int iEntityId = 0;
+
+        /**
+         * Set entityId parameter
+         *
+         * @param entityId The entity id
+         */
+        public Entities(int entityId) {
+            iEntityId = entityId;
+        }
+
+        /**
+         * getter of a GetEntities object with specific entity
+         *
+         * @return The GetEntities object
+         */
+        public GetEntity get() {
+            return new GetEntity(octaneHttpClient, urlDomain, iEntityId);
+        }
+
+        /**
+         * getter of a UpdateEntities object with specific entity
+         *
+         * @return The UpdateEntities object
+         */
+        public UpdateEntity update() {
+            return new UpdateEntity(octaneHttpClient, urlDomain, iEntityId);
+        }
+
+        /**
+         * getter of a CreateEntities object with specific entity
+         *
+         * @return The DeleteEntities object
+         */
+        public DeleteEntity delete() {
+            return new DeleteEntity(octaneHttpClient, urlDomain, iEntityId);
+        }
+
+    }
 
 }
