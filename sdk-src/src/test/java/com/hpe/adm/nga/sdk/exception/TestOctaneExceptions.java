@@ -13,13 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.hpe.adm.nga.sdk.unit_tests.exception;
+package com.hpe.adm.nga.sdk.exception;
 
-import com.hpe.adm.nga.sdk.exception.OctaneException;
-import com.hpe.adm.nga.sdk.exception.OctanePartialException;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
-import com.hpe.adm.nga.sdk.CommonUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

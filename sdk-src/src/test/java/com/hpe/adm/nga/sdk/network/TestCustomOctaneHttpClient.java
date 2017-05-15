@@ -1,10 +1,9 @@
-package com.hpe.adm.nga.sdk.unit_tests.customhttpclient;
+package com.hpe.adm.nga.sdk.network;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
-import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import org.junit.Assert;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
@@ -22,9 +21,9 @@ public class TestCustomOctaneHttpClient {
     @Test
     public void testCustomOctaneHttpClient() {
         //Make the sdk use a custom implementation of the octane http client
-        String octaneHttpClientClassName = "com.hpe.adm.nga.sdk.unit_tests.customhttpclient.DummyOctaneHttpClient";
+        String octaneHttpClientClassName = "com.hpe.adm.nga.sdk.network.DummyOctaneHttpClient";
 
-        System.getProperties().setProperty(
+        System.setProperty(
                 OctaneClassFactory.OCTANE_HTTP_CLIENT_CLASS_NAME,
                 octaneHttpClientClassName);
 

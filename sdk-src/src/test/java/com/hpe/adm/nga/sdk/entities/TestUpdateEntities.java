@@ -13,13 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.hpe.adm.nga.sdk.unit_tests.entityListService;
+package com.hpe.adm.nga.sdk.entities;
 
-import com.hpe.adm.nga.sdk.CommonUtils;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.entities.CreateEntities;
-import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -31,43 +30,42 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.Collection;
-
 import static org.junit.Assert.fail;
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
-public class TestCreateEntities {
+public class TestUpdateEntities {
 	private static Octane octane;
+	private static EntityList defects;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		octane = CommonMethods.getOctaneForTest();
-
+		defects = octane.entityList("defects");
 	}
 	
 	@Test
-	public void testCreateEntity(){		
-		final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"moris2\"}],\"total_count\":1}";
+	public void testUpdateEntity(){		
+		final String jsonUpdateString = "{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"name\"}";
+		// test single entity
+		UpdateEntity spiedUpdateEntity = PowerMockito.spy(defects.at(1002).update());
 		
-		EntityList defects = octane.entityList("defects");
-		CreateEntities spiedCreateEntity = PowerMockito.spy(defects.create());
-		
-		try{
-			Collection<EntityModel> entityModelsIn = CommonUtils.testGetEntityModels(jsonCreateString);
-
-			spiedCreateEntity.entities(entityModelsIn);
+		try{	
+			// convert string to json object
+			JSONObject inJsonEntity = new JSONObject(jsonUpdateString);
+			// run protected method which converts to EntityModel
+			EntityModel entityModelIn = ModelParser.getInstance().getEntityModel(inJsonEntity);
 			
-			Collection<EntityModel> internalModels = (Collection<EntityModel>) Whitebox.getInternalState(spiedCreateEntity, "entityModels");
-			JSONObject jsonEntity = CommonUtils.getEntitiesJSONObject(internalModels);
+			// Insert data to update entity
+			spiedUpdateEntity.entity(entityModelIn);
+			// get internal state of EntityModel
+			EntityModel entityModelOut = (EntityModel) Whitebox.getInternalState(spiedUpdateEntity, "entityModel");
+			// convert internal data to JSONObject via internal method and convert it to EntityModel
 
-			Collection<EntityModel> entityModelsOut = CommonUtils.testGetEntityModels(jsonEntity.toString());
-			Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModelsIn, entityModelsOut));
+			Assert.assertTrue(CommonUtils.isEntityAInEntityB(entityModelIn, entityModelOut));
 		}
 		catch(Exception ex){
 			fail("Failed with exception: " + ex);
 		}
 		
 	}
-
-
 }

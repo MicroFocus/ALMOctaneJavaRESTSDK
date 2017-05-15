@@ -13,10 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.hpe.adm.nga.sdk.unit_tests.attachments;
+package com.hpe.adm.nga.sdk.attachments;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.junit.BeforeClass;
 import org.junit.Test;

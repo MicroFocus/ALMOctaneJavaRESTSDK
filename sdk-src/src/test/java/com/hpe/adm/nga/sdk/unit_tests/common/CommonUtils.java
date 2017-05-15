@@ -13,22 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk.unit_tests.common;
 
-import com.hpe.adm.nga.sdk.model.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.FieldModel;
+import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
+import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 
-import java.util.*;
-import java.util.stream.IntStream;
-
-import static org.junit.Assert.fail;
+import java.util.Collection;
+import java.util.Set;
 
 public class CommonUtils {
-    private final static String JSON_DATA_NAME = "data";
-
-
-
     public static boolean isEntityAInEntityB(EntityModel entityA, EntityModel entityB) {
         return isEntityAInEntityB(entityA, entityB, false);
     }
@@ -94,21 +89,4 @@ public class CommonUtils {
         return !(idA == null || idB == null || idA.getValue() == null || idB.getValue() == null ||
                 !idA.getValue().equals(idB.getValue())) && (typeA != null && typeB != null && typeA.getValue() != null && typeA.getValue().equals(typeB.getValue()) || subtypeA != null && typeB != null && subtypeA.getValue() != null && subtypeA.getValue().equals(typeB.getValue()) || subtypeB != null && typeA != null && subtypeB.getValue() != null && subtypeB.getValue().equals(typeA.getValue()));
     }
-
-    public static Collection<EntityModel> testGetEntityModels(String jason) throws Exception{
-
-
-        JSONObject jasonObj = new JSONObject(jason);
-        JSONArray jasoDataArr = jasonObj.getJSONArray(JSON_DATA_NAME);
-        Collection<EntityModel> entityModels = new ArrayList<>();
-        IntStream.range(0, jasoDataArr.length()).forEach((i) -> {entityModels.add(ModelParser.getInstance().getEntityModel(jasoDataArr.getJSONObject(i)));
-
-        });
-
-        return entityModels;
-    }
-    public static JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels){
-        return ModelParser.getInstance().getEntitiesJSONObject(entitiesModels);
-    }
-
 }

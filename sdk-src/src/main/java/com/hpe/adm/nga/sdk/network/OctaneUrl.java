@@ -90,6 +90,9 @@ public final class OctaneUrl {
 
         //Append paths
         if(getPaths().size()>0){
+            if (!url.endsWith("/")) {
+                url += "/";
+            }
             url += getPaths().stream().collect(Collectors.joining(PATH_SEPARATOR));
         }
 

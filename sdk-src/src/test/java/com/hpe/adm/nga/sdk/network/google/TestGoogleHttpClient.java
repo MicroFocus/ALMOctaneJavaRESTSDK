@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.unit_tests.network.google;
+package com.hpe.adm.nga.sdk.network.google;
 
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;

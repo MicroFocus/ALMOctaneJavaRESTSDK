@@ -1,9 +1,6 @@
-package com.hpe.adm.nga.sdk.unit_tests.customhttpclient;
+package com.hpe.adm.nga.sdk.network;
 
 import com.hpe.adm.nga.sdk.authentication.Authentication;
-import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
-import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

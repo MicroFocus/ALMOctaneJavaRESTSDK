@@ -37,7 +37,9 @@ public class CommonMethods {
 
     public static Octane getOctaneForTest() {
         System.setProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME, TestOctaneClassFactory.class.getName());
-        return new Octane.Builder(new SimpleUserAuthentication("user", "password")).Server(getDomain()).sharedSpace(Long.parseLong(getSharedSpace())).workSpace(getWorkSpace()).build();
+        final Octane octane = new Octane.Builder(new SimpleUserAuthentication("user", "password")).Server(getDomain()).sharedSpace(Long.parseLong(getSharedSpace())).workSpace(getWorkSpace()).build();
+        System.clearProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
+        return octane;
     }
 
     public static String getDomain() {
