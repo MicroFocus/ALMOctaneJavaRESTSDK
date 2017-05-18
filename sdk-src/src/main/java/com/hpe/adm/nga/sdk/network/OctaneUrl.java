@@ -6,6 +6,9 @@ import com.hpe.adm.nga.sdk.query.Query;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for building URLs for the implementation of the {@link OctaneHttpClient}
+ */
 public final class OctaneUrl {
 
     private static final String LIMIT_PARAM_NAME = "limit";
@@ -20,39 +23,63 @@ public final class OctaneUrl {
     private Map<String, String> queryParams = new HashMap<>();
     private List<String> paths = new ArrayList<>();
 
+    /**
+     * Create a url starting from the provided base
+     * @param baseUrl scheme:[//[user[:password]@]host[:port]]
+     */
     OctaneUrl(String baseUrl){
         this.baseUrl = baseUrl;
     }
 
-    void addPath(String path){
-        String[] subPaths =  path.split(PATH_SEPARATOR);
-        paths.addAll(Arrays.asList(subPaths));
+    /**
+     * Add a path or more paths to the url, paths are concatenated into the final url
+     * @return string or a list of strings representing the path from the base url
+     */
+    void addPaths(String paths){
+        String[] subPaths =  paths.split(PATH_SEPARATOR);
+        this.paths.addAll(Arrays.asList(subPaths));
     }
 
-    private List<String> getPaths(){
+    /**
+     * Return the current paths
+     * @return list of strings representing the path of the current url
+     */
+    public List<String> getPaths(){
         return paths;
     }
 
-    private boolean hasParam(String paramName){
+    /**
+     * Check whether the query param with {@code paramName} has already been set via {@link #setParam(String, String)}
+     * @param paramName name of the parameter
+     * return true if the param was set, false otherwise
+     */
+    public boolean hasParam(String paramName){
         return queryParams.containsKey(paramName);
     }
 
+    /**
+     * Set query param
+     * @param paramName name of the parameter
+     * @param paramValue value of the parameter
+     */
     public void setParam(String paramName, String paramValue){
         queryParams.put(paramName, paramValue);
     }
 
-    private String getParam(String paramName){
+    /**
+     * Get the value of the query param
+     * @param paramName name of the parameter
+     * @return value of the parameter
+     */
+    public String getParam(String paramName){
         return queryParams.get(paramName);
     }
 
-    private String createQueryString(){
-        return queryParams
-                .keySet()
-                .stream()
-                .map(key -> key + "=" + queryParams.get(key))
-                .collect(Collectors.joining("&"));
-    }
 
+    /**
+     * Set hte value of the "fields" param,
+     * @param fields
+     */
     public void addFieldsParam(String... fields) {
         String fieldsString = Arrays.stream(fields).collect(Collectors.joining(","));
         if(hasParam(OctaneUrl.FIELDS_PARAM_NAME)){
@@ -62,14 +89,29 @@ public final class OctaneUrl {
         }
     }
 
+    /**
+     * Set query param named "limit", for the Octane API it controls max number of results returned from the data-set, <br>
+     * can be used for pagination together with {@link #setOffsetParam(int)}
+     * @param limit value of limit
+     */
     public void setLimitParam(int limit) {
         setParam(OctaneUrl.LIMIT_PARAM_NAME, String.valueOf(limit));
     }
 
+    /**
+     * Set query param named "offset", for the Octane API it controls the offset from the fist entity of the data-set, <br>
+     * can be used for pagination together with {@link #setLimitParam(int)}
+     * @param offset value of offset
+     */
     public void setOffsetParam(int offset) {
         setParam(OctaneUrl.OFFSET_PARAM_NAME, String.valueOf(offset));
     }
 
+    /**
+     * Set the value of the "order_by" param
+     * @param orderBy name of a field of an {@link com.hpe.adm.nga.sdk.model.EntityModel}, to sort by
+     * @param asc true for ascending, false for descending
+     */
     public void setOrderByParam(String orderBy, boolean asc) {
         String ascString = asc ? "" : "-";
         String orderByString = ascString + orderBy;
@@ -78,12 +120,28 @@ public final class OctaneUrl {
 
     /**
      * Set a param named "query" that is used to filter data
-     * @param query
+     * @param query {@link Query} object, build by {@link com.hpe.adm.nga.sdk.query.Query.QueryBuilder}
      */
     public void setDqlQueryParam(Query query) {
         setParam(OctaneUrl.QUERY_PARAM_NAME, '"' + query.getQueryString() + '"');
     }
 
+    /**
+     * Concatenate the query params for the url builder
+     * @return String of form: queryParamName1=queryParamValue1&queryParamName2=queryParamValue2
+     */
+    private String createQueryString(){
+        return queryParams
+                .keySet()
+                .stream()
+                .map(key -> key + "=" + queryParams.get(key))
+                .collect(Collectors.joining("&"));
+    }
+
+    /**
+     * Build the url string from the state of this object
+     * @return URL string containing base url with paths and query params
+     */
     @Override
     public String toString() {
         String url = baseUrl;
