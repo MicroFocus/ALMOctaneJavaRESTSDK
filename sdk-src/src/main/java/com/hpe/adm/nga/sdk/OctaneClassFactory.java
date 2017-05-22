@@ -5,16 +5,21 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Factory for the {@link Octane} class, can implemented by clients to modify the behaviour of the sdk
+ * Implementations of this class are required to be singleton
+ * If you specify a the system param for {@link #getSystemParamImplementation()},
+ * this method is called to instantiate the class
  */
 public interface OctaneClassFactory {
 
     /**
-     * Sys param name used by {@link #getInstance()}
+     * Sys param name used by {@link #getSystemParamImplementation()}
      */
     String OCTANE_CLASS_FACTORY_CLASS_NAME = "octaneClassFactoryClassName";
-    String OCTANE_HTTP_CLIENT_CLASS_NAME = "octaneHttpClientClassName";
 
     /**
      * Create an instance of the OctaneHttpClient for the {@link Octane} to use
@@ -36,7 +41,7 @@ public interface OctaneClassFactory {
      * Get the implementation implementation of {@link OctaneClassFactory}, can be modified by changing the OCTANE_CLASS_FACTORY_CLASS_NAME system param
      * @return
      */
-    static OctaneClassFactory getInstance() {
+    static OctaneClassFactory getSystemParamImplementation() {
         Logger logger = LogManager.getLogger(Octane.class.getName());
         String octaneClassFactoryClassName = System.getProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
 
@@ -52,10 +57,15 @@ public interface OctaneClassFactory {
             }
 
             try {
-                return clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                logger.error(e);
-                throw new RuntimeException("Failed to instantiate class " + octaneClassFactoryClassName, e);
+                //Call the get instance method of the class
+                Method method = clazz.getDeclaredMethod("getInstance");
+                return (OctaneClassFactory) method.invoke(null);
+            } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                String message = "Failed to instantiate class "
+                        + octaneClassFactoryClassName
+                        + ", the class must be a singleton and have a static getInstance() method";
+                logger.error(message);
+                throw new RuntimeException(message, e);
             }
         } else {
             return DefaultOctaneClassFactory.getInstance();

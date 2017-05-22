@@ -84,7 +84,7 @@ public class Octane {
      * @return A new EntityList object that list of entities
      */
     public EntityList entityList(String entityName) {
-        return OctaneClassFactory.getInstance().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
+        return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
     }
 
     /**
@@ -259,7 +259,7 @@ public class Octane {
         }
 
         private OctaneHttpClient createOctaneHttpClient() {
-            return OctaneClassFactory.getInstance().getOctaneHttpClient(urlDomain);
+            return OctaneClassFactory.getSystemParamImplementation().getOctaneHttpClient(urlDomain);
         }
 
         @Override

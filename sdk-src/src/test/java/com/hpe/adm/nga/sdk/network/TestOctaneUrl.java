@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by brucesp on 15-May-17.
+ * Test for {@link OctaneUrl}
  */
 public class TestOctaneUrl {
 

@@ -44,7 +44,7 @@ public class AttachmentList {
     public AttachmentList(OctaneHttpClient octaneHttpClient, String baseDomain) {
         this.octaneHttpClient = octaneHttpClient;
         this.attachmentListDomain = baseDomain + ATTACHMENTS_URL;
-        entityList = OctaneClassFactory.getInstance().getEntityList(this.octaneHttpClient, baseDomain, ATTACHMENTS_URL);
+        entityList = OctaneClassFactory.getSystemParamImplementation().getEntityList(this.octaneHttpClient, baseDomain, ATTACHMENTS_URL);
     }
 
     /**
