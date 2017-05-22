@@ -26,12 +26,12 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
  * The REST API metadata is split into two: entities and fields.  For each context the correct method used:
  * <br>
  *</p>
- * <p><code>[server_url]/metadata/entities</code> use {@link #entities()}</p>
- * <p><code>[server_url]/metadata/fields</code> use {@link #fields()}</p>
+ * <p>{@code [server_url]/metadata/entities} use {@link #entities()}</p>
+ * <p>{@code [server_url]/metadata/fields} use {@link #fields()}</p>
  * <p>In addition you can use the API to retrieve specific entities and fields.  For example:</p>
- * <p><code>[server_url]/metadata/entities?query="name EQ 'story'"</code> use {@link #entities(String...)} with "story" as the parameter</p>
- * <p><code>[server_url]/metadata/fields?query="entity_name EQ 'pipeline'"</code> use {@link #fields(String...)} with "pipeline" as the parameter</p>
- * <p>Metadata can only be read (HTTP GET) so after the correct method is called the <code>execute()</code> method should be used.</p>
+ * <p>{@code [server_url]/metadata/entities?query="name EQ 'story'"} use {@link #entities(String...)} with "story" as the parameter</p>
+ * <p>{@code [server_url]/metadata/fields?query="entity_name EQ 'pipeline'"} use {@link #fields(String...)} with "pipeline" as the parameter</p>
+ * <p>Metadata can only be read (HTTP GET) so after the correct method is called the {@code execute()} method should be used.</p>
  * @see EntityMetadata for more information about entity metadata
  * @see FieldMetadata for more information about field metadata
  * */

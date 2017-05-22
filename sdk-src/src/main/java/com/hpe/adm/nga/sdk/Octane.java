@@ -47,7 +47,7 @@ import java.util.UUID;
  * }
  * </p>
  * <p>
- * The <code>Octane</code> class is instantialized using the {@link Octane.Builder} class.  Once that instance has been
+ * The {@code Octane} class is instantialized using the {@link Octane.Builder} class.  Once that instance has been
  * obtained the Octane context can be used to create further entity, metadata, attachment contexts or to sign out of the server.
  * </p>
  * <p>
@@ -79,7 +79,7 @@ public class Octane {
     /**
      * <p>
      * Creates a new EntityList context.  The entity name should be the collection name of the entity.
-     * For example <code>defects, tests, releases</code>
+     * For example {@code defects, tests, releases}
      * </p>
      * This method creates a new separate entity context each time that can be reused or used in parallel
      * <p>
@@ -94,7 +94,7 @@ public class Octane {
     /**
      * Creates a new Metadata object.  This represents the following URL:
      * <p>
-     * <code>[workspace_url/metadata</code>
+     * {@code [workspace_url/metadata}
      * </p>
      * <p>
      * This can then be used further to get metadata information from the server
@@ -109,7 +109,7 @@ public class Octane {
     /**
      * Creates a new AttachmentList object.  This returns the context for attachments.  This is equivalent to
      * <br>
-     * <code>[workspace_url/attachments</code>
+     * {@code [workspace_url/attachments}
      *
      * @return A new AttachmentList object that holds the attachments context
      */
@@ -146,12 +146,12 @@ public class Octane {
     /**
      * This class is used to create an {@link Octane} instance.  It is initialised using the correct {@link Authentication}
      * <br>
-     * The <code>Builder</code> class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
+     * The {@code Builder} class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
      * necessary to add a sharedspace or workspace and will work with entities under that context.
      * <br>
      * Use the workspace and sharedspace methods only once otherwise the behaviour cannot be guaranteed!
      * <br>
-     * Once the correct context has been built up use the {@link #build()} method to create the <code>Octane</code> instance
+     * Once the correct context has been built up use the {@link #build()} method to create the {@code Octane} instance
      */
     public static class Builder {
         //Private
@@ -214,7 +214,7 @@ public class Octane {
         /**
          * Sets the domain and the port.  The domain should include the full http scheme (http/https)
          * <br>
-         * eg <code>http://octane.server.com</code>
+         * eg {@code http://octane.server.com}
          *
          * @param domain - domain name including http scheme
          * @param port   - port number
@@ -231,7 +231,7 @@ public class Octane {
         /**
          * Sets the domain and the port.  The domain should include the full http scheme (http/https)
          * <br>
-         * eg <code>http://octane.server.com</code>
+         * eg {@code http://octane.server.com}
          *
          * @param domain - domain name including http scheme
          * @return this object

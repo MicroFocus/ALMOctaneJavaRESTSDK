@@ -56,7 +56,7 @@ public interface OctaneClassFactory {
     EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName);
 
     /**
-     * Get the implementation implementation of {@link OctaneClassFactory}, can be modified by changing the OCTANE_CLASS_FACTORY_CLASS_NAME system param
+     * Get the implementation implementation of OctaneClassFactory, can be modified by changing the OCTANE_CLASS_FACTORY_CLASS_NAME system param
      * @return
      */
     static OctaneClassFactory getSystemParamImplementation() {

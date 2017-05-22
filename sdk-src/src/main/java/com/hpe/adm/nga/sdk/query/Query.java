@@ -33,10 +33,10 @@ package com.hpe.adm.nga.sdk.query;
  *       For example:
  *       <br>
  *       To build a query such as {@code name eq 'entity_name'} the following code is used:
- *       <br><code>Query.statement("name", QueryMethod.EqualTo, "entity_name");</code><br>
+ *       <br>{@code Query.statement("name", QueryMethod.EqualTo, "entity_name");}<br>
  *       <br>
  *       To negate this statement such as {@code !name eq 'entity_name'} the following code is used:
- *       <br><code>Query.not("name", QueryMethod.EqualTo, "entity_name");</code><br>
+ *       <br>{@code Query.not("name", QueryMethod.EqualTo, "entity_name");}<br>
  *   </p>
  *   <p>
  *       These statements produce a {@code QueryBuilder} object.  By calling the {@link QueryBuilder#build()} method this creates a {@code Query object} which can then
