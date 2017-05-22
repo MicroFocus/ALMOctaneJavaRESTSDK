@@ -5,7 +5,7 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 
 /**
- * Default implementation of the {@link OctaneClassFactory}, used by {@link OctaneClassFactory#getInstance()} when no system property is specified
+ * Default implementation of the {@link OctaneClassFactory}, used by {@link OctaneClassFactory#getSystemParamImplementation()} when no system property is specified
  */
 final class DefaultOctaneClassFactory implements OctaneClassFactory{
 

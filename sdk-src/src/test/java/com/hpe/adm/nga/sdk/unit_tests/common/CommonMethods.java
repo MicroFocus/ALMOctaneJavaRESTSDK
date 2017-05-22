@@ -101,6 +101,12 @@ public class CommonMethods {
 
     public static final class TestOctaneClassFactory implements OctaneClassFactory {
 
+        private static final TestOctaneClassFactory instance = new TestOctaneClassFactory();
+        private TestOctaneClassFactory(){}
+        public static OctaneClassFactory getInstance(){
+            return instance;
+        }
+
         @Override
         public OctaneHttpClient getOctaneHttpClient(String urlDomain) {
             final OctaneHttpClient octaneHttpClient = PowerMockito.mock(OctaneHttpClient.class);
