@@ -15,7 +15,7 @@
  */
 package com.hpe.adm.nga.sdk.attachments;
 
-import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.entities.*;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
@@ -42,10 +42,9 @@ public class AttachmentList {
      * @param baseDomain - domain of attachmentList
      */
     public AttachmentList(OctaneHttpClient octaneHttpClient, String baseDomain) {
-
         this.octaneHttpClient = octaneHttpClient;
         this.attachmentListDomain = baseDomain + ATTACHMENTS_URL;
-        entityList = Octane.getOctaneClassFactory().getEntityList(this.octaneHttpClient, baseDomain, ATTACHMENTS_URL);
+        entityList = OctaneClassFactory.getInstance().getEntityList(this.octaneHttpClient, baseDomain, ATTACHMENTS_URL);
     }
 
     /**
