@@ -84,7 +84,7 @@ public class Octane {
      * @return A new EntityList object that list of entities
      */
     public EntityList entityList(String entityName) {
-        return getOctaneClassFactory().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
+        return OctaneClassFactory.getInstance().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
     }
 
     /**
@@ -259,7 +259,7 @@ public class Octane {
         }
 
         private OctaneHttpClient createOctaneHttpClient() {
-            return getOctaneClassFactory().getOctaneHttpClient(urlDomain);
+            return OctaneClassFactory.getInstance().getOctaneHttpClient(urlDomain);
         }
 
         @Override
@@ -268,28 +268,4 @@ public class Octane {
         }
     }
 
-    public static OctaneClassFactory getOctaneClassFactory() {
-        final String octaneClassFactoryClassName = System.getProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
-
-        if (octaneClassFactoryClassName != null) {
-            logger.info("Creating OctaneClassFactory using implementation {}", octaneClassFactoryClassName);
-            //Use reflection to instantiate the class
-            Class<OctaneClassFactory> clazz;
-            try {
-                clazz = (Class<OctaneClassFactory>) Class.forName(octaneClassFactoryClassName);
-            } catch (ClassNotFoundException e) {
-                logger.error(e);
-                throw new RuntimeException("Failed to find class with name: " + octaneClassFactoryClassName, e);
-            }
-
-            try {
-                return clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                logger.error(e);
-                throw new RuntimeException("Failed to instantiate class " + octaneClassFactoryClassName, e);
-            }
-        } else {
-            return DefaultOctaneClassFactory.getInstance();
-        }
-    }
 }

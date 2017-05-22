@@ -28,7 +28,6 @@ import java.util.Collection;
 
 /**
  * An abstract representation of a request
- *
  */
 public abstract class OctaneRequest {
 
@@ -49,7 +48,7 @@ public abstract class OctaneRequest {
 
 	protected OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final int entityId) {
 		this (octaneHttpClient, urlDomain);
-		octaneUrl.addPath(String.valueOf(entityId));
+		octaneUrl.addPaths(String.valueOf(entityId));
 	}
 
 	protected final OctaneUrl getOctaneUrl(){

@@ -13,7 +13,7 @@ import java.util.Collection;
  * GetEntities.
  */
 public class GetEntities extends OctaneRequest {
-    // Public
+
     GetEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain);
     }

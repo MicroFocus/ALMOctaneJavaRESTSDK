@@ -21,11 +21,8 @@ import java.util.TimeZone;
 import java.util.function.BiFunction;
 
 /**
- *
- * Created by busi on 04/01/2017.
+ * Used to define the comparison methods that can be used for the {@link com.hpe.adm.nga.sdk.query.Query.QueryBuilder}
  */
-
-
 public enum QueryMethod {
 
     EqualTo(QueryMethod::equalTo),
@@ -52,7 +49,6 @@ public enum QueryMethod {
     public BiFunction<String, Object, String> getAction(){
         return this.function;
     }
-
 
     /**
      * Generates a query string for "equal to" comparison
@@ -104,7 +100,6 @@ public enum QueryMethod {
         return "(" + field + " " + COMPARISON_OPERATOR_GREATER_EQUALS + " " + toString(value) + ")";
     }
 
-
     /**
      * Generates a string representation of a given Object
      * @param value - Object to convert
@@ -126,7 +121,5 @@ public enum QueryMethod {
             return value.toString();
         }
     }
-
-
 
 }
