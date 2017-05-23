@@ -51,7 +51,7 @@ public final class OctaneUrl {
 
     /**
      * Add a path or more paths to the url, paths are concatenated into the final url
-     * @return string or a list of strings representing the path from the base url
+     * @param paths string or a list of strings representing the path from the base url
      */
     void addPaths(String paths){
         String[] subPaths =  paths.split(PATH_SEPARATOR);
@@ -69,7 +69,7 @@ public final class OctaneUrl {
     /**
      * Check whether the query param with {@code paramName} has already been set via {@link #setParam(String, String)}
      * @param paramName name of the parameter
-     * return true if the param was set, false otherwise
+     * @return true if the param was set, false otherwise
      */
     public boolean hasParam(String paramName){
         return queryParams.containsKey(paramName);
@@ -96,7 +96,7 @@ public final class OctaneUrl {
 
     /**
      * Set hte value of the "fields" param,
-     * @param fields
+     * @param fields list of fields of the Entity to be retrieved
      */
     public void addFieldsParam(String... fields) {
         String fieldsString = Arrays.stream(fields).collect(Collectors.joining(","));

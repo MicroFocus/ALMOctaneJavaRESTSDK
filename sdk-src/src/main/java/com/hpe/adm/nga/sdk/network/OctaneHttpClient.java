@@ -35,6 +35,7 @@ public interface OctaneHttpClient {
 
     /**
      * Authenticate with the Octane server using an implementation of the {@link Authentication} class
+     * @param authentication implementation of {@link Authentication}
      * @return true if the authentication was successful, false otherwise
      */
     boolean authenticate(Authentication authentication);

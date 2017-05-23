@@ -43,6 +43,8 @@ public final class Field extends MetadataOctaneRequest {
 
     /**
      * Creates a new Field object
+     * @param octaneHttpClient implementation of the {@link OctaneHttpClient}
+     * @param urlDomain base url to use with the http client
      */
     public Field(OctaneHttpClient octaneHttpClient, String urlDomain) {
 

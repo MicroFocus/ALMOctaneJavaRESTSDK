@@ -74,7 +74,7 @@ public abstract class OctaneRequest {
 	 *
 	 * @param octaneHttpRequest - http request
 	 * @return entities ased on Http Request
-	 * * @throws Exception
+	 * @throws Exception if response parsing fails
 	 */
 	protected final Collection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
 

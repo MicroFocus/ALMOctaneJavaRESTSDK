@@ -50,14 +50,14 @@ public interface OctaneClassFactory {
      * Get the implementation of the {@link EntityList} used by the {@link Octane} object
      * @param octaneHttpClient used to create the
      * @param baseDomain for the entity list
-     * @param entityName
-     * @return
+     * @param entityName API entity name to be used in the url
+     * @return EntityList for the specific entity, implementation uses provided @param octaneHttpClient
      */
     EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName);
 
     /**
      * Get the implementation implementation of OctaneClassFactory, can be modified by changing the OCTANE_CLASS_FACTORY_CLASS_NAME system param
-     * @return
+     * @return OctaneClassFactory implementation based on the OCTANE_CLASS_FACTORY_CLASS_NAME sys param, if the param is missing, returns {@link DefaultOctaneClassFactory}
      */
     static OctaneClassFactory getSystemParamImplementation() {
         Logger logger = LogManager.getLogger(Octane.class.getName());
