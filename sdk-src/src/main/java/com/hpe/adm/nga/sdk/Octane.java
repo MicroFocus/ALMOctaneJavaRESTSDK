@@ -1,24 +1,25 @@
-/*    Copyright 2017 Hewlett-Packard Development Company, L.P.
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-*/
+/*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,7 +44,7 @@ import java.util.UUID;
  * }
  * </p>
  * <p>
- * The <code>Octane</code> class is instantialized using the {@link Octane.Builder} class.  Once that instance has been
+ * The {@code Octane} class is instantialized using the {@link Octane.Builder} class.  Once that instance has been
  * obtained the Octane context can be used to create further entity, metadata, attachment contexts or to sign out of the server.
  * </p>
  * <p>
@@ -56,8 +57,7 @@ public class Octane {
     private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/";
     private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
     private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
-    private static final String METADATA_DOMAIN_FORMAT = "metadata";
-    private static final String ATTACHMENT_LIST_DOMAIN_FORMAT = "attachments";
+    private static final Logger logger = LogManager.getLogger(Octane.class.getName());
 
     //private members
     private final String urlDomain;
@@ -66,7 +66,7 @@ public class Octane {
     private final OctaneHttpClient octaneHttpClient;
 
     // functions
-    protected Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
+    private Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
         this.octaneHttpClient = octaneHttpClient;
         urlDomain = domain;
         idsharedSpaceId = sharedSpaceId;
@@ -76,7 +76,7 @@ public class Octane {
     /**
      * <p>
      * Creates a new EntityList context.  The entity name should be the collection name of the entity.
-     * For example <code>defects, tests, releases</code>
+     * For example {@code defects, tests, releases}
      * </p>
      * This method creates a new separate entity context each time that can be reused or used in parallel
      * <p>
@@ -85,38 +85,33 @@ public class Octane {
      * @return A new EntityList object that list of entities
      */
     public EntityList entityList(String entityName) {
-
-        String entityListDomain = getBaseDomainFormat() + entityName;
-        return new EntityList(octaneHttpClient, entityListDomain);
+        return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
     }
 
     /**
      * Creates a new Metadata object.  This represents the following URL:
      * <p>
-     *     <code>[workspace_url/metadata</code>
+     * {@code [workspace_url/metadata}
      * </p>
      * <p>
-     *     This can then be used further to get metadata information from the server
+     * This can then be used further to get metadata information from the server
      * </p>
      *
      * @return A new Metadata object that holds the metadata context
      */
     public Metadata metadata() {
-        String metadataDomain = getBaseDomainFormat() + METADATA_DOMAIN_FORMAT;
-        return new Metadata(octaneHttpClient, metadataDomain);
+        return new Metadata(octaneHttpClient, getBaseDomainFormat());
     }
 
     /**
      * Creates a new AttachmentList object.  This returns the context for attachments.  This is equivalent to
      * <br>
-     *  <code>[workspace_url/attachments</code>
+     * {@code [workspace_url/attachments}
      *
      * @return A new AttachmentList object that holds the attachments context
      */
     public AttachmentList AttachmentList() {
-
-        String attachmentListDomain = getBaseDomainFormat() + ATTACHMENT_LIST_DOMAIN_FORMAT;
-        return new AttachmentList(octaneHttpClient, attachmentListDomain);
+        return new AttachmentList(octaneHttpClient, getBaseDomainFormat());
     }
 
     /**
@@ -124,7 +119,7 @@ public class Octane {
      *
      * @return base domain
      */
-    private String getBaseDomainFormat() {
+    protected String getBaseDomainFormat() {
 
         String baseDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
 
@@ -148,12 +143,12 @@ public class Octane {
     /**
      * This class is used to create an {@link Octane} instance.  It is initialised using the correct {@link Authentication}
      * <br>
-     * The <code>Builder</code> class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
+     * The {@code Builder} class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
      * necessary to add a sharedspace or workspace and will work with entities under that context.
      * <br>
      * Use the workspace and sharedspace methods only once otherwise the behaviour cannot be guaranteed!
      * <br>
-     * Once the correct context has been built up use the {@link #build()} method to create the <code>Octane</code> instance
+     * Once the correct context has been built up use the {@link #build()} method to create the {@code Octane} instance
      */
     public static class Builder {
         //Private
@@ -216,7 +211,7 @@ public class Octane {
         /**
          * Sets the domain and the port.  The domain should include the full http scheme (http/https)
          * <br>
-         * eg <code>http://octane.server.com</code>
+         * eg {@code http://octane.server.com}
          *
          * @param domain - domain name including http scheme
          * @param port   - port number
@@ -233,7 +228,7 @@ public class Octane {
         /**
          * Sets the domain and the port.  The domain should include the full http scheme (http/https)
          * <br>
-         * eg <code>http://octane.server.com</code>
+         * eg {@code http://octane.server.com}
          *
          * @param domain - domain name including http scheme
          * @return this object
@@ -256,7 +251,7 @@ public class Octane {
             Octane objOctane = null;
 
             logger.info("Building Octane context using {}", this);
-            OctaneHttpClient octaneHttpClient = new GoogleHttpClient(urlDomain);
+            OctaneHttpClient octaneHttpClient = createOctaneHttpClient();
             if (octaneHttpClient.authenticate(authentication)) {
                 objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
             }
@@ -264,9 +259,14 @@ public class Octane {
             return objOctane;
         }
 
+        private OctaneHttpClient createOctaneHttpClient() {
+            return OctaneClassFactory.getSystemParamImplementation().getOctaneHttpClient(urlDomain);
+        }
+
         @Override
         public String toString() {
             return String.format("Server: %s SharedSpace: %s Workspace: %s", urlDomain, idsharedSpaceId, workSpaceId);
         }
     }
+
 }

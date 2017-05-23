@@ -1,23 +1,27 @@
 /*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    Copyright 2017 Hewlett-Packard Development Company, L.P.
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.hpe.adm.nga.sdk.examples;
 
 import com.hpe.adm.nga.sdk.*;
+import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.GetEntities;
+import com.hpe.adm.nga.sdk.entities.GetEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
+import com.hpe.adm.nga.sdk.query.Query;
+import com.hpe.adm.nga.sdk.query.QueryMethod;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -54,9 +58,9 @@ public class EntityExample {
      */
     public void getEntity() {
         // the context of the entity list is set to ID 2010.
-        final EntityListService.Entities entity = entityList.at(2010);
+        final EntityList.Entities entity = entityList.at(2010);
         // we are going to use this to GET the entity
-        final EntityListService.Entities.Get get = entity.get();
+        final GetEntity get = entity.get();
         // this actually executes the REST request and gets the entity
         final EntityModel entityModel = get.execute();
 
@@ -78,9 +82,9 @@ public class EntityExample {
      */
     public void convertServerZuluTimeToLocalTime() {
         // the context of the entity list is set to ID 2010.
-        final EntityListService.Entities entity = entityList.at(2010);
+        final EntityList.Entities entity = entityList.at(2010);
         // we are going to use this to GET the entity
-        final EntityListService.Entities.Get get = entity.get();
+        final GetEntity get = entity.get();
         // this actually executes the REST request and gets the entity
         final EntityModel entityModel = get.execute();
 
@@ -106,7 +110,7 @@ public class EntityExample {
      */
     public void getAllEntities() {
         // the context is for all entities
-        final EntityListService.Get get = entityList.get();
+        final GetEntities get = entityList.get();
 
         // we execute the get.  This returns a collection; this can be queried as with one entity
         final Collection<EntityModel> entityModels = get.execute();
@@ -129,7 +133,7 @@ public class EntityExample {
      */
     public void getAllEntitiesWithQuery() {
         // the context is for all entities
-        final EntityListService.Get get = entityList.get();
+        final GetEntities get = entityList.get();
 
         // build query which is the equivalent to "id eq 2"
         final Query.QueryBuilder idQueryBuilder = Query.statement("id", QueryMethod.EqualTo, 2);
@@ -151,7 +155,7 @@ public class EntityExample {
      */
     public void getCrossFilterQuery() {
         // the context is for all entities
-        final EntityListService.Get get = entityList.get();
+        final GetEntities get = entityList.get();
 
         final Query.QueryBuilder statement = Query.statement("user_tags", QueryMethod.EqualTo,
                 Query.statement("id", QueryMethod.EqualTo, 1001)

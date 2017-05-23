@@ -1,19 +1,18 @@
 /*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    Copyright 2017 Hewlett-Packard Development Company, L.P.
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-package com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk.query;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,11 +20,8 @@ import java.util.TimeZone;
 import java.util.function.BiFunction;
 
 /**
- *
- * Created by busi on 04/01/2017.
+ * Used to define the comparison methods that can be used for the {@link com.hpe.adm.nga.sdk.query.Query.QueryBuilder}
  */
-
-
 public enum QueryMethod {
 
     EqualTo(QueryMethod::equalTo),
@@ -52,7 +48,6 @@ public enum QueryMethod {
     public BiFunction<String, Object, String> getAction(){
         return this.function;
     }
-
 
     /**
      * Generates a query string for "equal to" comparison
@@ -104,7 +99,6 @@ public enum QueryMethod {
         return "(" + field + " " + COMPARISON_OPERATOR_GREATER_EQUALS + " " + toString(value) + ")";
     }
 
-
     /**
      * Generates a string representation of a given Object
      * @param value - Object to convert
@@ -126,7 +120,5 @@ public enum QueryMethod {
             return value.toString();
         }
     }
-
-
 
 }

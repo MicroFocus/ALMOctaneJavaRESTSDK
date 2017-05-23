@@ -1,31 +1,27 @@
 /*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    Copyright 2017 Hewlett-Packard Development Company, L.P.
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-package com.hpe.adm.nga.sdk.unit_tests.model;
+package com.hpe.adm.nga.sdk.model;
 
 
-import com.hpe.adm.nga.sdk.EntityListService;
 import com.hpe.adm.nga.sdk.model.*;
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -38,8 +34,6 @@ import static org.junit.Assert.fail;
 
 public class TestModel {
 
-    private static Method getEntityJSONObject;
-    private static EntityListService service;
     private static Set<FieldModel> set;
     private EntityModel model;
     private String expectedResult;
@@ -48,13 +42,6 @@ public class TestModel {
     @BeforeClass
     public static void initializeOnCreate() {
         set = new HashSet<FieldModel>();
-        try {
-            service = new EntityListService(CommonMethods.getOctaneHttpClient(), "");
-            getEntityJSONObject = service.getClass().getDeclaredMethod("getEntityJSONObject", new Class[]{EntityModel.class});
-            getEntityJSONObject.setAccessible(true);
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
     }
 
     @Before
@@ -74,7 +61,7 @@ public class TestModel {
         set.add(new BooleanFieldModel("falseValue", false));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -90,7 +77,7 @@ public class TestModel {
         set.add(new StringFieldModel("thirdValue", "third"));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -109,7 +96,7 @@ public class TestModel {
         set.add(new ReferenceFieldModel("secondRef", refModel));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -136,7 +123,7 @@ public class TestModel {
 
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -150,7 +137,7 @@ public class TestModel {
         set.add(new LongFieldModel("secondField", new Long(200)));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -164,7 +151,7 @@ public class TestModel {
         set.add(new DateFieldModel("field", now));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -178,7 +165,7 @@ public class TestModel {
         set.add(new LongFieldModel("secondField", new Long(651651651)));
         ErrorModel model = new ErrorModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -216,7 +203,7 @@ public class TestModel {
         set.add(new BooleanFieldModel("boolField", true));
         model = new EntityModel(set);
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -229,7 +216,7 @@ public class TestModel {
         model = new EntityModel();
         model.setValue(new BooleanFieldModel("trueValue", true));
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
@@ -244,7 +231,7 @@ public class TestModel {
         model = new EntityModel(fieldSet);
         model.setValue(new BooleanFieldModel("trueValue", true));
         try {
-            JSONObject outJsonEntity = (JSONObject) getEntityJSONObject.invoke(service, model);
+            JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);

@@ -1,17 +1,16 @@
 /*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    Copyright 2017 Hewlett-Packard Development Company, L.P.
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.hpe.adm.nga.sdk.network.google;
 
@@ -36,7 +35,7 @@ import java.util.Optional;
 
 /**
  * HTTP Client using Google's API
- * <p>This will be refactored in future releases to enable the use of different underlying APIs<p>
+ * <p>This will be refactored in future releases to enable the use of different underlying APIs</p>
  */
 public class GoogleHttpClient implements OctaneHttpClient {
 
@@ -54,15 +53,15 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
 
     private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
-    private final HttpRequestFactory requestFactory;
-    private String lwssoValue = "";
-    private final String urlDomain;
-    private Authentication lastUsedAuthentication;
+    protected HttpRequestFactory requestFactory;
+    protected String lwssoValue = "";
+    protected final String urlDomain;
+    protected Authentication lastUsedAuthentication;
 
     /**
      * Request initializer called on every request made by the requestFactory
      */
-    private HttpRequestInitializer requestInitializer = request -> {
+    protected HttpRequestInitializer requestInitializer = request -> {
         request.setResponseInterceptor(response -> {
             // retrieve new LWSSO in response if any
             HttpHeaders responseHeaders = response.getHeaders();
@@ -135,7 +134,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @param octaneHttpRequest input {@link OctaneHttpRequest}
      * @return {@link HttpRequest}
      */
-    private HttpRequest convertOctaneRequestToGoogleHttpRequest(OctaneHttpRequest octaneHttpRequest) {
+    protected HttpRequest convertOctaneRequestToGoogleHttpRequest(OctaneHttpRequest octaneHttpRequest) {
         final HttpRequest httpRequest;
         try {
             switch (octaneHttpRequest.getOctaneRequestMethod()) {
@@ -180,6 +179,16 @@ public class GoogleHttpClient implements OctaneHttpClient {
         return httpRequest;
     }
 
+    /**
+     * Convert google implementation of {@link HttpResponse} to an implementation abstract {@link OctaneHttpResponse}
+     * @param httpResponse implementation specific {@link HttpResponse}
+     * @return {@link OctaneHttpResponse} created from the impl response object
+     * @throws IOException if the response output stream stream cannot be read
+     */
+    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) throws IOException {
+        return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
+    }
+
     @Override
     public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest) {
         return execute(octaneHttpRequest, HTTP_REQUEST_RETRY_COUNT);
@@ -200,7 +209,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         try {
             httpResponse = executeRequest(httpRequest);
-            return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
+            return convertHttpResponseToOctaneHttpResponse(httpResponse);
         } catch (HttpResponseException e) {
 
             //Try to handle the exception

@@ -1,26 +1,29 @@
 /*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    Copyright 2017 Hewlett-Packard Development Company, L.P.
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.OctaneClassFactory;
+import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
+import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 
 import java.util.Collection;
@@ -31,12 +34,11 @@ public class CommonMethods {
     private final static String sharedSpace = "1001";
     private final static int workSpace = 1002;
 
-    public static OctaneHttpClient getOctaneHttpClient() {
-        return PowerMockito.mock(OctaneHttpClient.class);
-    }
-
     public static Octane getOctaneForTest() {
-        return new OctaneForTest(getOctaneHttpClient(), getDomain(), getSharedSpace(), getWorkSpace());
+        System.setProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME, TestOctaneClassFactory.class.getName());
+        final Octane octane = new Octane.Builder(new SimpleUserAuthentication("user", "password")).Server(getDomain()).sharedSpace(Long.parseLong(getSharedSpace())).workSpace(getWorkSpace()).build();
+        System.clearProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
+        return octane;
     }
 
     public static String getDomain() {
@@ -96,4 +98,24 @@ public class CommonMethods {
         return true;
     }
 
+    public static final class TestOctaneClassFactory implements OctaneClassFactory {
+
+        private static final TestOctaneClassFactory instance = new TestOctaneClassFactory();
+        private TestOctaneClassFactory(){}
+        public static OctaneClassFactory getInstance(){
+            return instance;
+        }
+
+        @Override
+        public OctaneHttpClient getOctaneHttpClient(String urlDomain) {
+            final OctaneHttpClient octaneHttpClient = PowerMockito.mock(OctaneHttpClient.class);
+            PowerMockito.when(octaneHttpClient.authenticate(Mockito.any())).thenReturn(true);
+            return octaneHttpClient;
+        }
+
+        @Override
+        public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
+            return new EntityList(octaneHttpClient, baseDomain + entityName);
+        }
+    }
 }
