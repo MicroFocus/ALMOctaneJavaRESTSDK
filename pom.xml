@@ -64,6 +64,8 @@
         <module>sdk-usage-examples</module>
     </modules>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <log4j.version>2.5</log4j.version>
         <google-api-client.version>1.21.0</google-api-client.version>
         <org-json.version>20160212</org-json.version>
