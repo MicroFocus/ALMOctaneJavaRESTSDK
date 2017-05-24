@@ -29,7 +29,7 @@ import java.util.Collection;
  */
 public class DeleteEntities extends OctaneRequest {
 
-    DeleteEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    protected DeleteEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain);
     }
 

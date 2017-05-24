@@ -32,7 +32,7 @@ public class CreateEntities extends OctaneRequest {
 
     private Collection<EntityModel> entityModels = null;
 
-    CreateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    protected CreateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super (octaneHttpClient, urlDomain);
     }
 

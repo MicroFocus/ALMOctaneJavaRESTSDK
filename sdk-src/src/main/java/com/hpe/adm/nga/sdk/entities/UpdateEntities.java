@@ -33,7 +33,7 @@ public class UpdateEntities extends OctaneRequest {
 
     private Collection<EntityModel> entityModels = null;
 
-    UpdateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    protected UpdateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super (octaneHttpClient, urlDomain);
     }
 

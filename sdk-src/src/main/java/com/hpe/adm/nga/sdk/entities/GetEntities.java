@@ -29,7 +29,7 @@ import java.util.Collection;
  */
 public class GetEntities extends OctaneRequest {
 
-    GetEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    protected GetEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain);
     }
 
