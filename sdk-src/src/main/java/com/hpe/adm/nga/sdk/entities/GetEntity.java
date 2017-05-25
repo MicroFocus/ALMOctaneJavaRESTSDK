@@ -25,7 +25,7 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
  */
 public class GetEntity extends OctaneRequest {
 
-    GetEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
+    protected GetEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
         super(octaneHttpClient, urlDomain, iEntityId);
     }
 

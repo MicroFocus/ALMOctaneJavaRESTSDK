@@ -62,7 +62,7 @@ public final class Entity extends MetadataOctaneRequest {
     /**
      * Creates a new entity object
      */
-    Entity(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    protected Entity(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain + "/" + TYPE_NAME_ENTITIES_NAME);
     }
 

@@ -36,7 +36,7 @@ public class CreateAttachment extends OctaneRequest {
     private InputStream inputStream = null;
     private EntityModel entity = null;
 
-    CreateAttachment(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    protected CreateAttachment(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain);
     }
 

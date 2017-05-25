@@ -21,14 +21,14 @@ import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
 
 /**
- * Created by brucesp on 15-May-17.
+ * Abstract base request
  */
 abstract class MetadataOctaneRequest extends OctaneRequest {
 
     protected static final String JSON_DATA_FIELD_NAME = "data";
     protected static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
 
-    MetadataOctaneRequest(OctaneHttpClient octaneHttpClient, String urlDomain){
+    protected MetadataOctaneRequest(OctaneHttpClient octaneHttpClient, String urlDomain){
         super(octaneHttpClient, urlDomain);
     }
 

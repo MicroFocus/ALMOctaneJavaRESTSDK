@@ -29,7 +29,7 @@ public class UpdateEntity extends OctaneRequest {
 
     private EntityModel entityModel;
 
-    UpdateEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
+    protected UpdateEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
         super(octaneHttpClient, urlDomain, iEntityId);
     }
 
