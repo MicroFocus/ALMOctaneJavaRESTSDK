@@ -21,7 +21,7 @@ import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
 
 /**
- * Abstract base request
+ * Abstract request used for fetching metadata
  */
 abstract class MetadataOctaneRequest extends OctaneRequest {
 
@@ -33,17 +33,20 @@ abstract class MetadataOctaneRequest extends OctaneRequest {
     }
 
     final <T extends MetadataOctaneRequest> T addEntities(String queryFieldName, String... entities) {
-        if (entities == null) {
+        if (entities == null || entities.length == 0) {
+            return (T) this;
+        } else {
+            Query.QueryBuilder builder = null;
+            for (String entity : entities){
+                if(builder == null) {
+                    builder = Query.statement(queryFieldName, QueryMethod.EqualTo, entity);
+                } else {
+                    builder = builder.or(Query.statement(queryFieldName, QueryMethod.EqualTo, entity));
+                }
+            }
+            getOctaneUrl().setDqlQueryParam(builder.build());
             return (T) this;
         }
-        if (entities.length == 0) {
-            return (T) this;
-        }
-
-        Query.QueryBuilder builder = Query.statement(queryFieldName, QueryMethod.EqualTo, "sdksdksdk");
-        for (String entity : entities){
-            builder = builder.or(Query.statement(queryFieldName, QueryMethod.EqualTo, entity));
-        }
-        return (T) this;
     }
+
 }
