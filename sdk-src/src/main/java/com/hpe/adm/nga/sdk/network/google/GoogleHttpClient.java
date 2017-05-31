@@ -317,9 +317,15 @@ public class GoogleHttpClient implements OctaneHttpClient {
         String strCookies = strHPSSOCookieCsrf1.toString();
         List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
         lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();*/
-        for (String strCookie :
-                strHPSSOCookieCsrf1) {
-            List<HttpCookie> cookies = HttpCookie.parse(strCookie);
+        for (String strCookie : strHPSSOCookieCsrf1) {
+            List<HttpCookie> cookies;
+            try {
+                // Sadly the server seems to send back empty cookies for some reason
+                cookies = HttpCookie.parse(strCookie);
+            } catch (Exception ex){
+                logger.error(ex);
+                continue;
+            }
             Optional<HttpCookie> lwssoCookie = cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst();
             if (lwssoCookie.isPresent()) {
                 lwssoValue = lwssoCookie.get().getValue();
