@@ -31,8 +31,8 @@ public class CreateContextExample {
 
     public void createContext() {
         // two types of authentication
-        // 1) API Ket
-        Authentication clientAuthentication = new SimpleClientAuthentication("sa@nga", "Welcome1");
+        // 1) API Key
+        Authentication clientAuthentication = new SimpleClientAuthentication("clientId", "clientSecret");
 
         // 2) User/pass
         //Authentication userPassAuthentication = new SimpleUserAuthentication("user", "password");

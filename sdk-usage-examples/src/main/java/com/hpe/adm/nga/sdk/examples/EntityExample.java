@@ -18,16 +18,14 @@ import com.hpe.adm.nga.sdk.*;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.GetEntities;
 import com.hpe.adm.nga.sdk.entities.GetEntity;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Demonstrates how to manipulate entities
@@ -164,5 +162,73 @@ public class EntityExample {
 
         // finally build it and create the Query object
         statement.build();
+    }
+
+    /**
+     * Create a new entity
+     */
+    public void createNewEntity() {
+        // create some fields
+        // the name field is a simple string
+        final FieldModel<String> nameField = new StringFieldModel("name", "newDefect");
+        // the invested_hours field is a number - here depicted as long
+        final FieldModel<Long> investedHoursField = new LongFieldModel("invested_hours", 3L);
+        // the parent field is a reference.  That means that there is a mini entity within the reference
+        // here we define the entity model on the fly
+        final FieldModel<EntityModel> parentField =
+                new ReferenceFieldModel("parent",
+                        new EntityModel(new HashSet<>(Arrays.asList(
+                                new StringFieldModel("type", "work_item_root"),
+                                // the reference here is an example - you need to get the correct value using the SDK
+                                new StringFieldModel("id", "7001")))));
+
+        // the phase is another reference field
+        final FieldModel<EntityModel> phaseField =
+                new ReferenceFieldModel("phase",
+                        new EntityModel(new HashSet<>(Arrays.asList(
+                                new StringFieldModel("type", "phase"),
+                                new StringFieldModel("id", "9001")
+                        ))));
+
+        // create the fields
+        final Set<FieldModel> entityFields = new HashSet<>(Arrays.asList(nameField, investedHoursField, parentField, phaseField));
+
+        final EntityModel entityModel = new EntityModel(entityFields);
+
+        final Collection<EntityModel> createdEntities =
+                // set the context to create
+                entityList.create()
+                        // add the entity model
+                        .entities(new ArrayList<>(Collections.singletonList(entityModel)))
+                        // carry out the execution
+                        .execute();
+    }
+
+    /**
+     * Update an entity
+     */
+    public void updateEntity() {
+        // in this example we assume that this collection actually contains some entities
+        final Collection<EntityModel> entities = Collections.emptyList();
+
+        // we get the first entity for this example
+        final EntityModel entityModel = entities.iterator().next();
+        // this is the old name
+        final String oldName = (String) entityModel.getValue("name").getValue();
+        entityModel.setValue(new StringFieldModel("name", "new Name"));
+        // create context of update and update the entities with the change
+        entityList.update().entities(entities).execute();
+
+        // one can update using a query (see query example above)
+        //entityList.update().query(query).entities(entities).execute();
+    }
+
+    /**
+     * Delete an entity
+     */
+    public void deleteEntity() {
+        // delete an entity whose id is equal to 123
+        // more complex queries can be used - see the API documentation for more details
+        entityList.delete().query(Query.statement("id", QueryMethod.EqualTo, "123").build()).execute();
     }
 }
