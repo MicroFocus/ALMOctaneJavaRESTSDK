@@ -3,8 +3,11 @@
 package com.hpe.adm.nga.sdk.model;
 
 /**
-* Generated class.  <b>Do not manually edit.</b>
-*/
+ * <p>Entity Name: ${entityMetadata.name}</p>
+ * <p>Label: ${entityMetadata.getLabel()}</p>
+ *
+ * Generated class.  <b>Do not manually edit.</b>
+ */
 public class ${className}EntityModel extends ${subTypeOf} {
 
     public ${className}EntityModel() {
@@ -12,6 +15,10 @@ public class ${className}EntityModel extends ${subTypeOf} {
     }
 
 #foreach(${field} in ${fieldMetadata})
+    /**
+     * Label: ${field.getLabel()}
+     * Description: ${field.getDescription()}
+     */
 #if(${field.getFieldType()} != "Reference")
     public ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
         return (${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})}) getValue("${field.name}").getValue();
