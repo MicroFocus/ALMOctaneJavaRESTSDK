@@ -47,6 +47,7 @@ public class GenerateModels {
             velocityContext.put("fieldMetadata", fieldMetadata);
             velocityContext.put("entityMetadataCollection", entityMetadata);
             velocityContext.put("GeneratorHelper", GeneratorHelper.class);
+            velocityContext.put("entityMetadataWrapper", GeneratorHelper.entityMetadataWrapper(entityMetadatum));
 
             final FileWriter fileWriter = new FileWriter(new File(oytDir, GeneratorHelper.camelCaseFieldName(name) + "EntityModel.java"));
             template.merge(velocityContext, fileWriter);

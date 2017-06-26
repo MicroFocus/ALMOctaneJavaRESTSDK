@@ -3,6 +3,7 @@ package com.hpe.adm.nga.sdk.generate;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.features.Feature;
+import com.hpe.adm.nga.sdk.metadata.features.RestFeature;
 import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
 import com.hpe.adm.nga.sdk.model.*;
 
@@ -149,5 +150,48 @@ public class GeneratorHelper {
             firstTime = false;
         }
         return referenceMetadata;
+    }
+
+    public static final class EntityMetadataWrapper{
+        com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods[] availableMethods = new com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods[0];
+        String url;
+
+        public com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods[] getAvailableMethods() {
+            return availableMethods;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+    }
+
+    public static EntityMetadataWrapper entityMetadataWrapper(final EntityMetadata entityMetadata) {
+        final EntityMetadataWrapper entityMetadataWrapper = new EntityMetadataWrapper();
+        final Optional<Feature> restFeatureOptional = entityMetadata.features().stream().filter(feature -> feature instanceof RestFeature).findAny();
+        if (!restFeatureOptional.isPresent()) {
+            return entityMetadataWrapper;
+        }
+
+        final RestFeature restFeature = (RestFeature) restFeatureOptional.get();
+        final String[] methods = restFeature.getMethods();
+        entityMetadataWrapper.availableMethods = new com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods[methods.length];
+        for (int i = 0; i < methods.length; ++i) {
+            switch (methods[i]) {
+                case "GET":
+                    entityMetadataWrapper.availableMethods[i] = com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods.GET;
+                    break;
+                case "POST":
+                    entityMetadataWrapper.availableMethods[i] = com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods.CREATE;
+                    break;
+                case "PUT":
+                    entityMetadataWrapper.availableMethods[i] = com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods.UPDATE;
+                    break;
+                case "DELETE":
+                    entityMetadataWrapper.availableMethods[i] = com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods.DELETE;
+                    break;
+            }
+        }
+        entityMetadataWrapper.url = restFeature.getUrl();
+        return entityMetadataWrapper;
     }
 }

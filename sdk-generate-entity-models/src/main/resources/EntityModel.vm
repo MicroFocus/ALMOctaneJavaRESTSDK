@@ -8,6 +8,7 @@ package com.hpe.adm.nga.sdk.model;
  *
  * Generated class.  <b>Do not manually edit.</b>
  */
+@EntityMetadata(url = "${entityMetadataWrapper.getUrl()}", availableMethods = {#foreach(${availableMethod} in ${entityMetadataWrapper.getAvailableMethods()})EntityMetadata.AvailableMethods.${availableMethod}, #end} )
 public class ${className}EntityModel extends ${subTypeOf} {
 
     public ${className}EntityModel() {
