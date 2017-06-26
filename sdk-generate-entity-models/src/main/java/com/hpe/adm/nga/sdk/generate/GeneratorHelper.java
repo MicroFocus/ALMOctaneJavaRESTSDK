@@ -60,7 +60,7 @@ public class GeneratorHelper {
             case String:
                 return "String";
             case Object:
-                return "Object";
+                return "String";
             case Reference:
                 return "Object";
         }
