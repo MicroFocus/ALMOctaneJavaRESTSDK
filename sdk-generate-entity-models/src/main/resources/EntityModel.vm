@@ -19,6 +19,7 @@ public class ${className}EntityModel extends ${subTypeOf} {
 #if($field.isEditable())
 #set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
 
+    #fieldMetadaAnnotations($field)
     public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
         setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
     }
@@ -32,6 +33,7 @@ public class ${className}EntityModel extends ${subTypeOf} {
 #if($field.isEditable())
 #set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
 
+    #fieldMetadaAnnotations($field)
     public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
         setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
     }
@@ -40,3 +42,6 @@ public class ${className}EntityModel extends ${subTypeOf} {
 
 #end
 }
+#macro (fieldMetadaAnnotations $field)
+@FieldMetadata(filterable = ${field.isFilterable()}, sortable = ${field.isSortable()}, required = ${field.isRequired()}#if(${field.getFieldType()} == "String"), maxLength = ${field.getMaxLength()}L#elseif((${field.getFieldType()} == "Integer") || (${field.getFieldType()} == "Float")), minValue = ${field.getMinValue()}L, maxValue = ${field.getMaxValue()}L#end)
+#end
