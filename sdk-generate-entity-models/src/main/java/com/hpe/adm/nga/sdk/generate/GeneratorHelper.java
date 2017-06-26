@@ -4,6 +4,7 @@ import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.features.Feature;
 import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
+import com.hpe.adm.nga.sdk.model.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -53,7 +54,7 @@ public class GeneratorHelper {
             case Float:
                 return "float";
             case Integer:
-                return "int";
+                return "long";
             case Memo:
             case String:
                 return "String";
@@ -64,6 +65,29 @@ public class GeneratorHelper {
         }
 
         throw new UnsupportedOperationException("type: " + fieldType + "is not supported!");
+    }
+
+    public static String getFieldModel(FieldMetadata field) {
+        switch (field.getFieldType()) {
+            case Date:
+            case DateTime:
+                return DateFieldModel.class.getName();
+            case Boolean:
+                return BooleanFieldModel.class.getName();
+            case Float:
+                return FloatFieldModel.class.getName();
+            case Integer:
+                return LongFieldModel.class.getName();
+            case Memo:
+            case String:
+                return StringFieldModel.class.getName();
+            case Object:
+                return StringFieldModel.class.getName();
+            case Reference:
+                return field.getFieldTypedata().isMultiple() ? MultiReferenceFieldModel.class.getName() : ReferenceFieldModel.class.getName();
+        }
+
+        throw new UnsupportedOperationException("type: " + field.getFieldType() + "is not supported!");
     }
 
     public static String getSubTypeOf(final EntityMetadata entityMetadata) {
@@ -104,7 +128,10 @@ public class GeneratorHelper {
             final Optional<EntityMetadata> matchingEntityMetadata = entityMetadataCollection.stream().filter(entityMetadata -> entityMetadata.getName().equals(type)).findFirst();
             if (!matchingEntityMetadata.isPresent()) {
                 if (firstTime) {
-                    referenceMetadata.referenceClassForSignature = (type.equals("work_item_root") ? "WorkItem" : "") + "EntityModel";
+                    referenceMetadata.referenceClassForSignature = (fieldTypedata.isMultiple() ? "java.util.Collection<" : "") +
+                            ((type.equals("work_item_root") ? "WorkItem" : "") + "EntityModel") +
+                            (fieldTypedata.isMultiple() ? ">" : "")
+                    ;
                 }
                 referenceMetadata.allowedReferencesForAnnotation.add((type.equals("work_item_root") ? "WorkItemRoot" : "") + "EntityModel.class");
             } else {
@@ -112,7 +139,10 @@ public class GeneratorHelper {
                 final Optional<Feature> subTypeOfFeature = getSubTypeOfFeature(matchedEntityMetadata);
                 final String camelCaseFieldName = camelCaseFieldName(subTypeOfFeature.isPresent() ? (((SubTypesOfFeature) subTypeOfFeature.get()).getType()) : type);
                 if (firstTime) {
-                    referenceMetadata.referenceClassForSignature = camelCaseFieldName + "EntityModel";
+                    referenceMetadata.referenceClassForSignature = (fieldTypedata.isMultiple() ? "java.util.Collection<" : "") +
+                            (camelCaseFieldName + "EntityModel") +
+                            (fieldTypedata.isMultiple() ? ">" : "")
+                    ;
                 }
                 referenceMetadata.allowedReferencesForAnnotation.add(camelCaseFieldName(type) + "EntityModel.class");
             }

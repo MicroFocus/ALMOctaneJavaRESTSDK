@@ -16,12 +16,26 @@ public class ${className}EntityModel extends ${subTypeOf} {
     public ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
         return (${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})}) getValue("${field.name}").getValue();
     }
+#if($field.isEditable())
+#set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
+
+    public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
+        setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
+    }
+#end
 #else
 #set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
     @AllowedReferences({#foreach(${allowedReferenceForAnnotation} in ${referenceMetadata.getAllowedReferencesForAnnotation()})${allowedReferenceForAnnotation}, #end})
     public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
         return (${referenceMetadata.getReferenceClassForSignature()}) getValue("${field.name}").getValue();
     }
+#if($field.isEditable())
+#set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
+
+    public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
+        setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
+    }
+#end
 #end
 
 #end
