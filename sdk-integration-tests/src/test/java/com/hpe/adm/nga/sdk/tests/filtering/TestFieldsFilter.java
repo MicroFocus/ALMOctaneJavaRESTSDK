@@ -78,7 +78,7 @@ public class TestFieldsFilter extends TestBase {
     public static boolean isOnlyRequestedFieldsExistInEntity(EntityModel entityModel, List<String> fields) {
         Set<FieldModel> fieldModelSet = entityModel.getValues();
         for (FieldModel fm : fieldModelSet) {
-            if (!fm.getName().equals("id") && !fm.getName().equals("type") && !fields.contains(fm.getName())) {
+            if (!fm.getName().equals("workspace_id") && !fm.getName().equals("id") && !fm.getName().equals("type") && !fields.contains(fm.getName())) {
                 return false;
             }
         }
