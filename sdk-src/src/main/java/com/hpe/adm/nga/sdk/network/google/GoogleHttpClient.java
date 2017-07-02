@@ -55,6 +55,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
     protected HttpRequestFactory requestFactory;
     protected String lwssoValue = "";
+    protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
 
@@ -70,9 +71,15 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
 
+        final StringBuilder cookieBuilder = new StringBuilder();
         if (lwssoValue != null && !lwssoValue.isEmpty()) {
-            request.getHeaders().setCookie(LWSSO_COOKIE_KEY + "=" + lwssoValue);
+            cookieBuilder.append(LWSSO_COOKIE_KEY).append("=").append(lwssoValue);
         }
+        if (octaneUserValue != null && !octaneUserValue.isEmpty()) {
+            cookieBuilder.append(";").append(OCTANE_USER_COOKIE_KEY).append("=").append(octaneUserValue);
+        }
+
+        request.getHeaders().setCookie(cookieBuilder.toString());
 
         if (lastUsedAuthentication != null) {
             String clientTypeHeader = lastUsedAuthentication.getClientHeader();
@@ -330,7 +337,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
             if (lwssoCookie.isPresent()) {
                 lwssoValue = lwssoCookie.get().getValue();
                 renewed = true;
-                break;
+            } else {
+                cookies.stream().filter(cookie -> cookie.getName().equals(OCTANE_USER_COOKIE_KEY)).findAny().ifPresent(cookie -> octaneUserValue = cookie.getValue());
             }
         }
 

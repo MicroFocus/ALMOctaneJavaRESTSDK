@@ -28,6 +28,7 @@ public interface OctaneHttpClient {
     String OAUTH_AUTH_URL = "/authentication/sign_in";
     String OAUTH_SIGNOUT_URL = "/authentication/sign_out";
     String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
+    String OCTANE_USER_COOKIE_KEY = "OCTANE_USER";
     String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
 
     /**
