@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * entities.
  *
  */
-public class EntityModel {
+public class EntityModel implements Entity{
 
 
     private Map<String, FieldModel> data = null;
@@ -97,5 +97,17 @@ public class EntityModel {
      */
     public void setValue(FieldModel fieldModel) {
         data.put(fieldModel.getName(), fieldModel);
+    }
+
+    @Override
+    public final String getType() {
+        final StringFieldModel type = (StringFieldModel) getValue("type");
+        return type == null ? null : type.getValue();
+    }
+
+    @Override
+    public final String getId() {
+        final StringFieldModel id = (StringFieldModel) getValue("id");
+        return id == null ? null : id.getValue();
     }
 }

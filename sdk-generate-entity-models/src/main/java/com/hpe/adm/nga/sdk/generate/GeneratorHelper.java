@@ -51,11 +51,11 @@ public class GeneratorHelper {
             case DateTime:
                 return "java.time.ZonedDateTime";
             case Boolean:
-                return "boolean";
+                return "Boolean";
             case Float:
-                return "float";
+                return "Float";
             case Integer:
-                return "long";
+                return "Long";
             case Memo:
             case String:
                 return "String";
@@ -93,7 +93,7 @@ public class GeneratorHelper {
 
     public static String getSubTypeOf(final EntityMetadata entityMetadata) {
         final Optional<Feature> subTypeOfFeature = getSubTypeOfFeature(entityMetadata);
-        return (subTypeOfFeature.isPresent() ? camelCaseFieldName(((SubTypesOfFeature) subTypeOfFeature.get()).getType()) : "") + "EntityModel";
+        return (subTypeOfFeature.isPresent() ? camelCaseFieldName(((SubTypesOfFeature) subTypeOfFeature.get()).getType()) : "Typed") + "EntityModel";
     }
 
     private static Optional<Feature> getSubTypeOfFeature(EntityMetadata entityMetadata) {
@@ -102,16 +102,36 @@ public class GeneratorHelper {
     }
 
     public static final class ReferenceMetadata {
+        private String referenceClassForSignature;
+        private final Set<String> allowedReferencesForAnnotation = new HashSet<>();
+        private boolean hasNonTypedReturn = false;
+        private boolean hasTypedReturn = false;
+        private final Set<String> referenceTypes = new HashSet<>();
+        private String typedType;
+
         public String getReferenceClassForSignature() {
             return referenceClassForSignature;
+        }
+
+        public String getTypedType() {
+            return typedType;
         }
 
         public Set<String> getAllowedReferencesForAnnotation() {
             return allowedReferencesForAnnotation;
         }
 
-        public String referenceClassForSignature;
-        public final Set<String> allowedReferencesForAnnotation = new HashSet<>();
+        public Set<String> getReferenceTypes() {
+            return referenceTypes;
+        }
+
+        public boolean hasNonTypedReturn() {
+            return hasNonTypedReturn;
+        }
+
+        public boolean hasTypedReturn() {
+            return hasTypedReturn;
+        }
     }
 
     public static ReferenceMetadata getAllowedSuperTypesForReference(final FieldMetadata fieldMetadata, final Collection<EntityMetadata> entityMetadataCollection) {
@@ -123,36 +143,52 @@ public class GeneratorHelper {
 
         final FieldMetadata.FieldTypeData fieldTypedata = fieldMetadata.getFieldTypedata();
         final FieldMetadata.Target[] targets = fieldTypedata.getTargets();
-        boolean firstTime = true;
+
         for (FieldMetadata.Target target : targets) {
             final String type = target.getType();
-            final Optional<EntityMetadata> matchingEntityMetadata = entityMetadataCollection.stream().filter(entityMetadata -> entityMetadata.getName().equals(type)).findFirst();
-            if (!matchingEntityMetadata.isPresent()) {
-                if (firstTime) {
-                    referenceMetadata.referenceClassForSignature = (fieldTypedata.isMultiple() ? "java.util.Collection<" : "") +
-                            ((type.equals("work_item_root") ? "WorkItem" : "") + "EntityModel") +
-                            (fieldTypedata.isMultiple() ? ">" : "")
-                    ;
-                }
-                referenceMetadata.allowedReferencesForAnnotation.add((type.equals("work_item_root") ? "WorkItemRoot" : "") + "EntityModel.class");
-            } else {
+            final Optional<EntityMetadata> matchingEntityMetadata = entityMetadataCollection.stream().filter(entityMetadata -> entityMetadata.getName().equals(type)).findAny();
+            if (matchingEntityMetadata.isPresent()) {
+                String camelCaseFieldName = camelCaseFieldName(type);
+                referenceMetadata.allowedReferencesForAnnotation.add(camelCaseFieldName + "EntityModel.class");
+                referenceMetadata.referenceTypes.add(type);
                 final EntityMetadata matchedEntityMetadata = matchingEntityMetadata.get();
                 final Optional<Feature> subTypeOfFeature = getSubTypeOfFeature(matchedEntityMetadata);
-                final String camelCaseFieldName = camelCaseFieldName(subTypeOfFeature.isPresent() ? (((SubTypesOfFeature) subTypeOfFeature.get()).getType()) : type);
-                if (firstTime) {
-                    referenceMetadata.referenceClassForSignature = (fieldTypedata.isMultiple() ? "java.util.Collection<" : "") +
-                            (camelCaseFieldName + "EntityModel") +
-                            (fieldTypedata.isMultiple() ? ">" : "")
-                    ;
+                final String typedType = camelCaseFieldName(subTypeOfFeature.isPresent() ? (((SubTypesOfFeature) subTypeOfFeature.get()).getType()) : type);
+                referenceMetadata.typedType = typedType + "Entity";
+
+                if (!referenceMetadata.hasNonTypedReturn) {
+                    if (referenceMetadata.hasTypedReturn) {
+                        camelCaseFieldName = typedType;
+                    } else {
+                        referenceMetadata.hasTypedReturn = true;
+                    }
+                    referenceMetadata.referenceClassForSignature =
+                            (fieldTypedata.isMultiple() ? ("java.util.Collection<" +
+                                    (subTypeOfFeature.isPresent() ? "? extends " : "")
+                            ) : "") +
+                                    camelCaseFieldName + "Entity" +
+                                    (fieldTypedata.isMultiple() ? ">" : "");
                 }
-                referenceMetadata.allowedReferencesForAnnotation.add(camelCaseFieldName(type) + "EntityModel.class");
+                // 0 if multiple - return ? extends supertype
+                // 1 if single - return type
+            } else {
+                referenceMetadata.allowedReferencesForAnnotation.add("EntityModel.class");
+                referenceMetadata.hasNonTypedReturn = true;
+                // 1 return Entity
+                referenceMetadata.referenceClassForSignature =
+                        (fieldTypedata.isMultiple() ? ("java.util.Collection<" +
+                                (referenceMetadata.hasTypedReturn ? "? extends " : "")
+                        ) : "") +
+                                "Entity" +
+                                (referenceMetadata.hasTypedReturn ? "" : "Model") +
+                                (fieldTypedata.isMultiple() ? ">" : "");
             }
-            firstTime = false;
         }
+
         return referenceMetadata;
     }
 
-    public static final class EntityMetadataWrapper{
+    public static final class EntityMetadataWrapper {
         com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods[] availableMethods = new com.hpe.adm.nga.sdk.model.EntityMetadata.AvailableMethods[0];
         String url;
 

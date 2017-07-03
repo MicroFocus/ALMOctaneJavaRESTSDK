@@ -9,47 +9,161 @@ package com.hpe.adm.nga.sdk.model;
  * Generated class.  <b>Do not manually edit.</b>
  */
 @EntityMetadata(url = "${entityMetadataWrapper.getUrl()}", availableMethods = {#foreach(${availableMethod} in ${entityMetadataWrapper.getAvailableMethods()})EntityMetadata.AvailableMethods.${availableMethod}, #end} )
-public class ${className}EntityModel extends ${subTypeOf} {
+public class ${className}EntityModel extends TypedEntityModel implements ${interfaceName} {
 
     public ${className}EntityModel() {
         super();
+        wrappedEntityModel.setValue(new StringFieldModel("type", "${entityMetadata.name}"));
+    }
+
+    public ${className}EntityModel(final EntityModel wrappedEntityModel) {
+        super(wrappedEntityModel);
     }
 
 #foreach(${field} in ${fieldMetadata})
-    /**
-     * Label: ${field.getLabel()}
-     * Description: ${field.getDescription()}
-     */
-#if(${field.getFieldType()} != "Reference")
-    public ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
-        return (${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})}) getValue("${field.name}").getValue();
-    }
-#if($field.isEditable())
-#set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
-
-    #fieldMetadaAnnotations($field)
-    public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
-        setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
-    }
-#end
-#else
-#set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
-    @AllowedReferences({#foreach(${allowedReferenceForAnnotation} in ${referenceMetadata.getAllowedReferencesForAnnotation()})${allowedReferenceForAnnotation}, #end})
-    public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
-        return (${referenceMetadata.getReferenceClassForSignature()}) getValue("${field.name}").getValue();
-    }
-#if($field.isEditable())
-#set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
-
-    #fieldMetadaAnnotations($field)
-    public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
-        setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
-    }
-#end
-#end
-
+    #getter ($field)
+    #if($field.isEditable())#setter ($field)#end
 #end
 }
+
 #macro (fieldMetadaAnnotations $field)
 @FieldMetadata(filterable = ${field.isFilterable()}, sortable = ${field.isSortable()}, required = ${field.isRequired()}#if(${field.getFieldType()} == "String"), maxLength = ${field.getMaxLength()}L#elseif((${field.getFieldType()} == "Integer") || (${field.getFieldType()} == "Float")), minValue = ${field.getMinValue()}L, maxValue = ${field.getMaxValue()}L#end)
+#end
+
+#macro (multipleReferenceAnnotations $referenceMetadata)
+#if (${referenceMetadata.hasTypedReturn()} && ${referenceMetadata.getReferenceTypes().size()} > 1)
+@AllowedReferences({#foreach(${allowedReferenceForAnnotation} in ${referenceMetadata.getAllowedReferencesForAnnotation()})${allowedReferenceForAnnotation}, #end})
+#end
+#end
+
+#macro (getter $field)
+/**
+	* Label: ${field.getLabel()}
+	* Description: ${field.getDescription()}
+	*/
+    #if(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
+
+#end
+
+#macro (getReference $field)
+    #set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
+    #if (${field.getFieldTypedata().isMultiple()})#getMultipleReference($field $referenceMetadata)#else#getSingleReference($field $referenceMetadata)#end
+    }
+#end
+
+#macro (getNonReference $field)
+public ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
+	    final FieldModel ${field.name} = wrappedEntityModel.getValue("${field.name}");
+	    return ${field.name} == null ? null : (${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})}) ${field.name}.getValue();
+	}
+#end
+
+#macro (getSingleReference $field $referenceMetadata)
+#multipleReferenceAnnotations (${referenceMetadata})
+public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
+    final ReferenceFieldModel ${field.name} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+		if (${field.name} == null) {
+            return null;
+		}
+		final EntityModel referenceFieldModel = ${field.name}.getValue();
+        #if (${referenceMetadata.hasTypedReturn()} && ${referenceMetadata.getReferenceTypes().size()} > 1)
+final StringFieldModel type = (StringFieldModel) referenceFieldModel.getValue("type");
+		final String referenceType = type.getValue();
+            #foreach($type in ${referenceMetadata.getReferenceTypes()})
+#if($foreach.count > 1)else #{end}if (referenceType.equals("${type}")) {
+			    return new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(referenceFieldModel);
+			}#{end}
+        #end
+        #if(${referenceMetadata.hasNonTypedReturn()})
+        return referenceFieldModel#{else}return new ${referenceMetadata.getReferenceClassForSignature()}Model(referenceFieldModel)#{end};
+#end
+
+#macro (getMultipleReference $field $referenceMetadata)
+#multipleReferenceAnnotations (${referenceMetadata})
+public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
+        final MultiReferenceFieldModel ${field.name} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+        if (${field.name} == null) {
+            return java.util.Collections.emptyList();
+        }
+        final java.util.Collection<EntityModel> value = ${field.name}.getValue();
+        #if (${referenceMetadata.hasTypedReturn()})
+        #if (${referenceMetadata.getReferenceTypes().size()} > 1)
+        return value.stream().map(entityModel -> {
+            final StringFieldModel type = (StringFieldModel) entityModel.getValue("type");
+            final String referenceType = type.getValue();
+            #foreach($type in ${referenceMetadata.getReferenceTypes()})
+                #if($foreach.count > 1)else #{end}if (referenceType.equals("${type}")) {
+				    return new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(entityModel);
+				}#{end}else {
+			        return#if(${referenceMetadata.hasNonTypedReturn()}) entityModel;
+                    #else new ${referenceMetadata.getTypedType()}Model(entityModel);
+                 #end}
+		})
+        #else
+        return value.stream().map(${GeneratorHelper.camelCaseFieldName(${referenceMetadata.getReferenceTypes().iterator().next()})}EntityModel::new)
+        #{end}.collect(java.util.stream.Collectors.toList());
+        #else
+        return value;
+        #end
+#end
+
+#macro (setter $field)
+    #set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
+    #if(${field.getFieldType()} == "Reference")#setReference($field $paramName)#{else}#setNonReference($field $paramName)#end
+#end
+
+#macro (setReference $field $paramName)
+    #set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
+    #if (${field.getFieldTypedata().isMultiple()})#setMultipleReference($field $referenceMetadata $paramName)#else#setSingleReference($field $referenceMetadata $paramName)#end
+#end
+
+#macro (setSingleReference $field $referenceMetadata $paramName)
+    #if (${referenceMetadata.hasTypedReturn()})
+        #foreach($type in ${referenceMetadata.getReferenceTypes()})
+#fieldMetadaAnnotations($field)
+        public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel $paramName){
+            wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}.getWrappedEntityModel()));
+        }
+
+        #end
+    #end
+    #if(${referenceMetadata.hasNonTypedReturn()})
+#fieldMetadaAnnotations($field)
+		public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final EntityModel $paramName){
+	    	wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}));
+		}
+
+    #end
+#end
+
+#macro (setMultipleReference $field $referenceMetadata $paramName)
+    #fieldMetadaAnnotations($field)
+    #multipleReferenceAnnotations (${referenceMetadata})
+	public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
+	    if ($paramName == null) {
+	        return;
+	    }
+    #if (${referenceMetadata.hasTypedReturn()})
+		final java.util.Collection<EntityModel> entityModels = ${paramName}.stream().map(entityModel -> {
+		    if (entityModel instanceof ${referenceMetadata.getTypedType()}) {
+		        return ((TypedEntityModel) entityModel).getWrappedEntityModel();
+		    } #if(${referenceMetadata.hasNonTypedReturn()}) else if (entityModel instanceof EntityModel){
+		        return (EntityModel) entityModel;
+		    }#{end} else {
+		        throw new IllegalArgumentException("Members of $paramName must be of types {#if (${referenceMetadata.hasTypedReturn()})${referenceMetadata.getTypedType()},#end #if(${referenceMetadata.hasNonTypedReturn()})EntityModel#end");
+		    }
+		}).collect(java.util.stream.Collectors.toList());
+		wrappedEntityModel.setValue(new MultiReferenceFieldModel("${field.name}", entityModels));
+    #else
+		wrappedEntityModel.setValue(new MultiReferenceFieldModel("${field.name}", $paramName));
+    #end
+	}
+
+#end
+
+#macro (setNonReference $field $paramName)
+	public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
+	    wrappedEntityModel.setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
+	}
+
 #end
