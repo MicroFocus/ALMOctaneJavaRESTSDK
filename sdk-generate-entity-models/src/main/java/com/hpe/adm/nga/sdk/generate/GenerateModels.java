@@ -51,7 +51,7 @@ public class GenerateModels {
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
-           // if (!name.equals("defect")) continue;
+            //if (!name.equals("epic")) continue;
             System.out.println(name + ":");
             final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute();
 

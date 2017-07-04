@@ -156,36 +156,72 @@ public class GeneratorHelper {
                 final String typedType = camelCaseFieldName(subTypeOfFeature.isPresent() ? (((SubTypesOfFeature) subTypeOfFeature.get()).getType()) : type);
                 referenceMetadata.typedType = typedType + "Entity";
 
+                boolean hasMultipleTypes = false;
                 if (!referenceMetadata.hasNonTypedReturn) {
                     if (referenceMetadata.hasTypedReturn) {
                         camelCaseFieldName = typedType;
+                        hasMultipleTypes = true;
                     } else {
                         referenceMetadata.hasTypedReturn = true;
                     }
                     referenceMetadata.referenceClassForSignature =
-                            (fieldTypedata.isMultiple() ? ("java.util.Collection<" +
-                                    (subTypeOfFeature.isPresent() ? "? extends " : "")
-                            ) : "") +
-                                    camelCaseFieldName + "Entity" +
-                                    (fieldTypedata.isMultiple() ? ">" : "");
+                            getReferenceSignature(fieldTypedata.isMultiple(), hasMultipleTypes, camelCaseFieldName + "Entity");
                 }
-                // 0 if multiple - return ? extends supertype
-                // 1 if single - return type
             } else {
                 referenceMetadata.allowedReferencesForAnnotation.add("EntityModel.class");
                 referenceMetadata.hasNonTypedReturn = true;
-                // 1 return Entity
                 referenceMetadata.referenceClassForSignature =
-                        (fieldTypedata.isMultiple() ? ("java.util.Collection<" +
-                                (referenceMetadata.hasTypedReturn ? "? extends " : "")
-                        ) : "") +
-                                "Entity" +
-                                (referenceMetadata.hasTypedReturn ? "" : "Model") +
-                                (fieldTypedata.isMultiple() ? ">" : "");
+                        getReferenceSignature(fieldTypedata.isMultiple(), referenceMetadata.hasTypedReturn, "Entity");
             }
         }
 
         return referenceMetadata;
+    }
+
+    private static String getReferenceSignature(final boolean isMultiple, final boolean hasMulipleTypes, final String referenceEntity) {
+        final StringBuilder stringBuilder = new StringBuilder();
+        if (isMultiple) {
+            stringBuilder.append("java.util.Collection<");
+            /*
+              If 1 type of Definitive:
+               BlaEntityModel
+              Else If 1 type of non definitive
+               EntityModel
+              Else If >1 type of Definitive
+               ? extends BlaEntity
+              Else if >1 type of non definitive
+               ? extends Entity
+             */
+            if (hasMulipleTypes) {
+                stringBuilder.append("? extends ");
+            }
+            stringBuilder.append(referenceEntity);
+            if (!hasMulipleTypes) {
+                stringBuilder.append("Model");
+            }
+            stringBuilder.append(">");
+        } else {
+            /*
+              If 1 type of Definitive:
+               BlaEntityModel
+              Else If 1 type of non definitive
+               EntityModel
+              Else If >1 type of Definitive
+               <T extends BlaEntity> T
+              Else if >1 type of non definitive
+               <T extends Entity> T
+             */
+            if (hasMulipleTypes) {
+                stringBuilder.append("<T extends ");
+            }
+            stringBuilder.append(referenceEntity);
+            if (!hasMulipleTypes) {
+                stringBuilder.append("Model");
+            } else {
+                stringBuilder.append("> T");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     public static final class EntityMetadataWrapper {

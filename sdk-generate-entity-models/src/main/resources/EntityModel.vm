@@ -71,11 +71,11 @@ final StringFieldModel type = (StringFieldModel) referenceFieldModel.getValue("t
 		final String referenceType = type.getValue();
             #foreach($type in ${referenceMetadata.getReferenceTypes()})
 #if($foreach.count > 1)else #{end}if (referenceType.equals("${type}")) {
-			    return new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(referenceFieldModel);
+			    return (T) new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(referenceFieldModel);
 			}#{end}
         #end
         #if(${referenceMetadata.hasNonTypedReturn()})
-        return referenceFieldModel#{else}return new ${referenceMetadata.getReferenceClassForSignature()}Model(referenceFieldModel)#{end};
+        return #if (${referenceMetadata.getReferenceTypes().size()} > 1)(T)#end referenceFieldModel#{else}return #if (${referenceMetadata.getReferenceTypes().size()} > 1)(T) new ${referenceMetadata.getTypedType()}Model(referenceFieldModel)#{else}new ${referenceMetadata.getReferenceClassForSignature()}(referenceFieldModel)#end#{end};
 #end
 
 #macro (getMultipleReference $field $referenceMetadata)
