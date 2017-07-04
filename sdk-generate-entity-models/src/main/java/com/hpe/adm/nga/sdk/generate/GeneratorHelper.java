@@ -45,6 +45,16 @@ public class GeneratorHelper {
         return stringBuffer.toString();
     }
 
+    public static String convertToUpperCase(final String fieldName) {
+        final StringBuffer stringBuffer = new StringBuffer();
+        final String[] splitFields = fieldName.split("_");
+        for (final String splitField : splitFields) {
+            stringBuffer.append(splitField.toUpperCase());
+        }
+
+        return stringBuffer.toString();
+    }
+
     public static String getFieldTypeAsJava(FieldMetadata.FieldType fieldType) {
         switch (fieldType) {
             case Date:
