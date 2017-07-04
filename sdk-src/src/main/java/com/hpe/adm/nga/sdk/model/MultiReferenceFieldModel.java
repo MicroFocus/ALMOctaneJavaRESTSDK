@@ -23,13 +23,13 @@ import java.util.Collection;
  *
  *
  */
-public class MultiReferenceFieldModel implements FieldModel<Collection<? extends EntityModel>> {
+public class MultiReferenceFieldModel implements FieldModel<Collection<EntityModel>> {
 	
 	
 	
 		//Private 
 		private String name = "";
-		private Collection<? extends EntityModel> data = null;
+		private Collection<EntityModel> data = null;
 		
 		/**
 		 * Creates a new MultiReferenceFieldModel object
@@ -37,7 +37,7 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<? extends
 		 * @param newName - Field name
 		 * @param value - Field Value
 		 */
-		public MultiReferenceFieldModel(String newName,Collection<? extends EntityModel> value){
+		public MultiReferenceFieldModel(String newName,Collection<EntityModel> value){
 			
 			setValue(newName,value);
 		}
@@ -45,7 +45,7 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<? extends
 		/**
 		 * get value
 		 */
-		public Collection<? extends EntityModel> getValue(){
+		public Collection<EntityModel> getValue(){
 			return data;
 		}
 
@@ -69,7 +69,7 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<? extends
 		/**
 		 * set name/value;
 		 */
-		public void setValue(String newName,Collection<? extends EntityModel> value){
+		public void setValue(String newName,Collection<EntityModel> value){
 			
 			name = newName;
 			data = value;
