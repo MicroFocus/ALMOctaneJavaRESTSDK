@@ -31,7 +31,7 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
 #end
 
 #macro (multipleReferenceAnnotations $referenceMetadata)
-#if (${referenceMetadata.hasTypedReturn()} && ${referenceMetadata.getReferenceTypes().size()} > 1)
+#if (${referenceMetadata.hasTypedReturn()} && (${referenceMetadata.getReferenceTypes().size()} > 1 || ${referenceMetadata.hasNonTypedReturn()}))
 @AllowedReferences({#foreach(${allowedReferenceForAnnotation} in ${referenceMetadata.getAllowedReferencesForAnnotation()})${allowedReferenceForAnnotation}, #end})
 #end
 #end
@@ -87,7 +87,7 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
         }
         final java.util.Collection<EntityModel> value = ${field.name}.getValue();
         #if (${referenceMetadata.hasTypedReturn()})
-        #if (${referenceMetadata.getReferenceTypes().size()} > 1)
+        #if ((${referenceMetadata.getReferenceTypes().size()} > 1) || (${referenceMetadata.hasNonTypedReturn()}))
         return value.stream().map(entityModel -> {
             final StringFieldModel type = (StringFieldModel) entityModel.getValue("type");
             final String referenceType = type.getValue();
