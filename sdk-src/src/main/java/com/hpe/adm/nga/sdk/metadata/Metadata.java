@@ -55,9 +55,9 @@ public class Metadata {
 	 * GetEntities metadata entity object
 	 * @return new metadata entity object
 	 */
-	public Entity entities(){
+	public GetEntityMetadata entities(){
 		
-		return new Entity(octaneHttpClient, urlDomain);
+		return new GetEntityMetadata(octaneHttpClient, urlDomain);
 	}
 	
 	/**
@@ -65,8 +65,8 @@ public class Metadata {
 	 * @param entities A comma separated array of entities that will be created to the context
 	 * @return new metadata entity object
 	 */
-	public Entity entities(String...entities){
-		final Entity entity = new Entity(octaneHttpClient, urlDomain);
+	public GetEntityMetadata entities(String...entities){
+		final GetEntityMetadata entity = new GetEntityMetadata(octaneHttpClient, urlDomain);
 		entity.addEntities(entities);
 		return entity;
 	}
@@ -75,9 +75,9 @@ public class Metadata {
 	 * GetEntities metadata field object
 	 * @return new field object
 	 */
-	public Field fields(){
+	public GetFieldMetadata fields(){
 		
-		return new Field(octaneHttpClient, urlDomain);
+		return new GetFieldMetadata(octaneHttpClient, urlDomain);
 	}
 	
 	/**
@@ -85,8 +85,8 @@ public class Metadata {
 	 * @param entities list of entities that will be returned
 	 * @return an object containing field metadata
 	 */
-	public Field fields(String...entities){
-		final Field field = new Field(octaneHttpClient, urlDomain);
+	public GetFieldMetadata fields(String...entities){
+		final GetFieldMetadata field = new GetFieldMetadata(octaneHttpClient, urlDomain);
 		field.addEntities(entities);
 		return field;
 	}

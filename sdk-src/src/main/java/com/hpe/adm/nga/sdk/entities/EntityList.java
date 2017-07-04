@@ -14,6 +14,13 @@
  */
 package com.hpe.adm.nga.sdk.entities;
 
+import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntity;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 
@@ -27,7 +34,6 @@ public class EntityList {
     protected final String urlDomain;
     protected final OctaneHttpClient octaneHttpClient;
 
-
     // **** public Functions ***
 
     /**
@@ -37,9 +43,8 @@ public class EntityList {
      * @param entityListDomain - Domain Name
      */
     public EntityList(OctaneHttpClient octaneHttpClient, String entityListDomain) {
-
-        urlDomain = entityListDomain;
         this.octaneHttpClient = octaneHttpClient;
+        urlDomain = entityListDomain;
     }
 
     /**

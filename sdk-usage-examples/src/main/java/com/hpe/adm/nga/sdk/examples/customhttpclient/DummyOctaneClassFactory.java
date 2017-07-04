@@ -17,6 +17,7 @@ package com.hpe.adm.nga.sdk.examples.customhttpclient;
 
 import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 /**
@@ -36,6 +37,11 @@ public class DummyOctaneClassFactory implements OctaneClassFactory {
     @Override
     public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
         return new EntityList(octaneHttpClient, baseDomain +  entityName);
+    }
+
+    @Override
+    public <T extends TypedEntityList> T getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, Class<T> enityListClass) {
+        return null;
     }
 
 }

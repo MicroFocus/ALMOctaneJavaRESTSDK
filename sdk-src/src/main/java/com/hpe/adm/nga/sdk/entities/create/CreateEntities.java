@@ -13,14 +13,11 @@
  * limitations under the License.
  */
 
-package com.hpe.adm.nga.sdk.entities;
+package com.hpe.adm.nga.sdk.entities.create;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
-import org.json.JSONObject;
 
 import java.util.Collection;
 
@@ -28,12 +25,13 @@ import java.util.Collection;
  * This class hold the UpdateEntities objects and serve all functions concern to
  * REST Post.
  */
-public class CreateEntities extends OctaneRequest {
+public class CreateEntities {
 
     private Collection<EntityModel> entityModels = null;
+    private final OctaneRequest octaneRequest;
 
-    protected CreateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
-        super (octaneHttpClient, urlDomain);
+    public CreateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain);
     }
 
     /**
@@ -42,21 +40,7 @@ public class CreateEntities extends OctaneRequest {
      * object
      */
     public Collection<EntityModel> execute() throws RuntimeException {
-
-        Collection<EntityModel> newEntityModels = null;
-        JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);
-        String strJsonEntityModel = objBase.toString();
-        try {
-            OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.PostOctaneHttpRequest(getFinalRequestUrl(), OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
-                            .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModels = getEntitiesResponse(octaneHttpRequest);
-        } catch (Exception e) {
-
-            handleException(e, true);
-        }
-
-        return newEntityModels;
+        return CreateHelper.getInstance().createEntities(entityModels, octaneRequest);
     }
 
     /**

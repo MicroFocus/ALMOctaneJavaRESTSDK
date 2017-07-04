@@ -18,6 +18,7 @@ package com.hpe.adm.nga.sdk;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import org.apache.logging.log4j.LogManager;
@@ -86,6 +87,10 @@ public class Octane {
      */
     public EntityList entityList(String entityName) {
         return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
+    }
+
+    public <T extends TypedEntityList> T entityList(Class<T> entityListClass) {
+        return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityListClass);
     }
 
     /**

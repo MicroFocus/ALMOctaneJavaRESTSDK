@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-package com.hpe.adm.nga.sdk.entities;
+package com.hpe.adm.nga.sdk.entities.delete;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 
 /**
  * This class hold the DeleteEntities object of one entity
  */
-public class DeleteEntity extends OctaneRequest {
+public class DeleteEntity {
+    private final OctaneRequest octaneRequest;
 
-    protected DeleteEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
-        super(octaneHttpClient, urlDomain, iEntityId);
+    public DeleteEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, iEntityId);
     }
 
     /**
@@ -34,15 +34,6 @@ public class DeleteEntity extends OctaneRequest {
      * new EntityModel object
      */
     public EntityModel execute() throws RuntimeException {
-        EntityModel newEntityModel = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(getFinalRequestUrl());
-            newEntityModel = getEntityResponse(octaneHttpRequest);
-        } catch (Exception e) {
-
-            handleException(e, false);
-        }
-        return newEntityModel;
-
+        return DeleteHelper.getInstance().deleteEntityModel(octaneRequest);
     }
 }

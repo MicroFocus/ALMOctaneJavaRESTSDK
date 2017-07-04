@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 
-package com.hpe.adm.nga.sdk.entities;
+package com.hpe.adm.nga.sdk.entities.delete;
 
-import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
+import com.hpe.adm.nga.sdk.query.Query;
 
 import java.util.Collection;
 
@@ -27,10 +26,11 @@ import java.util.Collection;
  * This class hold the DeleteEntities objects and serve all functions concern to
  * REST delete.
  */
-public class DeleteEntities extends OctaneRequest {
+public class DeleteEntities {
+    private final OctaneRequest octaneRequest;
 
-    protected DeleteEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
-        super(octaneHttpClient, urlDomain);
+    public DeleteEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain);
     }
 
     /**
@@ -39,18 +39,7 @@ public class DeleteEntities extends OctaneRequest {
      * @return null
      */
     public Collection<EntityModel> execute() throws RuntimeException {
-
-        Collection<EntityModel> deletedEntityModels = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(getFinalRequestUrl());
-            deletedEntityModels = getEntitiesResponse(octaneHttpRequest);
-        } catch (Exception e) {
-
-            handleException(e, false);
-        }
-
-        return deletedEntityModels;
-
+        return DeleteHelper.getInstance().deleteEntityModels(octaneRequest);
     }
 
     /**
@@ -60,7 +49,7 @@ public class DeleteEntities extends OctaneRequest {
      * @return a DeleteEntities Object with new Query parameters
      */
     public DeleteEntities query(Query query) {
-        getOctaneUrl().setDqlQueryParam(query);
+        octaneRequest.getOctaneUrl().setDqlQueryParam(query);
         return this;
     }
 }

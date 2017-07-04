@@ -16,6 +16,12 @@ package com.hpe.adm.nga.sdk.attachments;
 
 import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.entities.*;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntity;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 /**
