@@ -59,8 +59,21 @@ public com.hpe.adm.nga.sdk.enums.Phases.${className}Phase getPhase() {
 
 #macro (getReference $field)
     #set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
-    #if (${field.getFieldTypedata().isMultiple()})#getMultipleReference($field $referenceMetadata)#else#getSingleReference($field $referenceMetadata)#end
+    #set ($isListNode = ((${entityMetadata.name} != 'list_node') && (${field.getFieldTypedata().getTargets()[0].getType()} == 'list_node')))
+    #if ($isListNode)#getListNode($field)#elseif(${field.getFieldTypedata().isMultiple()})#getMultipleReference($field $referenceMetadata)#else#getSingleReference($field $referenceMetadata)#end
     }
+#end
+
+#macro (getListNode $field)
+#set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+public com.hpe.adm.nga.sdk.enums.Lists.${listName} get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
+    final ReferenceFieldModel ${field.name} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+    if (${field.name} == null) {
+        return null;
+    }
+    final EntityModel referenceFieldModel = ${field.name}.getValue();
+    return com.hpe.adm.nga.sdk.enums.Lists.${listName}.getFromEntityModel(referenceFieldModel);
+
 #end
 
 #macro (getNonReference $field)
@@ -130,9 +143,17 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 	}
 #end
 
+#macro (setListNode $field)
+#set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+	public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final com.hpe.adm.nga.sdk.enums.Lists.${listName} ${field.name}) {
+	wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${field.name}.getAsEntityModel()));
+	}
+#end
+
 #macro (setReference $field $paramName)
     #set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
-    #if (${field.getFieldTypedata().isMultiple()})#setMultipleReference($field $referenceMetadata $paramName)#else#setSingleReference($field $referenceMetadata $paramName)#end
+    #set ($isListNode = ((${entityMetadata.name} != 'list_node') && (${field.getFieldTypedata().getTargets()[0].getType()} == 'list_node')))
+    #if ($isListNode)#setListNode($field)#elseif (${field.getFieldTypedata().isMultiple()})#setMultipleReference($field $referenceMetadata $paramName)#else#setSingleReference($field $referenceMetadata $paramName)#end
 #end
 
 #macro (setSingleReference $field $referenceMetadata $paramName)

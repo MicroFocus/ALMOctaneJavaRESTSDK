@@ -9,6 +9,7 @@ import com.hpe.adm.nga.sdk.metadata.features.Feature;
 import com.hpe.adm.nga.sdk.metadata.features.RestFeature;
 import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -26,6 +27,9 @@ import java.util.stream.Collectors;
 public class GenerateModels {
 
     public static void main(String[] args) throws Exception {
+
+//        System.out.println("2".replaceAll("^\\d", "_$0"));
+//        if (1 ==1) return;
 
         File oytDir = new File("C:\\dev\\java-rest-sdk\\sdk-generate-entity-models\\target\\generated-sources/com/hpe/adm/nga/sdk/model/");
         oytDir.mkdirs();
@@ -45,7 +49,8 @@ public class GenerateModels {
         final Template template = velocityEngine.getTemplate("/EntityModel.vm");
         final Template interfaceTemplate = velocityEngine.getTemplate("/Entity.vm");
         final Template entityListTemplate = velocityEngine.getTemplate("/TypedEntityList.vm");
-        final Template enumTemplate = velocityEngine.getTemplate("/Phases.vm");
+        final Template phasesTemplate = velocityEngine.getTemplate("/Phases.vm");
+        final Template listsTemplate = velocityEngine.getTemplate("/Lists.vm");
 
         // work around for work_items_root
         final Octane octanePrivate = new Octane.Builder(new SimpleClientAuthentication("test_nd6l5z13vd1lztjxe9zp4oqe0", "+169663f176b79ddA", "HPE_REST_API_TECH_PREVIEW")).sharedSpace(20017).workSpace(4001).Server("https://mqast001pngx.saas.hpe.com").build();
@@ -58,21 +63,59 @@ public class GenerateModels {
         final Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
         entityMetadata.add(work_items_root);
 
+        final Map<String, String> logicalNameToListsMap = generateLists(qytDir, listsTemplate, octane);
+
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
-            final Collection<FieldMetadata> fieldMetadata = generateEntity(oytDir, template, work_items_rootFields, metadata, entityMetadata, entityMetadatum, name, interfaceName);
+            final Collection<FieldMetadata> fieldMetadata = generateEntity(oytDir, template, work_items_rootFields, metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap);
             generateInterface(oytDir, interfaceTemplate, entityMetadatum, name, interfaceName);
             generateEntityList(pytDir, entityListTemplate, entityMetadatum, name, fieldMetadata);
         }
 
-        generatePhases(qytDir, enumTemplate, octane);
+        generatePhases(qytDir, phasesTemplate, octane);
     }
 
-    private static void generatePhases(File qytDir, Template enumTemplate, Octane octane) throws IOException {
+    private static Map<String, String> generateLists(File qytDir, Template listsTemplate, Octane octane) throws IOException {
+        final Collection<EntityModel> listNodes = octane.entityList("list_nodes").get().addFields("name", "list_root", "id", "logical_name").execute();
+        final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
+        final Map<String, String> logicalNameToNameMap = new HashMap<>();
+        listNodes.forEach(listNode -> {
+            final String rootId;
+            final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
+            final EntityModel list_rootValue = list_root.getValue();
+            final String name;
+            if (list_rootValue != null) {
+                rootId = list_rootValue.getId();
+                name = ((StringFieldModel) listNode.getValue("name")).getValue().replaceAll(" ", "_").replaceAll("^\\d", "_$0").replaceAll("\\W", "_").toUpperCase();
+            } else {
+                rootId = listNode.getId();
+                name = GeneratorHelper.camelCaseFieldName(((StringFieldModel) listNode.getValue("name")).getValue().replaceAll("\\W", "_"));
+                logicalNameToNameMap.put(((StringFieldModel) listNode.getValue("logical_name")).getValue(), name);
+            }
+            final List<String[]> listHierarchy = mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>());
+
+            final String[] listNodeInfo = {name, ((StringFieldModel) listNode.getValue("id")).getValue()};
+            if (list_rootValue == null) {
+                listHierarchy.add(0, listNodeInfo);
+            } else {
+                listHierarchy.add(listNodeInfo);
+            }
+        });
+
+        final VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("listNodes", mappedListNodes);
+        final FileWriter fileWriter = new FileWriter(new File(qytDir, "Lists.java"));
+        listsTemplate.merge(velocityContext, fileWriter);
+        fileWriter.close();
+
+        return logicalNameToNameMap;
+    }
+
+    private static void generatePhases(File qytDir, Template phasesTemplate, Octane octane) throws IOException {
         final Map<String, Set<String[]>> phaseMap = new HashMap<>();
         final Collection<EntityModel> phases = octane.entityList("phases").get().addFields("id", "name", "entity").execute();
-        phases.stream().forEach(phase -> {
+        phases.forEach(phase -> {
             final Set<String[]> phaseValueSet = new HashSet<>();
             phaseValueSet.add(new String[]{phase.getId(), ((StringFieldModel) phase.getValue("name")).getValue().replaceAll(" ", "_").toUpperCase()});
             phaseMap.merge(GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(), true), phaseValueSet, (existingValues, newValues) -> {
@@ -84,11 +127,11 @@ public class GenerateModels {
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("phaseMap", phaseMap);
         final FileWriter fileWriter = new FileWriter(new File(qytDir, "Phases.java"));
-        enumTemplate.merge(velocityContext, fileWriter);
+        phasesTemplate.merge(velocityContext, fileWriter);
         fileWriter.close();
     }
 
-    private static Collection<FieldMetadata> generateEntity(File oytDir, Template template, Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName) throws IOException {
+    private static Collection<FieldMetadata> generateEntity(File oytDir, Template template, Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap) throws IOException {
         //if (!name.equals("run")) continue;
         System.out.println(name + ":");
         final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute();
@@ -97,6 +140,7 @@ public class GenerateModels {
         velocityContext.put("interfaceName", interfaceName);
         velocityContext.put("entityMetadata", entityMetadatum);
         velocityContext.put("fieldMetadata", fieldMetadata);
+        velocityContext.put("logicalNameToListsMap", logicalNameToListsMap);
         velocityContext.put("entityMetadataCollection", entityMetadata);
         velocityContext.put("GeneratorHelper", GeneratorHelper.class);
         velocityContext.put("entityMetadataWrapper", GeneratorHelper.entityMetadataWrapper(entityMetadatum));
