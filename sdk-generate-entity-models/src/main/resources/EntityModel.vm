@@ -138,15 +138,17 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 #end
 
 #macro (setPhase)
-	public void setPhase(final com.hpe.adm.nga.sdk.enums.Phases.${className}Phase phase) {
+	public ${className}EntityModel setPhase(final com.hpe.adm.nga.sdk.enums.Phases.${className}Phase phase) {
 	    wrappedEntityModel.setValue(new ReferenceFieldModel("phase", phase.getAsEntityModel()));
+        return this;
 	}
 #end
 
 #macro (setListNode $field)
 #set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
-	public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final com.hpe.adm.nga.sdk.enums.Lists.${listName} ${field.name}) {
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final com.hpe.adm.nga.sdk.enums.Lists.${listName} ${field.name}) {
 	wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${field.name}.getAsEntityModel()));
+    return this;
 	}
 #end
 
@@ -160,16 +162,18 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
     #if (${referenceMetadata.hasTypedReturn()})
         #foreach($type in ${referenceMetadata.getReferenceTypes()})
 #fieldMetadaAnnotations($field)
-        public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel $paramName){
+        public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel $paramName){
             wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}.getWrappedEntityModel()));
+            return this;
         }
 
         #end
     #end
     #if(${referenceMetadata.hasNonTypedReturn()})
 #fieldMetadaAnnotations($field)
-		public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final EntityModel $paramName){
+		public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final EntityModel $paramName){
 	    	wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}));
+            return this;
 		}
 
     #end
@@ -178,9 +182,9 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 #macro (setMultipleReference $field $referenceMetadata $paramName)
     #fieldMetadaAnnotations($field)
     #multipleReferenceAnnotations (${referenceMetadata})
-	public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
 	    if ($paramName == null) {
-	        return;
+	        return this;
 	    }
     #if (${referenceMetadata.hasTypedReturn()})
 		final java.util.Collection<EntityModel> entityModels = ${paramName}.stream().map(entityModel -> {
@@ -196,13 +200,15 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
     #else
 		wrappedEntityModel.setValue(new MultiReferenceFieldModel("${field.name}", $paramName));
     #end
+        return this;
 	}
 
 #end
 
 #macro (setNonReference $field $paramName)
-	public void set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
 	    wrappedEntityModel.setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
+        return this;
 	}
 
 #end

@@ -84,19 +84,21 @@ public class EntityModel implements Entity{
      *
      * @param values - a collection of field models
      */
-    public void setValues(Set<FieldModel> values) {
+    public EntityModel setValues(Set<FieldModel> values) {
         if (values != null) {
             data.clear();
             values.forEach(field -> data.put(field.getName(), field));
         }
+        return this;
     }
 
     /**
      * setter of single field, update if field exists
      * @param fieldModel the single field to update
      */
-    public void setValue(FieldModel fieldModel) {
+    public EntityModel setValue(FieldModel fieldModel) {
         data.put(fieldModel.getName(), fieldModel);
+        return this;
     }
 
     @Override
