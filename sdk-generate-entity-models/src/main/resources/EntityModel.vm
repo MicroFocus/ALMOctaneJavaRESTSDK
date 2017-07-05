@@ -41,7 +41,19 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
 	* Label: ${field.getLabel()}
 	* Description: ${field.getDescription()}
 	*/
-    #if(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
+    #if (${field.getName()} == "phase")#getPhase()#elseif(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
+
+#end
+
+#macro (getPhase)
+public com.hpe.adm.nga.sdk.enums.Phases.${className}Phase getPhase() {
+    final ReferenceFieldModel phase = (ReferenceFieldModel) wrappedEntityModel.getValue("phase");
+    if (phase == null) {
+        return null;
+    }
+    final EntityModel referenceFieldModel = phase.getValue();
+    return com.hpe.adm.nga.sdk.enums.Phases.${className}Phase.getFromEntityModel(referenceFieldModel);
+}
 
 #end
 
@@ -109,7 +121,13 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 
 #macro (setter $field)
     #set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
-    #if(${field.getFieldType()} == "Reference")#setReference($field $paramName)#{else}#setNonReference($field $paramName)#end
+    #if (${field.getName()} == "phase")#setPhase()#elseif(${field.getFieldType()} == "Reference")#setReference($field $paramName)#{else}#setNonReference($field $paramName)#end
+#end
+
+#macro (setPhase)
+	public void setPhase(final com.hpe.adm.nga.sdk.enums.Phases.${className}Phase phase) {
+	    wrappedEntityModel.setValue(new ReferenceFieldModel("phase", phase.getAsEntityModel()));
+	}
 #end
 
 #macro (setReference $field $paramName)
