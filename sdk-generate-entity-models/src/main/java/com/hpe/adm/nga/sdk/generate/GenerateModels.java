@@ -64,16 +64,15 @@ public class GenerateModels {
         entityMetadata.add(work_items_root);
 
         final Map<String, String> logicalNameToListsMap = generateLists(qytDir, listsTemplate, octane);
+        final Set<String> availablePhases = generatePhases(qytDir, phasesTemplate, octane);
 
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
-            final Collection<FieldMetadata> fieldMetadata = generateEntity(oytDir, template, work_items_rootFields, metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap);
+            final Collection<FieldMetadata> fieldMetadata = generateEntity(oytDir, template, work_items_rootFields, metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
             generateInterface(oytDir, interfaceTemplate, entityMetadatum, name, interfaceName);
             generateEntityList(pytDir, entityListTemplate, entityMetadatum, name, fieldMetadata);
         }
-
-        generatePhases(qytDir, phasesTemplate, octane);
     }
 
     private static Map<String, String> generateLists(File qytDir, Template listsTemplate, Octane octane) throws IOException {
@@ -112,7 +111,7 @@ public class GenerateModels {
         return logicalNameToNameMap;
     }
 
-    private static void generatePhases(File qytDir, Template phasesTemplate, Octane octane) throws IOException {
+    private static Set<String> generatePhases(File qytDir, Template phasesTemplate, Octane octane) throws IOException {
         final Map<String, Set<String[]>> phaseMap = new HashMap<>();
         final Collection<EntityModel> phases = octane.entityList("phases").get().addFields("id", "name", "entity").execute();
         phases.forEach(phase -> {
@@ -129,9 +128,11 @@ public class GenerateModels {
         final FileWriter fileWriter = new FileWriter(new File(qytDir, "Phases.java"));
         phasesTemplate.merge(velocityContext, fileWriter);
         fileWriter.close();
+
+        return phaseMap.keySet();
     }
 
-    private static Collection<FieldMetadata> generateEntity(File oytDir, Template template, Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap) throws IOException {
+    private static Collection<FieldMetadata> generateEntity(File oytDir, Template template, Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
         //if (!name.equals("run")) continue;
         System.out.println(name + ":");
         final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute();
@@ -144,6 +145,7 @@ public class GenerateModels {
         velocityContext.put("entityMetadataCollection", entityMetadata);
         velocityContext.put("GeneratorHelper", GeneratorHelper.class);
         velocityContext.put("entityMetadataWrapper", GeneratorHelper.entityMetadataWrapper(entityMetadatum));
+        velocityContext.put("availablePhases", availablePhases);
 
         final FileWriter fileWriter = new FileWriter(new File(oytDir, GeneratorHelper.camelCaseFieldName(name) + "EntityModel.java"));
         template.merge(velocityContext, fileWriter);

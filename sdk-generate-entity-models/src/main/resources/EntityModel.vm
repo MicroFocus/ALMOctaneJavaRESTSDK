@@ -41,7 +41,7 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
 	* Label: ${field.getLabel()}
 	* Description: ${field.getDescription()}
 	*/
-    #if (${field.getName()} == "phase")#getPhase()#elseif(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
+    #if ((${field.getName()} == "phase") && (${availablePhases.contains(${className})}))#getPhase()#elseif(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
 
 #end
 
@@ -134,7 +134,7 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 
 #macro (setter $field)
     #set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
-    #if (${field.getName()} == "phase")#setPhase()#elseif(${field.getFieldType()} == "Reference")#setReference($field $paramName)#{else}#setNonReference($field $paramName)#end
+    #if ((${field.getName()} == "phase") && (${availablePhases.contains(${className})}))#setPhase()#elseif(${field.getFieldType()} == "Reference")#setReference($field $paramName)#{else}#setNonReference($field $paramName)#end
 #end
 
 #macro (setPhase)
