@@ -26,14 +26,17 @@ import java.util.stream.Collectors;
  */
 public class GenerateModels {
 
+    private final Template template, interfaceTemplate, entityListTemplate, phasesTemplate, listsTemplate;
+    private final File modelDirectory, entitiesDirectory, enumsDirectory;
 
-    public static void main(String[] args) throws Exception {
-        File oytDir = new File("C:\\dev\\java-rest-sdk\\sdk-generate-entity-models\\target\\generated-sources/com/hpe/adm/nga/sdk/model/");
-        oytDir.mkdirs();
-        File pytDir = new File("C:\\dev\\java-rest-sdk\\sdk-generate-entity-models\\target\\generated-sources/com/hpe/adm/nga/sdk/entities/");
-        pytDir.mkdirs();
-        File qytDir = new File("C:\\dev\\java-rest-sdk\\sdk-generate-entity-models\\target\\generated-sources/com/hpe/adm/nga/sdk/enums/");
-        qytDir.mkdirs();
+    public GenerateModels(final File outputDirectory) {
+        final File packageDirectory = new File(outputDirectory, "/com/hpe/adm/nga/sdk");
+        modelDirectory = new File(packageDirectory, "model");
+        modelDirectory.mkdirs();
+        entitiesDirectory = new File(packageDirectory, "entities");
+        entitiesDirectory.mkdirs();
+        enumsDirectory = new File(packageDirectory, "enums");
+        enumsDirectory.mkdirs();
 
         final VelocityEngine velocityEngine = new VelocityEngine();
         velocityEngine.setProperty("resource.loader", "class");
@@ -43,36 +46,38 @@ public class GenerateModels {
 
         velocityEngine.init();
 
-        final Template template = velocityEngine.getTemplate("/EntityModel.vm");
-        final Template interfaceTemplate = velocityEngine.getTemplate("/Entity.vm");
-        final Template entityListTemplate = velocityEngine.getTemplate("/TypedEntityList.vm");
-        final Template phasesTemplate = velocityEngine.getTemplate("/Phases.vm");
-        final Template listsTemplate = velocityEngine.getTemplate("/Lists.vm");
+        template = velocityEngine.getTemplate("/EntityModel.vm");
+        interfaceTemplate = velocityEngine.getTemplate("/Entity.vm");
+        entityListTemplate = velocityEngine.getTemplate("/TypedEntityList.vm");
+        phasesTemplate = velocityEngine.getTemplate("/Phases.vm");
+        listsTemplate = velocityEngine.getTemplate("/Lists.vm");
+    }
 
+    public void generate(String clientId, String clientSecret, String server, long sharedSpace, long workSpace) throws IOException {
         // work around for work_items_root
-        final Octane octanePrivate = new Octane.Builder(new SimpleClientAuthentication("test_nd6l5z13vd1lztjxe9zp4oqe0", "+169663f176b79ddA", "HPE_REST_API_TECH_PREVIEW")).sharedSpace(20017).workSpace(4001).Server("https://mqast001pngx.saas.hpe.com").build();
+        final Octane octanePrivate = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret, "HPE_REST_API_TECH_PREVIEW")).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();
         final EntityMetadata work_items_root = octanePrivate.metadata().entities("work_item_root").execute().iterator().next();
         final Collection<FieldMetadata> work_items_rootFields = octanePrivate.metadata().fields("work_item_root").execute();
         octanePrivate.signOut();
 
-        final Octane octane = new Octane.Builder(new SimpleClientAuthentication("test_nd6l5z13vd1lztjxe9zp4oqe0", "+169663f176b79ddA")).sharedSpace(20017).workSpace(4001).Server("https://mqast001pngx.saas.hpe.com").build();
+        final Octane octane = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret)).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();
         final Metadata metadata = octane.metadata();
         final Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
         entityMetadata.add(work_items_root);
 
-        final Map<String, String> logicalNameToListsMap = generateLists(qytDir, listsTemplate, octane);
-        final Set<String> availablePhases = generatePhases(qytDir, phasesTemplate, octane);
+        final Map<String, String> logicalNameToListsMap = generateLists(octane);
+        final Set<String> availablePhases = generatePhases(octane);
 
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
-            final Collection<FieldMetadata> fieldMetadata = generateEntity(oytDir, template, work_items_rootFields, metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
-            generateInterface(oytDir, interfaceTemplate, entityMetadatum, name, interfaceName);
-            generateEntityList(pytDir, entityListTemplate, entityMetadatum, name, fieldMetadata);
+            final Collection<FieldMetadata> fieldMetadata = generateEntity(work_items_rootFields, metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
+            generateInterface(entityMetadatum, name, interfaceName);
+            generateEntityList(entityMetadatum, name, fieldMetadata);
         }
     }
 
-    private static Map<String, String> generateLists(File qytDir, Template listsTemplate, Octane octane) throws IOException {
+    private Map<String, String> generateLists(Octane octane) throws IOException {
         final Collection<EntityModel> listNodes = octane.entityList("list_nodes").get().addFields("name", "list_root", "id", "logical_name").execute();
         final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
         final Map<String, String> logicalNameToNameMap = new HashMap<>();
@@ -101,14 +106,14 @@ public class GenerateModels {
 
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("listNodes", mappedListNodes);
-        final FileWriter fileWriter = new FileWriter(new File(qytDir, "Lists.java"));
+        final FileWriter fileWriter = new FileWriter(new File(enumsDirectory, "Lists.java"));
         listsTemplate.merge(velocityContext, fileWriter);
         fileWriter.close();
 
         return logicalNameToNameMap;
     }
 
-    private static Set<String> generatePhases(File qytDir, Template phasesTemplate, Octane octane) throws IOException {
+    private Set<String> generatePhases(Octane octane) throws IOException {
         final Map<String, Set<String[]>> phaseMap = new HashMap<>();
         final Collection<EntityModel> phases = octane.entityList("phases").get().addFields("id", "name", "entity").execute();
         phases.forEach(phase -> {
@@ -122,14 +127,14 @@ public class GenerateModels {
 
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("phaseMap", phaseMap);
-        final FileWriter fileWriter = new FileWriter(new File(qytDir, "Phases.java"));
+        final FileWriter fileWriter = new FileWriter(new File(enumsDirectory, "Phases.java"));
         phasesTemplate.merge(velocityContext, fileWriter);
         fileWriter.close();
 
         return phaseMap.keySet();
     }
 
-    private static Collection<FieldMetadata> generateEntity(File oytDir, Template template, Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
+    private Collection<FieldMetadata> generateEntity(Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
         //if (!name.equals("run")) continue;
         System.out.println(name + ":");
         final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute();
@@ -186,14 +191,14 @@ public class GenerateModels {
         velocityContext.put("availablePhases", availablePhases);
         velocityContext.put("requiredFields", requiredFields);
 
-        final FileWriter fileWriter = new FileWriter(new File(oytDir, GeneratorHelper.camelCaseFieldName(name) + "EntityModel.java"));
+        final FileWriter fileWriter = new FileWriter(new File(modelDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityModel.java"));
         template.merge(velocityContext, fileWriter);
 
         fileWriter.close();
         return fieldMetadata;
     }
 
-    private static void expandCollectedReferences(final TreeMap<String, List<String>> collectedReferences, final int[] positions, final int pointer, final Set<List<String[]>> output) {
+    private void expandCollectedReferences(final TreeMap<String, List<String>> collectedReferences, final int[] positions, final int pointer, final Set<List<String[]>> output) {
         final Object[] keyArray = collectedReferences.keySet().toArray();
         final Object o = keyArray[pointer];
         for (int i = 0; i < collectedReferences.get(o).size(); ++i) {
@@ -211,7 +216,7 @@ public class GenerateModels {
         positions[pointer] = 0;
     }
 
-    private static void generateInterface(File oytDir, Template interfaceTemplate, EntityMetadata entityMetadatum, String name, String interfaceName) throws IOException {
+    private void generateInterface(EntityMetadata entityMetadatum, String name, String interfaceName) throws IOException {
         // interface
         final VelocityContext interfaceVelocityContext = new VelocityContext();
         final Optional<Feature> subTypeOfFeature = entityMetadatum.features().stream().filter(feature -> feature instanceof SubTypesOfFeature).findAny();
@@ -220,13 +225,13 @@ public class GenerateModels {
         interfaceVelocityContext.put("superInterfaceName",
                 (subTypeOfFeature.map(feature -> GeneratorHelper.camelCaseFieldName(((SubTypesOfFeature) feature).getType())).orElse("")) + "Entity");
 
-        final FileWriter interfaceFileWriter = new FileWriter(new File(oytDir, GeneratorHelper.camelCaseFieldName(name) + "Entity.java"));
+        final FileWriter interfaceFileWriter = new FileWriter(new File(modelDirectory, GeneratorHelper.camelCaseFieldName(name) + "Entity.java"));
         interfaceTemplate.merge(interfaceVelocityContext, interfaceFileWriter);
 
         interfaceFileWriter.close();
     }
 
-    private static void generateEntityList(File pytDir, Template entityListTemplate, EntityMetadata entityMetadatum, String name, Collection<FieldMetadata> fieldMetadata) throws IOException {
+    private void generateEntityList(EntityMetadata entityMetadatum, String name, Collection<FieldMetadata> fieldMetadata) throws IOException {
         // entityList
         final Optional<Feature> hasRestFeature = entityMetadatum.features().stream()
                 .filter(feature -> feature instanceof RestFeature)
@@ -260,7 +265,7 @@ public class GenerateModels {
                 }
             }
 
-            final FileWriter entityListFileWriter = new FileWriter(new File(pytDir, GeneratorHelper.camelCaseFieldName(name) + "EntityList.java"));
+            final FileWriter entityListFileWriter = new FileWriter(new File(entitiesDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityList.java"));
             entityListTemplate.merge(entityListVelocityContext, entityListFileWriter);
 
             entityListFileWriter.close();
