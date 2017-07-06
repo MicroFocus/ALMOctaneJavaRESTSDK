@@ -26,11 +26,8 @@ import java.util.stream.Collectors;
  */
 public class GenerateModels {
 
+
     public static void main(String[] args) throws Exception {
-
-//        System.out.println("2".replaceAll("^\\d", "_$0"));
-//        if (1 ==1) return;
-
         File oytDir = new File("C:\\dev\\java-rest-sdk\\sdk-generate-entity-models\\target\\generated-sources/com/hpe/adm/nga/sdk/model/");
         oytDir.mkdirs();
         File pytDir = new File("C:\\dev\\java-rest-sdk\\sdk-generate-entity-models\\target\\generated-sources/com/hpe/adm/nga/sdk/entities/");
@@ -137,6 +134,47 @@ public class GenerateModels {
         System.out.println(name + ":");
         final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute();
 
+        final TreeMap<String, List<String>> collectedReferences = fieldMetadata.stream()
+                .filter(FieldMetadata::isRequired)
+                .collect(Collectors.toMap(FieldMetadata::getName, fieldMetadata1 -> {
+                    final List<String> references = new ArrayList<>();
+                    final String className = GeneratorHelper.camelCaseFieldName(entityMetadatum.getName());
+                    if (fieldMetadata1.getName().equals("phase") && availablePhases.contains(className)) {
+                        references.add("com.hpe.adm.nga.sdk.enums.Phases." + className + "Phase");
+                    } else if (fieldMetadata1.getFieldType() == FieldMetadata.FieldType.Reference) {
+                        if ((!entityMetadatum.getName().equals("list_node")) && (fieldMetadata1.getFieldTypedata().getTargets()[0].getType().equals("list_node"))) {
+                            final String listName = logicalNameToListsMap.get(fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName());
+                            references.add("com.hpe.adm.nga.sdk.enums.Lists." + listName);
+                        } else {
+                            final GeneratorHelper.ReferenceMetadata referenceMetadata = GeneratorHelper.getAllowedSuperTypesForReference(fieldMetadata1, entityMetadata);
+                            if (fieldMetadata1.getFieldTypedata().isMultiple()) {
+                                references.add(referenceMetadata.getReferenceClassForSignature());
+                            } else {
+                                if (referenceMetadata.hasTypedReturn()) {
+                                    references.addAll(referenceMetadata.getReferenceTypes()
+                                            .stream()
+                                            .map(type -> GeneratorHelper.camelCaseFieldName(type).concat("EntityModel"))
+                                            .collect(Collectors.toSet()));
+                                }
+                                if (referenceMetadata.hasNonTypedReturn()) {
+                                    references.add("EntityModel");
+                                }
+                            }
+                        }
+                    } else {
+                        references.add(GeneratorHelper.getFieldTypeAsJava(fieldMetadata1.getFieldType()));
+                    }
+
+                    return references;
+                }, (strings, strings2) -> {
+                    throw new IllegalStateException("problem merging map");
+                }, TreeMap::new));
+
+        final Set<List<String[]>> requiredFields = new HashSet<>();
+        if (!collectedReferences.isEmpty()) {
+            expandCollectedReferences(collectedReferences, new int[collectedReferences.size()], 0, requiredFields);
+        }
+
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("interfaceName", interfaceName);
         velocityContext.put("entityMetadata", entityMetadatum);
@@ -146,12 +184,31 @@ public class GenerateModels {
         velocityContext.put("GeneratorHelper", GeneratorHelper.class);
         velocityContext.put("entityMetadataWrapper", GeneratorHelper.entityMetadataWrapper(entityMetadatum));
         velocityContext.put("availablePhases", availablePhases);
+        velocityContext.put("requiredFields", requiredFields);
 
         final FileWriter fileWriter = new FileWriter(new File(oytDir, GeneratorHelper.camelCaseFieldName(name) + "EntityModel.java"));
         template.merge(velocityContext, fileWriter);
 
         fileWriter.close();
         return fieldMetadata;
+    }
+
+    private static void expandCollectedReferences(final TreeMap<String, List<String>> collectedReferences, final int[] positions, final int pointer, final Set<List<String[]>> output) {
+        final Object[] keyArray = collectedReferences.keySet().toArray();
+        final Object o = keyArray[pointer];
+        for (int i = 0; i < collectedReferences.get(o).size(); ++i) {
+            if (pointer == positions.length - 1) {
+                final List<String[]> outputLine = new ArrayList<>(positions.length);
+                for (int j = 0; j < positions.length; ++j) {
+                    outputLine.add(new String[]{(String) keyArray[j], collectedReferences.get(keyArray[j]).get(positions[j])});
+                }
+                output.add(outputLine);
+            } else {
+                expandCollectedReferences(collectedReferences, positions, pointer + 1, output);
+            }
+            positions[pointer]++;
+        }
+        positions[pointer] = 0;
     }
 
     private static void generateInterface(File oytDir, Template interfaceTemplate, EntityMetadata entityMetadatum, String name, String interfaceName) throws IOException {
@@ -209,6 +266,4 @@ public class GenerateModels {
             entityListFileWriter.close();
         }
     }
-
-
 }

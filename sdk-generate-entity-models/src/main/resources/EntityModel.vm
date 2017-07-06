@@ -20,6 +20,27 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
         super(wrappedEntityModel);
     }
 
+    #requiredFieldsForConstructor()
+
+#macro (requiredFieldsForConstructor)
+    #foreach($requiredFieldList in $requiredFields)
+    public ${className}EntityModel(#outputRequiredFieldsConstructorSignature($requiredFieldList)) {
+        this();
+        #outputRequiredFieldsSetters($requiredFieldList)
+    }
+    #end
+#end
+
+#macro(outputRequiredFieldsConstructorSignature $requiredFieldList)
+    #foreach($requiredFieldTuple in $requiredFieldList)final $requiredFieldTuple[1] $requiredFieldTuple[0]#if($foreach.hasNext), #end#end
+#end
+
+#macro(outputRequiredFieldsSetters $requiredFieldList)
+    #foreach($requiredFieldTuple in $requiredFieldList)
+        set${GeneratorHelper.camelCaseFieldName($requiredFieldTuple[0])}($requiredFieldTuple[0]);
+    #end
+#end
+
 #foreach(${field} in ${fieldMetadata})
     #getter ($field)
     #if($field.isEditable())#setter ($field)#end
