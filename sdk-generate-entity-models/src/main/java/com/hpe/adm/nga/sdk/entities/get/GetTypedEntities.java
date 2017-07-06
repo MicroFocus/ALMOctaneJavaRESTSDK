@@ -19,7 +19,7 @@ public abstract class GetTypedEntities<T extends TypedEntityModel, E extends Get
 
     protected GetTypedEntities(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String baseDomain) {
         super(typedEntityModelClass);
-        octaneRequest = new OctaneRequest(octaneHttpClient, baseDomain + "defects");
+        octaneRequest = new OctaneRequest(octaneHttpClient, baseDomain);
     }
 
     public final Collection<T> execute() throws RuntimeException {
