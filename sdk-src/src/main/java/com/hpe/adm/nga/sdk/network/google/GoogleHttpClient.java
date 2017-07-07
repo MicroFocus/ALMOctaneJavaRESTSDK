@@ -16,8 +16,6 @@ package com.hpe.adm.nga.sdk.network.google;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.http.json.JsonHttpContent;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
@@ -293,10 +291,14 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
                         .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
 
-        MultipartContent.Part part1 = new MultipartContent.Part(new JsonHttpContent(new JacksonFactory(), octaneHttpRequest.getContent()));
-        part1.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME,
-                String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT,
-                        HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE)));
+        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", octaneHttpRequest.getContent().getBytes());
+        MultipartContent.Part part1 = new MultipartContent.Part(byteArrayContent);
+        String contentDisposition = String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT, HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE);
+        HttpHeaders httpHeaders =
+                new HttpHeaders()
+                    .set(HTTP_MULTIPART_PART_DISPOSITION_NAME, contentDisposition);
+
+        part1.setHeaders(httpHeaders);
         content.addPart(part1);
 
         // Add Stream
