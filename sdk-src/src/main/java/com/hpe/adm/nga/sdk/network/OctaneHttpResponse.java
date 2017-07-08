@@ -14,7 +14,13 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
+import com.google.api.client.util.IOUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -26,13 +32,13 @@ import java.io.InputStream;
 public class OctaneHttpResponse {
 
     private final int statusCode;
-    private final String content;
     private final InputStream inputStream;
+    private final Charset responseCharset;
 
-    public OctaneHttpResponse(int statusCode, String content, InputStream inputStream) {
+    public OctaneHttpResponse(int statusCode, InputStream inputStream, Charset responseCharset) {
         this.statusCode = statusCode;
-        this.content = content;
         this.inputStream = inputStream;
+        this.responseCharset = responseCharset;
     }
 
     /**
@@ -63,8 +69,14 @@ public class OctaneHttpResponse {
      * All content is read from the input content stream rather than being limited by the Content-Length. For the character set, it follows the specification by parsing the "charset" parameter of the Content-Type header or by default "ISO-8859-1" if the parameter is missing.
      * @return - parsed string or "" for no content
      */
-    public String getContent(){
-        return content;
+    public String getContent() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            IOUtils.copy(inputStream, out);
+            return out.toString(responseCharset.name());
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     /**
