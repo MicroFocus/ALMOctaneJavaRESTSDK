@@ -80,6 +80,14 @@ public class EntityModel {
     }
 
     /**
+     * Remove a value from completely, different from setting the value to null
+     * @param key the fieldName
+     */
+    public void removeValue(String key) {
+        data.remove(key);
+    }
+
+    /**
      * setter of new entity value, all old fields are cleared
      *
      * @param values - a collection of field models
