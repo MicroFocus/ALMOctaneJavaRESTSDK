@@ -147,30 +147,33 @@ public class TestAttachments extends TestBase {
                                 "")
                         .execute();
 
-        EntityModel uploadedAttachment = reloadEntityModel(entities, ownerFieldName);
+        EntityModel createdAttachment = reloadEntityModel(entities, ownerFieldName);
+
+        //Use this for the update call
+        EntityModel updateAttachment = new EntityModel();
+        updateAttachment.setValue(createdAttachment.getValue("id"));
+        updateAttachment.setValue(createdAttachment.getValue("type"));
 
         String newDescription = UUID.randomUUID().toString();
-        uploadedAttachment.setValue(new StringFieldModel("description", newDescription));
+        updateAttachment.setValue(new StringFieldModel("description", newDescription));
 
         //The extension cannot be changed
         String newName = UUID.randomUUID().toString();
-        uploadedAttachment.setValue(new StringFieldModel("name", newName + ".txt"));
-
-        //The parent cannot be changed, so remove it from the update call
-        uploadedAttachment.removeValue(ownerFieldName);
+        updateAttachment.setValue(new StringFieldModel("name", newName + ".txt"));
 
         entities =
             octane.attachmentList()
                     .update()
-                    .entities(Collections.singletonList(uploadedAttachment))
+                    .entities(Collections.singletonList(updateAttachment))
                     .execute();
 
-        EntityModel updatedAttachment = reloadEntityModel(entities, ownerFieldName);
+        //Do another fetch after to compare the fields
+        EntityModel reloadedAttachment = reloadEntityModel(entities, ownerFieldName);
 
-        //Add the parent back for the check
-        uploadedAttachment.setValue(new ReferenceFieldModel(ownerFieldName, attachmentParent));
+        //Add the parent back for the check, since it's needed
+        updateAttachment.setValue(new ReferenceFieldModel(ownerFieldName, attachmentParent));
 
-        checkAttachmentJson(uploadedAttachment, updatedAttachment, ownerFieldName);
+        checkAttachmentJson(updateAttachment, reloadedAttachment, ownerFieldName);
     }
 
     /**
