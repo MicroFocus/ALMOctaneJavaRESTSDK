@@ -23,7 +23,6 @@ import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -111,7 +110,7 @@ public class TestAttachments extends TestBase {
                         .create()
                         .attachment(
                                 initialAttachment,
-                                new ByteInputStream(pngBytes, pngBytes.length),
+                                new ByteArrayInputStream(pngBytes),
                                 "image/png",
                                 "")
                         .execute();
