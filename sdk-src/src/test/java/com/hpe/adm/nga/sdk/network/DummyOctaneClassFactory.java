@@ -63,7 +63,7 @@ public class DummyOctaneClassFactory implements OctaneClassFactory {
             //Return empty response
             String returnJson = "{\"total_count\":0,\"data\":[],\"exceeds_total_count\":false}";
             InputStream stream = new ByteArrayInputStream(returnJson.getBytes(StandardCharsets.UTF_8));
-            return new OctaneHttpResponse(202, returnJson, stream);
+            return new OctaneHttpResponse(202, stream, StandardCharsets.UTF_8);
         }
 
     }

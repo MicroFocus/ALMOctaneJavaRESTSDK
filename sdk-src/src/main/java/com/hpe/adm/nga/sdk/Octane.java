@@ -104,13 +104,13 @@ public class Octane {
     }
 
     /**
-     * Creates a new AttachmentList object.  This returns the context for attachments.  This is equivalent to
+     * Creates a new attachmentList object.  This returns the context for attachments.  This is equivalent to
      * <br>
      * {@code [workspace_url/attachments}
      *
-     * @return A new AttachmentList object that holds the attachments context
+     * @return A new attachmentList object that holds the attachments context
      */
-    public AttachmentList AttachmentList() {
+    public AttachmentList attachmentList() {
         return new AttachmentList(octaneHttpClient, getBaseDomainFormat());
     }
 

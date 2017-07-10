@@ -14,53 +14,301 @@
  */
 package com.hpe.adm.nga.sdk.tests.attachments;
 
+import com.google.common.io.ByteStreams;
+import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.query.Query;
+import com.hpe.adm.nga.sdk.query.QueryMethod;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.UUID;
 
 /**
- *
- * Created by Guy Guetta on 03/05/2016.
+ * Integration tests for {@link com.hpe.adm.nga.sdk.attachments.AttachmentList}
  */
 public class TestAttachments extends TestBase {
 
-    public TestAttachments() {
-        entityName = "product_areas";
+    private static EntityModel attachmentParent;
+    private static String ownerFieldName;
+
+    /**
+     * Create a parent defect for all tests
+     */
+    @BeforeClass
+    public static void createAttachmentParent() {
+        try {
+            Collection<EntityModel> entities = DataGenerator.generateEntityModel(octane, "defects");
+            entities = octane.entityList("defects").create().entities(entities).execute();
+            ownerFieldName = "owner_work_item";
+            attachmentParent = entities.iterator().next();
+        } catch (Exception ex) {
+            throw new RuntimeException(
+                    "Failed to create defect to use as attachment owner_work_item", ex);
+        }
     }
 
+    /**
+     * Create a text attachment. File extensions has to be .txt
+     */
     @Test
-    public void testCreateAttachmentForDefect() throws Exception {
-        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects");
-        Collection<EntityModel> defectModel = octane.entityList("defects").create().entities(generatedEntity).execute();
+    public void testTextAttachment() {
 
-        EntityModel expectedAttachments = createAttachment("owner_work_item", defectModel.iterator().next());
+        EntityModel initialAttachment = new EntityModel();
+        initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".txt"));
+        initialAttachment.setValue(new StringFieldModel("description", UUID.randomUUID().toString()));
+        initialAttachment.setValue(new ReferenceFieldModel(ownerFieldName, attachmentParent));
 
-        Collection<EntityModel> actualAttachments = octane.entityList("attachments").get().addFields("owner_work_item", "name").execute();
+        String attachmentText = UUID.randomUUID().toString();
 
-        Assert.assertTrue( CommonUtils.isEntityAInEntityB(expectedAttachments, actualAttachments.iterator().next()));
+        Collection<EntityModel> entities =
+                octane.attachmentList()
+                        .create()
+                        .attachment(
+                                initialAttachment,
+                                new ByteArrayInputStream(attachmentText.getBytes()),
+                                "text/plain",
+                                "")
+                        .execute();
+
+        EntityModel uploadedAttachment = reloadEntityModel(entities, ownerFieldName);
+
+        checkAttachmentJson(initialAttachment, uploadedAttachment, ownerFieldName);
+        checkAttachmentContent(attachmentText.getBytes(), uploadedAttachment);
     }
 
-    private EntityModel createAttachment(String fieldEntityType, EntityModel entity) throws Exception {
-        Set<FieldModel> fields = new HashSet<>();
-        fields.add(new ReferenceFieldModel(fieldEntityType, entity));
-        final String attachmentNAme = "sdk_attachment_" + UUID.randomUUID() + ".txt";
-        FieldModel name = new StringFieldModel("name", attachmentNAme);
-        fields.add(name);
+    /**
+     * Create an image attachment, generate a random png image. File extension has to be .png,
+     * the server will compute the mime type and compare it to the file extension.
+     */
+    @Test
+    public void testImageAttachment() {
 
-        ByteArrayInputStream bais = new ByteArrayInputStream("The first line\nThe second line".getBytes());
+        EntityModel initialAttachment = new EntityModel();
+        initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".png"));
+        initialAttachment.setValue(new StringFieldModel("description", UUID.randomUUID().toString()));
+        initialAttachment.setValue(new ReferenceFieldModel("owner_work_item", attachmentParent));
 
-        final EntityModel attachment = new EntityModel(fields);
-        octane.AttachmentList().create().attachment(attachment, bais, "text/plain", attachmentNAme).execute();
+        byte[] pngBytes = generateImageAttachmentContent();
 
-        return attachment;
+        Collection<EntityModel> entities =
+                octane.attachmentList()
+                        .create()
+                        .attachment(
+                                initialAttachment,
+                                new ByteInputStream(pngBytes, pngBytes.length),
+                                "image/png",
+                                "")
+                        .execute();
+
+        EntityModel uploadedAttachment = reloadEntityModel(entities, ownerFieldName);
+
+        checkAttachmentJson(initialAttachment, uploadedAttachment, ownerFieldName);
+        checkAttachmentContent(pngBytes, uploadedAttachment);
     }
+
+    /**
+     * Test updating the name and description of an attachment.
+     * In the name, the file extension cannot be changed.
+     * The owner fields are also read only, so you cannot move an attachment to another entity.
+     */
+    @Test
+    public void testUpdateAttachment() {
+
+        EntityModel initialAttachment = new EntityModel();
+        initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".txt"));
+        initialAttachment.setValue(new StringFieldModel("description", UUID.randomUUID().toString()));
+        initialAttachment.setValue(new ReferenceFieldModel(ownerFieldName, attachmentParent));
+
+        String attachmentText = UUID.randomUUID().toString();
+
+        // Create the attachment
+        Collection<EntityModel> entities =
+                octane.attachmentList()
+                        .create()
+                        .attachment(
+                                initialAttachment,
+                                new ByteArrayInputStream(attachmentText.getBytes()),
+                                "text/plain",
+                                "")
+                        .execute();
+
+        EntityModel uploadedAttachment = reloadEntityModel(entities, ownerFieldName);
+
+        String newDescription = UUID.randomUUID().toString();
+        uploadedAttachment.setValue(new StringFieldModel("description", newDescription));
+
+        //The extension cannot be changed
+        String newName = UUID.randomUUID().toString();
+        uploadedAttachment.setValue(new StringFieldModel("name", newName + ".txt"));
+
+        //The parent cannot be changed, so remove it from the update call
+        uploadedAttachment.removeValue(ownerFieldName);
+
+        entities =
+            octane.attachmentList()
+                    .update()
+                    .entities(Collections.singletonList(uploadedAttachment))
+                    .execute();
+
+        EntityModel updatedAttachment = reloadEntityModel(entities, ownerFieldName);
+
+        //Add the parent back for the check
+        uploadedAttachment.setValue(new ReferenceFieldModel(ownerFieldName, attachmentParent));
+
+        checkAttachmentJson(uploadedAttachment, updatedAttachment, ownerFieldName);
+    }
+
+    /**
+     * Create an attachment, then delete it
+     */
+    @Test
+    public void testDeleteAttachment() {
+
+        EntityModel initialAttachment = new EntityModel();
+        initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".txt"));
+        initialAttachment.setValue(new StringFieldModel("description", UUID.randomUUID().toString()));
+        initialAttachment.setValue(new ReferenceFieldModel(ownerFieldName, attachmentParent));
+
+        String attachmentText = UUID.randomUUID().toString();
+
+        Collection<EntityModel> entities =
+                octane.attachmentList()
+                        .create()
+                        .attachment(
+                                initialAttachment,
+                                new ByteArrayInputStream(attachmentText.getBytes()),
+                                "text/plain",
+                                "")
+                        .execute();
+
+        EntityModel uploadedAttachment = reloadEntityModel(entities, ownerFieldName);
+
+        octane.attachmentList()
+                .delete()
+                .query(Query.statement("id", QueryMethod.EqualTo, uploadedAttachment.getValue("id").getValue()).build())
+                .execute();
+
+        entities =
+                octane.attachmentList()
+                    .get()
+                    .query(Query.statement("id", QueryMethod.EqualTo, uploadedAttachment.getValue("id").getValue()).build())
+                    .execute();
+
+        Assert.assertEquals(entities.size(), 0);
+    }
+
+    /**
+     * Reload entity fields after create
+     * @param createResponse response from {@link AttachmentList#create()}
+     * @param ownerFieldName name of owner field to fetch
+     */
+    private EntityModel reloadEntityModel(Collection<EntityModel> createResponse, String ownerFieldName) {
+        Assert.assertTrue("One attachment should have been created", createResponse.size() == 1);
+        EntityModel entityModel = createResponse.iterator().next();
+        Integer id = Integer.valueOf(entityModel.getValue("id").getValue().toString());
+
+        return octane
+                .attachmentList()
+                .at(id)
+                .get()
+                .addFields("name", "description", ownerFieldName)
+                .execute();
+    }
+
+    /**
+     * Compares the initial attachment json to the one that's re-downloaded from the server
+     * @param initialEntityModel initial attachment
+     * @param uploadedEntityModel re-downloaded attachment
+     * @param ownerFieldName name of owner field to compare
+     */
+    private void checkAttachmentJson(EntityModel initialEntityModel, EntityModel uploadedEntityModel, String ownerFieldName) {
+        Assert.assertEquals(
+                initialEntityModel.getValue("name").getValue(),
+                uploadedEntityModel.getValue("name").getValue());
+
+        Assert.assertEquals(
+                initialEntityModel.getValue("description").getValue(),
+                uploadedEntityModel.getValue("description").getValue());
+
+        EntityModel uploadedOwner = (EntityModel) initialEntityModel.getValue(ownerFieldName).getValue();
+        EntityModel createdOwner = (EntityModel) uploadedEntityModel.getValue(ownerFieldName).getValue();
+        Assert.assertEquals(uploadedOwner.getValue("id").getValue(),
+                createdOwner.getValue("id").getValue());
+    }
+
+    /**
+     * Compares the initial attachment content to the one that's re-downloaded from the server
+     * @param requestContent content that was uploaded initially, not part of the {@link EntityModel}
+     * @param attachmentEntityModel attachment that was created
+     */
+    private void checkAttachmentContent(byte[] requestContent, EntityModel attachmentEntityModel) {
+        Integer id = Integer.valueOf(attachmentEntityModel.getValue("id").getValue().toString());
+        InputStream responseInputStream = octane.attachmentList().at(id).getBinary().execute();
+        try {
+            byte[] responseContent = ByteStreams.toByteArray(responseInputStream);
+            Assert.assertTrue(
+                    "Content of fetched attachment must be the same as what was uploaded",
+                    Arrays.equals(requestContent, responseContent));
+
+        } catch (IOException e) {
+            Assert.fail("Failed to read response attachment, " + e.getMessage());
+        }
+    }
+
+    /**
+     * Generate a random pretty picture, used to verify attachment content
+     *
+     * @return byte[] containing a BufferedImage
+     */
+    private static byte[] generateImageAttachmentContent() {
+        int size = 400;
+        int changeColorIndex = size / 4;
+
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        int color = getRandomRgb();
+
+        for (int y = 0; y < size; y++) {
+            if (y % changeColorIndex == 0) {
+                color = getRandomRgb();
+            }
+            for (int x = 0; x < size; x++) {
+                img.setRGB(x, y, color);
+            }
+        }
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(img, "png", outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to generate image");
+        }
+    }
+
+    /**
+     * Get random rgb int for {@link #generateImageAttachmentContent()}
+     * @return random rgb represented as an int
+     */
+    private static int getRandomRgb() {
+        int r = (int) (Math.random() * 256); //red
+        int g = (int) (Math.random() * 256); //green
+        int b = (int) (Math.random() * 256); //blue
+        return (255 << 24) | (r << 16) | (g << 8) | b;
+    }
+
 }

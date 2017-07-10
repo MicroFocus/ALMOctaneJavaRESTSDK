@@ -16,14 +16,13 @@ package com.hpe.adm.nga.sdk.network.google;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.http.json.JsonHttpContent;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,6 +38,8 @@ import java.util.Optional;
  */
 public class GoogleHttpClient implements OctaneHttpClient {
 
+    private static final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
+
     private static final String LOGGER_REQUEST_FORMAT = "Request: {} - {} - {}";
     private static final String LOGGER_RESPONSE_FORMAT = "Response: {} - {} - {}";
 
@@ -52,7 +53,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
 
-    private final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
     protected HttpRequestFactory requestFactory;
     protected String lwssoValue = "";
     protected String octaneUserValue;
@@ -193,7 +193,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @throws IOException if the response output stream stream cannot be read
      */
     protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) throws IOException {
-        return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.parseAsString(), httpResponse.getContent());
+        return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), httpResponse.getContentCharset());
     }
 
     @Override
@@ -255,20 +255,47 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     private HttpResponse executeRequest(final HttpRequest httpRequest) throws IOException {
         logger.debug(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(), httpRequest.getHeaders().toString());
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        final HttpContent content = httpRequest.getContent();
-        if (content != null) {
-            content.writeTo(byteArrayOutputStream);
 
-            //Do not print the body of the sign in request
-            if (!httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)) {
-                logger.debug("Content: " + byteArrayOutputStream.toString());
-            }
+        final HttpContent content = httpRequest.getContent();
+
+        // Make sure you don't log any http content send to the login rest api, since you don't want credentials in the logs
+        if (content != null && logger.isDebugEnabled() && !httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)) {
+            logHttpContent(Level.DEBUG, content);
         }
 
         HttpResponse response = httpRequest.execute();
         logger.debug(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(), response.getHeaders().toString());
         return response;
+    }
+
+    /**
+     * Util method to log {@link HttpContent}. This method will avoid logging {@link InputStreamContent}, since
+     * reading from the stream will probably make it unusable when the actual request is sent
+     *
+     * @param level   log level to log to
+     * @param content {@link HttpContent}
+     */
+    private static void logHttpContent(Level level, HttpContent content) {
+        if (content instanceof MultipartContent) {
+            MultipartContent multipartContent = ((MultipartContent) content);
+            logger.log(level, "MultipartContent: " + content.getType());
+            multipartContent.getParts().forEach(part -> {
+                logger.log(level, "Part: encoding: " + part.getEncoding() + ", headers: " + part.getHeaders());
+                logHttpContent(level, part.getContent());
+            });
+        } else if (content instanceof InputStreamContent) {
+            logger.log(level, "InputStreamContent: type: " + content.getType());
+        } else if (content instanceof FileContent) {
+            logger.log(level, "FileContent: type: " + content.getType() + ", filepath: " + ((FileContent) content).getFile().getAbsolutePath());
+        } else {
+            try {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                content.writeTo(byteArrayOutputStream);
+                logger.debug("Content: type: " + content.getType() + ", " + byteArrayOutputStream.toString());
+            } catch (IOException ex) {
+                logger.error("Failed to log content of " + content, ex);
+            }
+        }
     }
 
     private HttpRequest buildBinaryPostRequest(OctaneHttpRequest.PostBinaryOctaneHttpRequest octaneHttpRequest) throws IOException {
@@ -293,10 +320,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
                         .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
 
-        MultipartContent.Part part1 = new MultipartContent.Part(new JsonHttpContent(new JacksonFactory(), octaneHttpRequest.getContent()));
-        part1.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME,
-                String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT,
-                        HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE)));
+        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", octaneHttpRequest.getContent().getBytes());
+        MultipartContent.Part part1 = new MultipartContent.Part(byteArrayContent);
+        String contentDisposition = String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT, HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE);
+        HttpHeaders httpHeaders = new HttpHeaders()
+                .set(HTTP_MULTIPART_PART_DISPOSITION_NAME, contentDisposition);
+
+        part1.setHeaders(httpHeaders);
         content.addPart(part1);
 
         // Add Stream
@@ -329,7 +359,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             try {
                 // Sadly the server seems to send back empty cookies for some reason
                 cookies = HttpCookie.parse(strCookie);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 logger.error(ex);
                 continue;
             }
