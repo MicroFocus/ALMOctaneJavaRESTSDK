@@ -35,7 +35,7 @@ public class AttachmentList {
     private final String attachmentListDomain;
 
     /**
-     * Creates a new AttachmentList object
+     * Creates a new attachmentList object
      *
      * @param octaneHttpClient     - Octane request factory
      * @param baseDomain - domain of attachmentList
@@ -47,36 +47,36 @@ public class AttachmentList {
     }
 
     /**
-     * getter of AttachmentList GetEntities object
+     * getter of attachmentList GetEntities object
      *
-     * @return - new AttachmentList GetEntities object
+     * @return - new attachmentList GetEntities object
      */
     public GetEntities get() {
         return entityList.get();
     }
 
     /**
-     * getter of AttachmentList UpdateEntities object ( same functionality as EntityList.UpdateEntities )
+     * getter of attachmentList UpdateEntities object ( same functionality as EntityList.UpdateEntities )
      *
-     * @return - new AttachmentList UpdateEntities object
+     * @return - new attachmentList UpdateEntities object
      */
     public UpdateEntities update() {
         return entityList.update();
     }
 
     /**
-     * getter of AttachmentList create object
+     * getter of attachmentList create object
      *
-     * @return - new AttachmentList CreateEntities object
+     * @return - new attachmentList CreateEntities object
      */
     public CreateAttachment create() {
         return new CreateAttachment(octaneHttpClient, attachmentListDomain);
     }
 
     /**
-     * getter of AttachmentList DeleteEntities object ( same functionality as EntityList.DeleteEntities )
+     * getter of attachmentList DeleteEntities object ( same functionality as EntityList.DeleteEntities )
      *
-     * @return - new AttachmentList UpdateEntities object
+     * @return - new attachmentList UpdateEntities object
      */
     public DeleteEntities delete() {
         return entityList.delete();

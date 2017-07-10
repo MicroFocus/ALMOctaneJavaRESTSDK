@@ -77,7 +77,7 @@ public class TestAttachments extends TestBase {
         String attachmentText = UUID.randomUUID().toString();
 
         Collection<EntityModel> entities =
-                octane.AttachmentList()
+                octane.attachmentList()
                         .create()
                         .attachment(
                                 initialAttachment,
@@ -107,7 +107,7 @@ public class TestAttachments extends TestBase {
         byte[] pngBytes = generateImageAttachmentContent();
 
         Collection<EntityModel> entities =
-                octane.AttachmentList()
+                octane.attachmentList()
                         .create()
                         .attachment(
                                 initialAttachment,
@@ -139,7 +139,7 @@ public class TestAttachments extends TestBase {
 
         // Create the attachment
         Collection<EntityModel> entities =
-                octane.AttachmentList()
+                octane.attachmentList()
                         .create()
                         .attachment(
                                 initialAttachment,
@@ -161,7 +161,7 @@ public class TestAttachments extends TestBase {
         uploadedAttachment.removeValue(ownerFieldName);
 
         entities =
-            octane.AttachmentList()
+            octane.attachmentList()
                     .update()
                     .entities(Collections.singletonList(uploadedAttachment))
                     .execute();
@@ -188,7 +188,7 @@ public class TestAttachments extends TestBase {
         String attachmentText = UUID.randomUUID().toString();
 
         Collection<EntityModel> entities =
-                octane.AttachmentList()
+                octane.attachmentList()
                         .create()
                         .attachment(
                                 initialAttachment,
@@ -199,13 +199,13 @@ public class TestAttachments extends TestBase {
 
         EntityModel uploadedAttachment = reloadEntityModel(entities, ownerFieldName);
 
-        octane.AttachmentList()
+        octane.attachmentList()
                 .delete()
                 .query(Query.statement("id", QueryMethod.EqualTo, uploadedAttachment.getValue("id").getValue()).build())
                 .execute();
 
         entities =
-                octane.AttachmentList()
+                octane.attachmentList()
                     .get()
                     .query(Query.statement("id", QueryMethod.EqualTo, uploadedAttachment.getValue("id").getValue()).build())
                     .execute();
@@ -224,7 +224,7 @@ public class TestAttachments extends TestBase {
         Integer id = Integer.valueOf(entityModel.getValue("id").getValue().toString());
 
         return octane
-                .AttachmentList()
+                .attachmentList()
                 .at(id)
                 .get()
                 .addFields("name", "description", ownerFieldName)
@@ -259,7 +259,7 @@ public class TestAttachments extends TestBase {
      */
     private void checkAttachmentContent(byte[] requestContent, EntityModel attachmentEntityModel) {
         Integer id = Integer.valueOf(attachmentEntityModel.getValue("id").getValue().toString());
-        InputStream responseInputStream = octane.AttachmentList().at(id).getBinary().execute();
+        InputStream responseInputStream = octane.attachmentList().at(id).getBinary().execute();
         try {
             byte[] responseContent = ByteStreams.toByteArray(responseInputStream);
             Assert.assertTrue(

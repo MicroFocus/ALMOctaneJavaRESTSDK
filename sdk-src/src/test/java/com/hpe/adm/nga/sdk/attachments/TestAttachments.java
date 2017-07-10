@@ -35,7 +35,7 @@ public class TestAttachments {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		octane = CommonMethods.getOctaneForTest();
-		AttachmentList attachments = octane.AttachmentList();
+		AttachmentList attachments = octane.attachmentList();
 		spiedAttachments = PowerMockito.spy(attachments);
 	}
 	
