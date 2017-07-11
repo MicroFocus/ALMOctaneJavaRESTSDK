@@ -175,7 +175,11 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 #macro (setPhase)
     #fieldMetadaAnnotations($field)
 	public ${className}EntityModel setPhase(final com.hpe.adm.nga.sdk.enums.Phases.${className}Phase phase) {
-	    wrappedEntityModel.setValue(new ReferenceFieldModel("phase", phase.getAsEntityModel()));
+        if (phase == null) {
+	        wrappedEntityModel.removeValue("phase");
+        } else {
+	        wrappedEntityModel.setValue(new ReferenceFieldModel("phase", phase.getAsEntityModel()));
+        }
         return this;
 	}
 #end
@@ -184,7 +188,11 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 #set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
     #fieldMetadaAnnotations($field)
 	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final com.hpe.adm.nga.sdk.enums.Lists.${listName} ${field.name}) {
-	wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${field.name}.getAsEntityModel()));
+    if (${field.name} == null) {
+	    wrappedEntityModel.removeValue("${field.name}");
+    } else {
+	    wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${field.name}.getAsEntityModel()));
+    }
     return this;
 	}
 #end
@@ -200,7 +208,11 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
         #foreach($type in ${referenceMetadata.getReferenceTypes()})
 #fieldMetadaAnnotations($field)
         public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel $paramName){
-            wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}.getWrappedEntityModel()));
+			if ($paramName == null) {
+			    wrappedEntityModel.removeValue("${field.name}");
+			} else {
+                wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}.getWrappedEntityModel()));
+            }
             return this;
         }
 
@@ -209,7 +221,11 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
     #if(${referenceMetadata.hasNonTypedReturn()})
 #fieldMetadaAnnotations($field)
 		public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final EntityModel $paramName){
-	    	wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}));
+            if ($paramName == null) {
+                wrappedEntityModel.removeValue("${field.name}");
+            } else {
+	    	    wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}));
+            }
             return this;
 		}
 
@@ -221,6 +237,7 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
     #multipleReferenceAnnotations (${referenceMetadata})
 	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
 	    if ($paramName == null) {
+	        wrappedEntityModel.removeValue("${field.name}");
 	        return this;
 	    }
     #if (${referenceMetadata.hasTypedReturn()})
@@ -245,7 +262,11 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 #macro (setNonReference $field $paramName)
     #fieldMetadaAnnotations($field)
 	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
-	    wrappedEntityModel.setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
+        if ($paramName == null) {
+            wrappedEntityModel.removeValue("${field.name}");
+        } else {
+	        wrappedEntityModel.setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
+        }
         return this;
 	}
 

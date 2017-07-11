@@ -72,6 +72,14 @@ public class EntityModel implements Entity{
         }
 
         @Override
+        public FieldModel remove(Object key) {
+            if (entityState == EntityState.DIRTY) {
+                dirtyFields.add((String) key);
+            }
+            return super.remove(key);
+        }
+
+        @Override
         public void clear() {
             super.clear();
             dirtyFields.clear();
