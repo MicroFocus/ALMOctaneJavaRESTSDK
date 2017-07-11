@@ -263,4 +263,14 @@ public class TestModel {
         assertEquals(1, dirtyValues.size());
         assertEquals ("testKey2", (dirtyValues.iterator().next()).getName());
     }
+
+    @Test
+    public void testCleanEntityWithId() {
+        // all fields should be dirty
+        model = new EntityModel(Collections.singleton(new StringFieldModel("id", "idValue")), EntityModel.EntityState.CLEAN);
+        final Set<FieldModel> values = model.getValues();
+        assertEquals(1, values.size());
+        final Collection<FieldModel> dirtyValues = model.getDirtyValues();
+        assertEquals(1, dirtyValues.size());
+    }
 }

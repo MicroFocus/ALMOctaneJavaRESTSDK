@@ -25,13 +25,19 @@ import java.util.stream.Collectors;
  * will be considered dirty and will be sent to the server when creating or updating.
  * When the entity has been returned from the server then the initial state will be considered clean.  Each change after
  * that (for example by using a method set*) will make the entity "dirty" and will be sent to the server when used for updates
+ * Note - the id field is <em>always</em> considered a dirty field since it needs to be added
  */
 public class EntityModel {
+
+    public static final String ID_FIELD_NAME = "id";
+
     /**
      * Represents the state of the entity.  In most cases it will be DIRTY.  However - when an entity is retrieved from the
      * server then the initial state will be CLEAN (all those fields will not be updated unless changed)
      */
-    public enum EntityState {CLEAN, DIRTY}
+    public enum EntityState {
+        CLEAN, DIRTY
+    }
 
     /**
      * Internal Map that keeps the state of fields to be updated
@@ -49,6 +55,7 @@ public class EntityModel {
 
         /**
          * Initialise the hashmap with this initial state
+         *
          * @param entityState The state to initialise the map
          */
         private DirtyHashMap(EntityState entityState) {
@@ -72,11 +79,16 @@ public class EntityModel {
 
         /**
          * Returns all values that are dirty
+         *
          * @return Dirty values
          */
         private Collection<FieldModel> dirtyValues() {
             return
-                    entrySet().stream().filter(entry -> dirtyFields.contains(entry.getKey())).map(Entry::getValue).collect(Collectors.toSet());
+                    entrySet()
+                            .stream()
+                            .filter(entry -> entry.getKey().equals(ID_FIELD_NAME) || dirtyFields.contains(entry.getKey()))
+                            .map(Entry::getValue)
+                            .collect(Collectors.toSet());
         }
     }
 
@@ -165,6 +177,7 @@ public class EntityModel {
 
     /**
      * Remove a value from completely, different from setting the value to null
+     *
      * @param key the fieldName
      */
     public void removeValue(String key) {
