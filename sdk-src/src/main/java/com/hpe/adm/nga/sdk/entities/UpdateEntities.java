@@ -33,7 +33,7 @@ public class UpdateEntities extends OctaneRequest {
 
     private Collection<EntityModel> entityModels = null;
 
-    protected UpdateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    UpdateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super (octaneHttpClient, urlDomain);
     }
 
@@ -44,7 +44,7 @@ public class UpdateEntities extends OctaneRequest {
     public Collection<EntityModel> execute() throws RuntimeException {
 
         Collection<EntityModel> newEntityModels = null;
-        JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);
+        JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels, true);
         String jsonEntityModel = objBase.toString();
         try {
             OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.PutOctaneHttpRequest(

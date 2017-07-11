@@ -14,8 +14,6 @@
  */
 package com.hpe.adm.nga.sdk.model;
 
-
-import com.hpe.adm.nga.sdk.model.*;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -24,10 +22,7 @@ import org.junit.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -41,7 +36,7 @@ public class TestModel {
 
     @BeforeClass
     public static void initializeOnCreate() {
-        set = new HashSet<FieldModel>();
+        set = new HashSet<>();
     }
 
     @Before
@@ -133,8 +128,8 @@ public class TestModel {
     @Test
     public void testEntityModelWithLongField() {
         expectedResult = "{\"secondField\":200,\"firstField\":-200}";
-        set.add(new LongFieldModel("firstField", new Long(-200)));
-        set.add(new LongFieldModel("secondField", new Long(200)));
+        set.add(new LongFieldModel("firstField", (long) -200));
+        set.add(new LongFieldModel("secondField", 200L));
         model = new EntityModel(set);
         try {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
@@ -161,8 +156,8 @@ public class TestModel {
     @Test
     public void testErrorModel() {
         expectedResult = "{\"secondField\":651651651,\"firstField\":0}";
-        set.add(new LongFieldModel("firstField", new Long(0)));
-        set.add(new LongFieldModel("secondField", new Long(651651651)));
+        set.add(new LongFieldModel("firstField", 0L));
+        set.add(new LongFieldModel("secondField", 651651651L));
         ErrorModel model = new ErrorModel(set);
         try {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
@@ -198,7 +193,7 @@ public class TestModel {
         set.add(new MultiReferenceFieldModel("multiRefField", entityCol));
         set.add(new ReferenceFieldModel("RefField", refModel));
         set.add(new DateFieldModel("dateField", now));
-        set.add(new LongFieldModel("longField", new Long(200)));
+        set.add(new LongFieldModel("longField", 200L));
         set.add(new StringFieldModel("stringField", "first"));
         set.add(new BooleanFieldModel("boolField", true));
         model = new EntityModel(set);
@@ -236,5 +231,36 @@ public class TestModel {
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
         }
+    }
+
+    @Test
+    public void testDirtyEntity() {
+        // all fields should be dirty
+        model = new EntityModel();
+        model.setValue(new StringFieldModel("testKey", "testValue"));
+        final Set<FieldModel> values = model.getValues();
+        assertEquals(1, values.size());
+        assertEquals(1, model.getDirtyValues().size());
+    }
+
+    @Test
+    public void testNonDirtyEntity() {
+        // all fields should be dirty
+        model = new EntityModel(Collections.singleton(new StringFieldModel("testKey", "testValue")), EntityModel.EntityState.CLEAN);
+        final Set<FieldModel> values = model.getValues();
+        assertEquals(1, values.size());
+        assertEquals(0, model.getDirtyValues().size());
+    }
+
+    @Test
+    public void testNonDirtyEntityWithAddition() {
+        // all fields should be dirty
+        model = new EntityModel(Collections.singleton(new StringFieldModel("testKey", "testValue")), EntityModel.EntityState.CLEAN);
+        model.setValue(new StringFieldModel("testKey2", "testValue2"));
+        final Set<FieldModel> values = model.getValues();
+        assertEquals(2, values.size());
+        final Collection<FieldModel> dirtyValues = model.getDirtyValues();
+        assertEquals(1, dirtyValues.size());
+        assertEquals ("testKey2", (dirtyValues.iterator().next()).getName());
     }
 }

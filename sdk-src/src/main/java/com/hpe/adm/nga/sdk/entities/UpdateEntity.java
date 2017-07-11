@@ -29,7 +29,7 @@ public class UpdateEntity extends OctaneRequest {
 
     private EntityModel entityModel;
 
-    protected UpdateEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
+    UpdateEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
         super(octaneHttpClient, urlDomain, iEntityId);
     }
 
@@ -40,7 +40,7 @@ public class UpdateEntity extends OctaneRequest {
     public EntityModel execute() {
 
         EntityModel newEntityModel = null;
-        JSONObject objBase = ModelParser.getInstance().getEntityJSONObject(entityModel);
+        JSONObject objBase = ModelParser.getInstance().getEntityJSONObject(entityModel, true);
         String jsonEntityModel = objBase.toString();
 
         try {
