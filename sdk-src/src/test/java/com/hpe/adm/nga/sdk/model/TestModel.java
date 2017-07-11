@@ -128,7 +128,7 @@ public class TestModel {
     @Test
     public void testEntityModelWithLongField() {
         expectedResult = "{\"secondField\":200,\"firstField\":-200}";
-        set.add(new LongFieldModel("firstField", (long) -200));
+        set.add(new LongFieldModel("firstField", -200L));
         set.add(new LongFieldModel("secondField", 200L));
         model = new EntityModel(set);
         try {
