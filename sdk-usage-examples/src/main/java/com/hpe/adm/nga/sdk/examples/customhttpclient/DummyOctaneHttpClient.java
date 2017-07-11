@@ -68,7 +68,7 @@ public class DummyOctaneHttpClient implements OctaneHttpClient {
 
         //Return a dummy OctaneHttpResponse
         InputStream stream = new ByteArrayInputStream(returnJson.getBytes(StandardCharsets.UTF_8));
-        return new OctaneHttpResponse(202, returnJson, stream);
+        return new OctaneHttpResponse(202, stream, StandardCharsets.UTF_8);
     }
 
 }

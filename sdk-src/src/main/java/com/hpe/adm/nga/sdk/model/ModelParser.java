@@ -25,9 +25,6 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
-/**
- * Created by brucesp on 15-May-17.
- */
 public final class ModelParser {
     private static final String JSON_DATA_NAME = "data";
     private static final String JSON_ERRORS_NAME = "errors";
@@ -40,7 +37,8 @@ public final class ModelParser {
 
     private static ModelParser modelParser = new ModelParser();
 
-    private ModelParser(){}
+    private ModelParser() {
+    }
 
     public static ModelParser getInstance() {
         return modelParser;
@@ -53,8 +51,19 @@ public final class ModelParser {
      * @return new json object based on a given EntityModel object
      */
     public final JSONObject getEntityJSONObject(EntityModel entityModel) {
+        return getEntityJSONObject(entityModel, false);
+    }
 
-        Set<FieldModel> fieldModels = entityModel.getValues();
+    /**
+     * get a new json object based on a given EntityModel object
+     *
+     * @param entityModel the given entity model object
+     * @param onlyDirty   Return only dirty fields (used for updates)
+     * @return new json object based on a given EntityModel object
+     */
+    public final JSONObject getEntityJSONObject(EntityModel entityModel, boolean onlyDirty) {
+
+        Collection<FieldModel> fieldModels = onlyDirty ? entityModel.getDirtyValues() : entityModel.getValues();
         JSONObject objField = new JSONObject();
         fieldModels.forEach((i) -> objField.put(i.getName(), getFieldValue(i)));
 
@@ -68,13 +77,24 @@ public final class ModelParser {
      * @return new json object conatin entities data
      */
     public final JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels) {
+        return getEntitiesJSONObject(entitiesModels, false);
+    }
+
+    /**
+     * get a new json object based on a given EntityModel list
+     *
+     * @param entitiesModels - Collection of entities models
+     * @param onlyDirty      Converts only dirty fields (relevant for updating entity)
+     * @return new json object conatin entities data
+     */
+    public final JSONObject getEntitiesJSONObject(Collection<EntityModel> entitiesModels, boolean onlyDirty) {
 
         JSONObject objBase = new JSONObject();
         JSONArray objEntities = new JSONArray();
         objBase.put(JSON_DATA_NAME, objEntities);
         objBase.put(JSON_TOTAL_COUNT_NAME, entitiesModels.size());
         objBase.put(JSON_EXCEEDS_TOTAL_COUNT_NAME, false);
-        entitiesModels.forEach((i) -> objEntities.put(getEntityJSONObject(i)));
+        entitiesModels.forEach((i) -> objEntities.put(getEntityJSONObject(i, onlyDirty)));
 
         return objBase;
     }
@@ -85,22 +105,22 @@ public final class ModelParser {
      * @param fieldModel the source fieldModel
      * @return field value
      */
-    public Object getFieldValue(FieldModel fieldModel) {
+    private Object getFieldValue(FieldModel fieldModel) {
 
-        Object fieldValue = null;
+        Object fieldValue;
 
         if (fieldModel.getClass() == ReferenceFieldModel.class) {
             EntityModel fieldEntityModel = ((ReferenceFieldModel) fieldModel).getValue();
             fieldValue = JSONObject.NULL;
 
             if (fieldEntityModel != null) {
-                fieldValue = getEntityJSONObject(fieldEntityModel);
+                fieldValue = getEntityJSONObject(fieldEntityModel, false);
             }
 
         } else if (fieldModel.getClass() == MultiReferenceFieldModel.class) {
 
             Collection<EntityModel> entities = (Collection<EntityModel>) ((MultiReferenceFieldModel) fieldModel).getValue();
-            fieldValue = getEntitiesJSONObject(entities);
+            fieldValue = getEntitiesJSONObject(entities, false);
 
         } else {
 
@@ -166,7 +186,7 @@ public final class ModelParser {
             fieldModels.add(fldModel);
         }
 
-        entityModel = new EntityModel(fieldModels);
+        entityModel = new EntityModel(fieldModels, EntityModel.EntityState.CLEAN);
         return entityModel;
     }
 
