@@ -19,40 +19,126 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
  * This class hold the EntityModel objects and server as an entity data holder
  * entities.
- *
+ * The EntityModel class has two states - clean and dirty.  When creating a new entity from scratch then each addition
+ * will be considered dirty and will be sent to the server when creating or updating.
+ * When the entity has been returned from the server then the initial state will be considered clean.  Each change after
+ * that (for example by using a method set*) will make the entity "dirty" and will be sent to the server when used for updates
+ * Note - the id field is <em>always</em> considered a dirty field since it needs to be added
  */
 public class EntityModel {
 
+    public static final String ID_FIELD_NAME = "id";
 
-    private Map<String, FieldModel> data = null;
-
-    public EntityModel() {
-        data = new HashMap<>();
+    /**
+     * Represents the state of the entity.  In most cases it will be DIRTY.  However - when an entity is retrieved from the
+     * server then the initial state will be CLEAN (all those fields will not be updated unless changed)
+     */
+    public enum EntityState {
+        CLEAN, DIRTY
     }
 
     /**
-     * Creates a new EntityModel object with given field models
-     * Use this when create entity model with mass of fields
-     *
-     * @param values - a collection of field models
+     * Internal Map that keeps the state of fields to be updated
      */
-    public EntityModel(Set<FieldModel> values) {
-        if (values != null) {
-            data = new HashMap<>(values.size());
-            values.forEach(field -> data.put(field.getName(), field));
-        } else {
-            data = new HashMap<>();
+    private final class DirtyHashMap extends HashMap<String, FieldModel> {
+
+        /**
+         * The fields that should be updated
+         */
+        private final Collection<String> dirtyFields = new HashSet<>();
+        /**
+         * The current state of the map
+         */
+        private EntityState entityState;
+
+        /**
+         * Initialise the hashmap with this initial state
+         *
+         * @param entityState The state to initialise the map
+         */
+        private DirtyHashMap(EntityState entityState) {
+            super();
+            this.entityState = entityState;
+        }
+
+        @Override
+        public final FieldModel put(String key, FieldModel value) {
+            if (entityState == EntityState.DIRTY) {
+                dirtyFields.add(key);
+            }
+            return super.put(key, value);
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            dirtyFields.clear();
+        }
+
+        /**
+         * Returns all values that are dirty
+         *
+         * @return Dirty values
+         */
+        private Collection<FieldModel> dirtyValues() {
+            return
+                    entrySet()
+                            .stream()
+                            .filter(entry -> entry.getKey().equals(ID_FIELD_NAME) || dirtyFields.contains(entry.getKey()))
+                            .map(Entry::getValue)
+                            .collect(Collectors.toSet());
         }
     }
 
     /**
+     * The internal map of data that this entity represents
+     */
+    private final DirtyHashMap data;
+
+    /**
+     * Creates a new EntityModel object
+     * All fields set after using this constructor will be considered "dirty"
+     */
+    public EntityModel() {
+        this(null, EntityState.DIRTY);
+    }
+
+    /**
+     * Creates a new EntityModel object with given field models
+     * Use this when create entity model with mass of fields.
+     * By using this constructor these fields will be considered to be the "dirty slate" of the entity.  In other words
+     * these fields as well as those set afterwards will be considered in any updates
+     *
+     * @param values - a collection of field models
+     */
+    public EntityModel(Set<FieldModel> values) {
+        this(values, EntityState.DIRTY);
+    }
+
+    /**
+     * Creates a new EntityModel object with given field models
+     * Use this when create entity model with mass of fields.
+     *
+     * @param values      - a collection of field models
+     * @param entityState The initial state of the entity when constructing.  Once these fields have been initialised
+     *                    the entity is considered to be dirty
+     */
+    public EntityModel(Set<FieldModel> values, EntityState entityState) {
+        data = new DirtyHashMap(entityState);
+        if (values != null) {
+            values.forEach(field -> data.put(field.getName(), field));
+        }
+        data.entityState = EntityState.DIRTY;
+    }
+
+    /**
      * Creates a new EntityModel object with solo string field
+     * The entity will be considered dirty and thus these fields will be updated
      *
      * @param value - a collection of field models
-     * @param key The key to the model
+     * @param key   The key to the model
      */
     public EntityModel(String key, String value) {
         this();
@@ -66,7 +152,17 @@ public class EntityModel {
      * @return a collection of field models
      */
     public Set<FieldModel> getValues() {
-        return data.values().stream().collect(Collectors.toSet());
+        return new HashSet<>(data.values());
+    }
+
+    /**
+     * Returns all dirty values.
+     * Used when sending the entity to be updated
+     *
+     * @return a collection of field models
+     */
+    Collection<FieldModel> getDirtyValues() {
+        return data.dirtyValues();
     }
 
     /**
@@ -81,6 +177,7 @@ public class EntityModel {
 
     /**
      * Remove a value from completely, different from setting the value to null
+     *
      * @param key the fieldName
      */
     public void removeValue(String key) {
@@ -101,6 +198,7 @@ public class EntityModel {
 
     /**
      * setter of single field, update if field exists
+     *
      * @param fieldModel the single field to update
      */
     public void setValue(FieldModel fieldModel) {
