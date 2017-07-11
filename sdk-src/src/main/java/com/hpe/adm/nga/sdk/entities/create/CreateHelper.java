@@ -1,3 +1,17 @@
+/*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hpe.adm.nga.sdk.entities.create;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -9,7 +23,7 @@ import org.json.JSONObject;
 import java.util.Collection;
 
 /**
- * Created by brucesp on 27-Jun-17.
+ * A helper for creating entities
  */
 final class CreateHelper {
 
@@ -26,10 +40,10 @@ final class CreateHelper {
      * 1. build Entity Json Object  2. Post
      * Request execution with json data 3. Parse response to a new
      * object
-     * @param entityModels
-     * @param octaneRequest
+     * @param entityModels the collection of entitymodels
+     * @param octaneRequest the octane request
      */
-    public Collection<EntityModel> createEntities(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
+    Collection<EntityModel> createEntities(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
 
         Collection<EntityModel> newEntityModels = null;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);

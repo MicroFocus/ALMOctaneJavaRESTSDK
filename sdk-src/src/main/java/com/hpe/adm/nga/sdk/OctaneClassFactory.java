@@ -68,6 +68,7 @@ public interface OctaneClassFactory {
             //Use reflection to instantiate the class
             Class<OctaneClassFactory> clazz;
             try {
+                //noinspection unchecked
                 clazz = (Class<OctaneClassFactory>) Class.forName(octaneClassFactoryClassName);
             } catch (ClassNotFoundException e) {
                 logger.error(e);

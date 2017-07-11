@@ -32,6 +32,7 @@ import java.util.*;
  * Created by brucesp on 03-Jan-17.
  */
 
+@SuppressWarnings("ALL")
 public class EntityExample {
 
     /**

@@ -1,3 +1,17 @@
+############################################################################
+## Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##   http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+############################################################################
 #set ($className = ${GeneratorHelper.camelCaseFieldName(${entityMetadata.name})})
 #set ($subTypeOf = ${GeneratorHelper.getSubTypeOf(${entityMetadata})})
 package com.hpe.adm.nga.sdk.model;
@@ -159,6 +173,7 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 #end
 
 #macro (setPhase)
+    #fieldMetadaAnnotations($field)
 	public ${className}EntityModel setPhase(final com.hpe.adm.nga.sdk.enums.Phases.${className}Phase phase) {
 	    wrappedEntityModel.setValue(new ReferenceFieldModel("phase", phase.getAsEntityModel()));
         return this;
@@ -167,6 +182,7 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 
 #macro (setListNode $field)
 #set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+    #fieldMetadaAnnotations($field)
 	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final com.hpe.adm.nga.sdk.enums.Lists.${listName} ${field.name}) {
 	wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${field.name}.getAsEntityModel()));
     return this;
@@ -227,6 +243,7 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 #end
 
 #macro (setNonReference $field $paramName)
+    #fieldMetadaAnnotations($field)
 	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
 	    wrappedEntityModel.setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
         return this;

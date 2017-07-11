@@ -65,7 +65,7 @@ public class DummyOctaneHttpClientExample {
      * Simple debug method used to print a list of EntityModel objects to the console
      * For each entity, it will try to print the type + the fields [name] or [text]
      * If the fields that it tries to print do not exists, it will only print the type of the entity
-     * @param entities
+     * @param entities the entities to print
      */
     private static void printEntities(Collection<EntityModel> entities) {
         System.out.println("Collection size: " + entities.size());

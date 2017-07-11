@@ -119,7 +119,7 @@ public final class ModelParser {
 
         } else if (fieldModel.getClass() == MultiReferenceFieldModel.class) {
 
-            Collection<EntityModel> entities = (Collection<EntityModel>) ((MultiReferenceFieldModel) fieldModel).getValue();
+            Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
             fieldValue = getEntitiesJSONObject(entities, false);
 
         } else {

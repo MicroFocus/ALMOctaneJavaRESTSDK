@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.hpe.adm.nga.sdk.entities.get;
 
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
@@ -21,7 +20,12 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 
 /**
- * This class hold the GetEntities object of one entity
+ * The generic super class for the context of get for typed entities.
+ *
+ * @param <T> The type of the entity model
+ * @param <E> The implementing subclass of this class
+ * @param <F> The type of {@link com.hpe.adm.nga.sdk.entities.TypedEntityList.AvailableFields}
+ * @see GetEntity for the non typed version
  */
 public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTypedEntity, F extends TypedEntityList.AvailableFields>
         extends TypedEntityList.TypedEntityRequest<T> {
@@ -34,8 +38,10 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
     }
 
     /**
-     * 1. GetEntities Request execution with json data 2. Parse response to a
-     * new EntityModel object
+     * Carries out the execution and returns the entity
+     *
+     * @return The entity
+     * @throws RuntimeException Some type of error
      */
     public final T execute() throws RuntimeException {
         return getEntityInstance(GetHelper.getInstance().getEntityModel(octaneRequest));
@@ -45,8 +51,9 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
      * Set Fields Parameters
      *
      * @param fields An array or comma separated list of fields to be retrieved
-     * @return a new GetEntities object with new Fields Parameters
+     * @return this
      */
+    @SuppressWarnings("unchecked")
     public final E addFields(final F... fields) {
         GetTypedHelper.addFields(octaneRequest, fields);
         return (E) this;

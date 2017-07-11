@@ -48,17 +48,9 @@ final class DefaultOctaneClassFactory implements OctaneClassFactory{
     @Override
     public <T extends TypedEntityList> T getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, Class<T> entityListClass) {
         try {
-            final T newInstance = entityListClass.getConstructor(OctaneHttpClient.class, String.class).newInstance(octaneHttpClient, baseDomain);
-            return newInstance;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            return entityListClass.getConstructor(OctaneHttpClient.class, String.class).newInstance(octaneHttpClient, baseDomain);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }

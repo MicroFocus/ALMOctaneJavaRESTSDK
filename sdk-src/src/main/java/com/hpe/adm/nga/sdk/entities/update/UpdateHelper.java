@@ -1,3 +1,17 @@
+/*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hpe.adm.nga.sdk.entities.update;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -9,7 +23,7 @@ import org.json.JSONObject;
 import java.util.Collection;
 
 /**
- * Created by brucesp on 27-Jun-17.
+ * A helper for updating entities
  */
 final class UpdateHelper {
 
@@ -26,12 +40,12 @@ final class UpdateHelper {
      * 1. UpdateEntities Request execution with json data 2. Parse response to
      * a new EntityModel object
      *
-     * @param entityModel
-     * @param octaneRequest
+     * @param entityModel the entitymodel
+     * @param octaneRequest the octane request
      */
     EntityModel updateEntityModel(EntityModel entityModel, OctaneRequest octaneRequest) {
         EntityModel newEntityModel = null;
-        JSONObject objBase = ModelParser.getInstance().getEntityJSONObject(entityModel);
+        JSONObject objBase = ModelParser.getInstance().getEntityJSONObject(entityModel, true);
         String jsonEntityModel = objBase.toString();
 
         try {
@@ -53,12 +67,12 @@ final class UpdateHelper {
      * 1. Request UpdateEntities Execution
      * 2. Parse response to a new Collection object
      *
-     * @param entityModels
-     * @param octaneRequest
+     * @param entityModels the entitymodel
+     * @param octaneRequest the octane request
      */
     Collection<EntityModel> updateEntityModels(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
         Collection<EntityModel> newEntityModels = null;
-        JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);
+        JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels, true);
         String jsonEntityModel = objBase.toString();
         try {
             OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.PutOctaneHttpRequest(

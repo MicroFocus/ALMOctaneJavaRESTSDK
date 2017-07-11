@@ -21,7 +21,11 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 
 /**
- * This class hold the UpdateEntities object of one entity
+ * The generic super class for the context of get for typed entities.
+ *
+ * @param <T> The type of the entity model
+ * @param <E> The implementing subclass of this class
+ * @see UpdateEntity for the non typed version
  */
 public abstract class UpdateTypedEntity<T extends TypedEntityModel, E extends UpdateTypedEntity>
         extends TypedEntityList.TypedEntityRequest<T> {
@@ -35,8 +39,10 @@ public abstract class UpdateTypedEntity<T extends TypedEntityModel, E extends Up
     }
 
     /**
-     * 1. UpdateEntities Request execution with json data 2. Parse response to
-     * a new EntityModel object
+     * Carries out the execution and returns the entity
+     *
+     * @return The entity
+     * @throws RuntimeException Some type of error
      */
     public final T execute() {
         return getEntityInstance(UpdateHelper.getInstance().updateEntityModel(entityModel.getWrappedEntityModel(), octaneRequest));
@@ -46,8 +52,9 @@ public abstract class UpdateTypedEntity<T extends TypedEntityModel, E extends Up
      * set a new entity for updating
      *
      * @param entityModel The entity model to be updated
-     * @return an update object with new entity
+     * @return this
      */
+    @SuppressWarnings("unchecked")
     public final E entity(final T entityModel) {
         this.entityModel = entityModel;
         return (E) this;

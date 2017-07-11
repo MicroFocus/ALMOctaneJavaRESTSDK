@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.hpe.adm.nga.sdk.generate;
 
 import com.hpe.adm.nga.sdk.Octane;
@@ -22,13 +37,31 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by brucesp on 21-Jun-17.
+ * <p>The class that generates entities based on the metadata from the given ALM Octane server
+ * This class generates models based on the {@link com.hpe.adm.nga.sdk.model.TypedEntityModel},
+ * entity lists based on {@link com.hpe.adm.nga.sdk.entities.TypedEntityList} and Lists & Phases objects
+ * which represents those entities on the server and turns them into typed enums.
+ * </p>
+ * <p>
+ * The user that calls the generation must have the workspace member of the given workspace.
+ * </p>
+ * <p>
+ *     UDFs are generated if they are part of the metadata for that workspace.  That means that the generated
+ *     entities should be able to be reused over different workspaces within the same shared space.  However
+ *     some business rules could cause different behaviour in different Workspaces.  See the ALM Octane documentation
+ *     for more information
+ * </p>
  */
 public class GenerateModels {
 
     private final Template template, interfaceTemplate, entityListTemplate, phasesTemplate, listsTemplate;
     private final File modelDirectory, entitiesDirectory, enumsDirectory;
 
+    /**
+     * Initialise the class with the output directory.  This should normally be in a project that would be
+     * imported into the main Java project
+     * @param outputDirectory Where all the generated files will be placed
+     */
     public GenerateModels(final File outputDirectory) {
         final File packageDirectory = new File(outputDirectory, "/com/hpe/adm/nga/sdk");
         modelDirectory = new File(packageDirectory, "model");
@@ -53,6 +86,15 @@ public class GenerateModels {
         listsTemplate = velocityEngine.getTemplate("/Lists.vm");
     }
 
+    /**
+     * Run the actual generation
+     * @param clientId The client id
+     * @param clientSecret The client secret
+     * @param server The server including the protocol and port
+     * @param sharedSpace The SS id
+     * @param workSpace The WS id
+     * @throws IOException A problem with the generation of the entities
+     */
     public void generate(String clientId, String clientSecret, String server, long sharedSpace, long workSpace) throws IOException {
         // work around for work_items_root
         final Octane octanePrivate = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret, "HPE_REST_API_TECH_PREVIEW")).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();

@@ -25,8 +25,9 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
  */
 public class DummyOctaneClassFactory implements OctaneClassFactory {
 
-    private static DummyOctaneClassFactory instance = new DummyOctaneClassFactory();
-    private DummyOctaneClassFactory(){};
+    private static final DummyOctaneClassFactory instance = new DummyOctaneClassFactory();
+    private DummyOctaneClassFactory(){}
+
     public static DummyOctaneClassFactory getInstance(){ return instance; }
 
     @Override

@@ -89,6 +89,12 @@ public class Octane {
         return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
     }
 
+    /**
+     * Creates a new {@link TypedEntityList} context.  The class is the concrete instance of the TypedEntityList
+     * @param entityListClass The class that is the instance of the TypedEntityList
+     * @param <T> The type of class
+     * @return The instance that can then be set as the context
+     */
     public <T extends TypedEntityList> T entityList(Class<T> entityListClass) {
         return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityListClass);
     }

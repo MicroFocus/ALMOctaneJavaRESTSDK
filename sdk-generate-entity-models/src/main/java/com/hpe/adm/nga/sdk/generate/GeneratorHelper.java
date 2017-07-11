@@ -1,3 +1,17 @@
+/*
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hpe.adm.nga.sdk.generate;
 
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
@@ -13,9 +27,10 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Created by brucesp on 26-Jun-17.
+ * A class that is used to help with entity generation
  */
-public class GeneratorHelper {
+@SuppressWarnings("ALL")
+public final class GeneratorHelper {
 
     public static String camelCaseFieldName(final String fieldName) {
         return camelCaseFieldName(fieldName, true);
@@ -24,9 +39,9 @@ public class GeneratorHelper {
     /**
      * Convert fieldName to camelCase form.
      *
-     * @param fieldName
+     * @param fieldName the field name
      * @param theFirstLetterIsCapital - set true if the first letter in first world should be capital
-     * @return
+     * @return the name in camelCase
      */
     public static String camelCaseFieldName(final String fieldName, boolean theFirstLetterIsCapital) {
         final StringBuffer stringBuffer = new StringBuffer();

@@ -22,7 +22,7 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import java.util.Collection;
 
 /**
- * This class hold the UpdateEntities objects and serve all functions concern to
+ * This class hold the CreateEntities objects and serve all functions concern to
  * REST Post.
  */
 public class CreateEntities {
