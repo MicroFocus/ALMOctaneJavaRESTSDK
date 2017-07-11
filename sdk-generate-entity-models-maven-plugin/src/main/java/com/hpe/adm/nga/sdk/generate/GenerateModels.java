@@ -177,8 +177,6 @@ public class GenerateModels {
     }
 
     private Collection<FieldMetadata> generateEntity(Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
-        //if (!name.equals("run")) continue;
-        System.out.println(name + ":");
         final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute();
 
         final TreeMap<String, List<String>> collectedReferences = fieldMetadata.stream()
