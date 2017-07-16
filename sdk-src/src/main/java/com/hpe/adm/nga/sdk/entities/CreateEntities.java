@@ -41,9 +41,9 @@ public class CreateEntities extends OctaneRequest {
      * Request execution with json data 3. Parse response to a new
      * object
      */
-    public Collection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection execute() throws RuntimeException {
 
-        Collection<EntityModel> newEntityModels = null;
+        OctaneCollection newEntityModels = null;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);
         String strJsonEntityModel = objBase.toString();
         try {

@@ -14,6 +14,7 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -73,9 +74,9 @@ public abstract class OctaneRequest {
 	 * @return entities ased on Http Request
 	 * @throws Exception if response parsing fails
 	 */
-	protected final Collection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
+	protected final OctaneCollection getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
 
-		Collection<EntityModel> newEntityModels = null;
+		OctaneCollection newEntityModels = null;
 
 		OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
