@@ -40,13 +40,13 @@ public class TestDeleteEntity extends TestBase {
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
 
         EntityModel entityModel = entityModels.iterator().next();
-        int entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         entityList.at(entityId).delete().execute();
 
         Collection<EntityModel> getEntity = entityList.get().execute();
 
-        List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(getEntity);
+        List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(getEntity);
 
         Assert.assertFalse(entityIds.contains(entityId));
     }
@@ -55,7 +55,7 @@ public class TestDeleteEntity extends TestBase {
     public void testDeleteEntitiesByQuery() throws Exception{
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
-        List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
+        List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Query query = QueryUtils.getQueryForIds(entityIds);
 
@@ -63,7 +63,7 @@ public class TestDeleteEntity extends TestBase {
 
         Collection<EntityModel> getEntity = entityList.get().execute();
 
-        List<Integer> actualEntityIds = CommonUtils.getIdFromEntityModelCollection(getEntity);
+        List<String> actualEntityIds = CommonUtils.getIdFromEntityModelCollection(getEntity);
 
         //check there are no common ids
         actualEntityIds.retainAll(entityIds);

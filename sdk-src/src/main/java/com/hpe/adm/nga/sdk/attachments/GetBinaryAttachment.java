@@ -27,7 +27,7 @@ import java.io.InputStream;
  */
 public class GetBinaryAttachment extends OctaneRequest {
 
-    protected GetBinaryAttachment(OctaneHttpClient octaneHttpClient, String urlDomain, int entityId) {
+    protected GetBinaryAttachment(OctaneHttpClient octaneHttpClient, String urlDomain, String entityId) {
         super(octaneHttpClient, urlDomain, entityId);
     }
 
