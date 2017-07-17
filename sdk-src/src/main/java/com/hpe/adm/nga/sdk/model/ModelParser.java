@@ -15,6 +15,7 @@
 
 package com.hpe.adm.nga.sdk.model;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -196,11 +197,19 @@ public final class ModelParser {
      * @param json The JSON to parse
      * @return entity model collection based on a given json string
      */
-    public Collection<EntityModel> getEntities(String json) {
+    public OctaneCollection getEntities(String json) {
         JSONTokener tokener = new JSONTokener(json);
         JSONObject jsonObj = new JSONObject(tokener);
         JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_NAME);
-        Collection<EntityModel> entityModels = new ArrayList<>();
+
+        final OctaneCollection entityModels;
+        if (jsonObj.has(JSON_EXCEEDS_TOTAL_COUNT_NAME) && jsonObj.has(JSON_TOTAL_COUNT_NAME)) {
+            final boolean exceedsTotalAmount = jsonObj.getBoolean("exceeds_total_count");
+            final int totalCount = jsonObj.getInt("total_count");
+            entityModels = new OctaneCollectionImpl(totalCount, exceedsTotalAmount);
+        } else {
+            entityModels = new OctaneCollectionImpl();
+        }
         IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
 
         return entityModels;

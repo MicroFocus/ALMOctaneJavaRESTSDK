@@ -41,9 +41,9 @@ public class UpdateEntities extends OctaneRequest {
      * 1. Request UpdateEntities Execution
      * 2. Parse response to a new Collection object
      */
-    public Collection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection execute() throws RuntimeException {
 
-        Collection<EntityModel> newEntityModels = null;
+        OctaneCollection newEntityModels = null;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels, true);
         String jsonEntityModel = objBase.toString();
         try {
