@@ -19,32 +19,38 @@ import com.google.api.client.util.IOUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /**
- *
  * HTTP response.
  * Callers should call disconnect() when the HTTP response object is no longer needed. However, disconnect() does not have to be called if the response stream is properly closed.
- *
+ * <p>
  * Created by leufl on 2/11/2016.
  */
 public class OctaneHttpResponse {
 
     private final int statusCode;
     private final InputStream inputStream;
-    private final Charset responseCharset;
+    private final String content;
 
     public OctaneHttpResponse(int statusCode, InputStream inputStream, Charset responseCharset) {
         this.statusCode = statusCode;
         this.inputStream = inputStream;
-        this.responseCharset = responseCharset;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        String s = "";
+        try {
+            IOUtils.copy(inputStream, out);
+            s = out.toString(responseCharset.name());
+        } catch (IOException e) {
+//            content = null;
+        }
+        content = s;
     }
 
     /**
      * @return - Returns whether received a successful HTTP status code
      */
-    public boolean isSuccessStatusCode(){
+    public boolean isSuccessStatusCode() {
         return statusCode >= 200 && statusCode < 300;
     }
 //
@@ -67,16 +73,11 @@ public class OctaneHttpResponse {
      * Parses the content of the HTTP response from getContent() and reads it into a string.
      * Since this method returns "" for no content, a simpler check for no content is to check if getContent() is null.
      * All content is read from the input content stream rather than being limited by the Content-Length. For the character set, it follows the specification by parsing the "charset" parameter of the Content-Type header or by default "ISO-8859-1" if the parameter is missing.
+     *
      * @return - parsed string or "" for no content
      */
     public String getContent() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            IOUtils.copy(inputStream, out);
-            return out.toString(responseCharset.name());
-        } catch (IOException e) {
-            return "";
-        }
+        return content;
     }
 
     /**
@@ -84,6 +85,7 @@ public class OctaneHttpResponse {
      * The result is cached, so subsequent calls will be fast.
      * Callers should call InputStream.close() after the returned InputStream is no longer needed.
      * disconnect() does not have to be called if the content is closed.
+     *
      * @return - input stream content of the HTTP response or null for none
      */
     public InputStream getInputStream() {

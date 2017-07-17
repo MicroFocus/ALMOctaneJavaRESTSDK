@@ -29,7 +29,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpCookie;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -58,6 +60,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
     protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
+    private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
+    private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
     /**
      * Request initializer called on every request made by the requestFactory
@@ -149,6 +153,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
                     httpRequest = requestFactory.buildGetRequest(domain);
                     httpRequest.getHeaders().setAccept(((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType());
+                    final String eTagHeader = requestToEtagMap.get(octaneHttpRequest);
+                    if (eTagHeader != null) {
+                        httpRequest.getHeaders().setIfNoneMatch(eTagHeader);
+                    }
                     break;
                 }
                 case POST: {
@@ -216,15 +224,26 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         try {
             httpResponse = executeRequest(httpRequest);
-            return convertHttpResponseToOctaneHttpResponse(httpResponse);
+            final OctaneHttpResponse octaneHttpResponse = convertHttpResponseToOctaneHttpResponse(httpResponse);
+            final String eTag = httpResponse.getHeaders().getETag();
+            if (eTag != null) {
+                requestToEtagMap.put(octaneHttpRequest, eTag);
+                cachedRequestToResponse.put(octaneHttpRequest, octaneHttpResponse);
+            }
+            return octaneHttpResponse;
         } catch (HttpResponseException e) {
+
+            final int statusCode = e.getStatusCode();
+            if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
+                return cachedRequestToResponse.get(octaneHttpRequest);
+            }
 
             //Try to handle the exception
             if (retryCount > 0) {
 
                 //Try to handle 401/403 exceptions
                 //Attempt to re-authenticate in case of auth issue
-                if ((e.getStatusCode() == 401 || e.getStatusCode() == 403) && lastUsedAuthentication != null) {
+                if ((statusCode == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED || statusCode == HttpStatusCodes.STATUS_CODE_FORBIDDEN) && lastUsedAuthentication != null) {
                     logger.debug("Auth token invalid, trying to re-authenticate");
 
                     try {
