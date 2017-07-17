@@ -147,6 +147,22 @@ public class EntityExample {
     }
 
     /**
+     * Get defects assign to release.id = 22001
+     * <p>
+     * GET .../defects?query="release EQ {id EQ 22001}"
+     */
+    public void getDefectsByReleaseId() {
+        // the context is for all entities
+        final GetEntities get = entityList.get();
+
+        Query.QueryBuilder statement = Query.statement("release", QueryMethod.EqualTo,
+                Query.statement("id", QueryMethod.EqualTo, 22001));
+
+        // finally build the query object and execute it
+        get.query(statement.build()).execute();
+    }
+
+    /**
      * Cross filter query
      * <p>
      * GET .../defects?query="user_tags EQ {id EQ 1001;(id EQ 5000000||id EQ 7000000)}"
