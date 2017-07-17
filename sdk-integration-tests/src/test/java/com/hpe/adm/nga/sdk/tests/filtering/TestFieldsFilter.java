@@ -41,7 +41,7 @@ public class TestFieldsFilter extends TestBase {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
-        int entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         EntityModel getEntity = entityList.at(entityId).get().addFields("attachments").execute();
 
@@ -56,7 +56,7 @@ public class TestFieldsFilter extends TestBase {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
-        int entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         EntityModel getEntity = entityList.at(entityId).get().addFields("attachments", "creation_time", "has_attachments").execute();
 

@@ -35,8 +35,8 @@ import java.util.Set;
  */
 
 public class TestCrossFiltering extends TestBase {
-    private static long defectId;
-    private static long releaseId;
+    private static String defectId;
+    private static String releaseId;
 
     public TestCrossFiltering() {
         entityName = "releases";
@@ -48,7 +48,7 @@ public class TestCrossFiltering extends TestBase {
                 (Query.statement("id",QueryMethod.EqualTo, releaseId))
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
-        long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+        String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
         Assert.assertEquals("More defects than expected in response", 1, defects.size());
         Assert.assertEquals("Wrong defect id in response", defectId, newDefectId);
     }
@@ -61,7 +61,7 @@ public class TestCrossFiltering extends TestBase {
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
         // it could be that there are no other defects.  So if defects is empty that's also good
         if (defects != null && defects.size() > 0) {
-            long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+            String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
             Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
         }
     }
@@ -75,7 +75,7 @@ public class TestCrossFiltering extends TestBase {
                             )
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
-        long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+        String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
         Assert.assertEquals("More defects than expected in response", 1, defects.size());
         Assert.assertEquals("Wrong defect id in response", defectId, newDefectId);
     }
@@ -89,7 +89,7 @@ public class TestCrossFiltering extends TestBase {
                 )
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
-        long newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
+        String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
         Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
     }
 

@@ -46,9 +46,9 @@ public abstract class OctaneRequest {
 		this.octaneHttpClient = octaneHttpClient;
 	}
 
-	protected OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final int entityId) {
+	protected OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
 		this (octaneHttpClient, urlDomain);
-		octaneUrl.addPaths(String.valueOf(entityId));
+		octaneUrl.addPaths(entityId);
 	}
 
 	protected final OctaneUrl getOctaneUrl(){

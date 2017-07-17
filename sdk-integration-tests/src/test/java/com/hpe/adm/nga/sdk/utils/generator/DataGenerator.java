@@ -58,7 +58,7 @@ public class DataGenerator {
     public static Collection<EntityModel> getAllDataForEntities(Collection<EntityModel> entities, Octane octane, String entityType){
         Collection<EntityModel> entitiesWithData = new ArrayList<>();
         for(EntityModel entityModel : entities){
-            EntityModel entityModelWithData =  octane.entityList(entityType).at(Integer.parseInt(CommonUtils.getValueFromEntityModel(entityModel, "id"))).get().execute();
+            EntityModel entityModelWithData =  octane.entityList(entityType).at(CommonUtils.getValueFromEntityModel(entityModel, "id")).get().execute();
             entitiesWithData.add(entityModelWithData);
         }
         return entitiesWithData;
@@ -91,9 +91,9 @@ public class DataGenerator {
     private static EntityModel generatePA(Octane octane, Set<FieldModel> fields) throws Exception {
         Collection<EntityModel> pas = octane.entityList("product_areas").get().execute();
         EntityModel parentEntity = CommonUtils.getEntityWithStringValue(pas, "parent", null);
-        long parentId = CommonUtils.getIdFromEntityModel(parentEntity);
+        String parentId = CommonUtils.getIdFromEntityModel(parentEntity);
         Set<FieldModel> parentFields = new HashSet<>();
-        parentFields.add(new LongFieldModel("id", parentId));
+        parentFields.add(new StringFieldModel("id", parentId));
         parentFields.add(new StringFieldModel("type", "product_area"));
         EntityModel parent = new EntityModel(parentFields);
 
