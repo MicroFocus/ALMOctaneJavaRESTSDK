@@ -16,12 +16,12 @@ package com.hpe.adm.nga.sdk.model;
 
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 /**
  * Implementation of the {@link OctaneCollection}.  Implements a {@link java.util.Set}
  */
-class OctaneCollectionImpl extends HashSet<EntityModel> implements OctaneCollection {
+class OctaneCollectionImpl extends LinkedHashSet<EntityModel> implements OctaneCollection {
 
     private final int totalCount;
     private final boolean exceedsTotalCount;
