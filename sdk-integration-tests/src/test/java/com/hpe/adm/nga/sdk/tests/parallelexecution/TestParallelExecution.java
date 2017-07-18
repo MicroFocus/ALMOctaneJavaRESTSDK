@@ -53,12 +53,12 @@ public class TestParallelExecution extends TestBase {
         Collection<EntityModel> generatedEntity1 = DataGenerator.generateEntityModel(octane1, entityName1);
         Collection<EntityModel> entityModels1 = entityList1.create().entities(generatedEntity1).execute();
         EntityModel entityModel1 = entityModels1.iterator().next();
-        int entityId1 = CommonUtils.getIdFromEntityModel(entityModel1);
+        String entityId1 = CommonUtils.getIdFromEntityModel(entityModel1);
 
         Collection<EntityModel> generatedEntity2 = DataGenerator.generateEntityModel(octane2, entityName2);
         Collection<EntityModel> entityModels2 = entityList2.create().entities(generatedEntity2).execute();
         EntityModel entityModel2 = entityModels2.iterator().next();
-        int entityId2 = CommonUtils.getIdFromEntityModel(entityModel2);
+        String entityId2 = CommonUtils.getIdFromEntityModel(entityModel2);
 
         int counter = 0;
         do {

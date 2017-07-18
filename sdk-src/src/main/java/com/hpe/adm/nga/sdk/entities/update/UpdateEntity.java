@@ -27,8 +27,8 @@ public class UpdateEntity {
     private EntityModel entityModel;
     private final OctaneRequest octaneRequest;
 
-    public UpdateEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
-        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, iEntityId);
+    public UpdateEntity(OctaneHttpClient octaneHttpClient, String urlDomain, String entityId) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
     }
 
     /**

@@ -24,7 +24,7 @@ import java.util.List;
  * Created by Guy Guetta on 21/04/2016.
  */
 public class QueryUtils {
-    public static Query getQueryForIds(List<Integer> entityIds) {
+    public static Query getQueryForIds(List<String> entityIds) {
 
         Query.QueryBuilder queryBuilder = null;
 

@@ -25,8 +25,8 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
 public class DeleteEntity {
     private final OctaneRequest octaneRequest;
 
-    public DeleteEntity(OctaneHttpClient octaneHttpClient, String urlDomain, int iEntityId) {
-        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, iEntityId);
+    public DeleteEntity(OctaneHttpClient octaneHttpClient, String urlDomain, String entityId) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
     }
 
     /**

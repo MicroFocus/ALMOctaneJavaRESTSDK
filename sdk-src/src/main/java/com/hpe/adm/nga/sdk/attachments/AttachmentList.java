@@ -94,7 +94,7 @@ public class AttachmentList {
      * @param entityId -  An Attachments object with specific id
      * @return - An Attachments object with specific id
      */
-    public Attachments at(int entityId) {
+    public Attachments at(String entityId) {
         return new Attachments(entityId);
     }
 
@@ -103,7 +103,7 @@ public class AttachmentList {
      */
     public class Attachments {
 
-        private final int iEntityId;
+        private final String entityId;
         private final EntityList.Entities entities;
 
         /**
@@ -111,9 +111,9 @@ public class AttachmentList {
          *
          * @param entityId - attachment id
          */
-        private Attachments(int entityId) {
+        private Attachments(String entityId) {
             entities = entityList.at(entityId);
-            iEntityId = entityId;
+            this.entityId = entityId;
         }
 
         /**
@@ -150,7 +150,7 @@ public class AttachmentList {
          * @return new instance of GetBinary
          */
         public GetBinaryAttachment getBinary() {
-            return new GetBinaryAttachment(octaneHttpClient, attachmentListDomain, iEntityId);
+            return new GetBinaryAttachment(octaneHttpClient, attachmentListDomain, entityId);
         }
 
     }

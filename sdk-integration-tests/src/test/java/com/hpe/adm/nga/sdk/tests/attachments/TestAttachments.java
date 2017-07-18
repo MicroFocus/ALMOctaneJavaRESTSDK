@@ -223,7 +223,7 @@ public class TestAttachments extends TestBase {
     private EntityModel reloadEntityModel(Collection<EntityModel> createResponse, String ownerFieldName) {
         Assert.assertTrue("One attachment should have been created", createResponse.size() == 1);
         EntityModel entityModel = createResponse.iterator().next();
-        Integer id = Integer.valueOf(entityModel.getValue("id").getValue().toString());
+        String id = entityModel.getValue("id").getValue().toString();
 
         return octane
                 .attachmentList()
@@ -260,7 +260,7 @@ public class TestAttachments extends TestBase {
      * @param attachmentEntityModel attachment that was created
      */
     private void checkAttachmentContent(byte[] requestContent, EntityModel attachmentEntityModel) {
-        Integer id = Integer.valueOf(attachmentEntityModel.getValue("id").getValue().toString());
+        String id = attachmentEntityModel.getValue("id").getValue().toString();
         InputStream responseInputStream = octane.attachmentList().at(id).getBinary().execute();
         try {
             byte[] responseContent = ByteStreams.toByteArray(responseInputStream);

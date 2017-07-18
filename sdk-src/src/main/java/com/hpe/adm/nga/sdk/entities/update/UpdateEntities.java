@@ -15,6 +15,7 @@
 
 package com.hpe.adm.nga.sdk.entities.update;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -39,7 +40,7 @@ public class UpdateEntities {
      * 1. Request UpdateEntities Execution
      * 2. Parse response to a new Collection object
      */
-    public Collection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection execute() throws RuntimeException {
         return UpdateHelper.getInstance().updateEntityModels(entityModels, octaneRequest);
     }
 

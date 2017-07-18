@@ -54,7 +54,7 @@ public class EntityList {
      * @param entityId - entity id
      * @return a new Entities object with specific id
      */
-    public Entities at(int entityId) {
+    public Entities at(String entityId) {
         return new Entities(entityId);
     }
 
@@ -106,15 +106,15 @@ public class EntityList {
      */
     public class Entities {
 
-        private int iEntityId = 0;
+        private final String entityId;
 
         /**
          * Set entityId parameter
          *
          * @param entityId The entity id
          */
-        public Entities(int entityId) {
-            iEntityId = entityId;
+        public Entities(String entityId) {
+            this.entityId = entityId;
         }
 
         /**
@@ -123,7 +123,7 @@ public class EntityList {
          * @return The GetEntities object
          */
         public GetEntity get() {
-            return new GetEntity(octaneHttpClient, urlDomain, iEntityId);
+            return new GetEntity(octaneHttpClient, urlDomain, entityId);
         }
 
         /**
@@ -132,7 +132,7 @@ public class EntityList {
          * @return The UpdateEntities object
          */
         public UpdateEntity update() {
-            return new UpdateEntity(octaneHttpClient, urlDomain, iEntityId);
+            return new UpdateEntity(octaneHttpClient, urlDomain, entityId);
         }
 
         /**
@@ -141,7 +141,7 @@ public class EntityList {
          * @return The DeleteEntities object
          */
         public DeleteEntity delete() {
-            return new DeleteEntity(octaneHttpClient, urlDomain, iEntityId);
+            return new DeleteEntity(octaneHttpClient, urlDomain, entityId);
         }
 
     }

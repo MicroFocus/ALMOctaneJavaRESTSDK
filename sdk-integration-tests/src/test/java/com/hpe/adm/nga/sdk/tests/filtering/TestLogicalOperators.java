@@ -33,7 +33,7 @@ import java.util.*;
  */
 public class TestLogicalOperators extends TestBase {
 
-    private static List<Integer> defectIds = new ArrayList<>();
+    private static List<String> defectIds = new ArrayList<>();
     private static List<String> defectNames = new ArrayList<>();
 
 

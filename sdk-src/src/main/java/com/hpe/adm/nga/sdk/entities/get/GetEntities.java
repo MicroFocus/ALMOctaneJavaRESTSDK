@@ -15,12 +15,10 @@
 
 package com.hpe.adm.nga.sdk.entities.get;
 
-import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import com.hpe.adm.nga.sdk.query.Query;
-
-import java.util.Collection;
 
 /**
  * This class hold the GetEntities objects and serve all functions concern to REST
@@ -38,7 +36,7 @@ public class GetEntities {
      * 1. Request GetEntities Execution
      * 2. Parse response to a new Collection object
      */
-    public Collection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection execute() throws RuntimeException {
         return GetHelper.getInstance().getEntityModels(octaneRequest);
     }
 

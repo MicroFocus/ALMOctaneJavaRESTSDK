@@ -41,19 +41,19 @@ public class CommonUtils {
         throw new RuntimeException("Field  name [" + fieldName + "] not found in entity model: " + entityModel.toString());
     }
 
-    public static int getIdFromEntityModel(EntityModel entityModel) {
+    public static String getIdFromEntityModel(EntityModel entityModel) {
         Set<FieldModel> fieldModelSet = entityModel.getValues();
         for (FieldModel fm : fieldModelSet) {
             if (fm.getName().equals("id")) {
-                return Integer.parseInt(fm.getValue().toString());
+                return fm.getValue().toString();
             }
         }
         throw new RuntimeException("Field  ID not found in entity model: " + entityModel.toString());
     }
 
 
-    public static List<Integer> getIdFromEntityModelCollection(Collection<EntityModel> entityModels) {
-        ArrayList<Integer> idList = new ArrayList<>();
+    public static List<String> getIdFromEntityModelCollection(Collection<EntityModel> entityModels) {
+        ArrayList<String> idList = new ArrayList<>();
         entityModels.forEach(entityModel -> idList.add(getIdFromEntityModel(entityModel)));
         return idList;
     }

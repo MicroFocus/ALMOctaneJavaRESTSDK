@@ -30,7 +30,7 @@ public class GetBinaryAttachment {
     private final OctaneRequest octaneRequest;
     private final OctaneHttpClient octaneHttpClient;
 
-    protected GetBinaryAttachment(OctaneHttpClient octaneHttpClient, String urlDomain, int entityId) {
+    protected GetBinaryAttachment(OctaneHttpClient octaneHttpClient, String urlDomain, String entityId) {
         octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
         this.octaneHttpClient = octaneHttpClient;
     }

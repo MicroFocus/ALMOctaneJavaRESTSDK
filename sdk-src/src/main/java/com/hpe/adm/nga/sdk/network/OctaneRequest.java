@@ -14,6 +14,7 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -46,9 +47,9 @@ public final class OctaneRequest {
 		this.octaneHttpClient = octaneHttpClient;
 	}
 
-	public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final int entityId) {
+	public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
 		this (octaneHttpClient, urlDomain);
-		octaneUrl.addPaths(String.valueOf(entityId));
+		octaneUrl.addPaths(entityId);
 	}
 
 	public final OctaneUrl getOctaneUrl(){
@@ -66,9 +67,9 @@ public final class OctaneRequest {
 	 * @return entities ased on Http Request
 	 * @throws Exception if response parsing fails
 	 */
-	public Collection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
+	protected final OctaneCollection getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
 
-		Collection<EntityModel> newEntityModels = null;
+		OctaneCollection newEntityModels = null;
 
 		OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 

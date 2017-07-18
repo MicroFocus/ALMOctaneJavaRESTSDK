@@ -43,9 +43,9 @@ final class CreateHelper {
      * @param entityModels the collection of entitymodels
      * @param octaneRequest the octane request
      */
-    Collection<EntityModel> createEntities(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
+    OctaneCollection createEntities(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
 
-        Collection<EntityModel> newEntityModels = null;
+        OctaneCollection newEntityModels = null;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);
         String strJsonEntityModel = objBase.toString();
         try {
