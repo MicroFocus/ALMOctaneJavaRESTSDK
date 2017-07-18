@@ -65,7 +65,7 @@ public final class ${type}EntityList extends TypedEntityList {
         super(octaneHttpClient, baseDomain);
     }
 
-    public ${type}Entities at(int entityId) {
+    public ${type}Entities at(String entityId) {
         return new ${type}Entities(entityId);
     }
 
@@ -97,14 +97,14 @@ public final class ${type}EntityList extends TypedEntityList {
     */
     public class ${type}Entities {
 
-        private final int entityId;
+        private final String entityId;
 
         /**
         * Set entityId parameter
         *
         * @param entityId The entity id
         */
-        ${type}Entities(int entityId) {
+        ${type}Entities(String entityId) {
             this.entityId = entityId;
         }
 
@@ -138,7 +138,7 @@ public final class ${type}EntityList extends TypedEntityList {
     public final class ${crudMethod}${type}${entityEntities} extends ${crudMethod}Typed${entityEntities}<${type}EntityModel
     #if(${crudMethod} == 'Delete' && !${isMultiple})#else, ${crudMethod}${type}${entityEntities}#end
         #if(${crudMethod} == 'Get'), AvailableFields#if(${isMultiple}), SortableFields#end#end> {
-    ${crudMethod}${type}${entityEntities}(final OctaneHttpClient octaneHttpClient, final String baseDomain#if(!${isMultiple}), final int entityId#end) {
+    ${crudMethod}${type}${entityEntities}(final OctaneHttpClient octaneHttpClient, final String baseDomain#if(!${isMultiple}), final String entityId#end) {
             super(${type}EntityModel.class, octaneHttpClient, baseDomain + "${url}"#if(!${isMultiple}), entityId#end);
         }
     }
