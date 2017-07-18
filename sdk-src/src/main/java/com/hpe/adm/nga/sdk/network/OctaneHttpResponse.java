@@ -15,7 +15,10 @@
 package com.hpe.adm.nga.sdk.network;
 
 import com.google.api.client.util.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,21 +33,21 @@ import java.nio.charset.Charset;
 public class OctaneHttpResponse {
 
     private final int statusCode;
-    private final InputStream inputStream;
-    private final String content;
+    private final byte[] content;
+
+    private static final Logger logger = LogManager.getLogger(OctaneHttpResponse.class.getName());
+    private final Charset responseCharset;
 
     public OctaneHttpResponse(int statusCode, InputStream inputStream, Charset responseCharset) {
         this.statusCode = statusCode;
-        this.inputStream = inputStream;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        String s = "";
+        this.responseCharset = responseCharset;
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             IOUtils.copy(inputStream, out);
-            s = out.toString(responseCharset.name());
         } catch (IOException e) {
-//            content = null;
+            logger.error("Cannot create output stream", e);
         }
-        content = s;
+        content = out.toByteArray();
     }
 
     /**
@@ -53,21 +56,7 @@ public class OctaneHttpResponse {
     public boolean isSuccessStatusCode() {
         return statusCode >= 200 && statusCode < 300;
     }
-//
-//    /**
-//     * @return - Returns the HTTP status code or 0 for none.
-//     */
-//    int getStatusCode();
-//
-//    /**
-//     * @return - Returns the HTTP status message or null for none.
-//     */
-//    String getStatusMessage();
-//
-//    /**
-//     * @return - Returns the HTTP response headers.
-//     */
-//    Map getHeaders();
+
 
     /**
      * Parses the content of the HTTP response from getContent() and reads it into a string.
@@ -77,7 +66,7 @@ public class OctaneHttpResponse {
      * @return - parsed string or "" for no content
      */
     public String getContent() {
-        return content;
+        return new String(content, responseCharset);
     }
 
     /**
@@ -89,6 +78,6 @@ public class OctaneHttpResponse {
      * @return - input stream content of the HTTP response or null for none
      */
     public InputStream getInputStream() {
-        return inputStream;
+        return new ByteArrayInputStream(content);
     }
 }
