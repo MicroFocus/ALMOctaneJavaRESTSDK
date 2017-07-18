@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * that (for example by using a method set*) will make the entity "dirty" and will be sent to the server when used for updates
  * Note - the id field is <em>always</em> considered a dirty field since it needs to be added
  */
-public class EntityModel {
+public class EntityModel implements Entity{
 
     public static final String ID_FIELD_NAME = "id";
 
@@ -69,6 +69,14 @@ public class EntityModel {
                 dirtyFields.add(key);
             }
             return super.put(key, value);
+        }
+
+        @Override
+        public FieldModel remove(Object key) {
+            if (entityState == EntityState.DIRTY) {
+                dirtyFields.add((String) key);
+            }
+            return super.remove(key);
         }
 
         @Override
@@ -189,11 +197,12 @@ public class EntityModel {
      *
      * @param values - a collection of field models
      */
-    public void setValues(Set<FieldModel> values) {
+    public EntityModel setValues(Set<FieldModel> values) {
         if (values != null) {
             data.clear();
             values.forEach(field -> data.put(field.getName(), field));
         }
+        return this;
     }
 
     /**
@@ -201,7 +210,20 @@ public class EntityModel {
      *
      * @param fieldModel the single field to update
      */
-    public void setValue(FieldModel fieldModel) {
+    public EntityModel setValue(FieldModel fieldModel) {
         data.put(fieldModel.getName(), fieldModel);
+        return this;
+    }
+
+    @Override
+    public final String getType() {
+        final StringFieldModel type = (StringFieldModel) getValue("type");
+        return type == null ? null : type.getValue();
+    }
+
+    @Override
+    public final String getId() {
+        final StringFieldModel id = (StringFieldModel) getValue("id");
+        return id == null ? null : id.getValue();
     }
 }

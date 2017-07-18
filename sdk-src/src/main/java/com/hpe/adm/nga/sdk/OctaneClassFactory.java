@@ -16,6 +16,7 @@
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,6 +53,8 @@ public interface OctaneClassFactory {
      */
     EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName);
 
+    <T extends TypedEntityList>T getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, Class<T> entityListClass);
+
     /**
      * Get the implementation implementation of OctaneClassFactory, can be modified by changing the OCTANE_CLASS_FACTORY_CLASS_NAME system param
      * @return OctaneClassFactory implementation based on the OCTANE_CLASS_FACTORY_CLASS_NAME sys param, if the param is missing, returns {@link DefaultOctaneClassFactory}
@@ -65,6 +68,7 @@ public interface OctaneClassFactory {
             //Use reflection to instantiate the class
             Class<OctaneClassFactory> clazz;
             try {
+                //noinspection unchecked
                 clazz = (Class<OctaneClassFactory>) Class.forName(octaneClassFactoryClassName);
             } catch (ClassNotFoundException e) {
                 logger.error(e);

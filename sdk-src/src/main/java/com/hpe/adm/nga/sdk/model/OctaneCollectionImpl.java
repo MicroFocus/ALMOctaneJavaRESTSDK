@@ -21,7 +21,7 @@ import java.util.LinkedHashSet;
 /**
  * Implementation of the {@link OctaneCollection}.  Implements a {@link java.util.Set}
  */
-class OctaneCollectionImpl extends LinkedHashSet<EntityModel> implements OctaneCollection {
+final class OctaneCollectionImpl<T extends Entity> extends LinkedHashSet<T> implements OctaneCollection<T> {
 
     private final int totalCount;
     private final boolean exceedsTotalCount;

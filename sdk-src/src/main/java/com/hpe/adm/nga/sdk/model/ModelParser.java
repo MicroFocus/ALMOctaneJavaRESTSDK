@@ -197,18 +197,18 @@ public final class ModelParser {
      * @param json The JSON to parse
      * @return entity model collection based on a given json string
      */
-    public OctaneCollection getEntities(String json) {
+    public OctaneCollection<EntityModel> getEntities(String json) {
         JSONTokener tokener = new JSONTokener(json);
         JSONObject jsonObj = new JSONObject(tokener);
         JSONArray jsonDataArr = jsonObj.getJSONArray(JSON_DATA_NAME);
 
-        final OctaneCollection entityModels;
+        final OctaneCollection<EntityModel> entityModels;
         if (jsonObj.has(JSON_EXCEEDS_TOTAL_COUNT_NAME) && jsonObj.has(JSON_TOTAL_COUNT_NAME)) {
             final boolean exceedsTotalAmount = jsonObj.getBoolean("exceeds_total_count");
             final int totalCount = jsonObj.getInt("total_count");
-            entityModels = new OctaneCollectionImpl(totalCount, exceedsTotalAmount);
+            entityModels = new OctaneCollectionImpl<>(totalCount, exceedsTotalAmount);
         } else {
-            entityModels = new OctaneCollectionImpl();
+            entityModels = new OctaneCollectionImpl<>();
         }
         IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
 

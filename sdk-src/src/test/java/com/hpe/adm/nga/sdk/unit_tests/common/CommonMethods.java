@@ -18,6 +18,7 @@ import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
@@ -116,6 +117,11 @@ public class CommonMethods {
         @Override
         public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
             return new EntityList(octaneHttpClient, baseDomain + entityName);
+        }
+
+        @Override
+        public <T extends TypedEntityList> T getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, Class<T> entityListClass) {
+            return null;
         }
     }
 }

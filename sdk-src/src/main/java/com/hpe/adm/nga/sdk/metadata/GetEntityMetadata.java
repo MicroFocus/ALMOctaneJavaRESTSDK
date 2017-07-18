@@ -35,11 +35,11 @@ import java.util.stream.IntStream;
 /**
  * This class hold the entity metadata object
  */
-public final class Entity extends MetadataOctaneRequest {
+public final class GetEntityMetadata extends MetadataOctaneRequest {
 
     private static final String TYPE_NAME_ENTITIES_NAME = "entities";
     private static final String QUERY_NAME_FIELD_NAME = "name";
-    private final Logger logger = LogManager.getLogger(Entity.class.getName());
+    private final Logger logger = LogManager.getLogger(GetEntityMetadata.class.getName());
 
     private static final String JSON_NAME_FIELD_NAME = "name";
     private static final String JSON_LABEL_FIELD_NAME = "label";
@@ -62,12 +62,12 @@ public final class Entity extends MetadataOctaneRequest {
     /**
      * Creates a new entity object
      */
-    protected Entity(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    protected GetEntityMetadata(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain + "/" + TYPE_NAME_ENTITIES_NAME);
     }
 
-    public Entity addEntities(String...entities) {
-        return super.addEntities(QUERY_NAME_FIELD_NAME, entities);
+    public GetEntityMetadata addEntities(String... entities) {
+        return (GetEntityMetadata) super.addEntities(QUERY_NAME_FIELD_NAME, entities);
     }
 
     /**
@@ -79,7 +79,7 @@ public final class Entity extends MetadataOctaneRequest {
         Collection<EntityMetadata> entitiesMetadata = null;
         String json = "";
         try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(getFinalRequestUrl());
+            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
             OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
             if (response.isSuccessStatusCode()) {
@@ -91,7 +91,7 @@ public final class Entity extends MetadataOctaneRequest {
             logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
         } catch (Exception e) {
             logger.debug("Fail to execute GET request.", e);
-            handleException(e, false);
+            octaneRequest.handleException(e, false);
         }
 
         return entitiesMetadata;
