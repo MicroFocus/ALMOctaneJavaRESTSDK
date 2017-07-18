@@ -14,13 +14,15 @@
  */
 package com.hpe.adm.nga.sdk.entities.get;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.OctaneCollectionSupplier;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import com.hpe.adm.nga.sdk.query.Query;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -48,8 +50,12 @@ public abstract class GetTypedEntities<T extends TypedEntityModel, E extends Get
      * @return The entities
      * @throws RuntimeException Some type of error
      */
-    public final Collection<T> execute() throws RuntimeException {
-        return GetHelper.getInstance().getEntityModels(octaneRequest).stream().map(this::getEntityInstance).collect(Collectors.toList());
+    public final OctaneCollection<T> execute() throws RuntimeException {
+        final OctaneCollection<EntityModel> entityModels = GetHelper.getInstance().getEntityModels(octaneRequest);
+        return entityModels
+                .stream()
+                .map(this::getEntityInstance)
+                .collect(Collectors.toCollection(new OctaneCollectionSupplier<>(entityModels)));
     }
 
     /**

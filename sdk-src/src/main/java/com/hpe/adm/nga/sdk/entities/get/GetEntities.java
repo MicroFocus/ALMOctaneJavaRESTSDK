@@ -16,6 +16,7 @@
 package com.hpe.adm.nga.sdk.entities.get;
 
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
+import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import com.hpe.adm.nga.sdk.query.Query;
@@ -36,7 +37,7 @@ public class GetEntities {
      * 1. Request GetEntities Execution
      * 2. Parse response to a new Collection object
      */
-    public OctaneCollection execute() throws RuntimeException {
+    public OctaneCollection<EntityModel> execute() throws RuntimeException {
         return GetHelper.getInstance().getEntityModels(octaneRequest);
     }
 

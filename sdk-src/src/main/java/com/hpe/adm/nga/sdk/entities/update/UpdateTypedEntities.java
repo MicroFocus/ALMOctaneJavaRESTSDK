@@ -14,8 +14,10 @@
  */
 package com.hpe.adm.nga.sdk.entities.update;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.OctaneCollectionSupplier;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -49,10 +51,13 @@ public abstract class UpdateTypedEntities <T extends TypedEntityModel, E extends
      * @return The entities
      * @throws RuntimeException Some type of error
      */
-    public final Collection<T> execute() throws RuntimeException {
+    public final OctaneCollection<T> execute() throws RuntimeException {
         final List<EntityModel> convertedEntityModels = entityModels.stream().map(T::getWrappedEntityModel).collect(Collectors.toList());
-        final Collection<EntityModel> updatedEntities = UpdateHelper.getInstance().updateEntityModels(convertedEntityModels, octaneRequest);
-        return updatedEntities.stream().map(this::getEntityInstance).collect(Collectors.toList());
+        final OctaneCollection<EntityModel> updatedEntities = UpdateHelper.getInstance().updateEntityModels(convertedEntityModels, octaneRequest);
+        return updatedEntities
+                .stream()
+                .map(this::getEntityInstance)
+                .collect(Collectors.toCollection(new OctaneCollectionSupplier<>(updatedEntities)));
     }
 
     /**

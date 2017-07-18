@@ -19,8 +19,6 @@ import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 
-import java.util.Collection;
-
 /**
  * A helper for deleting entities
  */
@@ -58,8 +56,8 @@ final class DeleteHelper {
      * @param octaneRequest the octane request
      * @return null
      */
-    OctaneCollection deleteEntityModels(OctaneRequest octaneRequest) throws RuntimeException {
-        OctaneCollection deletedEntityModels = null;
+    OctaneCollection<EntityModel> deleteEntityModels(OctaneRequest octaneRequest) throws RuntimeException {
+        OctaneCollection<EntityModel> deletedEntityModels = null;
         try {
             OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
             deletedEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);

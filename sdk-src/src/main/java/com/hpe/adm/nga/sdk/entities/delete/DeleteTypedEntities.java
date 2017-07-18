@@ -14,14 +14,15 @@
  */
 package com.hpe.adm.nga.sdk.entities.delete;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.OctaneCollectionSupplier;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import com.hpe.adm.nga.sdk.query.Query;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -45,9 +46,12 @@ public abstract class DeleteTypedEntities<T extends TypedEntityModel, E extends 
      * @return The collection of typed entities
      * @throws RuntimeException Some type of error
      */
-    public final Collection<T> execute() throws RuntimeException {
-        final Collection<EntityModel> deletedEntities = DeleteHelper.getInstance().deleteEntityModels(octaneRequest);
-        return deletedEntities.stream().map(this::getEntityInstance).collect(Collectors.toList());
+    public final OctaneCollection<T> execute() throws RuntimeException {
+        final OctaneCollection<EntityModel> deletedEntities = DeleteHelper.getInstance().deleteEntityModels(octaneRequest);
+        return deletedEntities
+                .stream()
+                .map(this::getEntityInstance)
+                .collect(Collectors.toCollection(new OctaneCollectionSupplier<>(deletedEntities)));
     }
 
     /**

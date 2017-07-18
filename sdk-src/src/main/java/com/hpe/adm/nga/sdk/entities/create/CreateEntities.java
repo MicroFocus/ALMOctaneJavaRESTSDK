@@ -15,6 +15,7 @@
 
 package com.hpe.adm.nga.sdk.entities.create;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -39,7 +40,7 @@ public class CreateEntities {
      * Request execution with json data 3. Parse response to a new
      * object
      */
-    public Collection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection<EntityModel> execute() throws RuntimeException {
         return CreateHelper.getInstance().createEntities(entityModels, octaneRequest);
     }
 

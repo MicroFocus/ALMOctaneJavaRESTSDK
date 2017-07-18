@@ -67,9 +67,9 @@ public final class OctaneRequest {
 	 * @return entities ased on Http Request
 	 * @throws Exception if response parsing fails
 	 */
-	public final OctaneCollection getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
+	public final OctaneCollection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
 
-		OctaneCollection newEntityModels = null;
+		OctaneCollection<EntityModel> newEntityModels = null;
 
 		OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 

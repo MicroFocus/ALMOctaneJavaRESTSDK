@@ -19,8 +19,6 @@ import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 
-import java.util.Collection;
-
 /**
  * A helper for getting entities
  */
@@ -39,8 +37,8 @@ final class GetHelper {
      * 1. Request GetEntities Execution
      * 2. Parse response to a new Collection object
      */
-    final OctaneCollection getEntityModels(final OctaneRequest octaneRequest) throws RuntimeException {
-        OctaneCollection newEntityModels = null;
+    final OctaneCollection<EntityModel> getEntityModels(final OctaneRequest octaneRequest) throws RuntimeException {
+        OctaneCollection<EntityModel> newEntityModels = null;
         try {
             OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
             newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);

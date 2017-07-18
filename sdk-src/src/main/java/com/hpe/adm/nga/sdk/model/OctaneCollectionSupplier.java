@@ -16,33 +16,29 @@ package com.hpe.adm.nga.sdk.model;
 
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 
-import java.util.LinkedHashSet;
+import java.util.function.Supplier;
 
 /**
- * Implementation of the {@link OctaneCollection}.  Implements a {@link java.util.Set}
+ * Implementation of the {@link Supplier} that returns a new {@link OctaneCollection}
+ * @param <T> The type of entity that will be returned
  */
-final class OctaneCollectionImpl<T extends Entity> extends LinkedHashSet<T> implements OctaneCollection<T> {
+public final class OctaneCollectionSupplier<T extends Entity> implements Supplier<OctaneCollection<T>> {
 
     private final int totalCount;
     private final boolean exceedsTotalCount;
 
-    OctaneCollectionImpl(final int totalCount, final boolean exceedsTotalCount) {
-        super();
-        this.exceedsTotalCount = exceedsTotalCount;
-        this.totalCount = totalCount;
-    }
-
-    OctaneCollectionImpl() {
-        this(NO_TOTAL_COUNT_SET, false);
-    }
-
-    @Override
-    public int getTotalCount() {
-        return totalCount;
+    /**
+     * The original collection that will be converted.  It takes the parameters of the collection and transfers them
+     * over
+     * @param octaneCollection The original octane collection
+     */
+    public OctaneCollectionSupplier(final OctaneCollection<? extends Entity> octaneCollection){
+        totalCount = octaneCollection.getTotalCount();
+        exceedsTotalCount = octaneCollection.exceedsTotalCount();
     }
 
     @Override
-    public boolean exceedsTotalCount() {
-        return exceedsTotalCount;
+    public OctaneCollection<T> get() {
+        return new OctaneCollectionImpl<>(totalCount, exceedsTotalCount);
     }
 }
