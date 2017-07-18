@@ -14,7 +14,7 @@
  */
 package com.hpe.adm.nga.sdk.entities;
 
-import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.Entity;
 
 import java.util.Collection;
 
@@ -28,7 +28,7 @@ import java.util.Collection;
  *
  *  See the REST API documentation for more details
  */
-public interface OctaneCollection extends Collection<EntityModel> {
+public interface OctaneCollection<T extends Entity> extends Collection<T> {
 
     /**
      * Returned when the total count field has not been set

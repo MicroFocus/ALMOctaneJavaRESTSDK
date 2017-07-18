@@ -14,10 +14,10 @@
  */
 package com.hpe.adm.nga.sdk.examples;
 
-import com.hpe.adm.nga.sdk.*;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.entities.EntityList;
-import com.hpe.adm.nga.sdk.entities.GetEntities;
-import com.hpe.adm.nga.sdk.entities.GetEntity;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
@@ -32,6 +32,7 @@ import java.util.*;
  * Created by brucesp on 03-Jan-17.
  */
 
+@SuppressWarnings("ALL")
 public class EntityExample {
 
     /**

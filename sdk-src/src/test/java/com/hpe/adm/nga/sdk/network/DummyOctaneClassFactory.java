@@ -18,6 +18,7 @@ package com.hpe.adm.nga.sdk.network;
 import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -76,6 +77,11 @@ public class DummyOctaneClassFactory implements OctaneClassFactory {
     @Override
     public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
         return new EntityList(octaneHttpClient, baseDomain + entityName);
+    }
+
+    @Override
+    public <T extends TypedEntityList> T getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, Class<T> entityListClass) {
+        return null;
     }
 
 }

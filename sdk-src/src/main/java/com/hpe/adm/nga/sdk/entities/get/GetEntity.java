@@ -13,20 +13,21 @@
  * limitations under the License.
  */
 
-package com.hpe.adm.nga.sdk.entities;
+package com.hpe.adm.nga.sdk.entities.get;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 
 /**
  * This class hold the GetEntities object of one entity
  */
-public class GetEntity extends OctaneRequest {
+public class GetEntity {
 
-    protected GetEntity(OctaneHttpClient octaneHttpClient, String urlDomain, String entityId) {
-        super(octaneHttpClient, urlDomain, entityId);
+    private final OctaneRequest octaneRequest;
+
+    public GetEntity(OctaneHttpClient octaneHttpClient, String urlDomain, String entityId) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
     }
 
     /**
@@ -34,20 +35,7 @@ public class GetEntity extends OctaneRequest {
      * new EntityModel object
      */
     public EntityModel execute() throws RuntimeException {
-
-        EntityModel newEntityModel = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.GetOctaneHttpRequest(getFinalRequestUrl())
-                            .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModel = getEntityResponse(octaneHttpRequest);
-        } catch (Exception e) {
-
-            handleException(e, false);
-        }
-
-        return newEntityModel;
-
+        return GetHelper.getInstance().getEntityModel(octaneRequest);
     }
 
     /**
@@ -57,7 +45,7 @@ public class GetEntity extends OctaneRequest {
      * @return a new GetEntities object with new Fields Parameters
      */
     public GetEntity addFields(String... fields) {
-        getOctaneUrl().addFieldsParam(fields);
+        octaneRequest.getOctaneUrl().addFieldsParam(fields);
         return this;
     }
 }

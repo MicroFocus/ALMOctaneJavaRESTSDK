@@ -12,12 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hpe.adm.nga.sdk.entities.create;
 
-package com.hpe.adm.nga.sdk.entities;
-
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
-import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import org.json.JSONObject;
@@ -25,49 +24,41 @@ import org.json.JSONObject;
 import java.util.Collection;
 
 /**
- * This class hold the UpdateEntities objects and serve all functions concern to
- * REST Post.
+ * A helper for creating entities
  */
-public class CreateEntities extends OctaneRequest {
+final class CreateHelper {
 
-    private Collection<EntityModel> entityModels = null;
+    private static final CreateHelper INSTANCE = new CreateHelper();
 
-    protected CreateEntities(OctaneHttpClient octaneHttpClient, String urlDomain) {
-        super (octaneHttpClient, urlDomain);
+    private CreateHelper() {
+    }
+
+    static CreateHelper getInstance() {
+        return INSTANCE;
     }
 
     /**
      * 1. build Entity Json Object  2. Post
      * Request execution with json data 3. Parse response to a new
      * object
+     * @param entityModels the collection of entitymodels
+     * @param octaneRequest the octane request
      */
-    public OctaneCollection execute() throws RuntimeException {
+    OctaneCollection<EntityModel> createEntities(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
 
-        OctaneCollection newEntityModels = null;
+        OctaneCollection<EntityModel> newEntityModels = null;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);
         String strJsonEntityModel = objBase.toString();
         try {
             OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.PostOctaneHttpRequest(getFinalRequestUrl(), OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
+                    new OctaneHttpRequest.PostOctaneHttpRequest(octaneRequest.getFinalRequestUrl(), OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
                             .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModels = getEntitiesResponse(octaneHttpRequest);
+            newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
         } catch (Exception e) {
 
-            handleException(e, true);
+            octaneRequest.handleException(e, true);
         }
 
         return newEntityModels;
-    }
-
-    /**
-     * Set new entities collection
-     *
-     * @param entities The entities which will be created
-     * @return create Object with new entities collection
-     */
-    public CreateEntities entities(Collection<EntityModel> entities) {
-
-        entityModels = entities;
-        return this;
     }
 }

@@ -32,24 +32,25 @@ import java.util.stream.IntStream;
 /**
  * This class hold the field metadata object
  */
-public final class Field extends MetadataOctaneRequest {
+public final class GetFieldMetadata extends MetadataOctaneRequest {
 
-    private final Logger logger = LogManager.getLogger(Field.class.getName());
+    private final Logger logger = LogManager.getLogger(GetFieldMetadata.class.getName());
     private static final String TYPE_NAME_FIELDS_NAME = "fields";
     private static final String QUERY_NAME_FIELD_NAME = "entity_name";
 
     /**
      * Creates a new Field object
+     *
      * @param octaneHttpClient implementation of the {@link OctaneHttpClient}
-     * @param urlDomain base url to use with the http client
+     * @param urlDomain        base url to use with the http client
      */
-    public Field(OctaneHttpClient octaneHttpClient, String urlDomain) {
+    public GetFieldMetadata(OctaneHttpClient octaneHttpClient, String urlDomain) {
 
         super(octaneHttpClient, urlDomain + "/" + TYPE_NAME_FIELDS_NAME);
     }
 
-    Field addEntities(String...entities) {
-        return super.addEntities(QUERY_NAME_FIELD_NAME, entities);
+    GetFieldMetadata addEntities(String... entities) {
+        return (GetFieldMetadata) super.addEntities(QUERY_NAME_FIELD_NAME, entities);
     }
 
     /**
@@ -63,7 +64,7 @@ public final class Field extends MetadataOctaneRequest {
         try {
 
             OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.GetOctaneHttpRequest(getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+                    new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
             OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
             if (response.isSuccessStatusCode()) {
@@ -74,8 +75,7 @@ public final class Field extends MetadataOctaneRequest {
 
             logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
         } catch (Exception e) {
-
-            handleException(e, false);
+            octaneRequest.handleException(e, false);
         }
 
         return colEntitiesMetadata;

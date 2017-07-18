@@ -23,29 +23,32 @@ import com.hpe.adm.nga.sdk.query.QueryMethod;
 /**
  * Abstract request used for fetching metadata
  */
-abstract class MetadataOctaneRequest extends OctaneRequest {
+abstract class MetadataOctaneRequest {
 
     protected static final String JSON_DATA_FIELD_NAME = "data";
     protected static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
+    protected final OctaneRequest octaneRequest;
+    protected final OctaneHttpClient octaneHttpClient;
 
-    protected MetadataOctaneRequest(OctaneHttpClient octaneHttpClient, String urlDomain){
-        super(octaneHttpClient, urlDomain);
+    protected MetadataOctaneRequest(OctaneHttpClient octaneHttpClient, String urlDomain) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain);
+        this.octaneHttpClient = octaneHttpClient;
     }
 
-    final <T extends MetadataOctaneRequest> T addEntities(String queryFieldName, String... entities) {
+    final MetadataOctaneRequest addEntities(String queryFieldName, String... entities) {
         if (entities == null || entities.length == 0) {
-            return (T) this;
+            return this;
         } else {
             Query.QueryBuilder builder = null;
-            for (String entity : entities){
-                if(builder == null) {
+            for (String entity : entities) {
+                if (builder == null) {
                     builder = Query.statement(queryFieldName, QueryMethod.EqualTo, entity);
                 } else {
                     builder = builder.or(Query.statement(queryFieldName, QueryMethod.EqualTo, entity));
                 }
             }
-            getOctaneUrl().setDqlQueryParam(builder.build());
-            return (T) this;
+            octaneRequest.getOctaneUrl().setDqlQueryParam(builder.build());
+            return this;
         }
     }
 

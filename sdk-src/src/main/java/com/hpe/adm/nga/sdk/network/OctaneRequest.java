@@ -30,7 +30,7 @@ import java.util.Collection;
 /**
  * An abstract representation of a request
  */
-public abstract class OctaneRequest {
+public final class OctaneRequest {
 
 	private final Logger logger = LogManager.getLogger(OctaneRequest.class.getName());
 
@@ -42,30 +42,23 @@ public abstract class OctaneRequest {
 	private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
 	private static final long HTTPS_CONFLICT_STATUS_CODE = 409;
 
-	protected OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
+	public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
 		octaneUrl = new OctaneUrl(urlDomain);
 		this.octaneHttpClient = octaneHttpClient;
 	}
 
-	protected OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
+	public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
 		this (octaneHttpClient, urlDomain);
 		octaneUrl.addPaths(entityId);
 	}
 
-	protected final OctaneUrl getOctaneUrl(){
+	public final OctaneUrl getOctaneUrl(){
 		return octaneUrl;
 	}
 
-	protected final String getFinalRequestUrl() {
+	public final String getFinalRequestUrl() {
 		return octaneUrl.toString();
 	}
-
-	/**
-	 * Executes a call to the Octane server
-	 * @return instance of T from the server
-	 * @throws RuntimeException A problem occurred during runtime
-	 */
-	public abstract<T> T execute() throws RuntimeException;
 
 	/**
 	 * get entities result based on Http Request
@@ -74,9 +67,9 @@ public abstract class OctaneRequest {
 	 * @return entities ased on Http Request
 	 * @throws Exception if response parsing fails
 	 */
-	protected final OctaneCollection getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
+	public final OctaneCollection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
 
-		OctaneCollection newEntityModels = null;
+		OctaneCollection<EntityModel> newEntityModels = null;
 
 		OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
@@ -97,7 +90,7 @@ public abstract class OctaneRequest {
 	 * @param octaneHttpRequest the request object
 	 * @return EntityModel
 	 */
-	protected final EntityModel getEntityResponse(OctaneHttpRequest octaneHttpRequest) {
+	public EntityModel getEntityResponse(OctaneHttpRequest octaneHttpRequest) {
 
 		EntityModel newEntityModel = null;
 
@@ -122,7 +115,7 @@ public abstract class OctaneRequest {
 	 * @param e              - exception
 	 * @param partialSupport - Is Partial ?
 	 */
-	protected final void handleException(Exception e, boolean partialSupport) {
+	public void handleException(Exception e, boolean partialSupport) {
 
 		if (e instanceof HttpResponseException) {
 
