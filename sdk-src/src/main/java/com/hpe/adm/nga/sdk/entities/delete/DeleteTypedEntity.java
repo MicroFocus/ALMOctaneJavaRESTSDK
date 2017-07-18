@@ -28,9 +28,9 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
 public abstract class DeleteTypedEntity<T extends TypedEntityModel> extends TypedEntityList.TypedEntityRequest<T> {
     private final OctaneRequest octaneRequest;
 
-    protected DeleteTypedEntity(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String urlDomain, final int iEntityId) {
+    protected DeleteTypedEntity(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
         super(typedEntityModelClass);
-        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, iEntityId);
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
     }
 
     /**

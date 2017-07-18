@@ -33,9 +33,9 @@ public abstract class UpdateTypedEntity<T extends TypedEntityModel, E extends Up
     private T entityModel;
     private final OctaneRequest octaneRequest;
 
-    protected UpdateTypedEntity(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String urlDomain, final int iEntityId) {
+    protected UpdateTypedEntity(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
         super(typedEntityModelClass);
-        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, iEntityId);
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
     }
 
     /**

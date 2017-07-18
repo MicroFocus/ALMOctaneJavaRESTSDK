@@ -32,9 +32,9 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
 
     private final OctaneRequest octaneRequest;
 
-    protected GetTypedEntity(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String urlDomain, final int iEntityId) {
+    protected GetTypedEntity(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
         super(typedEntityModelClass);
-        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, iEntityId);
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
     }
 
     /**

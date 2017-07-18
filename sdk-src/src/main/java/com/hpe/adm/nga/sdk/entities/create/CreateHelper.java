@@ -14,6 +14,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.create;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;

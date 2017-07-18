@@ -15,6 +15,7 @@
 
 package com.hpe.adm.nga.sdk.attachments;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -23,7 +24,6 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.util.Collection;
 
 /**
  * This class hold the CreateEntities objects and serve all functions concern to REST
@@ -64,8 +64,8 @@ public class CreateAttachment {
      * Request Post Execution with Multipart content type
      * return a collection of entities models that have been created
      */
-    public Collection<EntityModel> execute() throws RuntimeException {
-        Collection<EntityModel> newEntityModels = null;
+    public OctaneCollection execute() throws RuntimeException {
+        OctaneCollection newEntityModels = null;
 
         JSONObject data = ModelParser.getInstance().getEntityJSONObject(entity);
         try {

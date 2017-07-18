@@ -14,6 +14,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.update;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
@@ -70,8 +71,8 @@ final class UpdateHelper {
      * @param entityModels the entitymodel
      * @param octaneRequest the octane request
      */
-    Collection<EntityModel> updateEntityModels(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
-        Collection<EntityModel> newEntityModels = null;
+    OctaneCollection updateEntityModels(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
+        OctaneCollection newEntityModels = null;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels, true);
         String jsonEntityModel = objBase.toString();
         try {
