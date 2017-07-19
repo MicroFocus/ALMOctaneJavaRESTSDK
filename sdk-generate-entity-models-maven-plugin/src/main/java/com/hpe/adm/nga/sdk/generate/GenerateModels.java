@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * <p>The class that generates entities based on the metadata from the given ALM Octane server
  * This class generates models based on the {@link com.hpe.adm.nga.sdk.model.TypedEntityModel},
- * entity lists based on {@link com.hpe.adm.nga.sdk.entities.TypedEntityList} and Lists & Phases objects
+ * entity lists based on {@link com.hpe.adm.nga.sdk.entities.TypedEntityList} and Lists &amp; Phases objects
  * which represents those entities on the server and turns them into typed enums.
  * </p>
  * <p>
