@@ -144,3 +144,12 @@ See the following example for how to use the generated code:
 ## What's New
 * 12.55.5
   * Added Entity Generation
+  * Added Etag support.  If the server resource has an etag then it is cached by the SDK for as long as the process is alive.
+  The cache is destroyed once the process ends
+  * All entity ids are now Strings.  IDs are strings according to the metadata but there was some code that assumed IDs were
+   integers
+  * Entity collection now returns an `OctaneCollection` which is an extension of `Collection`.  This includes important 
+  metadata about the returned collection:
+    * The total count of entities (not including the current limit)
+    * Whether the number of requested entities exceeds the total count of entities.
+  See the ALM Octane documentation for more information
