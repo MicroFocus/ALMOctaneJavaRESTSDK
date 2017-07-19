@@ -15,9 +15,9 @@
 package com.hpe.adm.nga.sdk.network;
 
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
- *
  * HTTP request.
  * <p>
  * Created by leufl on 2/11/2016.
@@ -51,24 +51,38 @@ public abstract class OctaneHttpRequest {
         return octaneRequestMethod;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof OctaneHttpRequest)) return false;
+        final OctaneHttpRequest that = (OctaneHttpRequest) obj;
+        return octaneRequestMethod == that.octaneRequestMethod && requestUrl.equals(that.requestUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new Object[]{
+                octaneRequestMethod,
+                requestUrl
+        });
+    }
+
     public static class DeleteOctaneHttpRequest extends OctaneHttpRequest {
         public DeleteOctaneHttpRequest(final String url) {
             super(url, OctaneRequestMethod.DELETE);
         }
     }
 
-    private abstract static class HasAcceptOctaneHttpRequest<E extends HasAcceptOctaneHttpRequest> extends OctaneHttpRequest
-    {
+    private abstract static class HasAcceptOctaneHttpRequest<E extends HasAcceptOctaneHttpRequest> extends OctaneHttpRequest {
         private String acceptType;
 
         private HasAcceptOctaneHttpRequest(final String url, OctaneRequestMethod octaneRequestMethod) {
             super(url, octaneRequestMethod);
         }
 
-         public E setAcceptType(String acceptType) {
+        public E setAcceptType(String acceptType) {
             this.acceptType = acceptType;
-             //noinspection unchecked
-             return (E) this;
+            //noinspection unchecked
+            return (E) this;
         }
 
         public final String getAcceptType() {
@@ -120,7 +134,7 @@ public abstract class OctaneHttpRequest {
         private final String binaryContentType;
 
         public PostBinaryOctaneHttpRequest(final String url, final InputStream binaryInputStream,
-                                            String content, String binaryContentName, String binaryContentType) {
+                                           String content, String binaryContentName, String binaryContentType) {
             super(url, OctaneRequestMethod.POST_BINARY, OCTET_STREAM_CONTENT_TYPE, content);
             this.binaryInputStream = binaryInputStream;
             this.binaryContentName = binaryContentName;
