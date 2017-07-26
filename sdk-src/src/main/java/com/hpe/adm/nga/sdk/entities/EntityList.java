@@ -27,6 +27,7 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 /**
  * This class represents the entity context and carries out the actual server requests.  It builds the correct URL as
  * appropriate
+ *
  */
 public class EntityList {
 
