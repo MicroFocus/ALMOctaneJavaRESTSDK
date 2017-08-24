@@ -152,4 +152,6 @@ See the following example for how to use the generated code:
   metadata about the returned collection:
     * The total count of entities (not including the current limit)
     * Whether the number of requested entities exceeds the total count of entities.
+  * Added support for IN and BTW for queries
+  
   See the ALM Octane documentation for more information
