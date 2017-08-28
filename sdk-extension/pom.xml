@@ -36,7 +36,7 @@
     <url>https://github.com/HPSoftware/sdk-extension</url>
 
     <modules>
-        <module>sdk-src</module>
+        <module>sdk-extension-src</module>
         <module>sdk-usage-examples</module>
     </modules>
 
