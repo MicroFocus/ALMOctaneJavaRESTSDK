@@ -29,6 +29,11 @@ public class StringQuery extends Query {
         super();
     }
 
+    /**
+     * Create a query object from a string directly, not validated client side
+     * @param queryString string to put as the request's "query" query param value
+     * @return com.hpe.adm.nga.sdk.extension.StringQuery to use in an OctaneRequest
+     */
     public static StringQuery fromString(String queryString){
         StringQuery query = new StringQuery();
         query.queryString = queryString;
