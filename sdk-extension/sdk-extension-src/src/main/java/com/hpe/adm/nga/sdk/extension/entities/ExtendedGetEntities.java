@@ -31,6 +31,11 @@ public class ExtendedGetEntities extends GetEntities {
         super(octaneHttpClient, urlDomain);
     }
 
+    /**
+     * Allows setting the expand query param of the request, controls what fields are returned for each relation field of base entity
+     * @param relationExpandFields map of relation field name to fields of the related entity type
+     * @return GetEntities Object with new expand parameter
+     */
     public GetEntities expand(Map<String, Set<String>> relationExpandFields) {
         String expandQueryString =
                 relationExpandFields.keySet().stream().map(relationFieldName -> {
