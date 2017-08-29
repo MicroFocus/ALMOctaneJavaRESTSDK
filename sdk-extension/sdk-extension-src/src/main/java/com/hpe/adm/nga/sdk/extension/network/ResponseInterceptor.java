@@ -18,16 +18,18 @@ package com.hpe.adm.nga.sdk.extension.network;
 import java.util.Map;
 
 /**
- * Default implementation, useful if you want to override just one of the methods
+ * Interceptor for http response
+ * Methods after the response is received by the {@link com.hpe.adm.nga.sdk.network.OctaneHttpClient} implementation
  */
 public interface ResponseInterceptor {
-    /*
-    TODO: disabled content interceptor, google http response not mutable, to discuss
-    default String content(String content){
-        return content;
-    }
-    */
+
+    /**
+     * Get and change the headers after the request is executed
+     * @param headers headers of the original response
+     * @return new headers that are passed {@link com.hpe.adm.nga.sdk.network.OctaneHttpClient} implementation
+     */
     default Map<String, Object> headers(Map<String, Object> headers){
         return headers;
     }
+
 }
