@@ -15,13 +15,16 @@
 
 package com.hpe.adm.nga.sdk.extension;
 
-
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
 
 public class Util {
+
+    private static final Logger logger = LogManager.getLogger(Util.class.getName());
 
     /**
      * Simple debug method used to print a list of EntityModel objects to the console
@@ -30,7 +33,7 @@ public class Util {
      * @param entities
      */
     public static void printEntities(Collection<EntityModel> entities) {
-        System.out.println("Collection size: " + entities.size());
+        logger.info("Collection size: " + entities.size());
         if (entities.size() != 0) {
             entities
                 .stream()
@@ -46,10 +49,8 @@ public class Util {
                     }
                     return entityType;
                 })
-                .forEach(System.out::println);
+                .forEach(logger::info);
         }
-        System.out.println("-----------------------------");
     }
-
 
 }

@@ -42,7 +42,7 @@ public class GetExpandQueryExample {
 
 
         Map<String, Set<String>> expandMap = new HashMap<>();
-        expandMap.put("fields", new HashSet<String>());
+        expandMap.put("fields", new HashSet<>());
         expandMap.get("fields").add("author");
 
         final Collection<EntityModel> defects =
@@ -50,6 +50,6 @@ public class GetExpandQueryExample {
                         .expand(expandMap)
                         .execute();
 
-        System.out.println(defects.size());
+        Util.printEntities(defects);
     }
 }
