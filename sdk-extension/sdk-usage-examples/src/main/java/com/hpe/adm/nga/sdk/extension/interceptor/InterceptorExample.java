@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -38,7 +39,6 @@ import java.util.Map;
 public class InterceptorExample {
 
     private static final Logger logger = LogManager.getLogger(InterceptorGoogleHttpClient.class.getName());
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     public static void main(String[] args){
 
@@ -98,7 +98,7 @@ public class InterceptorExample {
         EntityModel entityModel = entities.iterator().next();
 
         StringFieldModel stringFieldModel = (StringFieldModel) entityModel.getValue("name");
-        stringFieldModel.setValue("name", "entity " + dateFormat.format(new Date()));
+        stringFieldModel.setValue("name", "entity_" + ZonedDateTime.now());
         entityModel.setValue(stringFieldModel);
 
         octane.entityList("work_items").update().entities(Collections.singletonList(entityModel)).execute();
