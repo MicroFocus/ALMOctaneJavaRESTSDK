@@ -20,7 +20,8 @@ import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +30,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * Example to show how to use your own custom http client with the sdk
  */
 public class DummyOctaneHttpClientExample {
+
+    private static final Logger logger = LogManager.getLogger(DummyOctaneHttpClientExample.class.getName());
 
     public static void main(String[] args) {
 
@@ -53,7 +56,7 @@ public class DummyOctaneHttpClientExample {
 
         //Fetch defects as an example a print them to the console
         Collection<EntityModel> defects = octane.entityList("work_items").get().execute();
-        printEntities(defects);
+        defects.forEach(defect -> logger.info(defect.getValue("id").getValue() + " " + defect.getValue("name").getValue()));
 
         assert defects.size() == dummyDefectCount;
 
@@ -61,31 +64,4 @@ public class DummyOctaneHttpClientExample {
         System.getProperties().remove(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
     }
 
-    /**
-     * Simple debug method used to print a list of EntityModel objects to the console
-     * For each entity, it will try to print the type + the fields [name] or [text]
-     * If the fields that it tries to print do not exists, it will only print the type of the entity
-     * @param entities the entities to print
-     */
-    private static void printEntities(Collection<EntityModel> entities) {
-        System.out.println("Collection size: " + entities.size());
-        if (entities.size() != 0) {
-            entities
-                    .stream()
-                    .map(entityModel -> {
-                        String entityType = entityModel.getValue("type").getValue().toString().toUpperCase();
-                        String[] printFieldNames = new String[]{"name", "text"};
-
-                        for(String fieldName : printFieldNames) {
-                            FieldModel printFieldModel = entityModel.getValue(fieldName);
-                            if (printFieldModel != null) {
-                                return entityType+":"+printFieldModel.getValue().toString();
-                            }
-                        }
-                        return entityType;
-                    })
-                    .forEach(System.out::println);
-        }
-        System.out.println("-----------------------------");
-    }
 }
