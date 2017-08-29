@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Http client with support for adding {@link RequestInterceptor} and {@link RequestInterceptor} objects
+ */
 public class InterceptorGoogleHttpClient extends GoogleHttpClient {
 
     private static final Logger logger = LogManager.getLogger(InterceptorGoogleHttpClient.class.getName());
@@ -47,6 +50,11 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
         super(urlDomain);
     }
 
+    /**
+     * Util method that sets the http proxy
+     *
+     * @param httpProxy to use for all requests
+     */
     public void setHttpProxy(Proxy httpProxy) {
         HttpTransport HTTP_TRANSPORT = new NetHttpTransport.Builder().setProxy(httpProxy).build();
         requestFactory = HTTP_TRANSPORT.createRequestFactory(requestInitializer);
@@ -65,7 +73,13 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
         return super.convertHttpResponseToOctaneHttpResponse(httpResponse);
     }
 
-    private static void applyRequestInterceptor(RequestInterceptor requestInterceptor, HttpRequest httpRequest){
+    /**
+     * Apply request interceptor to the {@link HttpRequest} object
+     *
+     * @param requestInterceptor interceptor implementation
+     * @param httpRequest        target {@link HttpRequest}
+     */
+    private static void applyRequestInterceptor(RequestInterceptor requestInterceptor, HttpRequest httpRequest) {
         logger.debug("Applying responseInterceptor " + (responseInterceptors.indexOf(requestInterceptor) + 1) + " of " + responseInterceptors.size());
 
         //URL
@@ -73,8 +87,8 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
         httpRequest.setUrl(new GenericUrl(newUrl));
 
         //CONTENT
-        if(httpRequest.getContent() != null && !(httpRequest.getContent() instanceof EmptyContent)){
-            if(httpRequest.getContent() instanceof ByteArrayContent){
+        if (httpRequest.getContent() != null && !(httpRequest.getContent() instanceof EmptyContent)) {
+            if (httpRequest.getContent() instanceof ByteArrayContent) {
                 ByteArrayContent byteArrayContent = (ByteArrayContent) httpRequest.getContent();
                 try {
                     String byteArrayContentString = CharStreams.toString(new InputStreamReader(byteArrayContent.getInputStream(), StandardCharsets.UTF_8));
@@ -88,32 +102,65 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
 
         //HEADERS
         final Map<String, Object> oldHeaders = new HashMap<>();
-        httpRequest.getHeaders().forEach( (key, value) -> oldHeaders.put(key, value));
+        httpRequest.getHeaders().forEach((key, value) -> oldHeaders.put(key, value));
         final Map<String, Object> newHeaders = requestInterceptor.headers(oldHeaders);
         httpRequest.getHeaders().clear();
         newHeaders.forEach((key, value) -> httpRequest.getHeaders().set(key, value));
     }
 
-    private static void applyResponseInterceptor(ResponseInterceptor responseInterceptor, HttpResponse httpResponse){
+    /**
+     * Apply response interceptor to the {@link HttpResponse} object
+     *
+     * @param responseInterceptor interceptor implementation
+     * @param httpResponse        target {@link HttpResponse}
+     */
+    private static void applyResponseInterceptor(ResponseInterceptor responseInterceptor, HttpResponse httpResponse) {
         logger.debug("Applying responseInterceptor " + (responseInterceptors.indexOf(responseInterceptor) + 1) + " of " + responseInterceptors.size());
 
         //HEADERS
         final Map<String, Object> oldHeaders = new HashMap<>();
-        httpResponse.getHeaders().forEach( (key, value) -> oldHeaders.put(key, value));
+        httpResponse.getHeaders().forEach((key, value) -> oldHeaders.put(key, value));
         final Map<String, Object> newHeaders = responseInterceptor.headers(oldHeaders);
         httpResponse.getHeaders().clear();
         newHeaders.forEach((key, value) -> httpResponse.getHeaders().set(key, value));
     }
 
+    /**
+     * Add a request interceptor to the http client
+     *
+     * @param requestInterceptor implementation of {@link RequestInterceptor}
+     * @return true if it was added, false otherwise
+     */
     public static boolean addRequestInterceptor(RequestInterceptor requestInterceptor) {
         return requestInterceptors.add(requestInterceptor);
     }
+
+    /**
+     * Remove a request interceptor to the http client
+     *
+     * @param requestInterceptor implementation of {@link RequestInterceptor}
+     * @return true if it was removed, false otherwise
+     */
     public static boolean removeRequestInterceptor(RequestInterceptor requestInterceptor) {
         return requestInterceptors.remove(requestInterceptor);
     }
+
+    /**
+     * Add a response interceptor to the http client
+     *
+     * @param responseInterceptor implementation of {@link ResponseInterceptor}
+     * @return true if it was added, false otherwise
+     */
     public static boolean addResponseInterceptor(ResponseInterceptor responseInterceptor) {
         return responseInterceptors.add(responseInterceptor);
     }
+
+    /**
+     * Remove a response interceptor to the http client
+     *
+     * @param responseInterceptor implementation of {@link ResponseInterceptor}
+     * @return true if it was removed, false otherwise
+     */
     public static boolean removeResponseInterceptor(ResponseInterceptor responseInterceptor) {
         return responseInterceptors.add(responseInterceptor);
     }
