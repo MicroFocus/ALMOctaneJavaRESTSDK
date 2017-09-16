@@ -14,12 +14,12 @@
  */
 package com.hpe.adm.nga.sdk.entities;
 
-import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;

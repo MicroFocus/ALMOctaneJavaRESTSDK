@@ -14,9 +14,9 @@
  */
 package com.hpe.adm.nga.sdk.exception;
 
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -20,10 +20,10 @@ import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -32,7 +32,7 @@ import java.util.Collection;
  */
 public final class OctaneRequest {
 
-	private final Logger logger = LogManager.getLogger(OctaneRequest.class.getName());
+	private final Logger logger = LoggerFactory.getLogger(OctaneRequest.class.getName());
 
 	private final OctaneUrl octaneUrl;
 	protected final OctaneHttpClient octaneHttpClient;

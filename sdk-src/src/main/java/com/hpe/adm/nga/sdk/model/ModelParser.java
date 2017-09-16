@@ -16,11 +16,11 @@
 package com.hpe.adm.nga.sdk.model;
 
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -34,7 +34,7 @@ public final class ModelParser {
     private static final String REGEX_DATE_FORMAT = "\\d{4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z";
     private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = " field scheme is invalid";
 
-    private final Logger logger = LogManager.getLogger(ModelParser.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(ModelParser.class.getName());
 
     private static ModelParser modelParser = new ModelParser();
 

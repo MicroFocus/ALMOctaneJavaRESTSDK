@@ -20,7 +20,6 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponseException;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
-import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;

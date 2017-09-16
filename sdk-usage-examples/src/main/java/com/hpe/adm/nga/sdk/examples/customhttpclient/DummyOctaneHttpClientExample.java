@@ -20,8 +20,8 @@ import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.model.EntityModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,7 +31,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class DummyOctaneHttpClientExample {
 
-    private static final Logger logger = LogManager.getLogger(DummyOctaneHttpClientExample.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DummyOctaneHttpClientExample.class.getName());
 
     public static void main(String[] args) {
 

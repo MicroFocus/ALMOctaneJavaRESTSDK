@@ -14,17 +14,17 @@
  */
 package com.hpe.adm.nga.sdk.model;
 
-import static org.junit.Assert.*;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.Query.QueryBuilder;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
 public class TestQuery {
 	private static final String DATE_TIME_ISO_FORMAT 		= "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	private static final String DATE_TIME_UTC_ZONE_NAME 	= "UTC";

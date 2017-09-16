@@ -25,20 +25,17 @@ import com.hpe.adm.nga.sdk.extension.network.ResponseInterceptor;
 import com.hpe.adm.nga.sdk.extension.network.google.InterceptorGoogleHttpClient;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 
 public class InterceptorExample {
 
-    private static final Logger logger = LogManager.getLogger(InterceptorGoogleHttpClient.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(InterceptorGoogleHttpClient.class.getName());
 
     public static void main(String[] args){
 
