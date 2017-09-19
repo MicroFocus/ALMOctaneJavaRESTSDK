@@ -177,7 +177,7 @@ This will make the sdk use log4j as an slf4j implementation, configuring a log4j
     * The total count of entities (not including the current limit)
     * Whether the number of requested entities exceeds the total count of entities.
   * Added support for IN and BTW for queries
-  * skd-extension now part of the sdk repository
+  * [SDK extension](https://github.com/HPSoftware/sdk-extension) moved, now part of the sdk repository, 
   * SDK now uses SLF4J internally for all logging
   
   See the ALM Octane documentation for more information
