@@ -148,7 +148,7 @@ See the following example for how to use the generated code:
 The SDK uses [SLF4J](https://www.slf4j.org/) internally for all logging. This means that the users of the library can control the logging framework used for the implementation. 
 The easiest way is to add a maven dependency to such an implementation (slf4j-simple, log4j, logback etc.)
 
-###Example
+### Example
 ```xml
     <dependencies>
         <dependency>
