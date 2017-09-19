@@ -5,7 +5,7 @@
 A Java SDK that can be used to connect to ALM Octane's REST API.  See the Javadoc for more information of how to use the SDK.
 See also the REST API documentation for more details about Octane's API.
 
-This has more sub-projects:
+This has multiple sub-projects:
 
 1. sdk-src which is the main source of the Java SDK
 2. sdk-integration-tests which can be run to test the SDK against your Octane server
@@ -31,7 +31,7 @@ mvn javadoc:javadoc
 
 This will create a javadoc site in the `sdk-src/target/site/apidocs` directory
 
-##Entity Generation
+## Entity Generation
 
 You can generate entities based on your server's metadata using the `sdk-generate-entity-models-maven-plugin` plugin.
 This plugin connects to your ALM Octane server using the given authentication credentials, shared space and work space
