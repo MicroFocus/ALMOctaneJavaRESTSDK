@@ -81,5 +81,9 @@
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.7.7</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
     </dependencies>
 </project>
