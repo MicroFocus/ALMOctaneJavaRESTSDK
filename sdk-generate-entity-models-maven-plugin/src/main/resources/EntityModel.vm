@@ -101,6 +101,10 @@ public com.hpe.adm.nga.sdk.enums.Phases.${className}Phase getPhase() {
 
 #macro (getListNode $field)
 #set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+#if (${field.getFieldTypedata().isMultiple()})#getMultiListNode($field $listName)#else#getSingleListNode($field $listName)#end
+#end
+
+#macro (getSingleListNode $field $listName)
 public com.hpe.adm.nga.sdk.enums.Lists.${listName} get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
     final ReferenceFieldModel ${field.name} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
     if (${field.name} == null) {
@@ -108,6 +112,18 @@ public com.hpe.adm.nga.sdk.enums.Lists.${listName} get${GeneratorHelper.camelCas
     }
     final EntityModel referenceFieldModel = ${field.name}.getValue();
     return com.hpe.adm.nga.sdk.enums.Lists.${listName}.getFromEntityModel(referenceFieldModel);
+
+#end
+
+#macro (getMultiListNode $field $listName)
+public java.util.Collection<com.hpe.adm.nga.sdk.enums.Lists.${listName}> get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
+    final MultiReferenceFieldModel ${field.name} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+    if (${field.name} == null) {
+        return java.util.Collections.emptyList();
+    }
+	final java.util.Collection<EntityModel> value = ${field.name}.getValue();
+	return value.stream().map(com.hpe.adm.nga.sdk.enums.Lists.${listName}::getFromEntityModel)
+	    .collect(java.util.stream.Collectors.toList());
 
 #end
 
@@ -186,6 +202,10 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 
 #macro (setListNode $field)
 #set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+#if (${field.getFieldTypedata().isMultiple()})#setMultiListNode($field $listName)#else#setSingleListNode($field $listName)#end
+#end
+
+#macro (setSingleListNode $field $listName)
     #fieldMetadaAnnotations($field)
 	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final com.hpe.adm.nga.sdk.enums.Lists.${listName} ${field.name}) {
     if (${field.name} == null) {
@@ -194,6 +214,21 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 	    wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${field.name}.getAsEntityModel()));
     }
     return this;
+	}
+#end
+
+#macro (setMultiListNode $field $listName)
+    #fieldMetadaAnnotations($field)
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final java.util.Collection<com.hpe.adm.nga.sdk.enums.Lists.${listName}> ${field.name}) {
+        if (${field.name} == null) {
+            wrappedEntityModel.removeValue("${field.name}");
+            return this;
+        }
+
+        java.util.Collection<EntityModel> entityModels = ${field.name}.stream()
+            .map(com.hpe.adm.nga.sdk.enums.Lists.${listName}::getAsEntityModel).collect(java.util.stream.Collectors.toList());
+        wrappedEntityModel.setValue(new MultiReferenceFieldModel("${field.name}", entityModels));
+        return this;
 	}
 #end
 
