@@ -5,11 +5,13 @@
 A Java SDK that can be used to connect to ALM Octane's REST API.  See the Javadoc for more information of how to use the SDK.
 See also the REST API documentation for more details about Octane's API.
 
-This project has three sub-projects:
+This has multiple sub-projects:
 
 1. sdk-src which is the main source of the Java SDK
 2. sdk-integration-tests which can be run to test the SDK against your Octane server
 3. sdk-usage-examples which contain some simple examples as to how to use the SDK
+4. sdk-generate-entity-models-maven-plugin which contains a maven plugin that generates POJO's for your servers Octane entities [see "Entity Generation"](#entity-generation)
+5. sdk-extension which provides some tools to access more of the sdk-src's underlying implementation 
 
 The easiest way to compile the project is to use [maven](https://maven.apache.org/) and run the command:
 
@@ -141,6 +143,28 @@ See the following example for how to use the generated code:
         defectEntityList.update().entities(Collections.singleton(defect)).execute();
 ```
 
+## Logging
+
+The SDK uses [SLF4J](https://www.slf4j.org/) internally for all logging. This means that the users of the library can control the logging framework used for the implementation. 
+The easiest way is to add a maven dependency to such an implementation (slf4j-simple, log4j, logback etc.)
+
+### Example
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>com.hpe.adm.nga.sdk</groupId>
+            <artifactId>sdk-src</artifactId>
+            <version>12.55.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+    </dependencies>
+```
+This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
+
 ## What's New
 * 12.55.5
   * Added Entity Generation
@@ -153,5 +177,11 @@ See the following example for how to use the generated code:
     * The total count of entities (not including the current limit)
     * Whether the number of requested entities exceeds the total count of entities.
   * Added support for IN and BTW for queries
+  * [SDK extension](https://github.com/HPSoftware/sdk-extension) moved, now part of the sdk repository, 
+  * SDK now uses SLF4J internally for all logging
   
   See the ALM Octane documentation for more information
+  
+## Disclaimer
+  
+Certain versions of software accessible here may contain branding from Hewlett-Packard Company (now HP Inc.) and Hewlett Packard Enterprise Company.  As of September 1, 2017, the software is now offered by Micro Focus, a separately owned and operated company.  Any reference to the HP and Hewlett Packard Enterprise/HPE marks is historical in nature, and the HP and Hewlett Packard Enterprise/HPE marks are the property of their respective owners. 
