@@ -74,7 +74,7 @@ public class GenerateModels {
         final VelocityEngine velocityEngine = new VelocityEngine();
         velocityEngine.setProperty("resource.loader", "class");
         velocityEngine.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
-        velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", "root");
+        //velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", "root");
         velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 
         velocityEngine.init();
