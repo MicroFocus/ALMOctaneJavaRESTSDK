@@ -64,7 +64,7 @@ public interface OctaneClassFactory {
         String octaneClassFactoryClassName = System.getProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
 
         if (octaneClassFactoryClassName != null) {
-            logger.info("Creating OctaneClassFactory using implementation {}", octaneClassFactoryClassName);
+            logger.debug("Creating OctaneClassFactory using implementation {}", octaneClassFactoryClassName);
             //Use reflection to instantiate the class
             Class<OctaneClassFactory> clazz;
             try {
