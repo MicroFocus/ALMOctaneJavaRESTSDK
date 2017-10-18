@@ -22,9 +22,9 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import java.util.Optional;
  */
 public class GoogleHttpClient implements OctaneHttpClient {
 
-    private static final Logger logger = LogManager.getLogger(GoogleHttpClient.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(GoogleHttpClient.class.getName());
 
     private static final String LOGGER_REQUEST_FORMAT = "Request: {} - {} - {}";
     private static final String LOGGER_RESPONSE_FORMAT = "Response: {} - {} - {}";
@@ -279,7 +279,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         // Make sure you don't log any http content send to the login rest api, since you don't want credentials in the logs
         if (content != null && logger.isDebugEnabled() && !httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)) {
-            logHttpContent(Level.DEBUG, content);
+            logHttpContent(content);
         }
 
         HttpResponse response = httpRequest.execute();
@@ -288,24 +288,23 @@ public class GoogleHttpClient implements OctaneHttpClient {
     }
 
     /**
-     * Util method to log {@link HttpContent}. This method will avoid logging {@link InputStreamContent}, since
+     * Util method to debug log {@link HttpContent}. This method will avoid logging {@link InputStreamContent}, since
      * reading from the stream will probably make it unusable when the actual request is sent
      *
-     * @param level   log level to log to
      * @param content {@link HttpContent}
      */
-    private static void logHttpContent(Level level, HttpContent content) {
+    private static void logHttpContent(HttpContent content) {
         if (content instanceof MultipartContent) {
             MultipartContent multipartContent = ((MultipartContent) content);
-            logger.log(level, "MultipartContent: " + content.getType());
+            logger.debug("MultipartContent: " + content.getType());
             multipartContent.getParts().forEach(part -> {
-                logger.log(level, "Part: encoding: " + part.getEncoding() + ", headers: " + part.getHeaders());
-                logHttpContent(level, part.getContent());
+                logger.debug("Part: encoding: " + part.getEncoding() + ", headers: " + part.getHeaders());
+                logHttpContent(part.getContent());
             });
         } else if (content instanceof InputStreamContent) {
-            logger.log(level, "InputStreamContent: type: " + content.getType());
+            logger.debug("InputStreamContent: type: " + content.getType());
         } else if (content instanceof FileContent) {
-            logger.log(level, "FileContent: type: " + content.getType() + ", filepath: " + ((FileContent) content).getFile().getAbsolutePath());
+            logger.debug("FileContent: type: " + content.getType() + ", filepath: " + ((FileContent) content).getFile().getAbsolutePath());
         } else {
             try {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -379,7 +378,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 // Sadly the server seems to send back empty cookies for some reason
                 cookies = HttpCookie.parse(strCookie);
             } catch (Exception ex) {
-                logger.error(ex);
+                logger.error("Failed to parse HPSSOCookieCsrf: " + ex.getMessage());
                 continue;
             }
             Optional<HttpCookie> lwssoCookie = cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst();

@@ -15,8 +15,8 @@
 package com.hpe.adm.nga.sdk.network;
 
 import com.google.api.client.util.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,7 +35,7 @@ public class OctaneHttpResponse {
     private final int statusCode;
     private final byte[] content;
 
-    private static final Logger logger = LogManager.getLogger(OctaneHttpResponse.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OctaneHttpResponse.class.getName());
     private final Charset responseCharset;
 
     public OctaneHttpResponse(int statusCode, InputStream inputStream, Charset responseCharset) {

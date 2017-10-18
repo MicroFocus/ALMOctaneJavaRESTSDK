@@ -21,8 +21,8 @@ import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
@@ -58,7 +58,7 @@ public class Octane {
     private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/";
     private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
     private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
-    private static final Logger logger = LogManager.getLogger(Octane.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
 
     //private members
     private final String urlDomain;
@@ -163,7 +163,7 @@ public class Octane {
      */
     public static class Builder {
         //Private
-        private final Logger logger = LogManager.getLogger(Octane.class.getName());
+        private final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
         private String urlDomain = "";
         private String idsharedSpaceId = null;
         private long workSpaceId = 0;

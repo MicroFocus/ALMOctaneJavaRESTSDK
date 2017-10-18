@@ -17,14 +17,14 @@ package com.hpe.adm.nga.sdk.extension;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
 public class Util {
 
-    private static final Logger logger = LogManager.getLogger(Util.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Util.class.getName());
 
     /**
      * Simple debug method used to print a list of EntityModel objects to the console

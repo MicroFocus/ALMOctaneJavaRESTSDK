@@ -20,11 +20,11 @@ import com.hpe.adm.nga.sdk.metadata.features.*;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +39,7 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
 
     private static final String TYPE_NAME_ENTITIES_NAME = "entities";
     private static final String QUERY_NAME_FIELD_NAME = "name";
-    private final Logger logger = LogManager.getLogger(GetEntityMetadata.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(GetEntityMetadata.class.getName());
 
     private static final String JSON_NAME_FIELD_NAME = "name";
     private static final String JSON_LABEL_FIELD_NAME = "label";

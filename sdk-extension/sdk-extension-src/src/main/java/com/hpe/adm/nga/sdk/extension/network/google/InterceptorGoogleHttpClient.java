@@ -24,8 +24,8 @@ import com.hpe.adm.nga.sdk.extension.network.ResponseInterceptor;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public class InterceptorGoogleHttpClient extends GoogleHttpClient {
 
-    private static final Logger logger = LogManager.getLogger(InterceptorGoogleHttpClient.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(InterceptorGoogleHttpClient.class.getName());
 
     private static List<RequestInterceptor> requestInterceptors = new ArrayList<>(1);
     private static List<ResponseInterceptor> responseInterceptors = new ArrayList<>(1);
