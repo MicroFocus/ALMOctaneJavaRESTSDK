@@ -88,7 +88,7 @@
         <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
 
         <org.javassist.version>3.20.0-GA</org.javassist.version>
-        <org.apache.velocity.version>1.7</org.apache.velocity.version>
+        <org.apache.velocity.version>2.0</org.apache.velocity.version>
 
         <junit.version>4.11</junit.version>
         <powermock.version>1.6.1</powermock.version>
