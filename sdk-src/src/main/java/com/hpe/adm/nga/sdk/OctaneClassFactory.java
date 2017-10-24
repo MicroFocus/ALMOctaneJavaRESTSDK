@@ -16,9 +16,10 @@
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -52,22 +53,25 @@ public interface OctaneClassFactory {
      */
     EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName);
 
+    <T extends TypedEntityList>T getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, Class<T> entityListClass);
+
     /**
      * Get the implementation implementation of OctaneClassFactory, can be modified by changing the OCTANE_CLASS_FACTORY_CLASS_NAME system param
      * @return OctaneClassFactory implementation based on the OCTANE_CLASS_FACTORY_CLASS_NAME sys param, if the param is missing, returns {@link DefaultOctaneClassFactory}
      */
     static OctaneClassFactory getSystemParamImplementation() {
-        Logger logger = LogManager.getLogger(Octane.class.getName());
+        Logger logger = LoggerFactory.getLogger(Octane.class.getName());
         String octaneClassFactoryClassName = System.getProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
 
         if (octaneClassFactoryClassName != null) {
-            logger.info("Creating OctaneClassFactory using implementation {}", octaneClassFactoryClassName);
+            logger.debug("Creating OctaneClassFactory using implementation {}", octaneClassFactoryClassName);
             //Use reflection to instantiate the class
             Class<OctaneClassFactory> clazz;
             try {
+                //noinspection unchecked
                 clazz = (Class<OctaneClassFactory>) Class.forName(octaneClassFactoryClassName);
             } catch (ClassNotFoundException e) {
-                logger.error(e);
+                logger.error("Failed to instantiate OctaneClassFactory class from name: " + octaneClassFactoryClassName + ": " + e.getMessage());
                 throw new RuntimeException("Failed to find class with name: " + octaneClassFactoryClassName, e);
             }
 

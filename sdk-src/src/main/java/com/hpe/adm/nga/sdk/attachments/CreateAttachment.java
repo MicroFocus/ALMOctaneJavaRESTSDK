@@ -15,6 +15,7 @@
 
 package com.hpe.adm.nga.sdk.attachments;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -23,21 +24,21 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.util.Collection;
 
 /**
  * This class hold the CreateEntities objects and serve all functions concern to REST
  * GetEntities.
  */
-public class CreateAttachment extends OctaneRequest {
+public class CreateAttachment {
 
     private String contentType = "";
     private String contentName = "";
     private InputStream inputStream = null;
     private EntityModel entity = null;
+    private final OctaneRequest octaneRequest;
 
     protected CreateAttachment(OctaneHttpClient octaneHttpClient, String urlDomain) {
-        super(octaneHttpClient, urlDomain);
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain);
     }
 
     /**
@@ -63,34 +64,17 @@ public class CreateAttachment extends OctaneRequest {
      * Request Post Execution with Multipart content type
      * return a collection of entities models that have been created
      */
-    public Collection<EntityModel> execute() throws RuntimeException {
-
-        return executeMultipart(entity, inputStream, contentType, contentName);
-    }
-
-    /**
-     * Post a multipart request - A request made of a json data and file upload:
-     * 1. Construct multipart data
-     * 2. get response
-     *
-     * @param entity      - new entity data to create
-     * @param inputStream - file stream
-     * @param contentName The name of the content
-     * @param contentType The type of the content
-     * @return - response - collection of entity models which have been created
-     */
-    private Collection<EntityModel> executeMultipart(EntityModel entity, InputStream inputStream, String contentType, String contentName) {
-
-        Collection<EntityModel> newEntityModels = null;
+    public OctaneCollection execute() throws RuntimeException {
+        OctaneCollection newEntityModels = null;
 
         JSONObject data = ModelParser.getInstance().getEntityJSONObject(entity);
         try {
             OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.PostBinaryOctaneHttpRequest(getFinalRequestUrl(), inputStream, data.toString(), contentName, contentType)
+                    new OctaneHttpRequest.PostBinaryOctaneHttpRequest(octaneRequest.getFinalRequestUrl(), inputStream, data.toString(), contentName, contentType)
                             .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModels = getEntitiesResponse(octaneHttpRequest);
+            newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
         } catch (Exception e) {
-            handleException(e, false);
+            octaneRequest.handleException(e, false);
         }
 
         return newEntityModels;

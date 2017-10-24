@@ -40,7 +40,7 @@ public class TestCookieUpdate extends TestBase {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
-        int entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         int counter = 0;
         while (counter < 10) {

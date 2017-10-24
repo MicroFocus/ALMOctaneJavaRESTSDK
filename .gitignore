@@ -54,6 +54,9 @@ buildNumber.properties
 
 ## Plugin-specific files:
 
+# Ingeration test config file
+sdk-integration-test/src/test/resources/configuration.properties
+
 # IntelliJ
 .idea
 *.iml

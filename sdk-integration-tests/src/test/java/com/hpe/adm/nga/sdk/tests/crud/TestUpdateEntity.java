@@ -14,11 +14,11 @@
  */
 package com.hpe.adm.nga.sdk.tests.crud;
 
-import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.model.DateFieldModel;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
@@ -47,7 +47,7 @@ public class TestUpdateEntity extends TestBase {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
-        int entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         StringFieldModel nameField = new StringFieldModel("name", updatedNameValue);
         fields.add(nameField);
@@ -66,7 +66,7 @@ public class TestUpdateEntity extends TestBase {
         List<String> updatedNameValues = DataGenerator.generateNamesForUpdate();
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
-        List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
+        List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
         for (int i = 0; i < entityIds.size(); i++) {
@@ -98,7 +98,7 @@ public class TestUpdateEntity extends TestBase {
 
         Collection<EntityModel> generatedDefect = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = octane.entityList(entityName).create().entities(generatedDefect).execute();
-        List<Integer> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
+        List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
 
         Collection<EntityModel> updatedEntityCollection = new ArrayList<>();
 

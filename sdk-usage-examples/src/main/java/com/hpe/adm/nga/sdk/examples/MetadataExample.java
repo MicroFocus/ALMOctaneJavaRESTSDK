@@ -25,6 +25,7 @@ import java.util.Collection;
  * Demonstrates how to read metadata using the REST SDK
  * Created by brucesp on 11-Jan-17.
  */
+@SuppressWarnings("ALL")
 public class MetadataExample {
 
     /**

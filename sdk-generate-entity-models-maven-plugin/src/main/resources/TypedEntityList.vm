@@ -1,0 +1,169 @@
+############################################################################
+## Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##   http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+############################################################################
+package com.hpe.adm.nga.sdk.entities;
+
+import com.hpe.adm.nga.sdk.entities.create.CreateTypedEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteTypedEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteTypedEntity;
+import com.hpe.adm.nga.sdk.entities.get.GetTypedEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetTypedEntity;
+import com.hpe.adm.nga.sdk.entities.update.UpdateTypedEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateTypedEntity;
+import com.hpe.adm.nga.sdk.model.${type}EntityModel;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+
+/**
+* Generated file.  Do not edit!
+*/
+public final class ${type}EntityList extends TypedEntityList {
+
+    public enum AvailableFields implements TypedEntityList.AvailableFields {
+        #foreach($field in $availableFields)
+            #if($foreach.count > 1), #end${helper.convertToUpperCase(${field})}("${field}")
+        #end;
+
+        private final String fieldName;
+
+        AvailableFields(final String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+    }
+
+    public enum SortableFields implements TypedEntityList.SortableFields {
+        #foreach($field in $sortableFields)
+            #if($foreach.count > 1), #end${helper.convertToUpperCase(${field})}("${field}")
+        #end;
+
+        private final String fieldName;
+
+        SortableFields(final String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+    }
+
+    public ${type}EntityList(final OctaneHttpClient octaneHttpClient, final String baseDomain) {
+        super(octaneHttpClient, baseDomain);
+    }
+
+    public ${type}Entities at(String entityId) {
+        return new ${type}Entities(entityId);
+    }
+
+#macro (outputEntitiesGetter $crudMethod, $type)
+    public ${crudMethod}${type}Entities ${crudMethod.toLowerCase()}() {
+        return new ${crudMethod}${type}Entities(octaneHttpClient, baseDomain);
+    }
+#end
+
+    #if(${hasGet})
+    #outputEntitiesGetter('Get', $type)
+
+    #end
+    #if(${hasCreate})
+    #outputEntitiesGetter('Create', $type)
+
+    #end
+    #if(${hasUpdate})
+    #outputEntitiesGetter('Update', $type)
+
+    #end
+    #if(${hasDelete})
+    #outputEntitiesGetter('Delete', $type)
+
+    #end
+
+    /**
+    * This class hold the ${type}Entities object(An object that represent one ${type}Entity )
+    */
+    public class ${type}Entities {
+
+        private final String entityId;
+
+        /**
+        * Set entityId parameter
+        *
+        * @param entityId The entity id
+        */
+        ${type}Entities(String entityId) {
+            this.entityId = entityId;
+        }
+
+#macro (outputEntityGetter $crudMethod, $type)
+        /**
+        * getter of a ${crudMethod}${type}Entity object with specific entity
+        *
+        * @return The ${crudMethod}${type}Entity object
+        */
+        public ${crudMethod}${type}Entity ${crudMethod.toLowerCase()}() {
+            return new ${crudMethod}${type}Entity(octaneHttpClient, baseDomain, entityId);
+        }
+#end
+
+        #if(${hasGet})
+        #outputEntityGetter('Get', $type)
+
+        #end
+        #if(${hasUpdate})
+        #outputEntityGetter('Update', $type)
+
+        #end
+        #if(${hasDelete})
+        #outputEntityGetter('Delete', $type)
+
+        #end
+    }
+
+#macro (outputClassInstance $crudMethod $type $url $isMultiple)
+    #if($isMultiple)#set($entityEntities = 'Entities')#else#set($entityEntities = 'Entity')#end
+    public final class ${crudMethod}${type}${entityEntities} extends ${crudMethod}Typed${entityEntities}<${type}EntityModel
+    #if(${crudMethod} == 'Delete' && !${isMultiple})#else, ${crudMethod}${type}${entityEntities}#end
+        #if(${crudMethod} == 'Get'), AvailableFields#if(${isMultiple}), SortableFields#end#end> {
+    ${crudMethod}${type}${entityEntities}(final OctaneHttpClient octaneHttpClient, final String baseDomain#if(!${isMultiple}), final String entityId#end) {
+            super(${type}EntityModel.class, octaneHttpClient, baseDomain + "${url}"#if(!${isMultiple}), entityId#end);
+        }
+    }
+#end
+
+    #if(${hasGet})
+    #outputClassInstance('Get', $type, $url, true)
+
+    #outputClassInstance('Get', $type, $url, false)
+
+    #end
+    #if(${hasCreate})
+    #outputClassInstance('Create', $type, $url, true)
+
+    #end
+    #if(${hasUpdate})
+    #outputClassInstance('Update', $type, $url, true)
+
+    #outputClassInstance('Update', $type, $url, false)
+
+    #end
+    #if(${hasDelete})
+    #outputClassInstance('Delete', $type, $url, true)
+
+    #outputClassInstance('Delete', $type, $url, false)
+
+    #end
+}

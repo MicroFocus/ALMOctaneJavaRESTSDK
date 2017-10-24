@@ -14,11 +14,12 @@
  */
 package com.hpe.adm.nga.sdk.entities;
 
-import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
+import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -52,7 +53,7 @@ public class TestCreateEntities {
 	@Test
 	public void testCreateEntity(){		
 		final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"moris2\"}],\"total_count\":1}";
-		
+
 		EntityList defects = octane.entityList("defects");
 		CreateEntities spiedCreateEntity = PowerMockito.spy(defects.create());
 		

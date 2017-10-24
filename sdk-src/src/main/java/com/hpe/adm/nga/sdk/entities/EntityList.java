@@ -14,19 +14,26 @@
  */
 package com.hpe.adm.nga.sdk.entities;
 
+import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntity;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 
 /**
  * This class represents the entity context and carries out the actual server requests.  It builds the correct URL as
  * appropriate
+ *
  */
 public class EntityList {
 
     // private members
     protected final String urlDomain;
     protected final OctaneHttpClient octaneHttpClient;
-
 
     // **** public Functions ***
 
@@ -37,9 +44,8 @@ public class EntityList {
      * @param entityListDomain - Domain Name
      */
     public EntityList(OctaneHttpClient octaneHttpClient, String entityListDomain) {
-
-        urlDomain = entityListDomain;
         this.octaneHttpClient = octaneHttpClient;
+        urlDomain = entityListDomain;
     }
 
     /**
@@ -49,7 +55,7 @@ public class EntityList {
      * @param entityId - entity id
      * @return a new Entities object with specific id
      */
-    public Entities at(int entityId) {
+    public Entities at(String entityId) {
         return new Entities(entityId);
     }
 
@@ -101,15 +107,15 @@ public class EntityList {
      */
     public class Entities {
 
-        private int iEntityId = 0;
+        private final String entityId;
 
         /**
          * Set entityId parameter
          *
          * @param entityId The entity id
          */
-        public Entities(int entityId) {
-            iEntityId = entityId;
+        public Entities(String entityId) {
+            this.entityId = entityId;
         }
 
         /**
@@ -118,7 +124,7 @@ public class EntityList {
          * @return The GetEntities object
          */
         public GetEntity get() {
-            return new GetEntity(octaneHttpClient, urlDomain, iEntityId);
+            return new GetEntity(octaneHttpClient, urlDomain, entityId);
         }
 
         /**
@@ -127,7 +133,7 @@ public class EntityList {
          * @return The UpdateEntities object
          */
         public UpdateEntity update() {
-            return new UpdateEntity(octaneHttpClient, urlDomain, iEntityId);
+            return new UpdateEntity(octaneHttpClient, urlDomain, entityId);
         }
 
         /**
@@ -136,7 +142,7 @@ public class EntityList {
          * @return The DeleteEntities object
          */
         public DeleteEntity delete() {
-            return new DeleteEntity(octaneHttpClient, urlDomain, iEntityId);
+            return new DeleteEntity(octaneHttpClient, urlDomain, entityId);
         }
 
     }

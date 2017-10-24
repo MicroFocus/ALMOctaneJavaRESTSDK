@@ -14,24 +14,25 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
 /**
  * An abstract representation of a request
  */
-public abstract class OctaneRequest {
+public final class OctaneRequest {
 
-	private final Logger logger = LogManager.getLogger(OctaneRequest.class.getName());
+	private final Logger logger = LoggerFactory.getLogger(OctaneRequest.class.getName());
 
 	private final OctaneUrl octaneUrl;
 	protected final OctaneHttpClient octaneHttpClient;
@@ -41,30 +42,23 @@ public abstract class OctaneRequest {
 	private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
 	private static final long HTTPS_CONFLICT_STATUS_CODE = 409;
 
-	protected OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
+	public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
 		octaneUrl = new OctaneUrl(urlDomain);
 		this.octaneHttpClient = octaneHttpClient;
 	}
 
-	protected OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final int entityId) {
+	public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
 		this (octaneHttpClient, urlDomain);
-		octaneUrl.addPaths(String.valueOf(entityId));
+		octaneUrl.addPaths(entityId);
 	}
 
-	protected final OctaneUrl getOctaneUrl(){
+	public final OctaneUrl getOctaneUrl(){
 		return octaneUrl;
 	}
 
-	protected final String getFinalRequestUrl() {
+	public final String getFinalRequestUrl() {
 		return octaneUrl.toString();
 	}
-
-	/**
-	 * Executes a call to the Octane server
-	 * @return instance of T from the server
-	 * @throws RuntimeException A problem occurred during runtime
-	 */
-	public abstract<T> T execute() throws RuntimeException;
 
 	/**
 	 * get entities result based on Http Request
@@ -73,9 +67,9 @@ public abstract class OctaneRequest {
 	 * @return entities ased on Http Request
 	 * @throws Exception if response parsing fails
 	 */
-	protected final Collection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
+	public final OctaneCollection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
 
-		Collection<EntityModel> newEntityModels = null;
+		OctaneCollection<EntityModel> newEntityModels = null;
 
 		OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
@@ -96,7 +90,7 @@ public abstract class OctaneRequest {
 	 * @param octaneHttpRequest the request object
 	 * @return EntityModel
 	 */
-	protected final EntityModel getEntityResponse(OctaneHttpRequest octaneHttpRequest) {
+	public EntityModel getEntityResponse(OctaneHttpRequest octaneHttpRequest) {
 
 		EntityModel newEntityModel = null;
 
@@ -121,7 +115,7 @@ public abstract class OctaneRequest {
 	 * @param e              - exception
 	 * @param partialSupport - Is Partial ?
 	 */
-	protected final void handleException(Exception e, boolean partialSupport) {
+	public void handleException(Exception e, boolean partialSupport) {
 
 		if (e instanceof HttpResponseException) {
 

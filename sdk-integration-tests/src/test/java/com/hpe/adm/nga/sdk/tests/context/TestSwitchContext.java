@@ -15,9 +15,9 @@
 package com.hpe.adm.nga.sdk.tests.context;
 
 
-import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;

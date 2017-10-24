@@ -25,10 +25,14 @@ import java.io.InputStream;
 /**
  * This class hold the GetBinary objects (handle the binary data of a unique Attachment model )
  */
-public class GetBinaryAttachment extends OctaneRequest {
+public class GetBinaryAttachment {
 
-    protected GetBinaryAttachment(OctaneHttpClient octaneHttpClient, String urlDomain, int entityId) {
-        super(octaneHttpClient, urlDomain, entityId);
+    private final OctaneRequest octaneRequest;
+    private final OctaneHttpClient octaneHttpClient;
+
+    protected GetBinaryAttachment(OctaneHttpClient octaneHttpClient, String urlDomain, String entityId) {
+        octaneRequest = new OctaneRequest(octaneHttpClient, urlDomain, entityId);
+        this.octaneHttpClient = octaneHttpClient;
     }
 
     /**
@@ -36,30 +40,17 @@ public class GetBinaryAttachment extends OctaneRequest {
      * return a stream with binary data
      */
     public InputStream execute() throws RuntimeException {
-
-        return executeBinary();
-    }
-
-    /**
-     * GetEntities binary data
-     *
-     * @return - Stream with binary data
-     */
-    private InputStream executeBinary() {
         InputStream inputStream = null;
         try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(getFinalRequestUrl())
+            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())
                     .setAcceptType(OctaneHttpRequest.OCTET_STREAM_CONTENT_TYPE);
             OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
             if (response.isSuccessStatusCode()) {
-
                 inputStream = response.getInputStream();
             }
         } catch (Exception e) {
-
-            handleException(e, false);
-
+            octaneRequest.handleException(e, false);
         }
 
         return inputStream;

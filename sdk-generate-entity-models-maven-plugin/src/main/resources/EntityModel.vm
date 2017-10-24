@@ -1,0 +1,308 @@
+############################################################################
+## Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##   http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+############################################################################
+#set ($className = ${GeneratorHelper.camelCaseFieldName(${entityMetadata.name})})
+#set ($subTypeOf = ${GeneratorHelper.getSubTypeOf(${entityMetadata})})
+package com.hpe.adm.nga.sdk.model;
+
+/**
+ * <p>Entity Name: ${entityMetadata.name}</p>
+ * <p>Label: ${entityMetadata.getLabel()}</p>
+ *
+ * Generated class.  <b>Do not manually edit.</b>
+ */
+@EntityMetadata(url = "${entityMetadataWrapper.getUrl()}", availableMethods = {#foreach(${availableMethod} in ${entityMetadataWrapper.getAvailableMethods()})EntityMetadata.AvailableMethods.${availableMethod}, #end} )
+public class ${className}EntityModel extends TypedEntityModel implements ${interfaceName} {
+
+    public ${className}EntityModel() {
+        super();
+        wrappedEntityModel.setValue(new StringFieldModel("type", "${entityMetadata.name}"));
+    }
+
+    public ${className}EntityModel(final EntityModel wrappedEntityModel) {
+        super(wrappedEntityModel);
+    }
+
+    #requiredFieldsForConstructor()
+
+#macro (requiredFieldsForConstructor)
+    #foreach($requiredFieldList in $requiredFields)
+    public ${className}EntityModel(#outputRequiredFieldsConstructorSignature($requiredFieldList)) {
+        this();
+        #outputRequiredFieldsSetters($requiredFieldList)
+    }
+    #end
+#end
+
+#macro(outputRequiredFieldsConstructorSignature $requiredFieldList)
+    #foreach($requiredFieldTuple in $requiredFieldList)final $requiredFieldTuple[1] $requiredFieldTuple[0]#if($foreach.hasNext), #end#end
+#end
+
+#macro(outputRequiredFieldsSetters $requiredFieldList)
+    #foreach($requiredFieldTuple in $requiredFieldList)
+        set${GeneratorHelper.camelCaseFieldName($requiredFieldTuple[0])}($requiredFieldTuple[0]);
+    #end
+#end
+
+#foreach(${field} in ${fieldMetadata})
+    #getter ($field)
+    #if($field.isEditable())#setter ($field)#end
+#end
+}
+
+#macro (fieldMetadaAnnotations $field)
+@FieldMetadata(filterable = ${field.isFilterable()}, sortable = ${field.isSortable()}, required = ${field.isRequired()}#if(${field.getFieldType()} == "String"), maxLength = ${field.getMaxLength()}L#elseif((${field.getFieldType()} == "Integer") || (${field.getFieldType()} == "Float")), minValue = ${field.getMinValue()}L, maxValue = ${field.getMaxValue()}L#end)
+#end
+
+#macro (multipleReferenceAnnotations $referenceMetadata)
+#if (${referenceMetadata.hasTypedReturn()} && (${referenceMetadata.getReferenceTypes().size()} > 1 || ${referenceMetadata.hasNonTypedReturn()}))
+@AllowedReferences({#foreach(${allowedReferenceForAnnotation} in ${referenceMetadata.getAllowedReferencesForAnnotation()})${allowedReferenceForAnnotation}, #end})
+#end
+#end
+
+#macro (getter $field)
+/**
+	* Label: ${field.getLabel()}
+	* Description: ${field.getDescription()}
+	*/
+    #if ((${field.getName()} == "phase") && (${availablePhases.contains(${className})}))#getPhase()#elseif(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
+
+#end
+
+#macro (getPhase)
+public com.hpe.adm.nga.sdk.enums.Phases.${className}Phase getPhase() {
+    final ReferenceFieldModel phase = (ReferenceFieldModel) wrappedEntityModel.getValue("phase");
+    if (phase == null) {
+        return null;
+    }
+    final EntityModel referenceFieldModel = phase.getValue();
+    return com.hpe.adm.nga.sdk.enums.Phases.${className}Phase.getFromEntityModel(referenceFieldModel);
+}
+
+#end
+
+#macro (getReference $field)
+    #set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
+    #set ($isListNode = ((${entityMetadata.name} != 'list_node') && (${field.getFieldTypedata().getTargets()[0].getType()} == 'list_node')))
+    #if ($isListNode)#getListNode($field)#elseif(${field.getFieldTypedata().isMultiple()})#getMultipleReference($field $referenceMetadata)#else#getSingleReference($field $referenceMetadata)#end
+    }
+#end
+
+#macro (getListNode $field)
+#set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+#if (${field.getFieldTypedata().isMultiple()})#getMultiListNode($field $listName)#else#getSingleListNode($field $listName)#end
+#end
+
+#macro (getSingleListNode $field $listName)
+public com.hpe.adm.nga.sdk.enums.Lists.${listName} get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
+    final ReferenceFieldModel ${field.name} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+    if (${field.name} == null) {
+        return null;
+    }
+    final EntityModel referenceFieldModel = ${field.name}.getValue();
+    return com.hpe.adm.nga.sdk.enums.Lists.${listName}.getFromEntityModel(referenceFieldModel);
+
+#end
+
+#macro (getMultiListNode $field $listName)
+public java.util.Collection<com.hpe.adm.nga.sdk.enums.Lists.${listName}> get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
+    final MultiReferenceFieldModel ${field.name} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+    if (${field.name} == null) {
+        return java.util.Collections.emptyList();
+    }
+	final java.util.Collection<EntityModel> value = ${field.name}.getValue();
+	return value.stream().map(com.hpe.adm.nga.sdk.enums.Lists.${listName}::getFromEntityModel)
+	    .collect(java.util.stream.Collectors.toList());
+
+#end
+
+#macro (getNonReference $field)
+public ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
+	    final FieldModel ${field.name} = wrappedEntityModel.getValue("${field.name}");
+	    return ${field.name} == null ? null : (${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})}) ${field.name}.getValue();
+	}
+#end
+
+#macro (getSingleReference $field $referenceMetadata)
+#multipleReferenceAnnotations (${referenceMetadata})
+public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
+    final ReferenceFieldModel ${field.name} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+		if (${field.name} == null) {
+            return null;
+		}
+		final EntityModel referenceFieldModel = ${field.name}.getValue();
+        #if (${referenceMetadata.hasTypedReturn()} && ${referenceMetadata.getReferenceTypes().size()} > 1)
+final StringFieldModel type = (StringFieldModel) referenceFieldModel.getValue("type");
+		final String referenceType = type.getValue();
+            #foreach($type in ${referenceMetadata.getReferenceTypes()})
+#if($foreach.count > 1)else #{end}if (referenceType.equals("${type}")) {
+			    return (T) new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(referenceFieldModel);
+			}#{end}
+        #end
+        #if(${referenceMetadata.hasNonTypedReturn()})
+        return #if (${referenceMetadata.getReferenceTypes().size()} > 1)(T)#end referenceFieldModel#{else}return #if (${referenceMetadata.getReferenceTypes().size()} > 1)(T) new ${referenceMetadata.getTypedType()}Model(referenceFieldModel)#{else}new ${referenceMetadata.getReferenceClassForSignature()}(referenceFieldModel)#end#{end};
+#end
+
+#macro (getMultipleReference $field $referenceMetadata)
+#multipleReferenceAnnotations (${referenceMetadata})
+public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
+        final MultiReferenceFieldModel ${field.name} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
+        if (${field.name} == null) {
+            return java.util.Collections.emptyList();
+        }
+        final java.util.Collection<EntityModel> value = ${field.name}.getValue();
+        #if (${referenceMetadata.hasTypedReturn()})
+        #if ((${referenceMetadata.getReferenceTypes().size()} > 1) || (${referenceMetadata.hasNonTypedReturn()}))
+        return value.stream().map(entityModel -> {
+            final StringFieldModel type = (StringFieldModel) entityModel.getValue("type");
+            final String referenceType = type.getValue();
+            #foreach($type in ${referenceMetadata.getReferenceTypes()})
+                #if($foreach.count > 1)else #{end}if (referenceType.equals("${type}")) {
+				    return new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(entityModel);
+				}#{end}else {
+			        return#if(${referenceMetadata.hasNonTypedReturn()}) entityModel;
+                    #else new ${referenceMetadata.getTypedType()}Model(entityModel);
+                 #end}
+		})
+        #else
+        return value.stream().map(${GeneratorHelper.camelCaseFieldName(${referenceMetadata.getReferenceTypes().iterator().next()})}EntityModel::new)
+        #{end}.collect(java.util.stream.Collectors.toList());
+        #else
+        return value;
+        #end
+#end
+
+#macro (setter $field)
+    #set ($paramName = ${GeneratorHelper.camelCaseFieldName(${field.name}, false)})
+    #if ((${field.getName()} == "phase") && (${availablePhases.contains(${className})}))#setPhase()#elseif(${field.getFieldType()} == "Reference")#setReference($field $paramName)#{else}#setNonReference($field $paramName)#end
+#end
+
+#macro (setPhase)
+    #fieldMetadaAnnotations($field)
+	public ${className}EntityModel setPhase(final com.hpe.adm.nga.sdk.enums.Phases.${className}Phase phase) {
+        if (phase == null) {
+	        wrappedEntityModel.removeValue("phase");
+        } else {
+	        wrappedEntityModel.setValue(new ReferenceFieldModel("phase", phase.getAsEntityModel()));
+        }
+        return this;
+	}
+#end
+
+#macro (setListNode $field)
+#set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+#if (${field.getFieldTypedata().isMultiple()})#setMultiListNode($field $listName)#else#setSingleListNode($field $listName)#end
+#end
+
+#macro (setSingleListNode $field $listName)
+    #fieldMetadaAnnotations($field)
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final com.hpe.adm.nga.sdk.enums.Lists.${listName} ${field.name}) {
+    if (${field.name} == null) {
+	    wrappedEntityModel.removeValue("${field.name}");
+    } else {
+	    wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${field.name}.getAsEntityModel()));
+    }
+    return this;
+	}
+#end
+
+#macro (setMultiListNode $field $listName)
+    #fieldMetadaAnnotations($field)
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final java.util.Collection<com.hpe.adm.nga.sdk.enums.Lists.${listName}> ${field.name}) {
+        if (${field.name} == null) {
+            wrappedEntityModel.removeValue("${field.name}");
+            return this;
+        }
+
+        java.util.Collection<EntityModel> entityModels = ${field.name}.stream()
+            .map(com.hpe.adm.nga.sdk.enums.Lists.${listName}::getAsEntityModel).collect(java.util.stream.Collectors.toList());
+        wrappedEntityModel.setValue(new MultiReferenceFieldModel("${field.name}", entityModels));
+        return this;
+	}
+#end
+
+#macro (setReference $field $paramName)
+    #set ($referenceMetadata = ${GeneratorHelper.getAllowedSuperTypesForReference(${field}, ${entityMetadataCollection})})
+    #set ($isListNode = ((${entityMetadata.name} != 'list_node') && (${field.getFieldTypedata().getTargets()[0].getType()} == 'list_node')))
+    #if ($isListNode)#setListNode($field)#elseif (${field.getFieldTypedata().isMultiple()})#setMultipleReference($field $referenceMetadata $paramName)#else#setSingleReference($field $referenceMetadata $paramName)#end
+#end
+
+#macro (setSingleReference $field $referenceMetadata $paramName)
+    #if (${referenceMetadata.hasTypedReturn()})
+        #foreach($type in ${referenceMetadata.getReferenceTypes()})
+#fieldMetadaAnnotations($field)
+        public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel $paramName){
+			if ($paramName == null) {
+			    wrappedEntityModel.removeValue("${field.name}");
+			} else {
+                wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}.getWrappedEntityModel()));
+            }
+            return this;
+        }
+
+        #end
+    #end
+    #if(${referenceMetadata.hasNonTypedReturn()})
+#fieldMetadaAnnotations($field)
+		public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final EntityModel $paramName){
+            if ($paramName == null) {
+                wrappedEntityModel.removeValue("${field.name}");
+            } else {
+	    	    wrappedEntityModel.setValue(new ReferenceFieldModel("${field.name}", ${paramName}));
+            }
+            return this;
+		}
+
+    #end
+#end
+
+#macro (setMultipleReference $field $referenceMetadata $paramName)
+    #fieldMetadaAnnotations($field)
+    #multipleReferenceAnnotations (${referenceMetadata})
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${referenceMetadata.getReferenceClassForSignature()} $paramName){
+	    if ($paramName == null) {
+	        wrappedEntityModel.removeValue("${field.name}");
+	        return this;
+	    }
+    #if (${referenceMetadata.hasTypedReturn()})
+		final java.util.Collection<EntityModel> entityModels = ${paramName}.stream().map(entityModel -> {
+		    if (entityModel instanceof ${referenceMetadata.getTypedType()}) {
+		        return ((TypedEntityModel) entityModel).getWrappedEntityModel();
+		    } #if(${referenceMetadata.hasNonTypedReturn()}) else if (entityModel instanceof EntityModel){
+		        return (EntityModel) entityModel;
+		    }#{end} else {
+		        throw new IllegalArgumentException("Members of $paramName must be of types {#if (${referenceMetadata.hasTypedReturn()})${referenceMetadata.getTypedType()},#end #if(${referenceMetadata.hasNonTypedReturn()})EntityModel#end");
+		    }
+		}).collect(java.util.stream.Collectors.toList());
+		wrappedEntityModel.setValue(new MultiReferenceFieldModel("${field.name}", entityModels));
+    #else
+		wrappedEntityModel.setValue(new MultiReferenceFieldModel("${field.name}", $paramName));
+    #end
+        return this;
+	}
+
+#end
+
+#macro (setNonReference $field $paramName)
+    #fieldMetadaAnnotations($field)
+	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} $paramName){
+        if ($paramName == null) {
+            wrappedEntityModel.removeValue("${field.name}");
+        } else {
+	        wrappedEntityModel.setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", $paramName));
+        }
+        return this;
+	}
+
+#end

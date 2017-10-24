@@ -14,10 +14,10 @@
  */
 package com.hpe.adm.nga.sdk.examples;
 
-import com.hpe.adm.nga.sdk.*;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.entities.EntityList;
-import com.hpe.adm.nga.sdk.entities.GetEntities;
-import com.hpe.adm.nga.sdk.entities.GetEntity;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
@@ -32,6 +32,7 @@ import java.util.*;
  * Created by brucesp on 03-Jan-17.
  */
 
+@SuppressWarnings("ALL")
 public class EntityExample {
 
     /**
@@ -56,7 +57,7 @@ public class EntityExample {
      */
     public void getEntity() {
         // the context of the entity list is set to ID 2010.
-        final EntityList.Entities entity = entityList.at(2010);
+        final EntityList.Entities entity = entityList.at("2010");
         // we are going to use this to GET the entity
         final GetEntity get = entity.get();
         // this actually executes the REST request and gets the entity
@@ -80,7 +81,7 @@ public class EntityExample {
      */
     public void convertServerZuluTimeToLocalTime() {
         // the context of the entity list is set to ID 2010.
-        final EntityList.Entities entity = entityList.at(2010);
+        final EntityList.Entities entity = entityList.at("2010");
         // we are going to use this to GET the entity
         final GetEntity get = entity.get();
         // this actually executes the REST request and gets the entity
@@ -144,6 +145,22 @@ public class EntityExample {
         queryBuilder.build();
 
         // show cross filter
+    }
+
+    /**
+     * Get defects assign to release.id = 22001
+     * <p>
+     * GET .../defects?query="release EQ {id EQ 22001}"
+     */
+    public void getDefectsByReleaseId() {
+        // the context is for all entities
+        final GetEntities get = entityList.get();
+
+        Query.QueryBuilder statement = Query.statement("release", QueryMethod.EqualTo,
+                Query.statement("id", QueryMethod.EqualTo, 22001));
+
+        // finally build the query object and execute it
+        get.query(statement.build()).execute();
     }
 
     /**

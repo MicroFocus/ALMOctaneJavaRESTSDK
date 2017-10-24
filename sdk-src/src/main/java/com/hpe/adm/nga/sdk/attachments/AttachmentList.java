@@ -15,7 +15,13 @@
 package com.hpe.adm.nga.sdk.attachments;
 
 import com.hpe.adm.nga.sdk.OctaneClassFactory;
-import com.hpe.adm.nga.sdk.entities.*;
+import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntity;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 /**
@@ -35,7 +41,7 @@ public class AttachmentList {
     private final String attachmentListDomain;
 
     /**
-     * Creates a new AttachmentList object
+     * Creates a new attachmentList object
      *
      * @param octaneHttpClient     - Octane request factory
      * @param baseDomain - domain of attachmentList
@@ -47,36 +53,36 @@ public class AttachmentList {
     }
 
     /**
-     * getter of AttachmentList GetEntities object
+     * getter of attachmentList GetEntities object
      *
-     * @return - new AttachmentList GetEntities object
+     * @return - new attachmentList GetEntities object
      */
     public GetEntities get() {
         return entityList.get();
     }
 
     /**
-     * getter of AttachmentList UpdateEntities object ( same functionality as EntityList.UpdateEntities )
+     * getter of attachmentList UpdateEntities object ( same functionality as EntityList.UpdateEntities )
      *
-     * @return - new AttachmentList UpdateEntities object
+     * @return - new attachmentList UpdateEntities object
      */
     public UpdateEntities update() {
         return entityList.update();
     }
 
     /**
-     * getter of AttachmentList create object
+     * getter of attachmentList create object
      *
-     * @return - new AttachmentList CreateEntities object
+     * @return - new attachmentList CreateEntities object
      */
     public CreateAttachment create() {
         return new CreateAttachment(octaneHttpClient, attachmentListDomain);
     }
 
     /**
-     * getter of AttachmentList DeleteEntities object ( same functionality as EntityList.DeleteEntities )
+     * getter of attachmentList DeleteEntities object ( same functionality as EntityList.DeleteEntities )
      *
-     * @return - new AttachmentList UpdateEntities object
+     * @return - new attachmentList UpdateEntities object
      */
     public DeleteEntities delete() {
         return entityList.delete();
@@ -88,7 +94,7 @@ public class AttachmentList {
      * @param entityId -  An Attachments object with specific id
      * @return - An Attachments object with specific id
      */
-    public Attachments at(int entityId) {
+    public Attachments at(String entityId) {
         return new Attachments(entityId);
     }
 
@@ -97,7 +103,7 @@ public class AttachmentList {
      */
     public class Attachments {
 
-        private final int iEntityId;
+        private final String entityId;
         private final EntityList.Entities entities;
 
         /**
@@ -105,9 +111,9 @@ public class AttachmentList {
          *
          * @param entityId - attachment id
          */
-        private Attachments(int entityId) {
+        private Attachments(String entityId) {
             entities = entityList.at(entityId);
-            iEntityId = entityId;
+            this.entityId = entityId;
         }
 
         /**
@@ -144,7 +150,7 @@ public class AttachmentList {
          * @return new instance of GetBinary
          */
         public GetBinaryAttachment getBinary() {
-            return new GetBinaryAttachment(octaneHttpClient, attachmentListDomain, iEntityId);
+            return new GetBinaryAttachment(octaneHttpClient, attachmentListDomain, entityId);
         }
 
     }

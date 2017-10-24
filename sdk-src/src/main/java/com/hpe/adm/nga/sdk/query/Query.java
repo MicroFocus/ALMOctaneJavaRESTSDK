@@ -229,7 +229,7 @@ public class Query {
 
         /**
          * Wraps current builder content into a parenthesis
-         * @return
+         * @return with parentheses
          */
         private QueryBuilder parenthesis() {
             queryString = "(" + queryString + ")";

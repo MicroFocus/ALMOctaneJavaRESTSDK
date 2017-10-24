@@ -14,8 +14,8 @@
  */
 package com.hpe.adm.nga.sdk.tests.orderby;
 
-import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
@@ -43,7 +43,7 @@ public class TestOrderBy extends TestBase {
             generatedEntity.addAll(DataGenerator.generateEntityModel(octane, "releases"));
         }
         Collection<EntityModel> releases = octane.entityList("releases").create().entities(generatedEntity).execute();
-        List<Integer> ids = CommonUtils.getIdFromEntityModelCollection(releases);
+        List<String> ids = CommonUtils.getIdFromEntityModelCollection(releases);
         idQuery = QueryUtils.getQueryForIds(ids);
     }
 

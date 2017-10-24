@@ -18,10 +18,11 @@ package com.hpe.adm.nga.sdk;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
@@ -57,7 +58,7 @@ public class Octane {
     private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/";
     private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
     private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
-    private static final Logger logger = LogManager.getLogger(Octane.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
 
     //private members
     private final String urlDomain;
@@ -89,6 +90,16 @@ public class Octane {
     }
 
     /**
+     * Creates a new {@link TypedEntityList} context.  The class is the concrete instance of the TypedEntityList
+     * @param entityListClass The class that is the instance of the TypedEntityList
+     * @param <T> The type of class
+     * @return The instance that can then be set as the context
+     */
+    public <T extends TypedEntityList> T entityList(Class<T> entityListClass) {
+        return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityListClass);
+    }
+
+    /**
      * Creates a new Metadata object.  This represents the following URL:
      * <p>
      * {@code [workspace_url/metadata}
@@ -104,13 +115,13 @@ public class Octane {
     }
 
     /**
-     * Creates a new AttachmentList object.  This returns the context for attachments.  This is equivalent to
+     * Creates a new attachmentList object.  This returns the context for attachments.  This is equivalent to
      * <br>
      * {@code [workspace_url/attachments}
      *
-     * @return A new AttachmentList object that holds the attachments context
+     * @return A new attachmentList object that holds the attachments context
      */
-    public AttachmentList AttachmentList() {
+    public AttachmentList attachmentList() {
         return new AttachmentList(octaneHttpClient, getBaseDomainFormat());
     }
 
@@ -152,7 +163,7 @@ public class Octane {
      */
     public static class Builder {
         //Private
-        private final Logger logger = LogManager.getLogger(Octane.class.getName());
+        private final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
         private String urlDomain = "";
         private String idsharedSpaceId = null;
         private long workSpaceId = 0;
