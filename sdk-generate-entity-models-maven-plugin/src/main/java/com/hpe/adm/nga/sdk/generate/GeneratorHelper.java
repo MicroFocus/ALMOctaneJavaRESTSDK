@@ -21,16 +21,23 @@ import com.hpe.adm.nga.sdk.metadata.features.RestFeature;
 import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
 import com.hpe.adm.nga.sdk.model.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class that is used to help with entity generation
  */
 @SuppressWarnings("ALL")
 public final class GeneratorHelper {
+
+    private static final String keywords[] = {"abstract", "assert", "boolean",
+            "break", "byte", "case", "catch", "char", "class", "const",
+            "continue", "default", "do", "double", "else", "extends", "false",
+            "final", "finally", "float", "for", "goto", "if", "implements",
+            "import", "instanceof", "int", "interface", "long", "native",
+            "new", "null", "package", "private", "protected", "public",
+            "return", "short", "static", "strictfp", "super", "switch",
+            "synchronized", "this", "throw", "throws", "transient", "true",
+            "try", "void", "volatile", "while"};
 
     public static String camelCaseFieldName(final String fieldName) {
         return camelCaseFieldName(fieldName, true);
@@ -39,7 +46,7 @@ public final class GeneratorHelper {
     /**
      * Convert fieldName to camelCase form.
      *
-     * @param fieldName the field name
+     * @param fieldName               the field name
      * @param theFirstLetterIsCapital - set true if the first letter in first world should be capital
      * @return the name in camelCase
      */
@@ -57,7 +64,7 @@ public final class GeneratorHelper {
             stringBuffer.append(splitField.substring(1));
         }
 
-        return stringBuffer.toString();
+        return getSanitisedFieldName(stringBuffer.toString());
     }
 
     public static String convertToUpperCase(final String fieldName) {
@@ -68,6 +75,10 @@ public final class GeneratorHelper {
         }
 
         return stringBuffer.toString();
+    }
+
+    public static String getSanitisedFieldName(final String fieldName) {
+        return Arrays.binarySearch(keywords, fieldName) >= 0 ? "_" + fieldName : fieldName;
     }
 
     public static String getFieldTypeAsJava(FieldMetadata.FieldType fieldType) {
