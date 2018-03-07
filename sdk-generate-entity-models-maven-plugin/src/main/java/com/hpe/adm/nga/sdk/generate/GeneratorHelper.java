@@ -197,12 +197,11 @@ public final class GeneratorHelper {
                     if (referenceMetadata.hasTypedReturn) {
                         camelCaseFieldName = typedType;
                         hasMultipleTypes = true;
-                    } else {
-                        referenceMetadata.hasTypedReturn = true;
                     }
                     referenceMetadata.referenceClassForSignature =
                             getReferenceSignature(fieldTypedata.isMultiple(), hasMultipleTypes, camelCaseFieldName + "Entity");
                 }
+                referenceMetadata.hasTypedReturn = true;
             } else {
                 referenceMetadata.allowedReferencesForAnnotation.add("EntityModel.class");
                 referenceMetadata.hasNonTypedReturn = true;
