@@ -104,6 +104,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
     public boolean authenticate(Authentication authentication) {
+        //reset so it's not sent to auth request, server might return 304
+        lwssoValue = null;
         lastUsedAuthentication = authentication;
         try {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
