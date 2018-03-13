@@ -408,7 +408,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static void logProxySystemProperties(){
         String[]  proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
         Arrays.stream(proxySysProperties)
-                .filter(sysProp -> System.getProperty(sysProp) != null)
                 .forEach(sysProp -> logger.debug(sysProp + ": " + System.getProperty(sysProp)));
     }
 
