@@ -24,15 +24,14 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpCookie;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.util.*;
 
 /**
  * HTTP Client using Google's API
@@ -96,6 +95,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     public GoogleHttpClient(final String urlDomain) {
         this.urlDomain = urlDomain;
+
+        logProxySystemProperties();
+        logSystemProxyForUrlDomain(urlDomain);
+
         HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         requestFactory = HTTP_TRANSPORT.createRequestFactory(requestInitializer);
     }
@@ -398,4 +401,27 @@ public class GoogleHttpClient implements OctaneHttpClient {
     public static int getHttpRequestRetryCount() {
         return HTTP_REQUEST_RETRY_COUNT;
     }
+
+    /**
+     * Log jvm proxy system properties for debugging connection issues
+     */
+    private static void logProxySystemProperties(){
+        String[]  proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
+        Arrays.stream(proxySysProperties)
+                .forEach(sysProp -> logger.debug(sysProp + ": " + System.getProperty(sysProp)));
+    }
+
+    /**
+     * Log proxy for octane url domain using system wide {@link ProxySelector}
+     * @param urlDomain base url of octane server
+     */
+    private static void logSystemProxyForUrlDomain(String urlDomain){
+        try {
+            List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(urlDomain));
+            logger.debug("System proxies for " + urlDomain + ": " + proxies.toString());
+        } catch (SecurityException ex) {
+            logger.debug("SecurityException when trying to access system wide proxy selector: " + ex);
+        }
+    }
+
 }
