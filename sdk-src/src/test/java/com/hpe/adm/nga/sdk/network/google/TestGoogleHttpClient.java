@@ -48,7 +48,7 @@ public class TestGoogleHttpClient {
     @Test
     public void testRequestRetry() throws Exception {
 
-        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient(""));
+        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com"));
 
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
         doReturn(true).when(googleHttpClientSpy, "authenticate", any(Authentication.class));
@@ -57,7 +57,7 @@ public class TestGoogleHttpClient {
         doThrow(forbiddenException)
                 .when(googleHttpClientSpy, "executeRequest", Matchers.any(HttpRequest.class));
 
-        OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("");
+        OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("http://url.com");
 
         try {
             googleHttpClientSpy.execute(request);
