@@ -14,52 +14,87 @@
  */
 package com.hpe.adm.nga.sdk.model;
 
-
 /**
  *
- * This class hold the ReferenceFieldModel objects and serve as a ReferenceField type FieldModel data holder 
+ * This class hold the ReferenceFieldModel objects and serve as a ReferenceField
+ * type FieldModel data holder
  *
  *
  */
 public class ReferenceFieldModel implements FieldModel<EntityModel> {
-	
-	//Private 
-	private EntityModel refValue;
-	private String refName;
-	
-	/**
-	 * Creates a new ReferenceFieldModel object
-	 * 
-	 * @param name - Field name
-	 * @param value - Field Value
-	 */
-	public ReferenceFieldModel(String name,EntityModel value){
-		
-		setValue( name, value);
-	}
-	
-	/**
-	 * GetEntities Value
-	 */
-	public EntityModel getValue(){
-		return refValue ;
-	}
-	
-	/**
-	 * GetEntities name
-	 */
-	public String getName(){
-		return refName;
-	}
-	
-	/**
-	 * Set name/value
-	 */
-	public void setValue(String name,EntityModel value){
-		
-		refValue = value;
-		refName = name;
-	}
-	
-	
+
+    // Private
+    private EntityModel refValue;
+    private String refName;
+
+    /**
+     * Creates a new ReferenceFieldModel object
+     * 
+     * @param name
+     *            - Field name
+     * @param value
+     *            - Field Value
+     */
+    public ReferenceFieldModel(String name, EntityModel value) {
+
+        setValue(name, value);
+    }
+
+    /**
+     * GetEntities Value
+     */
+    @Override
+    public EntityModel getValue() {
+        return refValue;
+    }
+
+    /**
+     * GetEntities name
+     */
+    @Override
+    public String getName() {
+        return refName;
+    }
+
+    /**
+     * Set name/value
+     */
+    @Override
+    public void setValue(String name, EntityModel value) {
+
+        refValue = value;
+        refName = name;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((refName == null) ? 0 : refName.hashCode());
+        result = prime * result + ((refValue == null) ? 0 : refValue.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ReferenceFieldModel other = (ReferenceFieldModel) obj;
+        if (refName == null) {
+            if (other.refName != null)
+                return false;
+        } else if (!refName.equals(other.refName))
+            return false;
+        if (refValue == null) {
+            if (other.refValue != null)
+                return false;
+        } else if (!refValue.equals(other.refValue))
+            return false;
+        return true;
+    }
+
 }

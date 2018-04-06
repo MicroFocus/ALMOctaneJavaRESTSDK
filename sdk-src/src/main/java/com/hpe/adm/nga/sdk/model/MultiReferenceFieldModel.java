@@ -16,64 +16,99 @@ package com.hpe.adm.nga.sdk.model;
 
 import java.util.Collection;
 
-
 /**
  *
- * This class hold the MultiReferenceFieldModel objects and serve as a multi reference type FieldModel data holder 
+ * This class hold the MultiReferenceFieldModel objects and serve as a multi
+ * reference type FieldModel data holder
  *
  *
  */
 public class MultiReferenceFieldModel implements FieldModel<Collection<EntityModel>> {
-	
-	
-	
-		//Private 
-		private String name = "";
-		private Collection<EntityModel> data = null;
-		
-		/**
-		 * Creates a new MultiReferenceFieldModel object
-		 * 
-		 * @param newName - Field name
-		 * @param value - Field Value
-		 */
-		public MultiReferenceFieldModel(String newName,Collection<EntityModel> value){
-			
-			setValue(newName,value);
-		}
-		
-		/**
-		 * get value
-		 */
-		public Collection<EntityModel> getValue(){
-			return data;
-		}
+
+    // Private
+    private String name = "";
+    private Collection<EntityModel> data = null;
 
     /**
-		 * get name
-		 */
-		public String getName(){
-			
-			return name;
-		}
-		
-		/**
-		 * set name
-		 * @param newName - new field name
-		 */
-		public void setName(String newName){
-			
-			name = newName;
-		}
-		
-		/**
-		 * set name/value;
-		 */
-		public void setValue(String newName,Collection<EntityModel> value){
-			
-			name = newName;
-			data = value;
-		}
+     * Creates a new MultiReferenceFieldModel object
+     * 
+     * @param newName
+     *            - Field name
+     * @param value
+     *            - Field Value
+     */
+    public MultiReferenceFieldModel(String newName, Collection<EntityModel> value) {
 
+        setValue(newName, value);
+    }
+
+    /**
+     * get value
+     */
+    @Override
+    public Collection<EntityModel> getValue() {
+        return data;
+    }
+
+    /**
+     * get name
+     */
+    @Override
+    public String getName() {
+
+        return name;
+    }
+
+    /**
+     * set name
+     * 
+     * @param newName
+     *            - new field name
+     */
+    public void setName(String newName) {
+
+        name = newName;
+    }
+
+    /**
+     * set name/value;
+     */
+    @Override
+    public void setValue(String newName, Collection<EntityModel> value) {
+
+        name = newName;
+        data = value;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MultiReferenceFieldModel other = (MultiReferenceFieldModel) obj;
+        if (data == null) {
+            if (other.data != null)
+                return false;
+        } else if (!data.equals(other.data))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
 
 }

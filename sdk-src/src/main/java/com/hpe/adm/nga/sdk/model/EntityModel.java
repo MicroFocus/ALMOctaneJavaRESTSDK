@@ -23,20 +23,23 @@ import java.util.stream.Collectors;
 
 /**
  * This class hold the EntityModel objects and server as an entity data holder
- * entities.
- * The EntityModel class has two states - clean and dirty.  When creating a new entity from scratch then each addition
- * will be considered dirty and will be sent to the server when creating or updating.
- * When the entity has been returned from the server then the initial state will be considered clean.  Each change after
- * that (for example by using a method set*) will make the entity "dirty" and will be sent to the server when used for updates
- * Note - the id field is <em>always</em> considered a dirty field since it needs to be added
+ * entities. The EntityModel class has two states - clean and dirty. When
+ * creating a new entity from scratch then each addition will be considered
+ * dirty and will be sent to the server when creating or updating. When the
+ * entity has been returned from the server then the initial state will be
+ * considered clean. Each change after that (for example by using a method set*)
+ * will make the entity "dirty" and will be sent to the server when used for
+ * updates Note - the id field is <em>always</em> considered a dirty field since
+ * it needs to be added
  */
-public class EntityModel implements Entity{
+public class EntityModel implements Entity {
 
     public static final String ID_FIELD_NAME = "id";
 
     /**
-     * Represents the state of the entity.  In most cases it will be DIRTY.  However - when an entity is retrieved from the
-     * server then the initial state will be CLEAN (all those fields will not be updated unless changed)
+     * Represents the state of the entity. In most cases it will be DIRTY.
+     * However - when an entity is retrieved from the server then the initial
+     * state will be CLEAN (all those fields will not be updated unless changed)
      */
     public enum EntityState {
         CLEAN, DIRTY
@@ -59,7 +62,8 @@ public class EntityModel implements Entity{
         /**
          * Initialise the hashmap with this initial state
          *
-         * @param entityState The state to initialise the map
+         * @param entityState
+         *            The state to initialise the map
          */
         private DirtyHashMap(EntityState entityState) {
             super();
@@ -94,12 +98,11 @@ public class EntityModel implements Entity{
          * @return Dirty values
          */
         private Collection<FieldModel> dirtyValues() {
-            return
-                    entrySet()
-                            .stream()
-                            .filter(entry -> entry.getKey().equals(ID_FIELD_NAME) || dirtyFields.contains(entry.getKey()))
-                            .map(Entry::getValue)
-                            .collect(Collectors.toSet());
+            return entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().equals(ID_FIELD_NAME) || dirtyFields.contains(entry.getKey()))
+                    .map(Entry::getValue)
+                    .collect(Collectors.toSet());
         }
     }
 
@@ -109,32 +112,37 @@ public class EntityModel implements Entity{
     private final DirtyHashMap data;
 
     /**
-     * Creates a new EntityModel object
-     * All fields set after using this constructor will be considered "dirty"
+     * Creates a new EntityModel object All fields set after using this
+     * constructor will be considered "dirty"
      */
     public EntityModel() {
         this(null, EntityState.DIRTY);
     }
 
     /**
-     * Creates a new EntityModel object with given field models
-     * Use this when create entity model with mass of fields.
-     * By using this constructor these fields will be considered to be the "dirty slate" of the entity.  In other words
-     * these fields as well as those set afterwards will be considered in any updates
+     * Creates a new EntityModel object with given field models Use this when
+     * create entity model with mass of fields. By using this constructor these
+     * fields will be considered to be the "dirty slate" of the entity. In other
+     * words these fields as well as those set afterwards will be considered in
+     * any updates
      *
-     * @param values - a collection of field models
+     * @param values
+     *            - a collection of field models
      */
     public EntityModel(Set<FieldModel> values) {
         this(values, EntityState.DIRTY);
     }
 
     /**
-     * Creates a new EntityModel object with given field models
-     * Use this when create entity model with mass of fields.
+     * Creates a new EntityModel object with given field models Use this when
+     * create entity model with mass of fields.
      *
-     * @param values      - a collection of field models
-     * @param entityState The initial state of the entity when constructing.  Once these fields have been initialised
-     *                    the entity is considered to be dirty
+     * @param values
+     *            - a collection of field models
+     * @param entityState
+     *            The initial state of the entity when constructing. Once these
+     *            fields have been initialised the entity is considered to be
+     *            dirty
      */
     public EntityModel(Set<FieldModel> values, EntityState entityState) {
         data = new DirtyHashMap(entityState);
@@ -145,11 +153,13 @@ public class EntityModel implements Entity{
     }
 
     /**
-     * Creates a new EntityModel object with solo string field
-     * The entity will be considered dirty and thus these fields will be updated
+     * Creates a new EntityModel object with solo string field The entity will
+     * be considered dirty and thus these fields will be updated
      *
-     * @param value - a collection of field models
-     * @param key   The key to the model
+     * @param value
+     *            - a collection of field models
+     * @param key
+     *            The key to the model
      */
     public EntityModel(String key, String value) {
         this();
@@ -167,8 +177,7 @@ public class EntityModel implements Entity{
     }
 
     /**
-     * Returns all dirty values.
-     * Used when sending the entity to be updated
+     * Returns all dirty values. Used when sending the entity to be updated
      *
      * @return a collection of field models
      */
@@ -179,7 +188,8 @@ public class EntityModel implements Entity{
     /**
      * getter of single field
      *
-     * @param key the fieldName
+     * @param key
+     *            the fieldName
      * @return the field of specified field name
      */
     public FieldModel getValue(String key) {
@@ -189,7 +199,8 @@ public class EntityModel implements Entity{
     /**
      * Remove a value from completely, different from setting the value to null
      *
-     * @param key the fieldName
+     * @param key
+     *            the fieldName
      */
     public void removeValue(String key) {
         data.remove(key);
@@ -198,7 +209,8 @@ public class EntityModel implements Entity{
     /**
      * setter of new entity value, all old fields are cleared
      *
-     * @param values - a collection of field models
+     * @param values
+     *            - a collection of field models
      */
     public EntityModel setValues(Set<FieldModel> values) {
         if (values != null) {
@@ -211,7 +223,8 @@ public class EntityModel implements Entity{
     /**
      * setter of single field, update if field exists
      *
-     * @param fieldModel the single field to update
+     * @param fieldModel
+     *            the single field to update
      */
     public EntityModel setValue(FieldModel fieldModel) {
         data.put(fieldModel.getName(), fieldModel);
@@ -229,4 +242,30 @@ public class EntityModel implements Entity{
         final StringFieldModel id = (StringFieldModel) getValue("id");
         return id == null ? null : id.getValue();
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        EntityModel other = (EntityModel) obj;
+        if (data == null) {
+            if (other.data != null)
+                return false;
+        } else if (!data.equals(other.data))
+            return false;
+        return true;
+    }
+
 }
