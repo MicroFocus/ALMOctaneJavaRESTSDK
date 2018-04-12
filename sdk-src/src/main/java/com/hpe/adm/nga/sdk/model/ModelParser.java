@@ -164,9 +164,11 @@ public final class ModelParser {
 
                     Collection<EntityModel> entities = getEntities(aObj.toString());
                     fldModel = new MultiReferenceFieldModel(strKey, entities);
-                } else {
+                } else if (!fieldObject.isNull("type") && !fieldObject.isNull("id")) {
                     EntityModel ref = getEntityModel(jsonEntityObj.getJSONObject(strKey));
                     fldModel = new ReferenceFieldModel(strKey, ref);
+                } else {
+                    fldModel = new ObjectFieldModel(strKey, aObj.toString());
                 }
 
             } else if (aObj instanceof String) {
