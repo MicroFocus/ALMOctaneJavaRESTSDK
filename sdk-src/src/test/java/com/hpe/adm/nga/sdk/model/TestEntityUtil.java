@@ -58,4 +58,86 @@ public class TestEntityUtil {
         assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
     }
 
+    @Test
+    public void testEntityModelEqualsByIdAndType() {
+        EntityModel entityModelOne = new EntityModel();
+        EntityModel entityModelTwo = new EntityModel();
+
+        assertTrue(EntityUtil.areEqualByIdAndType(entityModelOne, entityModelTwo));
+
+        entityModelOne.setValue(new StringFieldModel("id", "ID_HERE"));
+        entityModelTwo.setValue(new StringFieldModel("id", "ID_HERE"));
+
+        assertTrue(EntityUtil.areEqualByIdAndType(entityModelOne, entityModelTwo));
+
+        entityModelOne.setValue(new StringFieldModel("type", "work_item"));
+        entityModelTwo.setValue(new StringFieldModel("type", "work_item"));
+
+        assertTrue(EntityUtil.areEqualByIdAndType(entityModelOne, entityModelTwo));
+
+        entityModelOne.setValue(new StringFieldModel("type", "test"));
+
+        assertFalse(EntityUtil.areEqualByIdAndType(entityModelOne, entityModelTwo));
+
+        entityModelOne.setValue(new StringFieldModel("type", "work_item"));
+        entityModelOne.setValue(new StringFieldModel("id", "NEW_ID"));
+
+        assertFalse(EntityUtil.areEqualByIdAndType(entityModelOne, entityModelTwo));
+    }
+
+    @Test
+    public void testEntityModelEqualsByContent() {
+        EntityModel entityModelOne = new EntityModel();
+        EntityModel entityModelTwo = new EntityModel();
+
+        assertTrue(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        entityModelOne.setValue(new StringFieldModel("id", "ID_HERE"));
+        assertFalse(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        entityModelTwo.setValue(new StringFieldModel("id", "ID_HERE"));
+        assertTrue(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        entityModelOne.setValue(new LongFieldModel("newField", 1337L));
+        assertFalse(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        entityModelTwo.setValue(new LongFieldModel("newField", 1337L));
+        assertTrue(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        entityModelTwo.setValue(new LongFieldModel("newField", 1336L));
+        assertFalse(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        entityModelTwo.setValue(new LongFieldModel("newField", 1337L));
+        assertTrue(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        entityModelTwo.setValue(new DateFieldModel("newField", ZonedDateTime.now()));
+        assertFalse(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+    }
+
+    @Test
+    public void testReferenceFieldModelEqualsByContent() {
+        EntityModel entityModelOne = new EntityModel();
+        EntityModel refEntityModelOne = new EntityModel();
+        refEntityModelOne.setValue(new LongFieldModel("newField", 1337L));
+        entityModelOne.setValue(new ReferenceFieldModel("refEntity", refEntityModelOne));
+
+        EntityModel entityModelTwo = new EntityModel();
+        EntityModel refEntityModelTwo = new EntityModel();
+        refEntityModelTwo.setValue(new LongFieldModel("newField", 1337L));
+        entityModelTwo.setValue(new ReferenceFieldModel("refEntity", refEntityModelTwo));
+
+        assertTrue(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        //we have to go deeper
+        EntityModel refRefEntityModelOne = new EntityModel();
+        refRefEntityModelOne.setValue(new BooleanFieldModel("potato", true));
+        refEntityModelOne.setValue(new ReferenceFieldModel("refRefEntity", refRefEntityModelOne));
+
+        assertFalse(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+
+        refEntityModelTwo.setValue(new ReferenceFieldModel("refRefEntity", refRefEntityModelOne));
+        assertTrue(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
+    }
+
 }
