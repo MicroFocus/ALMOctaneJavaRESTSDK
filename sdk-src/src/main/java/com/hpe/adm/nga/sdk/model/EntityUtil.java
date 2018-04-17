@@ -2,6 +2,10 @@ package com.hpe.adm.nga.sdk.model;
 
 import java.util.*;
 
+/**
+ * Util methods for comparing {@link EntityModel} objects.
+ * Also has useful methods for handling {@link Collection Collection} of {@link EntityModel EntityModels}
+ */
 public class EntityUtil {
 
     /**
@@ -51,6 +55,14 @@ public class EntityUtil {
         return true;
     }
 
+    /**
+     * Check if two field models have the same content, uses {@link #areEqualByContent(EntityModel, EntityModel)} for {@link ReferenceFieldModel}
+     * and {@link #containsSameEntities(Collection, Collection, EntityEquator)} for {@link MultiReferenceFieldModel}
+     *
+     * @param leftFieldModel  {@link EntityModel}
+     * @param rightFieldModel {@link EntityModel}
+     * @return true if the field models have the same content, false otherwise
+     */
     public static boolean areFieldModelsEqualByContent(FieldModel leftFieldModel, FieldModel rightFieldModel) {
         if(!Objects.equals(leftFieldModel.getName(), rightFieldModel.getName())){
             return false;
@@ -72,6 +84,12 @@ public class EntityUtil {
         return Objects.equals(leftFieldModel.getValue(), rightFieldModel.getValue());
     }
 
+    /**
+     * Find a {@link FieldModel} by name in a {@link Collection}
+     * @param collection of {@link FieldModel}
+     * @param fieldName name of the field to look for
+     * @return FieldModel if found, null otherwise
+     */
     private static FieldModel findByFieldName(Collection<FieldModel> collection, String fieldName) {
         return collection
             .stream()

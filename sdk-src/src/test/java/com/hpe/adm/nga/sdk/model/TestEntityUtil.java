@@ -133,7 +133,6 @@ public class TestEntityUtil {
         EntityModel refRefEntityModelOne = new EntityModel();
         refRefEntityModelOne.setValue(new BooleanFieldModel("potato", true));
         refEntityModelOne.setValue(new ReferenceFieldModel("refRefEntity", refRefEntityModelOne));
-
         assertFalse(EntityUtil.areEqualByContent(entityModelOne, entityModelTwo));
 
         refEntityModelTwo.setValue(new ReferenceFieldModel("refRefEntity", refRefEntityModelOne));
