@@ -46,18 +46,17 @@ final class CreateHelper {
      */
     OctaneCollection<EntityModel> createEntities(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
 
-        OctaneCollection<EntityModel> newEntityModels = null;
+        OctaneCollection<EntityModel> newEntityModels;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels);
         String strJsonEntityModel = objBase.toString();
-        try {
-            OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.PostOctaneHttpRequest(octaneRequest.getFinalRequestUrl(), OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
-                            .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
-        } catch (Exception e) {
 
-            octaneRequest.handleException(e, true);
-        }
+        OctaneHttpRequest octaneHttpRequest =
+                new OctaneHttpRequest.PostOctaneHttpRequest(octaneRequest.getFinalRequestUrl(), OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
+                        .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+
+        newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
+
+        //TODO: partial support
 
         return newEntityModels;
     }

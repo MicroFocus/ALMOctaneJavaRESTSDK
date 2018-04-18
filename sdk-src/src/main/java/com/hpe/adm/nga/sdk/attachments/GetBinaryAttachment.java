@@ -41,16 +41,13 @@ public class GetBinaryAttachment {
      */
     public InputStream execute() throws RuntimeException {
         InputStream inputStream = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())
-                    .setAcceptType(OctaneHttpRequest.OCTET_STREAM_CONTENT_TYPE);
-            OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
-            if (response.isSuccessStatusCode()) {
-                inputStream = response.getInputStream();
-            }
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
+        OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())
+                .setAcceptType(OctaneHttpRequest.OCTET_STREAM_CONTENT_TYPE);
+        OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
+
+        if (response.isSuccessStatusCode()) {
+            inputStream = response.getInputStream();
         }
 
         return inputStream;

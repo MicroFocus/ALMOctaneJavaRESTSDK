@@ -67,7 +67,7 @@ public final class OctaneRequest {
 	 * @return entities ased on Http Request
 	 * @throws Exception if response parsing fails
 	 */
-	public final OctaneCollection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) throws Exception {
+	public final OctaneCollection<EntityModel> getEntitiesResponse(OctaneHttpRequest octaneHttpRequest) {
 
 		OctaneCollection<EntityModel> newEntityModels = null;
 
@@ -109,39 +109,4 @@ public final class OctaneRequest {
 
 	}
 
-	/**
-	 * Handle exceptions
-	 *
-	 * @param e              - exception
-	 * @param partialSupport - Is Partial ?
-	 */
-	public void handleException(Exception e, boolean partialSupport) {
-
-		if (e instanceof HttpResponseException) {
-
-			HttpResponseException httpResponseException = (HttpResponseException) e;
-			logger.debug(String.format(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString()));
-			if (partialSupport && httpResponseException.getStatusCode() == HTTPS_CONFLICT_STATUS_CODE) {
-				Collection<EntityModel> entities = ModelParser.getInstance().getEntities(httpResponseException.getContent());
-				Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(httpResponseException.getContent());
-				throw new OctanePartialException(errorModels, entities);
-			} else {
-				ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(httpResponseException.getContent());
-				throw new OctaneException(errorModel);
-			}
-		} else {
-			boolean traverse = true;
-			Throwable throwable = e;
-			while (traverse) {
-				Throwable nextThrowable = throwable.getCause();
-				if (nextThrowable == null || nextThrowable == throwable) {
-					traverse = false;
-				} else {
-					throwable = nextThrowable;
-				}
-			}
-			ErrorModel errorModel = new ErrorModel(throwable.getMessage());
-			throw new OctaneException(errorModel);
-		}
-	}
 }

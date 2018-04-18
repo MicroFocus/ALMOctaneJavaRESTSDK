@@ -57,27 +57,22 @@ public final class GetFieldMetadata extends MetadataOctaneRequest {
      * GetEntities Request execution of metadata's field info
      * Collection object
      */
-    public Collection<FieldMetadata> execute() throws RuntimeException {
+    public Collection<FieldMetadata> execute() {
 
         Collection<FieldMetadata> colEntitiesMetadata = null;
         String json = "";
-        try {
 
-            OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
+        OctaneHttpRequest octaneHttpRequest =
+                new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
-            if (response.isSuccessStatusCode()) {
+        if (response.isSuccessStatusCode()) {
 
-                json = response.getContent();
-                colEntitiesMetadata = getFieldMetadata(json);
-            }
-
-            logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
+            json = response.getContent();
+            colEntitiesMetadata = getFieldMetadata(json);
         }
 
+        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
         return colEntitiesMetadata;
 
     }

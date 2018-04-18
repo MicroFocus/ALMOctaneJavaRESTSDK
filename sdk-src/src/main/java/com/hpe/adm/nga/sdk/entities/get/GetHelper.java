@@ -38,14 +38,8 @@ final class GetHelper {
      * 2. Parse response to a new Collection object
      */
     final OctaneCollection<EntityModel> getEntityModels(final OctaneRequest octaneRequest) throws RuntimeException {
-        OctaneCollection<EntityModel> newEntityModels = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
-        }
-        return newEntityModels;
+        OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        return octaneRequest.getEntitiesResponse(octaneHttpRequest);
     }
 
     /**
@@ -53,16 +47,10 @@ final class GetHelper {
      * new EntityModel object
      */
     final EntityModel getEntityModel(final OctaneRequest octaneRequest) throws RuntimeException {
-        EntityModel newEntityModel = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())
-                            .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModel = octaneRequest.getEntityResponse(octaneHttpRequest);
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
-        }
-
-        return newEntityModel;
+        OctaneHttpRequest octaneHttpRequest =
+                new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())
+                        .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        return octaneRequest.getEntityResponse(octaneHttpRequest);
     }
+
 }
