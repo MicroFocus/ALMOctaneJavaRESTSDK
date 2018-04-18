@@ -39,7 +39,7 @@ public class GetBinaryAttachment {
      * GetEntities Request execution of binary data
      * return a stream with binary data
      */
-    public InputStream execute() throws RuntimeException {
+    public InputStream execute()  {
         InputStream inputStream = null;
 
         OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())

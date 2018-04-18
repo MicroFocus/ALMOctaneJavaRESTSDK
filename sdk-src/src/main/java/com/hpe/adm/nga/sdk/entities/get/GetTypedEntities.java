@@ -48,9 +48,9 @@ public abstract class GetTypedEntities<T extends TypedEntityModel, E extends Get
      * Carries out the execution and returns the entities
      *
      * @return The entities
-     * @throws RuntimeException Some type of error
+
      */
-    public final OctaneCollection<T> execute() throws RuntimeException {
+    public final OctaneCollection<T> execute()  {
         final OctaneCollection<EntityModel> entityModels = GetHelper.getInstance().getEntityModels(octaneRequest);
         return entityModels
                 .stream()

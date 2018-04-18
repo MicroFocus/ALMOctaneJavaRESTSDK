@@ -40,7 +40,7 @@ public class UpdateEntities {
      * 1. Request UpdateEntities Execution
      * 2. Parse response to a new Collection object
      */
-    public OctaneCollection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection<EntityModel> execute()  {
         return UpdateHelper.getInstance().updateEntityModels(entityModels, octaneRequest);
     }
 

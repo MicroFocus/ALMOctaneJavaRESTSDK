@@ -44,9 +44,9 @@ public abstract class DeleteTypedEntities<T extends TypedEntityModel, E extends 
     /**
      * Carries out the execution and returns a collection of deleted entities
      * @return The collection of typed entities
-     * @throws RuntimeException Some type of error
+
      */
-    public final OctaneCollection<T> execute() throws RuntimeException {
+    public final OctaneCollection<T> execute()  {
         final OctaneCollection<EntityModel> deletedEntities = DeleteHelper.getInstance().deleteEntityModels(octaneRequest);
         return deletedEntities
                 .stream()

@@ -37,7 +37,7 @@ final class GetHelper {
      * 1. Request GetEntities Execution
      * 2. Parse response to a new Collection object
      */
-    final OctaneCollection<EntityModel> getEntityModels(final OctaneRequest octaneRequest) throws RuntimeException {
+    final OctaneCollection<EntityModel> getEntityModels(final OctaneRequest octaneRequest)  {
         OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
         return octaneRequest.getEntitiesResponse(octaneHttpRequest);
     }
@@ -46,7 +46,7 @@ final class GetHelper {
      * 1. GetEntities Request execution with json data 2. Parse response to a
      * new EntityModel object
      */
-    final EntityModel getEntityModel(final OctaneRequest octaneRequest) throws RuntimeException {
+    final EntityModel getEntityModel(final OctaneRequest octaneRequest)  {
         OctaneHttpRequest octaneHttpRequest =
                 new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())
                         .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);

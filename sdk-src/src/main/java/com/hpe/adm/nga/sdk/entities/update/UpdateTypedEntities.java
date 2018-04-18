@@ -49,9 +49,9 @@ public abstract class UpdateTypedEntities <T extends TypedEntityModel, E extends
      * Carries out the execution and returns the entities
      *
      * @return The entities
-     * @throws RuntimeException Some type of error
+
      */
-    public final OctaneCollection<T> execute() throws RuntimeException {
+    public final OctaneCollection<T> execute()  {
         final List<EntityModel> convertedEntityModels = entityModels.stream().map(T::getWrappedEntityModel).collect(Collectors.toList());
         final OctaneCollection<EntityModel> updatedEntities = UpdateHelper.getInstance().updateEntityModels(convertedEntityModels, octaneRequest);
         return updatedEntities

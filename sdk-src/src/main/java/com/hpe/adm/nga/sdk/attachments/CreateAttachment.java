@@ -64,7 +64,7 @@ public class CreateAttachment {
      * Request Post Execution with Multipart content type
      * return a collection of entities models that have been created
      */
-    public OctaneCollection execute() throws RuntimeException {
+    public OctaneCollection execute()  {
         JSONObject data = ModelParser.getInstance().getEntityJSONObject(entity);
 
         OctaneHttpRequest octaneHttpRequest =

@@ -64,7 +64,7 @@ final class UpdateHelper {
      * @param entityModels the entitymodel
      * @param octaneRequest the octane request
      */
-    OctaneCollection<EntityModel> updateEntityModels(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
+    OctaneCollection<EntityModel> updateEntityModels(Collection<EntityModel> entityModels, OctaneRequest octaneRequest)  {
         OctaneCollection<EntityModel> newEntityModels;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels, true);
         String jsonEntityModel = objBase.toString();

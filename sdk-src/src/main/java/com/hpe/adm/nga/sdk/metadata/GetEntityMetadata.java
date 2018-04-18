@@ -74,7 +74,7 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
      * GetEntities Request execution of metadata's entity info
      * Collection object
      */
-    public Collection<EntityMetadata> execute() throws RuntimeException {
+    public Collection<EntityMetadata> execute()  {
 
         Collection<EntityMetadata> entitiesMetadata = null;
         String json = "";

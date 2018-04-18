@@ -34,7 +34,7 @@ public class GetEntity {
      * 1. GetEntities Request execution with json data 2. Parse response to a
      * new EntityModel object
      */
-    public EntityModel execute() throws RuntimeException {
+    public EntityModel execute()  {
         return GetHelper.getInstance().getEntityModel(octaneRequest);
     }
 

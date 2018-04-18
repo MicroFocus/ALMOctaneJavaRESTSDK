@@ -40,7 +40,7 @@ public class CreateEntities {
      * Request execution with json data 3. Parse response to a new
      * object
      */
-    public OctaneCollection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection<EntityModel> execute()  {
         return CreateHelper.getInstance().createEntities(entityModels, octaneRequest);
     }
 
