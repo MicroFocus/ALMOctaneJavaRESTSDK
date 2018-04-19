@@ -43,7 +43,7 @@ public class TestGoogleHttpClient {
      * Exception thrown every time any request is executed
      */
     private static HttpResponseException forbiddenException
-            = new HttpResponseException.Builder(401, "Unauthorized", new HttpHeaders()).build();
+            = new HttpResponseException.Builder(401, "{\"errorCode\":\"VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT\"}", new HttpHeaders()).build();
 
     @Test
     public void testRequestRetry() throws Exception {
