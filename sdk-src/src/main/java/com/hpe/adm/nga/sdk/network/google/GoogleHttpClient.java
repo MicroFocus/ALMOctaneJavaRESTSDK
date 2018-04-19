@@ -19,6 +19,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -293,17 +294,20 @@ public class GoogleHttpClient implements OctaneHttpClient {
         if(exception instanceof HttpResponseException) {
 
             HttpResponseException httpResponseException = (HttpResponseException) exception;
-
             logger.debug(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString());
 
-            //Try parsing the status message as json
+            ErrorModel errorModel;
             try {
-                ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(httpResponseException.getStatusMessage());
-                return new OctaneException(errorModel);
-            } catch (Exception ignored){}
+                //Try parsing the status message as json
+                errorModel = ModelParser.getInstance().getErrorModelFromjson(httpResponseException.getStatusMessage());
+            } catch (Exception ignored){
+                //Fallback
+                errorModel = new ErrorModel(exception.getMessage());
+            }
 
-            //Fallback
-            return new OctaneException(new ErrorModel(exception.getMessage()));
+            errorModel.setValue(new LongFieldModel("httpStatusCode", (long) httpResponseException.getStatusCode()));
+
+            return new OctaneException(errorModel);
         } else {
             return new OctaneException(new ErrorModel(exception.getMessage()));
         }
