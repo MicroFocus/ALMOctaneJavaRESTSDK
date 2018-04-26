@@ -38,9 +38,7 @@ public final class OctaneRequest {
 	protected final OctaneHttpClient octaneHttpClient;
 
 	// constant
-	private static final String LOGGER_RESPONSE_FORMAT = "Response: %d - %s - %s";
 	private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
-	private static final long HTTPS_CONFLICT_STATUS_CODE = 409;
 
 	public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
 		octaneUrl = new OctaneUrl(urlDomain);
