@@ -18,10 +18,8 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
-import com.hpe.adm.nga.sdk.model.ErrorModel;
-import com.hpe.adm.nga.sdk.model.LongFieldModel;
-import com.hpe.adm.nga.sdk.model.ModelParser;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.exception.OctanePartialException;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
@@ -123,9 +121,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
             // Initialize Cookies keys
             return response.isSuccessStatusCode();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             lastUsedAuthentication = null; //not reusable
-            throw createOctaneException(e);
+            throw e;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -141,7 +141,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {
-            throw createOctaneException(e);
+            throw wrapException(e);
         }
     }
 
@@ -195,7 +195,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 }
             }
         } catch (IOException e) {
-            throw createOctaneException(e);
+            throw new RuntimeException(e);
         }
         return httpRequest;
     }
@@ -206,8 +206,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @return {@link OctaneHttpResponse} created from the impl response object
      * @throws IOException if the response output stream stream cannot be read
      */
-    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) throws IOException {
-        return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), httpResponse.getContentCharset());
+    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) {
+        try {
+            return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), httpResponse.getContentCharset());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -230,6 +234,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         try {
             httpResponse = executeRequest(httpRequest);
+
             final OctaneHttpResponse octaneHttpResponse = convertHttpResponseToOctaneHttpResponse(httpResponse);
             final String eTag = httpResponse.getHeaders().getETag();
             if (eTag != null) {
@@ -237,18 +242,21 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 cachedRequestToResponse.put(octaneHttpRequest, octaneHttpResponse);
             }
             return octaneHttpResponse;
-        } catch (HttpResponseException e) {
 
-            final int statusCode = e.getStatusCode();
-            if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
-                return cachedRequestToResponse.get(octaneHttpRequest);
+        } catch (RuntimeException exception) {
+
+            //Return cached response
+            if(exception.getCause() instanceof HttpResponseException) {
+                HttpResponseException httpResponseException = (HttpResponseException) exception.getCause();
+                final int statusCode = httpResponseException.getStatusCode();
+                if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
+                    return cachedRequestToResponse.get(octaneHttpRequest);
+                }
             }
 
-            OctaneException octaneException = createOctaneException(e);
-
-            //Try to handle the exception
-            if (retryCount > 0) {
-
+            //Handle session timeout exception
+            if(retryCount > 0 && exception instanceof OctaneException) {
+                OctaneException octaneException = (OctaneException) exception;
                 StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
 
                 //Handle session timeout
@@ -264,53 +272,58 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 }
             }
 
-            //Handling octaneException failed
-            throw octaneException;
-
-        } catch (IOException e) {
-
-            throw createOctaneException(e);
+            throw exception;
         }
     }
 
-    private HttpResponse executeRequest(final HttpRequest httpRequest) throws IOException {
+    private HttpResponse executeRequest(final HttpRequest httpRequest) {
         logger.debug(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(), httpRequest.getHeaders().toString());
 
         final HttpContent content = httpRequest.getContent();
-
-        //CookieHandler.getDefault().
 
         // Make sure you don't log any http content send to the login rest api, since you don't want credentials in the logs
         if (content != null && logger.isDebugEnabled() && !httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)) {
             logHttpContent(content);
         }
 
-        HttpResponse response = httpRequest.execute();
+        HttpResponse response;
+        try {
+            response = httpRequest.execute();
+        } catch (Exception e) {
+            throw wrapException(e);
+        }
+
         logger.debug(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(), response.getHeaders().toString());
         return response;
     }
 
-    private static OctaneException createOctaneException(Exception exception) {
+    private static RuntimeException wrapException(Exception exception) {
         if(exception instanceof HttpResponseException) {
 
             HttpResponseException httpResponseException = (HttpResponseException) exception;
             logger.debug(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString());
 
-            ErrorModel errorModel;
-            try {
-                //Try parsing the status message as json
-                errorModel = ModelParser.getInstance().getErrorModelFromjson(httpResponseException.getStatusMessage());
-            } catch (Exception ignored){
-                //Fallback
-                errorModel = new ErrorModel(exception.getMessage());
+            List<String> exceptionContentList = new ArrayList<>();
+            exceptionContentList.add(httpResponseException.getStatusMessage());
+            exceptionContentList.add(httpResponseException.getContent());
+
+            for(String exceptionContent : exceptionContentList) {
+                try {
+                    if(ModelParser.getInstance().hasErrorModels(exceptionContent)) {
+                        Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
+                        Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
+                        return new OctanePartialException(errorModels, entities);
+                    } else {
+                        ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
+                        errorModel.setValue(new LongFieldModel("httpStatusCode", (long) httpResponseException.getStatusCode()));
+                        return new OctaneException(errorModel);
+                    }
+                } catch (Exception ignored) {}
             }
-
-            errorModel.setValue(new LongFieldModel("httpStatusCode", (long) httpResponseException.getStatusCode()));
-
-            return new OctaneException(errorModel);
-        } else {
-            return new OctaneException(new ErrorModel(exception.getMessage()));
         }
+
+        //In case nothing in exception is parsable
+        return new RuntimeException(exception);
     }
 
     /**

@@ -215,6 +215,12 @@ public final class ModelParser {
         return entityModels;
     }
 
+    public boolean hasErrorModels(String json) {
+        JSONTokener tokener = new JSONTokener(json);
+        JSONObject jsonObj = new JSONObject(tokener);
+        return jsonObj.has(JSON_ERRORS_NAME) && jsonObj.get(JSON_ERRORS_NAME) instanceof JSONArray;
+    }
+
     /**
      * GetEntities Error models based on a given error json string
      *
