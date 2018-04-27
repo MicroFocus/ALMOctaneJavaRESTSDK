@@ -15,10 +15,12 @@
 
 package com.hpe.adm.nga.sdk.network.google;
 
-import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponseException;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.exception.OctaneException;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +30,8 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import java.util.HashSet;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -39,12 +43,6 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @PrepareForTest(GoogleHttpClient.class)
 public class TestGoogleHttpClient {
 
-    /**
-     * Exception thrown every time any request is executed
-     */
-    private static HttpResponseException forbiddenException
-            = new HttpResponseException.Builder(401, "{\"errorCode\":\"VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT\"}", new HttpHeaders()).build();
-
     @Test
     public void testRequestRetry() throws Exception {
 
@@ -54,7 +52,13 @@ public class TestGoogleHttpClient {
         doReturn(true).when(googleHttpClientSpy, "authenticate", any(Authentication.class));
         Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
 
-        doThrow(forbiddenException)
+        //Create timeout exception, the same way octane does
+        ErrorModel errorModel = new ErrorModel(new HashSet<>());
+        errorModel.setValue(new StringFieldModel("errorCode", "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT"));
+        errorModel.setValue(new LongFieldModel("httpStatusCode", 401L));
+        OctaneException octaneException = new OctaneException(errorModel);
+
+        doThrow(octaneException)
                 .when(googleHttpClientSpy, "executeRequest", Matchers.any(HttpRequest.class));
 
         OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("http://url.com");
