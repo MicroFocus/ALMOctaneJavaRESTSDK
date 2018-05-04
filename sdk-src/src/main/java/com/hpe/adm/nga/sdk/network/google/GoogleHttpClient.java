@@ -315,7 +315,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         return new OctanePartialException(errorModels, entities);
                     } else {
                         ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
-                        errorModel.setValue(new LongFieldModel("httpStatusCode", (long) httpResponseException.getStatusCode()));
+                        errorModel.setValue(new LongFieldModel("http_status_code", (long) httpResponseException.getStatusCode()));
                         return new OctaneException(errorModel);
                     }
                 } catch (Exception ignored) {}
