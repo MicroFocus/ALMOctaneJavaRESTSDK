@@ -95,7 +95,7 @@ public class TestOctaneException extends TestBase {
 
             OctaneException octaneException = (OctaneException) ex;
             assertEquals("platform.modify_non_editable_field", octaneException.getError().getValue("error_code").getValue());
-            assertEquals(403L, octaneException.getError().getValue("httpStatusCode").getValue());
+            assertEquals(403L, octaneException.getError().getValue("http_status_code").getValue());
             return;
         }
 
