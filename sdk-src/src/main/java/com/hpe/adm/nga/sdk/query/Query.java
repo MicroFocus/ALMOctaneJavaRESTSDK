@@ -238,6 +238,7 @@ public class Query {
 
         /**
          * Wraps current builder content into a parenthesis
+         * @param queryBuilder {@link QueryBuilder} to wrap into parenthesis
          * @return enclose the inner query of the QueryBuilder in parenthesis
          */
         public static QueryBuilder parenthesis(QueryBuilder queryBuilder) {

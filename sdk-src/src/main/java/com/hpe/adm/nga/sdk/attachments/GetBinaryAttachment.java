@@ -37,7 +37,7 @@ public class GetBinaryAttachment {
 
     /**
      * GetEntities Request execution of binary data
-     * return a stream with binary data
+     * @return a stream with binary data
      */
     public InputStream execute()  {
         InputStream inputStream = null;

@@ -61,6 +61,8 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
 
     /**
      * Creates a new entity object
+     * @param octaneHttpClient {@link OctaneHttpClient} impl to execute http requests
+     * @param urlDomain base url of octane server
      */
     protected GetEntityMetadata(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain + "/" + TYPE_NAME_ENTITIES_NAME);
@@ -73,6 +75,7 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
     /**
      * GetEntities Request execution of metadata's entity info
      * Collection object
+     * @return Collection of {@link EntityMetadata}
      */
     public Collection<EntityMetadata> execute()  {
 

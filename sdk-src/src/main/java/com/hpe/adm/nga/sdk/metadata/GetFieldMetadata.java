@@ -56,6 +56,7 @@ public final class GetFieldMetadata extends MetadataOctaneRequest {
     /**
      * GetEntities Request execution of metadata's field info
      * Collection object
+     * @return Collection of {@link FieldMetadata} objects from the server
      */
     public Collection<FieldMetadata> execute() {
 

@@ -204,7 +204,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * Convert google implementation of {@link HttpResponse} to an implementation abstract {@link OctaneHttpResponse}
      * @param httpResponse implementation specific {@link HttpResponse}
      * @return {@link OctaneHttpResponse} created from the impl response object
-     * @throws IOException if the response output stream stream cannot be read
      */
     protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) {
         try {

@@ -197,8 +197,8 @@ public class EntityModel implements Entity{
 
     /**
      * setter of new entity value, all old fields are cleared
-     *
      * @param values - a collection of field models
+     * @return EntityModel with the field models set as a values
      */
     public EntityModel setValues(Set<FieldModel> values) {
         if (values != null) {
@@ -210,8 +210,8 @@ public class EntityModel implements Entity{
 
     /**
      * setter of single field, update if field exists
-     *
      * @param fieldModel the single field to update
+     * @return EntityModel with the field model set as a value
      */
     public EntityModel setValue(FieldModel fieldModel) {
         data.put(fieldModel.getName(), fieldModel);

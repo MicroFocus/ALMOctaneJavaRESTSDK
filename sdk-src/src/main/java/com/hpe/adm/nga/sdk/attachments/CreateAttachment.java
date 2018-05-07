@@ -62,7 +62,7 @@ public class CreateAttachment {
 
     /**
      * Request Post Execution with Multipart content type
-     * return a collection of entities models that have been created
+     * @return a collection of entities models that have been created
      */
     public OctaneCollection execute()  {
         JSONObject data = ModelParser.getInstance().getEntityJSONObject(entity);
