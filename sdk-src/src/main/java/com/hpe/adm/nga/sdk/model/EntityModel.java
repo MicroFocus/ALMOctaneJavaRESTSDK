@@ -32,7 +32,17 @@ import java.util.stream.Collectors;
  */
 public class EntityModel implements Entity{
 
+    /**
+     * ID field, should always be sent to the server (always dirty)
+     */
     public static final String ID_FIELD_NAME = "id";
+
+    /**
+     * Field that keeps track if the entity has changed on the server vs what is being sent from the client
+     * If it's contained in the entity model, it should always be sent back to the server (always dirty)
+     * This prevents users to overwrite other people's changes from their client side cached entity
+     */
+    public static final String CLIENT_LOCK_STAMP_FIELD_NAME = "client_lock_stamp";
 
     /**
      * Represents the state of the entity.  In most cases it will be DIRTY.  However - when an entity is retrieved from the
@@ -97,7 +107,10 @@ public class EntityModel implements Entity{
             return
                     entrySet()
                             .stream()
-                            .filter(entry -> entry.getKey().equals(ID_FIELD_NAME) || dirtyFields.contains(entry.getKey()))
+                            .filter(entry ->
+                                    entry.getKey().equals(ID_FIELD_NAME) ||
+                                    entry.getKey().equals(CLIENT_LOCK_STAMP_FIELD_NAME) ||
+                                    dirtyFields.contains(entry.getKey()))
                             .map(Entry::getValue)
                             .collect(Collectors.toSet());
         }
