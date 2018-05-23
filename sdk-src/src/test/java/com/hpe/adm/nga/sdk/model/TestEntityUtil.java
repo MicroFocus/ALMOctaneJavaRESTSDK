@@ -9,41 +9,60 @@ import static org.junit.Assert.assertTrue;
 
 public class TestEntityUtil {
 
+    private FieldModel fieldModelOne;
+    private FieldModel fieldModelTwo;
+
     @Test
-    @SuppressWarnings("rawtypes")
-    public void testAreFieldModelsEqualByContent() {
-
-        FieldModel fieldModelOne;
-        FieldModel fieldModelTwo;
-
-        fieldModelOne = new LongFieldModel("id", 1L);
-        fieldModelTwo = new StringFieldModel("id", "1");
-        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
-
+    public void testLongFieldModelEquals() {
         fieldModelOne = new LongFieldModel("id", 1L);
         fieldModelTwo = new LongFieldModel("id", 1L);
         assertTrue(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
+    }
 
-        fieldModelOne = new FloatFieldModel("id", 1.0F);
-        fieldModelTwo = new LongFieldModel("id", 1L);
-        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
-
-        fieldModelOne = new BooleanFieldModel("field", true);
-        fieldModelTwo = new StringFieldModel("field", "true");
-        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
-
+    @Test
+    public void testBooleanFieldModelEquals() {
         fieldModelOne = new BooleanFieldModel("field", true);
         fieldModelTwo = new BooleanFieldModel("field", false);
         assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
+    }
 
-        fieldModelOne = new BooleanFieldModel("field", true);
-        fieldModelTwo = new BooleanFieldModel("field", true);
-        assertTrue(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
-
+    @Test
+    public void testStringFieldModelEquals() {
         fieldModelOne = new StringFieldModel("field", "string");
         fieldModelTwo = new StringFieldModel("field", "string");
         assertTrue(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
+    }
 
+    @Test
+    public void testDifferentFieldModelEquals() {
+        fieldModelOne = new StringFieldModel("fieldOne", "string");
+        fieldModelTwo = new StringFieldModel("fieldTwo", "string");
+        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
+    }
+
+    @Test
+    public void testLongStringFieldModelEquals() {
+        fieldModelOne = new LongFieldModel("id", 1L);
+        fieldModelTwo = new StringFieldModel("id", "1");
+        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
+    }
+
+    @Test
+    public void testFloatLongFieldModelEquals() {
+        fieldModelOne = new FloatFieldModel("id", 1.0F);
+        fieldModelTwo = new LongFieldModel("id", 1L);
+        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
+    }
+
+    @Test
+    public void testBooleanStringFieldModelEquals() {
+        fieldModelOne = new BooleanFieldModel("field", true);
+        fieldModelTwo = new StringFieldModel("field", "true");
+        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
+    }
+
+    @Test
+    public void testDateFieldModelEquals() {
         ZonedDateTime dateTime = ZonedDateTime.now();
         fieldModelOne = new DateFieldModel("field", dateTime);
         fieldModelTwo = new DateFieldModel("field", dateTime);
@@ -51,10 +70,6 @@ public class TestEntityUtil {
 
         fieldModelOne = new DateFieldModel("field", dateTime);
         fieldModelTwo = new DateFieldModel("field", dateTime.plusHours(1L));
-        assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
-
-        fieldModelOne = new StringFieldModel("fieldOne", "string");
-        fieldModelTwo = new StringFieldModel("fieldTwo", "string");
         assertFalse(EntityUtil.areFieldModelsEqualByContent(fieldModelOne, fieldModelTwo));
     }
 
