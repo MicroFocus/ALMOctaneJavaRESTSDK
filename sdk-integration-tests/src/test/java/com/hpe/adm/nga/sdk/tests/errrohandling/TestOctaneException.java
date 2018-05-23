@@ -16,19 +16,16 @@ package com.hpe.adm.nga.sdk.tests.errrohandling;
 
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
-import com.hpe.adm.nga.sdk.model.*;
-import com.hpe.adm.nga.sdk.query.Query;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import com.hpe.adm.nga.sdk.utils.CommonUtils;
-import com.hpe.adm.nga.sdk.utils.QueryUtils;
-import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -60,7 +57,6 @@ public class TestOctaneException extends TestBase {
             Assert.assertTrue(ex instanceof OctanePartialException);
 
             //One should pass, one should fail
-            assertEquals(1, ((OctanePartialException) ex).getEntitiesModels().size());
             assertEquals(1, ((OctanePartialException) ex).getEntitiesModels().size());
             return;
         }
