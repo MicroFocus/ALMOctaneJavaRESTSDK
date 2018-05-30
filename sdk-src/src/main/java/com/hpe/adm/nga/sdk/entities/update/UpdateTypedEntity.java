@@ -42,7 +42,7 @@ public abstract class UpdateTypedEntity<T extends TypedEntityModel, E extends Up
      * Carries out the execution and returns the entity
      *
      * @return The entity
-     * @throws RuntimeException Some type of error
+
      */
     public final T execute() {
         return getEntityInstance(UpdateHelper.getInstance().updateEntityModel(entityModel.getWrappedEntityModel(), octaneRequest));

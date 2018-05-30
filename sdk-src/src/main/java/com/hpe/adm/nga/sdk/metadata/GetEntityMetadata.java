@@ -61,6 +61,8 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
 
     /**
      * Creates a new entity object
+     * @param octaneHttpClient {@link OctaneHttpClient} impl to execute http requests
+     * @param urlDomain base url of octane server
      */
     protected GetEntityMetadata(OctaneHttpClient octaneHttpClient, String urlDomain) {
         super(octaneHttpClient, urlDomain + "/" + TYPE_NAME_ENTITIES_NAME);
@@ -73,29 +75,24 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
     /**
      * GetEntities Request execution of metadata's entity info
      * Collection object
+     * @return Collection of {@link EntityMetadata}
      */
-    public Collection<EntityMetadata> execute() throws RuntimeException {
+    public Collection<EntityMetadata> execute()  {
 
         Collection<EntityMetadata> entitiesMetadata = null;
         String json = "";
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
-            OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
-            if (response.isSuccessStatusCode()) {
+        OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
+        OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
-                json = response.getContent();
-                entitiesMetadata = getEntitiesMetadata(json);
-            }
+        if (response.isSuccessStatusCode()) {
 
-            logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
-        } catch (Exception e) {
-            logger.debug("Fail to execute GET request.", e);
-            octaneRequest.handleException(e, false);
+            json = response.getContent();
+            entitiesMetadata = getEntitiesMetadata(json);
         }
 
+        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
         return entitiesMetadata;
-
     }
 
     /**

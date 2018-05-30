@@ -14,19 +14,17 @@
  */
 package com.hpe.adm.nga.sdk.model;
 
+import org.json.JSONObject;
+
 import java.util.Set;
 
 /**
  *
  * This class hold the ErrorModel objects and server as an error data holder
  * entities.
- *
- *
  */
-public class ErrorModel extends  EntityModel{
-	
-	private static final String ERROR_DESCRIPTION_KEY 	= "Description";
-	
+public class ErrorModel extends EntityModel{
+
 	/**
 	 * Creates a new ErrorModel object with given field models
 	 * 
@@ -35,21 +33,12 @@ public class ErrorModel extends  EntityModel{
 	 */
 	public ErrorModel(Set<FieldModel> value) {
 		super(value);
-		
-	}
-	
-	/**
-	 * Creates a new ErrorModel object with given error message
-	 * @param value -  error message
-	 */
-	public ErrorModel(String value) {
-		
-		super(ERROR_DESCRIPTION_KEY,value);
-			
 	}
 
-	public String getDescription() {
-		FieldModel descriptionModel = getValue(ErrorModel.ERROR_DESCRIPTION_KEY);
-		return descriptionModel != null ? String.valueOf(getValue(ErrorModel.ERROR_DESCRIPTION_KEY).getValue()) : null;
+	@Override
+	public String toString() {
+		JSONObject jsonObject = ModelParser.getInstance().getEntityJSONObject(this);
+		return jsonObject.toString();
 	}
+
 }

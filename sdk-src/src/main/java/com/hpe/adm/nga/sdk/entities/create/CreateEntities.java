@@ -39,8 +39,9 @@ public class CreateEntities {
      * 1. build Entity Json Object  2. Post
      * Request execution with json data 3. Parse response to a new
      * object
+     * @return a collection of entities models that have been created
      */
-    public OctaneCollection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection<EntityModel> execute()  {
         return CreateHelper.getInstance().createEntities(entityModels, octaneRequest);
     }
 

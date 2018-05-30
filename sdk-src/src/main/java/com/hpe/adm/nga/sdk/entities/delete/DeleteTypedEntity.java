@@ -37,9 +37,9 @@ public abstract class DeleteTypedEntity<T extends TypedEntityModel> extends Type
      * Carries out the execution and returns the deleted entity
      *
      * @return The deleted entity
-     * @throws RuntimeException Some type of error
+
      */
-    public final T execute() throws RuntimeException {
+    public final T execute()  {
         return getEntityInstance(DeleteHelper.getInstance().deleteEntityModel(octaneRequest));
     }
 }

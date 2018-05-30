@@ -30,7 +30,7 @@ public class Util {
      * Simple debug method used to print a list of EntityModel objects to the console
      * For each entity, it will try to print the type + the fields [name] or [text]
      * If the fields that it tries to print do not exists, it will only print the type of the entity
-     * @param entities
+     * @param entities {@link Collection} of {@link EntityModel}s to print
      */
     public static void printEntities(Collection<EntityModel> entities) {
         logger.info("Collection size: " + entities.size());

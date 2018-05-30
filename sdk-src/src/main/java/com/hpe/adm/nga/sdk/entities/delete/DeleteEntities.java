@@ -37,7 +37,7 @@ public class DeleteEntities {
      *
      * @return collection of deleted entities
      */
-    public OctaneCollection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection<EntityModel> execute()  {
         return DeleteHelper.getInstance().deleteEntityModels(octaneRequest);
     }
 

@@ -18,7 +18,8 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
-import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.exception.OctanePartialException;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
@@ -52,6 +53,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"; filename=\"blob\"";
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
+    private static final String ERROR_CODE_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT";
+
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
 
     protected HttpRequestFactory requestFactory;
@@ -118,11 +121,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
             // Initialize Cookies keys
             return response.isSuccessStatusCode();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             lastUsedAuthentication = null; //not reusable
-            ErrorModel errorModel = new ErrorModel(e.getMessage());
-            logger.error("Error in contacting server: {}, ", e.getMessage());
-            throw new OctaneException(errorModel);
+            throw e;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -138,9 +141,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {
-            ErrorModel errorModel = new ErrorModel(e.getMessage());
-            logger.error("Error in contacting server: ", e);
-            throw new OctaneException(errorModel);
+            throw wrapException(e);
         }
     }
 
@@ -194,7 +195,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Problem creating httprequest", e);
+            throw new RuntimeException(e);
         }
         return httpRequest;
     }
@@ -203,10 +204,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * Convert google implementation of {@link HttpResponse} to an implementation abstract {@link OctaneHttpResponse}
      * @param httpResponse implementation specific {@link HttpResponse}
      * @return {@link OctaneHttpResponse} created from the impl response object
-     * @throws IOException if the response output stream stream cannot be read
      */
-    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) throws IOException {
-        return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), httpResponse.getContentCharset());
+    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) {
+        try {
+            return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), httpResponse.getContentCharset());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -229,6 +233,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         try {
             httpResponse = executeRequest(httpRequest);
+
             final OctaneHttpResponse octaneHttpResponse = convertHttpResponseToOctaneHttpResponse(httpResponse);
             final String eTag = httpResponse.getHeaders().getETag();
             if (eTag != null) {
@@ -236,48 +241,41 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 cachedRequestToResponse.put(octaneHttpRequest, octaneHttpResponse);
             }
             return octaneHttpResponse;
-        } catch (HttpResponseException e) {
 
-            final int statusCode = e.getStatusCode();
-            if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
-                return cachedRequestToResponse.get(octaneHttpRequest);
+        } catch (RuntimeException exception) {
+
+            //Return cached response
+            if(exception.getCause() instanceof HttpResponseException) {
+                HttpResponseException httpResponseException = (HttpResponseException) exception.getCause();
+                final int statusCode = httpResponseException.getStatusCode();
+                if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
+                    return cachedRequestToResponse.get(octaneHttpRequest);
+                }
             }
 
-            //Try to handle the exception
-            if (retryCount > 0) {
+            //Handle session timeout exception
+            if(retryCount > 0 && exception instanceof OctaneException) {
+                OctaneException octaneException = (OctaneException) exception;
+                StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
 
-                //Try to handle 401/403 exceptions
-                //Attempt to re-authenticate in case of auth issue
-                if ((statusCode == HttpStatusCodes.STATUS_CODE_UNAUTHORIZED || statusCode == HttpStatusCodes.STATUS_CODE_FORBIDDEN) && lastUsedAuthentication != null) {
-                    logger.debug("Auth token invalid, trying to re-authenticate");
-
+                //Handle session timeout
+                if (errorCodeFieldModel != null && ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) && lastUsedAuthentication != null) {
+                    logger.debug("Auth token expired, trying to re-authenticate");
                     try {
-                        //NOTE: if the credentials are somehow invalidated after your Octane objects has been created,
-                        // this will retry authentication @code retryCount times, even if the @method authenticate() throws the exception
                         authenticate(lastUsedAuthentication);
                     } catch (OctaneException ex) {
                         logger.debug("Exception while retrying authentication: {}", ex.getMessage());
                     }
-
-                    //Only retry if you've actually handled the exception in some way
-                    //Retrying a 400 bad request makes no sense without some kind of handling
                     logger.debug("Retrying request, retries left: {}", retryCount);
                     return execute(octaneHttpRequest, --retryCount);
                 }
             }
 
-            logger.debug("The request was retried {} time(s), the exception could not be handled",
-                            HTTP_REQUEST_RETRY_COUNT - retryCount);
-
-            throw new RuntimeException("Problem executing httprequest", e);
-
-        } catch (IOException e) {
-            throw new RuntimeException("Problem executing httprequest", e);
+            throw exception;
         }
-
     }
 
-    private HttpResponse executeRequest(final HttpRequest httpRequest) throws IOException {
+    private HttpResponse executeRequest(final HttpRequest httpRequest) {
         logger.debug(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(), httpRequest.getHeaders().toString());
 
         final HttpContent content = httpRequest.getContent();
@@ -287,9 +285,44 @@ public class GoogleHttpClient implements OctaneHttpClient {
             logHttpContent(content);
         }
 
-        HttpResponse response = httpRequest.execute();
+        HttpResponse response;
+        try {
+            response = httpRequest.execute();
+        } catch (Exception e) {
+            throw wrapException(e);
+        }
+
         logger.debug(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(), response.getHeaders().toString());
         return response;
+    }
+
+    private static RuntimeException wrapException(Exception exception) {
+        if(exception instanceof HttpResponseException) {
+
+            HttpResponseException httpResponseException = (HttpResponseException) exception;
+            logger.debug(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString());
+
+            List<String> exceptionContentList = new ArrayList<>();
+            exceptionContentList.add(httpResponseException.getStatusMessage());
+            exceptionContentList.add(httpResponseException.getContent());
+
+            for(String exceptionContent : exceptionContentList) {
+                try {
+                    if(ModelParser.getInstance().hasErrorModels(exceptionContent)) {
+                        Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
+                        Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
+                        return new OctanePartialException(errorModels, entities);
+                    } else {
+                        ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
+                        errorModel.setValue(new LongFieldModel("http_status_code", (long) httpResponseException.getStatusCode()));
+                        return new OctaneException(errorModel);
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
+        //In case nothing in exception is parsable
+        return new RuntimeException(exception);
     }
 
     /**

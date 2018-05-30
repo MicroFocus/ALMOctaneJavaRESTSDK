@@ -55,7 +55,7 @@ public class OctaneException extends RuntimeException {
 
 	@Override
 	public String getMessage() {
-		return errorModel.getDescription();
+		return errorModel.toString();
 	}
 }
 

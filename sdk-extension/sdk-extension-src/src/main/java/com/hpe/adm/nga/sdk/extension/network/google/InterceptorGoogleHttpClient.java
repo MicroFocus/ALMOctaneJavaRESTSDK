@@ -68,7 +68,7 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
     }
 
     @Override
-    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) throws IOException {
+    protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) {
         responseInterceptors.forEach(responseInterceptor -> applyResponseInterceptor(responseInterceptor, httpResponse));
         return super.convertHttpResponseToOctaneHttpResponse(httpResponse);
     }

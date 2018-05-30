@@ -45,23 +45,16 @@ final class UpdateHelper {
      * @param octaneRequest the octane request
      */
     EntityModel updateEntityModel(EntityModel entityModel, OctaneRequest octaneRequest) {
-        EntityModel newEntityModel = null;
         JSONObject objBase = ModelParser.getInstance().getEntityJSONObject(entityModel, true);
         String jsonEntityModel = objBase.toString();
 
-        try {
-            OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.PutOctaneHttpRequest(octaneRequest.getFinalRequestUrl(),
-                            OctaneHttpRequest.JSON_CONTENT_TYPE,
-                            jsonEntityModel)
-                            .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        OctaneHttpRequest octaneHttpRequest =
+                new OctaneHttpRequest.PutOctaneHttpRequest(octaneRequest.getFinalRequestUrl(),
+                        OctaneHttpRequest.JSON_CONTENT_TYPE,
+                        jsonEntityModel)
+                        .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
 
-            newEntityModel = octaneRequest.getEntityResponse(octaneHttpRequest);
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
-        }
-
-        return newEntityModel;
+        return octaneRequest.getEntityResponse(octaneHttpRequest);
     }
 
     /**
@@ -71,20 +64,18 @@ final class UpdateHelper {
      * @param entityModels the entitymodel
      * @param octaneRequest the octane request
      */
-    OctaneCollection<EntityModel> updateEntityModels(Collection<EntityModel> entityModels, OctaneRequest octaneRequest) throws RuntimeException {
-        OctaneCollection<EntityModel> newEntityModels = null;
+    OctaneCollection<EntityModel> updateEntityModels(Collection<EntityModel> entityModels, OctaneRequest octaneRequest)  {
+        OctaneCollection<EntityModel> newEntityModels;
         JSONObject objBase = ModelParser.getInstance().getEntitiesJSONObject(entityModels, true);
         String jsonEntityModel = objBase.toString();
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.PutOctaneHttpRequest(
-                    octaneRequest.getFinalRequestUrl(),
-                    OctaneHttpRequest.JSON_CONTENT_TYPE, jsonEntityModel)
-                    .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
 
-        } catch (Exception e) {
-            octaneRequest.handleException(e, true);
-        }
+        OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.PutOctaneHttpRequest(
+                octaneRequest.getFinalRequestUrl(),
+                OctaneHttpRequest.JSON_CONTENT_TYPE, jsonEntityModel)
+                .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
+
+        //TODO: partial support exception handling
 
         return newEntityModels;
     }

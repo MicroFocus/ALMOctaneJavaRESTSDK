@@ -38,7 +38,7 @@ public class ExtendedOctaneClassFactory implements OctaneClassFactory {
     /**
      * Set the http proxy for all {@link OctaneHttpClient} created by this factory.
      * This does not affect exiting http clients in exiting instances of {@link com.hpe.adm.nga.sdk.Octane}
-     * @param httpProxy
+     * @param httpProxy {@link Proxy} to use when connecting to octane
      */
     public static void setHttpClientProxy(Proxy httpProxy){
         ExtendedOctaneClassFactory.httpProxy = httpProxy;

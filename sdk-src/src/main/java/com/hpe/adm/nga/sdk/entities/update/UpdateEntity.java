@@ -34,6 +34,7 @@ public class UpdateEntity {
     /**
      * 1. UpdateEntities Request execution with json data 2. Parse response to
      * a new EntityModel object
+     * @return the updated entity model from the server
      */
     public EntityModel execute() {
         return UpdateHelper.getInstance().updateEntityModel(entityModel, octaneRequest);

@@ -39,15 +39,9 @@ final class DeleteHelper {
      *
      * @param octaneRequest the octane request
      */
-    EntityModel deleteEntityModel(OctaneRequest octaneRequest) throws RuntimeException {
-        EntityModel newEntityModel = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
-            newEntityModel = octaneRequest.getEntityResponse(octaneHttpRequest);
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
-        }
-        return newEntityModel;
+    EntityModel deleteEntityModel(OctaneRequest octaneRequest)  {
+        OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
+        return octaneRequest.getEntityResponse(octaneHttpRequest);
     }
 
     /**
@@ -56,15 +50,8 @@ final class DeleteHelper {
      * @param octaneRequest the octane request
      * @return null
      */
-    OctaneCollection<EntityModel> deleteEntityModels(OctaneRequest octaneRequest) throws RuntimeException {
-        OctaneCollection<EntityModel> deletedEntityModels = null;
-        try {
-            OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
-            deletedEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
-        }
-
-        return deletedEntityModels;
+    OctaneCollection<EntityModel> deleteEntityModels(OctaneRequest octaneRequest)  {
+        OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
+        return octaneRequest.getEntitiesResponse(octaneHttpRequest);
     }
 }

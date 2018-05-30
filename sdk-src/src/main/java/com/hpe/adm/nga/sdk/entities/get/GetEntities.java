@@ -34,10 +34,11 @@ public class GetEntities {
     }
 
     /**
-     * 1. Request GetEntities Execution
+     * 1. Request GetEntities Execution <br>
      * 2. Parse response to a new Collection object
+     * @return a collection of entities models that have been retrieved
      */
-    public OctaneCollection<EntityModel> execute() throws RuntimeException {
+    public OctaneCollection<EntityModel> execute()  {
         return GetHelper.getInstance().getEntityModels(octaneRequest);
     }
 

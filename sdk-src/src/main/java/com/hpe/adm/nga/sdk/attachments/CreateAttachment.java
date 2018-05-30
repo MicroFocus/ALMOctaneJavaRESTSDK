@@ -62,21 +62,15 @@ public class CreateAttachment {
 
     /**
      * Request Post Execution with Multipart content type
-     * return a collection of entities models that have been created
+     * @return a collection of entities models that have been created
      */
-    public OctaneCollection execute() throws RuntimeException {
-        OctaneCollection newEntityModels = null;
-
+    public OctaneCollection execute()  {
         JSONObject data = ModelParser.getInstance().getEntityJSONObject(entity);
-        try {
-            OctaneHttpRequest octaneHttpRequest =
-                    new OctaneHttpRequest.PostBinaryOctaneHttpRequest(octaneRequest.getFinalRequestUrl(), inputStream, data.toString(), contentName, contentType)
-                            .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-            newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
-        } catch (Exception e) {
-            octaneRequest.handleException(e, false);
-        }
 
-        return newEntityModels;
+        OctaneHttpRequest octaneHttpRequest =
+                new OctaneHttpRequest.PostBinaryOctaneHttpRequest(octaneRequest.getFinalRequestUrl(), inputStream, data.toString(), contentName, contentType)
+                        .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+
+        return  octaneRequest.getEntitiesResponse(octaneHttpRequest);
     }
 }

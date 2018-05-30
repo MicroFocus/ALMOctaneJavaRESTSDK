@@ -41,9 +41,9 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
      * Carries out the execution and returns the entity
      *
      * @return The entity
-     * @throws RuntimeException Some type of error
+
      */
-    public final T execute() throws RuntimeException {
+    public final T execute()  {
         return getEntityInstance(GetHelper.getInstance().getEntityModel(octaneRequest));
     }
 

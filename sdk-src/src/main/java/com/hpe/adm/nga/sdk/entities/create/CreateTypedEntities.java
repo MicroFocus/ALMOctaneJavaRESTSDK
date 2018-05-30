@@ -45,9 +45,9 @@ public abstract class CreateTypedEntities<T extends TypedEntityModel, E extends 
     /**
      * Carries out the execution and returns a collection of created entities
      * @return The collection of typed entities
-     * @throws RuntimeException Some type of error
+
      */
-    public final OctaneCollection<T> execute() throws RuntimeException {
+    public final OctaneCollection<T> execute()  {
         final List<EntityModel> convertedEntityModels = entityModels.stream().map(T::getWrappedEntityModel).collect(Collectors.toList());
         final OctaneCollection<EntityModel> createdEntities = CreateHelper.getInstance().createEntities(convertedEntityModels, octaneRequest);
         return createdEntities
