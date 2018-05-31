@@ -166,6 +166,15 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
+* 12.55.32
+  * Octane server errors will not be properly parsed into an ErrorModel object
+  * ErrorModels from OctaneExceptions will now also contain the HTTP status code
+  * Added ObjectFieldModel for fields that contain JSON content but do not represent a relation to another entity model
+  * Added helper methods for comparing entity models
+* 12.55.8
+  * Fixed various bugs related to entity generation
+  * Fixed bug related to http session handling
+  * HTTP proxy settings are now logged
 * 12.55.5
   * Added Entity Generation
   * Added Etag support.  If the server resource has an etag then it is cached by the SDK for as long as the process is alive.
