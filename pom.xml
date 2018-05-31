@@ -26,7 +26,7 @@
     <name>HPE ALM Octane REST API SDK</name>
     <description>The Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP
     </description>
-    <url>https://github.com/HPSoftware/ALMOctaneJavaRESTSDK</url>
+    <url>https://github.com/MicroFocus/ALMOctaneJavaRESTSDK</url>
 
     <licenses>
         <license>
@@ -37,9 +37,9 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/HPSoftware/ALMOctaneJavaRESTSDK</url>
-        <connection>scm:git:https://github.com/HPSoftware/ALMOctaneJavaRESTSDK.git</connection>
-        <developerConnection>scm:git:ssh://github.com:HPSoftware/ALMOctaneJavaRESTSDK.git</developerConnection>
+        <url>https://github.com/MicroFocus/ALMOctaneJavaRESTSDK</url>
+        <connection>scm:git:https://github.com/MicroFocus/ALMOctaneJavaRESTSDK.git</connection>
+        <developerConnection>scm:git:ssh://github.com:MicroFocus/ALMOctaneJavaRESTSDK.git</developerConnection>
     </scm>
 
     <organization>

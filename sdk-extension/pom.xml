@@ -30,10 +30,9 @@
 
     <name>HPE ALM Octane REST API SDK Extension</name>
     <description>
-        Extension of ALM Octane Java REST SDK (https://github.com/HPSoftware/ALMOctaneJavaRESTSDK),
-        can be used for more advanced use cases.
+        Extension of ALM Octane Java REST SDK, can be used for more advanced use cases.
     </description>
-    <url>https://github.com/HPSoftware/sdk-extension</url>
+    <url>https://github.com/MicroFocus/ALMOctaneJavaRESTSDK</url>
 
     <modules>
         <module>sdk-extension-src</module>
