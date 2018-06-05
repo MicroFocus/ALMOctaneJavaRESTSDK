@@ -21,7 +21,7 @@
     <groupId>com.hpe.adm.nga.sdk</groupId>
     <artifactId>sdk-root</artifactId>
     <packaging>pom</packaging>
-    <version>12.55.32</version>
+    <version>12.60.21-SNAPSHOT</version>
 
     <name>HPE ALM Octane REST API SDK</name>
     <description>The Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP
