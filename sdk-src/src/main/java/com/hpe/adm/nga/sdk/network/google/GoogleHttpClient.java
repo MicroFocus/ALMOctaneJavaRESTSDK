@@ -161,7 +161,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     httpRequest.getHeaders().setAccept(((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType());
                     final String eTagHeader = requestToEtagMap.get(octaneHttpRequest);
                     if (eTagHeader != null) {
-                        httpRequest.getHeaders().setIfNoneMatch(eTagHeader);
+                        httpRequest.getHeaders().setETag(eTagHeader);
                     }
                     break;
                 }
