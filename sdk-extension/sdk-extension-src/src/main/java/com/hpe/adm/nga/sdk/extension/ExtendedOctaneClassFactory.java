@@ -45,15 +45,6 @@ public class ExtendedOctaneClassFactory implements OctaneClassFactory {
     }
 
     @Override
-    public OctaneHttpClient getOctaneHttpClient(String urlDomain) {
-        InterceptorGoogleHttpClient httpClient = new InterceptorGoogleHttpClient(urlDomain);
-        if(httpProxy != null){
-            httpClient.setHttpProxy(httpProxy);
-        }
-        return httpClient;
-    }
-
-    @Override
     public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
         return new ExtendedEntityList(octaneHttpClient, baseDomain + entityName);
     }
