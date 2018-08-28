@@ -1,0 +1,119 @@
+<!--
+  ~ © 2017 EntIT Software LLC, a Micro Focus company, L.P.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<idea-plugin version="2">
+    <id>com.hpe.adm.octane.ideplugins.intellij</id>
+
+    <name>ALM Octane</name>
+
+    <!--This is set by gradle build plugin-->
+    <version>0.0</version>
+
+    <vendor email="agm.cluj.dev@microfocus.com" url="https://www.microfocus.com">Micro Focus</vendor>
+
+    <description><![CDATA[
+        Enables integration with ALM Octane.<br>
+        Compatible with ALM Octane version 12.53.20 and above.
+    ]]></description>
+
+    <change-notes><![CDATA[
+      <b>2016.2-12.55.17.1</b>
+      <ul>
+        <li>Implemented compatibility with ALM Octane 12.55.17 (backwards compatible down to version 12.53.20)</li>
+        <li>Test suites and manual runs now have comment support</li>
+        <li>Fixed bug where the visible fields dropdown would not display the correct information</li>
+        <li>Fixed bug where the visible fields dropdown would not display properly while using the Windows theme</li>
+        <li>Comment item in "My Work" will now show the parent item type</li>
+      </ul>
+
+      <b>2016.2-12.55.13.1</b>
+      <ul>
+        <li>Micro Focus re-branding</li>
+        <li>User can now select what fields to see in a backlog item's details view</li>
+      </ul>
+
+      <b>2016.2-12.55.8.1</b>
+      <ul>
+        <li>Implemented compatibility with ALM Octane 12.55.8 (backwards compatible down to version 12.53.20)</li>
+      </ul>
+
+      <b>2016.2-12.55.6.1</b>
+      <ul>
+        <li>Added support for requirements and updated the commit message functionality</li>
+      </ul>
+
+      <b>2016.2-12.55.4.1</b>
+      <ul>
+        <li>Implemented compatibility with ALM Octane 12.55.4 (backwards compatible down to version 12.53.20)</li>
+      </ul>
+
+      <b>2016.2-12.53.22.2</b>
+      <ul>
+        <li>Fixed bug involving Gherkin script download</li>
+        <li>Fixed bug involving search</li>
+      </ul>
+
+      <b>2016.2-12.53.22.1</b>
+      <ul>
+        <li>Implemented compatibility with ALM Octane 12.53.22 (backwards compatible with 12.53.20 and 12.53.21)</li>
+      </ul>
+
+      <b>2016.2-12.53.21.1</b>
+      <ul>
+        <li>Implemented compatibility with ALM Octane 12.53.21 (backwards compatible with 12.53.20)</li>
+        <li>Fixed bug involving certain character sets</li>
+        <li>Fixed bug involving server session timeout</li>
+      </ul>
+
+      <b>2016.2-12.53.20.2</b>
+      <ul>
+        <li>Adjusted plugin name</li>
+        <li>Minor bug fixes</li>
+      </ul>
+    ]]>
+    </change-notes>
+
+    <idea-version since-build="162"/>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow factoryClass="com.hpe.adm.octane.ideplugins.intellij.ui.EntryPoint" anchor="bottom"
+                    icon="/images/favicon.png" secondary="true" id="ALM Octane"/>
+
+        <projectService
+                serviceInterface="com.hpe.adm.octane.ideplugins.intellij.settings.IdePersistentConnectionSettingsProvider"
+                serviceImplementation="com.hpe.adm.octane.ideplugins.intellij.settings.IdePersistentConnectionSettingsProvider"/>
+
+        <projectService serviceInterface="com.hpe.adm.octane.ideplugins.intellij.settings.IdePluginPersistentState"
+                        serviceImplementation="com.hpe.adm.octane.ideplugins.intellij.settings.IdePluginPersistentState"/>
+
+        <projectConfigurable id="com.hpe.adm.octane.ideplugins.intellij.settings.ConnectionSettingsConfigurable"
+                             displayName="ALM Octane Settings"
+                             instance="com.hpe.adm.octane.ideplugins.intellij.settings.ConnectionSettingsConfigurable"/>
+
+        <checkinHandlerFactory
+                implementation="com.hpe.adm.octane.ideplugins.intellij.gitcommit.OctaneCheckinHandlerFactory"/>
+    </extensions>
+
+    <application-components>
+        <!-- Add your application customcomponents here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project customcomponents here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+</idea-plugin>

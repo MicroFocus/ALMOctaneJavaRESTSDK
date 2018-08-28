@@ -12,6 +12,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 ############################################################################
-package com.microfocus.adm.nga.sdk.model;
+package com.microfocus.adm.almoctane.sdk.model;
 
 interface ${interfaceName} extends ${superInterfaceName} {}

@@ -12,17 +12,17 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 ############################################################################
-package com.microfocus.adm.nga.sdk.entities;
+package com.microfocus.adm.almoctane.sdk.entities;
 
-import com.microfocus.adm.nga.sdk.entities.create.CreateTypedEntities;
-import com.microfocus.adm.nga.sdk.entities.delete.DeleteTypedEntities;
-import com.microfocus.adm.nga.sdk.entities.delete.DeleteTypedEntity;
-import com.microfocus.adm.nga.sdk.entities.get.GetTypedEntities;
-import com.microfocus.adm.nga.sdk.entities.get.GetTypedEntity;
-import com.microfocus.adm.nga.sdk.entities.update.UpdateTypedEntities;
-import com.microfocus.adm.nga.sdk.entities.update.UpdateTypedEntity;
-import com.microfocus.adm.nga.sdk.model.${type}EntityModel;
-import com.microfocus.adm.nga.sdk.network.OctaneHttpClient;
+import com.microfocus.adm.almoctane.sdk.entities.create.CreateTypedEntities;
+import com.microfocus.adm.almoctane.sdk.entities.delete.DeleteTypedEntities;
+import com.microfocus.adm.almoctane.sdk.entities.delete.DeleteTypedEntity;
+import com.microfocus.adm.almoctane.sdk.entities.get.GetTypedEntities;
+import com.microfocus.adm.almoctane.sdk.entities.get.GetTypedEntity;
+import com.microfocus.adm.almoctane.sdk.entities.update.UpdateTypedEntities;
+import com.microfocus.adm.almoctane.sdk.entities.update.UpdateTypedEntity;
+import com.microfocus.adm.almoctane.sdk.model.${type}EntityModel;
+import com.microfocus.adm.almoctane.sdk.network.OctaneHttpClient;
 
 /**
 * Generated file.  Do not edit!
