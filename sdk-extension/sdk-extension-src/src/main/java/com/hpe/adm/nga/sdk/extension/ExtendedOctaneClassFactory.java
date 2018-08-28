@@ -29,20 +29,10 @@ import java.net.Proxy;
  */
 public class ExtendedOctaneClassFactory implements OctaneClassFactory {
 
-    private static Proxy httpProxy;
     private static ExtendedOctaneClassFactory instance = new ExtendedOctaneClassFactory();
 
     private ExtendedOctaneClassFactory(){}
     public static ExtendedOctaneClassFactory getInstance(){ return instance; }
-
-    /**
-     * Set the http proxy for all {@link OctaneHttpClient} created by this factory.
-     * This does not affect exiting http clients in exiting instances of {@link com.hpe.adm.nga.sdk.Octane}
-     * @param httpProxy {@link Proxy} to use when connecting to octane
-     */
-    public static void setHttpClientProxy(Proxy httpProxy){
-        ExtendedOctaneClassFactory.httpProxy = httpProxy;
-    }
 
     @Override
     public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
