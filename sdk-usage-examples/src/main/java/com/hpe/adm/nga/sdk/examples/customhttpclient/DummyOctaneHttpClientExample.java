@@ -38,17 +38,12 @@ public class DummyOctaneHttpClientExample {
         Authentication authentication
                 = new SimpleUserAuthentication("", "");
 
-        //Set custom implementation via system propery
-        System.getProperties().setProperty(
-                OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME,
-                "com.hpe.adm.nga.sdk.examples.customhttpclient.DummyOctaneClassFactory");
-
         int dummyDefectCount = ThreadLocalRandom.current().nextInt(0, 101);
         //Set the number of dummy entities the custom http client should make
         DummyOctaneHttpClient.dummyDefectCount = dummyDefectCount;
 
         Octane octane =
-                new Octane.Builder(authentication)
+                new Octane.Builder(authentication, new DummyOctaneHttpClient(""))
                         .Server("")
                         .sharedSpace(-1)
                         .workSpace(-1)

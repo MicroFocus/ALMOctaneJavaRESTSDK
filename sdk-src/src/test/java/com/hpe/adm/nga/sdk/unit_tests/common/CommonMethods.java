@@ -31,15 +31,20 @@ import java.util.Collection;
 import java.util.Set;
 
 public class CommonMethods {
+
     private final static String urlDomain = "http://localhost:8080";
     private final static String sharedSpace = "1001";
     private final static int workSpace = 1002;
 
     public static Octane getOctaneForTest() {
-        System.setProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME, TestOctaneClassFactory.class.getName());
-        final Octane octane = new Octane.Builder(new SimpleUserAuthentication("user", "password")).Server(getDomain()).sharedSpace(Long.parseLong(getSharedSpace())).workSpace(getWorkSpace()).build();
-        System.clearProperty(OctaneClassFactory.OCTANE_CLASS_FACTORY_CLASS_NAME);
-        return octane;
+        final OctaneHttpClient octaneHttpClient = PowerMockito.mock(OctaneHttpClient.class);
+        PowerMockito.when(octaneHttpClient.authenticate(Mockito.any())).thenReturn(true);
+
+        return new Octane.Builder(new SimpleUserAuthentication("user", "password"), octaneHttpClient)
+                .Server(getDomain())
+                .sharedSpace(Long.parseLong(getSharedSpace()))
+                .workSpace(getWorkSpace())
+                .build();
     }
 
     public static String getDomain() {
@@ -99,29 +104,4 @@ public class CommonMethods {
         return true;
     }
 
-    public static final class TestOctaneClassFactory implements OctaneClassFactory {
-
-        private static final TestOctaneClassFactory instance = new TestOctaneClassFactory();
-        private TestOctaneClassFactory(){}
-        public static OctaneClassFactory getInstance(){
-            return instance;
-        }
-
-        @Override
-        public OctaneHttpClient getOctaneHttpClient(String urlDomain) {
-            final OctaneHttpClient octaneHttpClient = PowerMockito.mock(OctaneHttpClient.class);
-            PowerMockito.when(octaneHttpClient.authenticate(Mockito.any())).thenReturn(true);
-            return octaneHttpClient;
-        }
-
-        @Override
-        public EntityList getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, String entityName) {
-            return new EntityList(octaneHttpClient, baseDomain + entityName);
-        }
-
-        @Override
-        public <T extends TypedEntityList> T getEntityList(OctaneHttpClient octaneHttpClient, String baseDomain, Class<T> entityListClass) {
-            return null;
-        }
-    }
 }
