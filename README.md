@@ -44,7 +44,7 @@ To enable this add the following to your project's POM file (assuming 12.55.5 be
  <build>
         <plugins>
             <plugin>
-                <groupId>com.hpe.adm.nga.sdk</groupId>
+                <groupId>com.microfocus.adm.nga.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
                 <version>12.55.5</version>
                 <executions>
@@ -152,7 +152,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 ```xml
     <dependencies>
         <dependency>
-            <groupId>com.hpe.adm.nga.sdk</groupId>
+            <groupId>com.microfocus.adm.nga.sdk</groupId>
             <artifactId>sdk-src</artifactId>
             <version>12.55.5</version>
         </dependency>
