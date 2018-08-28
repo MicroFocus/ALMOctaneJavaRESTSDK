@@ -38,7 +38,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 12.55.5 being the SDK version):
+To enable this add the following to your project's POM file (assuming 12.60.16 being the SDK version):
 
 ```xml
  <build>
@@ -46,7 +46,7 @@ To enable this add the following to your project's POM file (assuming 12.55.5 be
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>12.55.5</version>
+                <version>12.60.16</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -154,7 +154,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>12.55.5</version>
+            <version>12.60.16</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -166,6 +166,21 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
+* 12.60.16
+  * Rebranding: maven group id and package name has changed from **"com.hpe.adm.nga.sdk"** to **"com.microfocus.adm.almoctane.sdk"**
+    
+    To upgrade to the latest version of the sdk, you have to change your maven dependencies to match the new maven group id
+    ```xml
+        <dependencies>
+            <dependency>
+                <groupId>com.microfocus.adm.almoctane.sdk</groupId>
+                <artifactId>sdk-src</artifactId>
+                <version>12.60.16</version>
+            </dependency>
+        </dependencies>
+    ```
+    After which your import statements for SDK Classes in the consumer project need to be updated, you can easily perform a find and replace on your code from **"com.hpe.adm.nga.sdk"** to **"com.microfocus.adm.almoctane.sdk"** and the compilation errors will be resolved
+    
 * 12.55.32
   * Octane server errors will not be properly parsed into an ErrorModel object
   * ErrorModels from OctaneExceptions will now also contain the HTTP status code
