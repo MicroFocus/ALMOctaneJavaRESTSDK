@@ -19,10 +19,7 @@ import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.extension.entities.ExtendedEntityList;
-import com.hpe.adm.nga.sdk.extension.network.google.InterceptorGoogleHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-
-import java.net.Proxy;
 
 /**
  * Class factory for the extension
