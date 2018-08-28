@@ -113,7 +113,7 @@ Alternatively you can use the maven command line command to generate.  See the m
  
 ### Generated Directories
 
-The generator will create three directories under the `com.hpe.adm.nga.sdk` package:
+The generator will create three directories under the `com.microfocus.adm.nga.sdk` package:
 
 * entities
 * enums

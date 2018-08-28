@@ -12,10 +12,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 ############################################################################
-package com.hpe.adm.nga.sdk.enums;
+package com.microfocus.adm.nga.sdk.enums;
 
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.microfocus.adm.nga.sdk.model.EntityModel;
+import com.microfocus.adm.nga.sdk.model.StringFieldModel;
 import java.util.Arrays;
 
 /**
