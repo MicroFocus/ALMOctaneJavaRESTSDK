@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <version>12.60.21-SNAPSHOT</version>
 
-    <name>HPE ALM Octane REST API SDK</name>
+    <name>ALM Octane REST API SDK</name>
     <description>The Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP
     </description>
     <url>https://github.com/MicroFocus/ALMOctaneJavaRESTSDK</url>
@@ -43,15 +43,15 @@
     </scm>
 
     <organization>
-        <name>Hewlett Packard Enterprise</name>
-        <url>http://www.hpe.com</url>
+        <name>Micro Focus</name>
+        <url>http://microfocus.com</url>
     </organization>
 
     <developers>
         <developer>
             <name>Spencer Bruce</name>
-            <email>spencerbruce@hpe.com</email>
-            <organization>HPE</organization>
+            <email>spencerbruce@microfocus.com</email>
+            <organization>Micro Focus</organization>
         </developer>
     </developers>
 

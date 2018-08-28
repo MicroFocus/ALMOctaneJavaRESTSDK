@@ -36,7 +36,7 @@ import java.util.Collection;
  * Created by Dmitry Zavyalov on 09/05/2016.
  */
 
-@Ignore //Before remove ignore, please support username = "rest2@hpe.com" with password = "Welcome2"
+@Ignore //Before remove ignore, please support username = "rest2@microfocus.com" with password = "Welcome2"
 public class TestParallelExecution extends TestBase {
 
     @Test
@@ -86,7 +86,7 @@ public class TestParallelExecution extends TestBase {
     private Octane getOctaneClientSecond() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authentication authentication = new SimpleUserAuthentication("rest2@hpe.com", "Welcome2");
+        Authentication authentication = new SimpleUserAuthentication("rest2@microfocus.com", "Welcome2");
         String sharedSpaceId = "2002";
         String workspaceId = configuration.getString("sdk.workspaceId");
 

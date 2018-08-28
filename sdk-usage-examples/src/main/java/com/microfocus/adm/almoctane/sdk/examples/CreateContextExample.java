@@ -41,7 +41,7 @@ public class CreateContextExample {
         final Octane.Builder octaneBuilder = new Octane.Builder(clientAuthentication);
 
         // now we can add the server
-        octaneBuilder.Server("http://myd-vm10632.hpeswlab.net:8081");
+        octaneBuilder.Server("https://awesome-octane.saas.microfocus.com");
         // the sharedspace
         octaneBuilder.sharedSpace(1001);
         // the workspace
