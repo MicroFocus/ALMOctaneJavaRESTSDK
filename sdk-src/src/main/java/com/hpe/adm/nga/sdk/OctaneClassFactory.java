@@ -38,13 +38,6 @@ public interface OctaneClassFactory {
     String OCTANE_CLASS_FACTORY_CLASS_NAME = "octaneClassFactoryClassName";
 
     /**
-     * Create an instance of the OctaneHttpClient for the {@link Octane} to use
-     * @param urlDomain for the {@link OctaneHttpClient} constructor
-     * @return OctaneHttpClient implementation with urlDomain set
-     */
-    OctaneHttpClient getOctaneHttpClient(String urlDomain);
-
-    /**
      * Get the implementation of the {@link EntityList} used by the {@link Octane} object
      * @param octaneHttpClient used to create the
      * @param baseDomain for the entity list

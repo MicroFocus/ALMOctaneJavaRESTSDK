@@ -21,6 +21,7 @@ import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,6 +168,7 @@ public class Octane {
         private String urlDomain = "";
         private String idsharedSpaceId = null;
         private long workSpaceId = 0;
+        private OctaneHttpClient octaneHttpClient;
         private final Authentication authentication;
 
         //Functions
@@ -180,6 +182,20 @@ public class Octane {
         public Builder(Authentication authentication) {
             assert authentication != null;
             this.authentication = authentication;
+        }
+
+        /**
+         * Creates a new Builder object using the correct authentication
+         *
+         * @param authentication - Authentication object.  Cannot be null
+         * @param octaneHttpClient - Implementation of {@link OctaneHttpClient}. Cannot be null
+         * @throws AssertionError if the authentication or octaneHttpClient is null
+         */
+        public Builder(Authentication authentication, OctaneHttpClient octaneHttpClient) {
+            assert authentication != null;
+            assert octaneHttpClient != null;
+            this.authentication = authentication;
+            this.octaneHttpClient = octaneHttpClient;
         }
 
         /**
@@ -262,16 +278,15 @@ public class Octane {
             Octane objOctane = null;
 
             logger.info("Building Octane context using {}", this);
-            OctaneHttpClient octaneHttpClient = createOctaneHttpClient();
+
+            // Init default http client if it wasn't specified
+            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
+
             if (octaneHttpClient.authenticate(authentication)) {
                 objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
             }
 
             return objOctane;
-        }
-
-        private OctaneHttpClient createOctaneHttpClient() {
-            return OctaneClassFactory.getSystemParamImplementation().getOctaneHttpClient(urlDomain);
         }
 
         @Override
