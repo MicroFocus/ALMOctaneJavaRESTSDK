@@ -184,6 +184,7 @@ public final class ModelParser {
                 }
             } else {
                 logger.debug(strKey + LOGGER_INVALID_FIELD_SCHEME_FORMAT);
+                continue; //do not put it inside the model object to avoid a null pointer exception
             }
 
             fieldModels.add(fldModel);
