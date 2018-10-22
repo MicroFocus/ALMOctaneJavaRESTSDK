@@ -19,7 +19,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
 	<parent>
-        <groupId>com.hpe.adm.nga.sdk.extension</groupId>
+        <groupId>com.microfocus.adm.octane.sdk.extension</groupId>
         <artifactId>sdk-extension-root</artifactId>
         <version>12.60.21-SNAPSHOT</version>
     </parent>

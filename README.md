@@ -44,7 +44,7 @@ To enable this add the following to your project's POM file (assuming 12.60.21 b
  <build>
         <plugins>
             <plugin>
-                <groupId>com.hpe.adm.nga.sdk</groupId>
+                <groupId>com.microfocus.adm.octane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
                 <version>12.60.21</version>
                 <executions>
@@ -113,7 +113,7 @@ Alternatively you can use the maven command line command to generate.  See the m
  
 ### Generated Directories
 
-The generator will create three directories under the `com.hpe.adm.nga.sdk` package:
+The generator will create three directories under the `com.microfocus.adm.octane.sdk` package:
 
 * entities
 * enums
@@ -152,7 +152,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 ```xml
     <dependencies>
         <dependency>
-            <groupId>com.hpe.adm.nga.sdk</groupId>
+            <groupId>com.microfocus.adm.octane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
             <version>12.60.21</version>
         </dependency>
