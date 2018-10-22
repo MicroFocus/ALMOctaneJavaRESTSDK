@@ -63,7 +63,7 @@ public class GenerateModels {
      * @param outputDirectory Where all the generated files will be placed
      */
     public GenerateModels(final File outputDirectory) {
-        final File packageDirectory = new File(outputDirectory, "/com/hpe/adm/nga/sdk");
+        final File packageDirectory = new File(outputDirectory, "/com/microfocus/adm/octane/sdk");
         modelDirectory = new File(packageDirectory, "model");
         modelDirectory.mkdirs();
         entitiesDirectory = new File(packageDirectory, "entities");
