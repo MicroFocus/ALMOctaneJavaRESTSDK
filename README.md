@@ -165,8 +165,34 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 ```
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
+## Upgrading from 12.60.16 to 12.60.21
+
+### Maven group id change
+
+Maven group id changed from "com.hpe.adm.nga.sdk" to "com.microfocus.adm.octane.sdk" starting from version 12.60.21
+
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>com.microfocus.adm.octane.sdk</groupId>
+            <artifactId>sdk-src</artifactId>
+            <version>12.60.21</version>
+        </dependency>
+    </dependencies>
+```
+
+### Updating your code to be compatible with new version of the sdk
+
+Package names changed from "com.hpe.adm.nga.sdk" to "com.microfocus.adm.octane.sdk"
+
+Use your IDE or any text editor to find and replace "com.hpe.adm.nga.sdk" to "com.microfocus.adm.octane.sdk".
+
+This should replace import statements in java files and the group ids in the pom.xml / build.grade files, your code should now compile again.
+
 ## What's New
 * 12.60.21
+  * Re-branding from HPE to Microfocus
+* 12.60.16
   * Fixed bug where etag header was not being set properly
   * Fixed null pointer if the sdk encountered un-parsable entity JSON
   * Octane.OctaneBuilder now has constructor that allows passing a specific instance of OctaneHttpClient for the Octane object
