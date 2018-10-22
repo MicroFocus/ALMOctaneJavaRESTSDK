@@ -38,7 +38,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 12.60.16 being the SDK version):
+To enable this add the following to your project's POM file (assuming 12.60.21 being the SDK version):
 
 ```xml
  <build>
@@ -46,7 +46,7 @@ To enable this add the following to your project's POM file (assuming 12.60.16 b
             <plugin>
                 <groupId>com.hpe.adm.nga.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>12.60.16</version>
+                <version>12.60.21</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -154,7 +154,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.hpe.adm.nga.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>12.60.16</version>
+            <version>12.60.21</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -166,7 +166,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
-* 12.60.16
+* 12.60.21
   * Fixed bug where etag header was not being set properly
   * Fixed null pointer if the sdk encountered un-parsable entity JSON
   * Octane.OctaneBuilder now has constructor that allows passing a specific instance of OctaneHttpClient for the Octane object
