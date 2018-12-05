@@ -25,6 +25,8 @@ import java.util.Set;
  */
 public class ErrorModel extends EntityModel{
 
+	public static final String HTTP_STATUS_CODE_PROPERTY_NAME = "http_status_code";
+
 	/**
 	 * Creates a new ErrorModel object with given field models
 	 * 

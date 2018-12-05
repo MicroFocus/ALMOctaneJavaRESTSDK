@@ -260,7 +260,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             if(retryCount > 0 && exception instanceof OctaneException) {
                 OctaneException octaneException = (OctaneException) exception;
                 StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
-                LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue("http_status_code");
+                LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
 
                 //Handle session timeout
                 if (errorCodeFieldModel != null && httpStatusCode.getValue() == 401 &&
@@ -321,7 +321,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         return new OctanePartialException(errorModels, entities);
                     } else {
                         ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
-                        errorModel.setValue(new LongFieldModel("http_status_code", (long) httpResponseException.getStatusCode()));
+                        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
                         return new OctaneException(errorModel);
                     }
                 } catch (Exception ignored) {}

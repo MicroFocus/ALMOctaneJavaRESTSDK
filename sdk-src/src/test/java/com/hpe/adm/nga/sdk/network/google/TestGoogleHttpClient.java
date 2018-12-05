@@ -55,7 +55,7 @@ public class TestGoogleHttpClient {
         //Create timeout exception, the same way octane does
         ErrorModel errorModel = new ErrorModel(new HashSet<>());
         errorModel.setValue(new StringFieldModel("errorCode", "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT"));
-        errorModel.setValue(new LongFieldModel("httpStatusCode", 401L));
+        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, 401L));
         OctaneException octaneException = new OctaneException(errorModel);
 
         doThrow(octaneException)

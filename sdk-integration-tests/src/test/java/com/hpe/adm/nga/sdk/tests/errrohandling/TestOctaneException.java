@@ -17,6 +17,7 @@ package com.hpe.adm.nga.sdk.tests.errrohandling;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
@@ -91,7 +92,7 @@ public class TestOctaneException extends TestBase {
 
             OctaneException octaneException = (OctaneException) ex;
             assertEquals("platform.modify_non_editable_field", octaneException.getError().getValue("error_code").getValue());
-            assertEquals(403L, octaneException.getError().getValue("http_status_code").getValue());
+            assertEquals(403L, octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME).getValue());
             return;
         }
 
