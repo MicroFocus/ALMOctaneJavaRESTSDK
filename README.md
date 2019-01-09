@@ -10,7 +10,7 @@
 ```
 ### Gradle
 ```groovy
-compile group: 'com.hpe.adm.nga.sdk', name: 'sdk-src', version: '12.60.35'
+compile group: 'com.microfocus.adm.octane.sdk', name: 'sdk-src', version: '12.60.35'
 ```
 
 ## Introduction
