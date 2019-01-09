@@ -8,7 +8,7 @@
     <version>12.60.35</version>
 </dependency>
 ```
-### Gradle
+#### Gradle
 ```groovy
 compile group: 'com.microfocus.adm.octane.sdk', name: 'sdk-src', version: '12.60.35'
 ```
