@@ -16,16 +16,34 @@ package com.hpe.adm.nga.sdk.model;
 
 /**
  *
- * Interface of FieldModel
- *
+ * This class represents an Empty Field
  *
  */
-public interface FieldModel<T> {
+public class EmptyFieldModel implements FieldModel<Object> {
 
-	T getValue();
-	void setValue(String name, T value);
-	String getName();
-	default boolean hasValue() {
-		return true;
+	private String name;
+
+	public EmptyFieldModel(String strKey) {
+		setValue(strKey, null);
+	}
+
+	@Override
+	public Object getValue() {
+		return null;
+	}
+
+	@Override
+	public void setValue(String name, Object value) {
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public boolean hasValue() {
+		return false;
 	}
 }

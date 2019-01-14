@@ -149,7 +149,7 @@ public final class ModelParser {
             String strKey = (String) keys.next();
             Object aObj = jsonEntityObj.get(strKey);
             if (aObj == JSONObject.NULL) {
-                fldModel = new ReferenceFieldModel(strKey, null);
+                fldModel = new EmptyFieldModel(strKey);
             } else if (aObj instanceof Long || aObj instanceof Integer) {
                 fldModel = new LongFieldModel(strKey, Long.parseLong(aObj.toString()));
             } else if (aObj instanceof Double || aObj instanceof Float) {
