@@ -14,6 +14,7 @@
  */
 package com.hpe.adm.nga.sdk.metadata.features;
 
+import com.hpe.adm.nga.sdk.metadata.FieldMetadata.AccessLevel;
 
 /**
  *
@@ -24,9 +25,11 @@ public class RestFeature extends Feature{
 	
 	private String url; 
 	private String[] methods;
+	private AccessLevel access_level;
 	
 	/**
 	 * get url
+	 * 
 	 * @return The url of the rest feature
 	 */
 	public String getUrl(){
@@ -35,11 +38,21 @@ public class RestFeature extends Feature{
 	
 	/**
 	 * get supported methods
+	 * 
 	 * @return the supported methods (GET, POST, PUT, DELETE)
 	 */
 	public String[] getMethods(){
 		return methods;
 	}
+
+	/**
+	 * get access level of the methods
+	 * 
+	 * @return the Access Level of the Feature
+	 */
+	public AccessLevel getAccessLevel() {
+		return access_level;
+    }
 }
 
 
