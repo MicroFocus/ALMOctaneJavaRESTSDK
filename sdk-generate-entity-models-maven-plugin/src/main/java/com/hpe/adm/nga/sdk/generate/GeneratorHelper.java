@@ -56,12 +56,18 @@ public final class GeneratorHelper {
         int wordCounter = 0;
         for (final String splitField : splitFields) {
             wordCounter++;
-            if (wordCounter > 1 || theFirstLetterIsCapital) {
-                stringBuffer.append(splitField.substring(0, 1).toUpperCase());
-            } else {
-                stringBuffer.append(splitField.substring(0, 1).toLowerCase());
+            try {
+                if (wordCounter > 1 || theFirstLetterIsCapital) {
+                    stringBuffer.append(splitField.substring(0, 1).toUpperCase());
+                } else {
+                    stringBuffer.append(splitField.substring(0, 1).toLowerCase());
+                }
+                stringBuffer.append(splitField.substring(1));
+            } catch (StringIndexOutOfBoundsException e) {
+                e.getCause();
+                // we do nothing here and move to the next wordcounter
             }
-            stringBuffer.append(splitField.substring(1));
+
         }
 
         return getSanitisedFieldName(stringBuffer.toString());
