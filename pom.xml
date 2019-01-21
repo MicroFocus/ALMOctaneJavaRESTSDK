@@ -166,19 +166,20 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <build>
 
+    <build>
+        <!-- License headers are checked during the verify phase, the build will fail if a file is missing the header. -->
+        <!-- To fix license errors, use the following commands on the root pom. -->
+        <!-- mvn com.mycila:license-maven-plugin:format (add headers if missing) -->
+        <!-- mvn com.mycila:license-maven-plugin:remove (remove existing header) -->
         <plugins>
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
+                    <!-- Update this file accordingly to change the license everywhere -->
                     <header>LICENSE.txt</header>
-                    <properties>
-                        <owner></owner>
-                        <email></email>
-                    </properties>
                     <excludes>
                         <exclude>README.MD</exclude>
                         <exclude>.gitignore</exclude>
