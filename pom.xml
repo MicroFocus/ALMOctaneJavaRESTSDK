@@ -184,6 +184,9 @@
                         <exclude>README.MD</exclude>
                         <exclude>.gitignore</exclude>
                         <exclude>.LICENSE.txt</exclude>
+                        <exclude>*.html</exclude>
+                        <exclude>*.vm</exclude>
+                        <exclude>*.properties</exclude>
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>***/src/main/resources/**</exclude>
                     </excludes>
