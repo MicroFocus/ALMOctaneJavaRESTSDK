@@ -64,6 +64,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
+    protected Date lastSuccessfulAuthTimestamp;
     private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
     private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
@@ -111,7 +112,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
-    public boolean authenticate(Authentication authentication) {
+    public synchronized boolean authenticate(Authentication authentication) {
         //reset so it's not sent to auth request, server might return 304
         lwssoValue = null;
         octaneUserValue = null;
@@ -119,11 +120,14 @@ public class GoogleHttpClient implements OctaneHttpClient {
         try {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
-
             HttpResponse response = executeRequest(httpRequest);
 
-            // Initialize Cookies keys
-            return response.isSuccessStatusCode();
+            if (response.isSuccessStatusCode()) {
+                lastSuccessfulAuthTimestamp = new Date();
+                return true;
+            } else {
+                return false;
+            }
         } catch (RuntimeException e) {
             lastUsedAuthentication = null; //not reusable
             throw e;
@@ -132,7 +136,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
     }
 
-    public void signOut() {
+    public synchronized void signOut() {
         GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_SIGNOUT_URL);
         try {
             HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
@@ -205,6 +209,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     /**
      * Convert google implementation of {@link HttpResponse} to an implementation abstract {@link OctaneHttpResponse}
+     *
      * @param httpResponse implementation specific {@link HttpResponse}
      * @return {@link OctaneHttpResponse} created from the impl response object
      */
@@ -248,7 +253,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         } catch (RuntimeException exception) {
 
             //Return cached response
-            if(exception.getCause() instanceof HttpResponseException) {
+            if (exception.getCause() instanceof HttpResponseException) {
                 HttpResponseException httpResponseException = (HttpResponseException) exception.getCause();
                 final int statusCode = httpResponseException.getStatusCode();
                 if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
@@ -257,24 +262,37 @@ public class GoogleHttpClient implements OctaneHttpClient {
             }
 
             //Handle session timeout exception
-            if(retryCount > 0 && exception instanceof OctaneException) {
+            if (retryCount > 0 && exception instanceof OctaneException) {
                 OctaneException octaneException = (OctaneException) exception;
                 StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
                 LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
+
 
                 //Handle session timeout
                 if (errorCodeFieldModel != null && httpStatusCode.getValue() == 401 &&
                         (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())) &&
                         lastUsedAuthentication != null) {
 
-                    logger.debug("Auth token expired, trying to re-authenticate");
-                    try {
-                        authenticate(lastUsedAuthentication);
-                    } catch (OctaneException ex) {
-                        logger.debug("Exception while retrying authentication: {}", ex.getMessage());
+                    Date currentTimestamp = new Date();
+
+                    // The same http client should not attempt re-auth from multiple threads
+                    synchronized (this) {
+
+                        // If another thread already handled session timeout, skip the re-auth and just retry the request
+                        if (lastSuccessfulAuthTimestamp.getTime() < currentTimestamp.getTime()) {
+                            logger.debug("Auth token expired, trying to re-authenticate");
+                            try {
+                                authenticate(lastUsedAuthentication);
+                            } catch (OctaneException ex) {
+                                logger.debug("Exception while retrying authentication: {}", ex.getMessage());
+                            }
+                        } else {
+                            logger.debug("Auth token expired, but re-authentication was handled by another thread, will not re-authenticate");
+                        }
+
+                        logger.debug("Retrying request, retries left: {}", retryCount);
+                        return execute(octaneHttpRequest, --retryCount);
                     }
-                    logger.debug("Retrying request, retries left: {}", retryCount);
-                    return execute(octaneHttpRequest, --retryCount);
                 }
             }
 
@@ -304,7 +322,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     }
 
     private static RuntimeException wrapException(Exception exception) {
-        if(exception instanceof HttpResponseException) {
+        if (exception instanceof HttpResponseException) {
 
             HttpResponseException httpResponseException = (HttpResponseException) exception;
             logger.debug(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString());
@@ -313,9 +331,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
             exceptionContentList.add(httpResponseException.getStatusMessage());
             exceptionContentList.add(httpResponseException.getContent());
 
-            for(String exceptionContent : exceptionContentList) {
+            for (String exceptionContent : exceptionContentList) {
                 try {
-                    if(ModelParser.getInstance().hasErrorModels(exceptionContent)) {
+                    if (ModelParser.getInstance().hasErrorModels(exceptionContent)) {
                         Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
                         Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
                         return new OctanePartialException(errorModels, entities);
@@ -324,7 +342,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
                         return new OctaneException(errorModel);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
@@ -445,17 +464,18 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * Log jvm proxy system properties for debugging connection issues
      */
-    private static void logProxySystemProperties(){
-        String[]  proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
+    private static void logProxySystemProperties() {
+        String[] proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
         Arrays.stream(proxySysProperties)
                 .forEach(sysProp -> logger.debug(sysProp + ": " + System.getProperty(sysProp)));
     }
 
     /**
      * Log proxy for octane url domain using system wide {@link ProxySelector}
+     *
      * @param urlDomain base url of octane server
      */
-    private static void logSystemProxyForUrlDomain(String urlDomain){
+    private static void logSystemProxyForUrlDomain(String urlDomain) {
         try {
             List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(urlDomain));
             logger.debug("System proxies for " + urlDomain + ": " + proxies.toString());
