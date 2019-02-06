@@ -195,25 +195,29 @@ public class GenerateModels {
 	}
 
 	private Set<String> generatePhases(Octane octane) throws IOException {
-		final Map<String, Set<String[]>> phaseMap = new HashMap<>();
+		final Map<String, List<String[]>> phaseMap = new TreeMap<>();
 		final Collection<EntityModel> phases = octane.entityList("phases")
 				.get()
 				.addFields("id", "name", "entity")
 				.execute();
-		phases.forEach(phase -> {
-			final Set<String[]> phaseValueSet = new HashSet<>();
-			phaseValueSet.add(new String[] { phase.getId(),
-					((StringFieldModel) phase.getValue("name")).getValue()
-							.replaceAll(" ", "_")
-							.replaceAll("&", "N")
-							.toUpperCase() });
-			phaseMap.merge(
-					GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(), true),
-					phaseValueSet, (existingValues, newValues) -> {
-						existingValues.addAll(newValues);
-						return existingValues;
-					});
-		});
+		phases.stream()
+				.sorted(Comparator.comparing(phase -> ((StringFieldModel) phase.getValue("name")).getValue()))
+				.forEach(phase -> {
+					final List<String[]> phaseValueList = new ArrayList<>();
+					phaseValueList.add(new String[] { phase.getId(),
+							((StringFieldModel) phase.getValue("name")).getValue()
+									.replaceAll(" ", "_")
+									.replaceAll("&", "N")
+									.toUpperCase() });
+					phaseMap.merge(
+							GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(),
+									true),
+							phaseValueList, //
+							(existingValues, newValues) -> {
+								existingValues.addAll(newValues);
+								return existingValues;
+							});
+				});
 
 		final VelocityContext velocityContext = new VelocityContext();
 		velocityContext.put("phaseMap", phaseMap);
