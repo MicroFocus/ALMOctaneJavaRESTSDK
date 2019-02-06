@@ -57,10 +57,10 @@
 
     <modules>
         <module>sdk-src</module>
-        <module>sdk-integration-tests</module>
-        <module>sdk-usage-examples</module>
+<!--        <module>sdk-integration-tests</module>-->
+<!--        <module>sdk-usage-examples</module>-->
         <module>sdk-generate-entity-models-maven-plugin</module>
-        <module>sdk-extension</module>
+<!--        <module>sdk-extension</module>-->
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -75,6 +75,7 @@
 
         <commons-configuration.version>2.0</commons-configuration.version>
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
+        <commons-lang.version.version>3.8.1</commons-lang.version.version>
 
         <maven-release.version>2.5.3</maven-release.version>
         <maven-surefire.version>2.19.1</maven-surefire.version>
@@ -144,6 +145,11 @@
                 <version>${commons-beanutils.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
@@ -188,6 +194,25 @@
         <!-- mvn com.mycila:license-maven-plugin:format (add headers if missing) -->
         <!-- mvn com.mycila:license-maven-plugin:remove (remove existing header) -->
         <plugins>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>1.17.0</version>
+                <configuration>
+                    <java>
+                        <includes>
+                            <include>sdk-generate-entity-models-maven-plugin/src/**/java/**/*.java</include>
+                        </includes>
+                        <eclipse>
+                            <file>${session.executionRootDirectory}/eclipse-formatter.xml</file>
+                            <version>4.7.1</version>
+                        </eclipse>
+                        <importOrder>
+                            <file>${session.executionRootDirectory}/cool.importorder</file>
+                        </importOrder>
+                    </java>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
