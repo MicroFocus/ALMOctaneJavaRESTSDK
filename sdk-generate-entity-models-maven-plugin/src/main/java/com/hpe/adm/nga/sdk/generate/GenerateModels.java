@@ -373,10 +373,13 @@ public class GenerateModels {
 			entityListVelocityContext.put("type", GeneratorHelper.camelCaseFieldName(name));
 			entityListVelocityContext.put("url", restFeature.getUrl());
 			entityListVelocityContext.put("availableFields",
-					fieldMetadata.stream().map(FieldMetadata::getName).collect(Collectors.toList()));
+					fieldMetadata.stream().map(FieldMetadata::getName).sorted().collect(Collectors.toList()));
 			entityListVelocityContext.put("sortableFields",
-					fieldMetadata.stream().filter(FieldMetadata::isSortable).map(FieldMetadata::getName).collect(
-							Collectors.toList()));
+					fieldMetadata.stream()
+							.filter(FieldMetadata::isSortable)
+							.map(FieldMetadata::getName)
+							.sorted()
+							.collect(Collectors.toList()));
 
 			final String[] restFeatureMethods = restFeature.getMethods();
 			for (String restFeatureMethod : restFeatureMethods) {
