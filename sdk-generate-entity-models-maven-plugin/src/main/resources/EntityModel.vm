@@ -153,13 +153,15 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
         return value.stream().map(entityModel -> {
             final StringFieldModel type = (StringFieldModel) entityModel.getValue("type");
             final String referenceType = type.getValue();
+            switch(referenceType) {
             #foreach($type in ${referenceMetadata.getReferenceTypes()})
-                #if($foreach.count > 1)else #{end}if (referenceType.equals("${type}")) {
-				    return new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(entityModel);
-				}#{end}else {
-			        return#if(${referenceMetadata.hasNonTypedReturn()}) entityModel;
-                    #else new ${referenceMetadata.getTypedType()}Model(entityModel);
-                 #end}
+                case "${type}":
+                    return new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(entityModel);
+            #{end}
+            default:
+                return#if(${referenceMetadata.hasNonTypedReturn()}) entityModel;
+                #else new ${referenceMetadata.getTypedType()}Model(entityModel);#end
+            }
 		})
         #else
         return value.stream().map(${GeneratorHelper.camelCaseFieldName(${referenceMetadata.getReferenceTypes().iterator().next()})}EntityModel::new)
