@@ -16,7 +16,16 @@ package com.hpe.adm.nga.sdk.generate;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.velocity.Template;
@@ -64,7 +73,7 @@ public class GenerateModels {
 	/**
 	 * Initialise the class with the output directory. This should normally be
 	 * in a project that would be imported into the main Java project
-	 * 
+	 *
 	 * @param outputDirectory
 	 *            Where all the generated files will be placed
 	 */
@@ -95,7 +104,7 @@ public class GenerateModels {
 
 	/**
 	 * Run the actual generation
-	 * 
+	 *
 	 * @param clientId
 	 *            The client id
 	 * @param clientSecret
@@ -157,18 +166,15 @@ public class GenerateModels {
 				.execute();
 		final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
 		final Map<String, String> logicalNameToNameMap = new HashMap<>();
-		listNodes.forEach(listNode -> {
+
+		listNodes.stream().sorted(Comparator.comparing(this::getEntityModelName)).forEach(listNode -> {
 			final String rootId;
 			final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
 			final EntityModel list_rootValue = list_root.getValue();
 			final String name;
 			if (list_rootValue != null) {
 				rootId = list_rootValue.getId();
-				name = ((StringFieldModel) listNode.getValue("name")).getValue()
-						.replaceAll(" ", "_")
-						.replaceAll("^\\d", "_$0")
-						.replaceAll("\\W", "_")
-						.toUpperCase();
+				name = getEntityModelName(listNode);
 			} else {
 				rootId = listNode.getId();
 				name = GeneratorHelper.camelCaseFieldName(
@@ -185,13 +191,24 @@ public class GenerateModels {
 			}
 		});
 
+		final Map<String, List<String[]>> sortedMappedListNodes = new TreeMap<>();
+		mappedListNodes.values().forEach(strings -> sortedMappedListNodes.put(strings.get(0)[0], strings));
+
 		final VelocityContext velocityContext = new VelocityContext();
-		velocityContext.put("listNodes", mappedListNodes);
+		velocityContext.put("listNodes", sortedMappedListNodes);
 		final FileWriter fileWriter = new FileWriter(new File(enumsDirectory, "Lists.java"));
 		listsTemplate.merge(velocityContext, fileWriter);
 		fileWriter.close();
 
 		return logicalNameToNameMap;
+	}
+
+	private String getEntityModelName(EntityModel listNode) {
+		return ((StringFieldModel) listNode.getValue("name")).getValue()
+				.replaceAll(" ", "_")
+				.replaceAll("^\\d", "_$0")
+				.replaceAll("\\W", "_")
+				.toUpperCase();
 	}
 
 	private Set<String> generatePhases(Octane octane) throws IOException {
