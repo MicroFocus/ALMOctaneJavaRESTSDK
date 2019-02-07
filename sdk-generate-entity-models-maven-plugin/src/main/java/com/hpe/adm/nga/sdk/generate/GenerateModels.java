@@ -249,9 +249,9 @@ public class GenerateModels {
 			Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name,
 			String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases)
 			throws IOException {
-		final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields
-				: metadata.fields(name).execute();
-
+		final List<FieldMetadata> fieldMetadata = new ArrayList<>(
+				name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute());
+		fieldMetadata.sort(Comparator.comparing(FieldMetadata::getName));
 		final TreeMap<String, List<String>> collectedReferences = fieldMetadata.stream()
 				.filter(FieldMetadata::isRequired)
 				.collect(Collectors.toMap(FieldMetadata::getName, fieldMetadata1 -> {
