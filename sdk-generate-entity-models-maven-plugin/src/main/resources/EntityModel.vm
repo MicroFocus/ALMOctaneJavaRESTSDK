@@ -2,12 +2,16 @@
 #set ($subTypeOf = ${GeneratorHelper.getSubTypeOf(${entityMetadata})})
 package com.hpe.adm.nga.sdk.model;
 
+import javax.annotation.Generated;
+
 /**
- * <p>Entity Name: ${entityMetadata.name}</p>
- * <p>Label: ${entityMetadata.getLabel()}</p>
+ * Entity Name: ${entityMetadata.name}
+ * <br>
+ * Label: ${entityMetadata.getLabel()}
  *
- * Generated class.  <b>Do not manually edit.</b>
+ * Generated class. <b>Do not manually edit.</b>
  */
+@Generated("sdk-generate-entity-models-maven-plugin")
 @EntityMetadata(url = "${entityMetadataWrapper.getUrl()}", availableMethods = {#foreach(${availableMethod} in ${entityMetadataWrapper.getAvailableMethods()})EntityMetadata.AvailableMethods.${availableMethod}, #end} )
 public class ${className}EntityModel extends TypedEntityModel implements ${interfaceName} {
 
@@ -59,11 +63,13 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
 
 #macro (getter $field)
 /**
-	* Label: ${field.getLabel()}
-	* Description: ${field.getDescription()}
-	*/
-    #if ((${field.getName()} == "phase") && (${availablePhases.contains(${className})}))#getPhase()#elseif(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
-
+ * Label: ${field.getLabel()}
+#if($field.getDescription() != "")
+ * <br>
+ * Description: ${field.getDescription()}
+#end
+ */
+#if ((${field.getName()} == "phase") && (${availablePhases.contains(${className})}))#getPhase()#elseif(${field.getFieldType()} == "Reference")#getReference($field)#{else}#getNonReference($field)#end
 #end
 
 #macro (getPhase)

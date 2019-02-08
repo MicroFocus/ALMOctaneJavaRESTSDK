@@ -43,6 +43,8 @@ import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.query.Query;
+import com.hpe.adm.nga.sdk.query.QueryMethod;
 
 /**
  * <p>
@@ -189,6 +191,7 @@ public class GenerateModels {
 				.addFields("name", "list_root", "id", "logical_name")
 				.query(Query.not("list_root", QueryMethod.EqualTo, null).build())
 				.execute();
+
 		final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
 		final Map<String, String> logicalNameToNameMap = new HashMap<>();
 
@@ -251,6 +254,7 @@ public class GenerateModels {
 				.get()
 				.addFields("id", "name", "entity")
 				.execute();
+
 		phases.stream()
 				.sorted(Comparator.comparing(phase -> ((StringFieldModel) phase.getValue("name")).getValue()))
 				.forEach(phase -> {
@@ -409,12 +413,12 @@ public class GenerateModels {
 			entityListVelocityContext.put("type", GeneratorHelper.camelCaseFieldName(name));
 			entityListVelocityContext.put("url", restFeature.getUrl());
 			entityListVelocityContext.put("availableFields",
-					fieldMetadata.stream().map(FieldMetadata::getName).sorted().collect(Collectors.toList()));
+					fieldMetadata.stream().sorted(Comparator.comparing(FieldMetadata::getName)).collect(
+							Collectors.toList()));
 			entityListVelocityContext.put("sortableFields",
 					fieldMetadata.stream()
 							.filter(FieldMetadata::isSortable)
-							.map(FieldMetadata::getName)
-							.sorted()
+							.sorted(Comparator.comparing(FieldMetadata::getName))
 							.collect(Collectors.toList()));
 
 			final String[] restFeatureMethods = restFeature.getMethods();

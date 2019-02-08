@@ -1,5 +1,7 @@
 package com.hpe.adm.nga.sdk.entities;
 
+import javax.annotation.Generated;
+
 import com.hpe.adm.nga.sdk.entities.create.CreateTypedEntities;
 import com.hpe.adm.nga.sdk.entities.delete.DeleteTypedEntities;
 import com.hpe.adm.nga.sdk.entities.delete.DeleteTypedEntity;
@@ -11,14 +13,22 @@ import com.hpe.adm.nga.sdk.model.${type}EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 /**
-* Generated file.  Do not edit!
-*/
+ * Generated file.  Do not edit!
+ */
+@Generated("sdk-generate-entity-models-maven-plugin")
 public final class ${type}EntityList extends TypedEntityList {
 
     public enum AvailableFields implements TypedEntityList.AvailableFields {
         #foreach($field in $availableFields)
-            #if($foreach.count > 1), #end${helper.convertToUpperCase(${field})}("${field}")
-        #end;
+        /**
+         * Label: ${field.getLabel()}
+         #if($field.getDescription() != "")
+         * <br>
+         * Description: ${field.getDescription()}
+         #end
+         */
+        ${helper.convertToUpperCase(${field.name})}("${field.name}")#if($foreach.hasNext),#else;#end
+        #end
 
         private final String fieldName;
 
@@ -33,8 +43,15 @@ public final class ${type}EntityList extends TypedEntityList {
 
     public enum SortableFields implements TypedEntityList.SortableFields {
         #foreach($field in $sortableFields)
-            #if($foreach.count > 1), #end${helper.convertToUpperCase(${field})}("${field}")
-        #end;
+        /**
+         * Label: ${field.getLabel()}
+         #if($field.getDescription() != "")
+         * <br>
+         * Description: ${field.getDescription()}
+         #end
+        */
+        ${helper.convertToUpperCase(${field.name})}("${field.name}")#if($foreach.hasNext),#else;#end
+        #end
 
         private final String fieldName;
 
@@ -51,7 +68,7 @@ public final class ${type}EntityList extends TypedEntityList {
         super(octaneHttpClient, baseDomain);
     }
 
-    public ${type}Entities at(String entityId) {
+    public ${type}Entities at(final String entityId) {
         return new ${type}Entities(entityId);
     }
 
@@ -79,27 +96,27 @@ public final class ${type}EntityList extends TypedEntityList {
     #end
 
     /**
-    * This class hold the ${type}Entities object(An object that represent one ${type}Entity )
-    */
+     * This class hold the ${type}Entities object(An object that represent one ${type}Entity )
+     */
     public class ${type}Entities {
 
         private final String entityId;
 
         /**
-        * Set entityId parameter
-        *
-        * @param entityId The entity id
-        */
-        ${type}Entities(String entityId) {
+         * Set entityId parameter
+         *
+         * @param entityId The entity id
+         */
+        ${type}Entities(final String entityId) {
             this.entityId = entityId;
         }
 
 #macro (outputEntityGetter $crudMethod, $type)
         /**
-        * getter of a ${crudMethod}${type}Entity object with specific entity
-        *
-        * @return The ${crudMethod}${type}Entity object
-        */
+         * getter of a ${crudMethod}${type}Entity object with specific entity
+         *
+         * @return The ${crudMethod}${type}Entity object
+         */
         public ${crudMethod}${type}Entity ${crudMethod.toLowerCase()}() {
             return new ${crudMethod}${type}Entity(octaneHttpClient, baseDomain, entityId);
         }
