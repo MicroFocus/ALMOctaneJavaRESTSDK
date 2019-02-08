@@ -180,6 +180,7 @@ public class GenerateModels {
 			generateInterface(entityMetadatum, name, interfaceName);
 			generateEntityList(entityMetadatum, name, fieldMetadata);
 		}
+		octane.signOut();
 	}
 
 	private Map<String, String> generateLists(Octane octane) throws IOException {
