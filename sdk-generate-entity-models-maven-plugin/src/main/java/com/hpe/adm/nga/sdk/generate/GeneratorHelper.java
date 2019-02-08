@@ -73,13 +73,7 @@ public final class GeneratorHelper {
 	}
 
 	public static String convertToUpperCase(final String fieldName) {
-		final StringBuffer stringBuffer = new StringBuffer();
-		final String[] splitFields = fieldName.split("_");
-		for (final String splitField : splitFields) {
-			stringBuffer.append(splitField.toUpperCase());
-		}
-
-		return stringBuffer.toString();
+		return fieldName.toUpperCase();
 	}
 
 	public static String getSanitisedFieldName(final String fieldName) {
@@ -313,7 +307,8 @@ public final class GeneratorHelper {
 	 * Replaces accented characters in a String by unaccented equivalents.
 	 *
 	 * @see https://www.mail-archive.com/java-user@lucene.apache.org/msg23562.html
-	 * @param input - String
+	 * @param input
+	 *            String
 	 * @return cleaned String
 	 */
 	public final static String removeAccents(final String input) {
