@@ -38,13 +38,15 @@ public class GenerateModelsPlugin extends AbstractMojo {
 	private long sharedSpace;
 	@Parameter(required = true)
 	private long workSpace;
+	@Parameter(defaultValue = "false")
+	private boolean doNotValidateCertificate;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("Starting to generate entities");
 		try {
 			new GenerateModels(generatedSourcesDirectory).generate(clientId, clientSecret, server, sharedSpace,
-					workSpace);
+					workSpace, doNotValidateCertificate);
 		} catch (IOException e) {
 			throw new MojoExecutionException("Problem generating entities", e);
 		}

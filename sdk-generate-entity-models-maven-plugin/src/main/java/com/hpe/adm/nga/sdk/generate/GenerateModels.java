@@ -120,13 +120,36 @@ public class GenerateModels {
 	 */
 	public void generate(String clientId, String clientSecret, String server, long sharedSpace, long workSpace)
 			throws IOException {
+		this.generate(clientId, clientSecret, server, sharedSpace, workSpace, false);
+	}
+
+	/**
+	 * Run the actual generation
+	 *
+	 * @param clientId
+	 *            The client id
+	 * @param clientSecret
+	 *            The client secret
+	 * @param server
+	 *            The server including the protocol and port
+	 * @param sharedSpace
+	 *            The SS id
+	 * @param workSpace
+	 *            The WS id
+	 * @param doNotValidateCertificate
+	 *            Disables validating server SSL certificates
+	 * @throws IOException
+	 *             A problem with the generation of the entities
+	 */
+	public void generate(String clientId, String clientSecret, String server, long sharedSpace, long workSpace,
+			final boolean doNotValidateCertificate) throws IOException {
 		// work around for work_items_root
 		final Octane octanePrivate = new Octane.Builder(
 				new SimpleClientAuthentication(clientId, clientSecret, "HPE_REST_API_TECH_PREVIEW"))
 						.sharedSpace(sharedSpace)
 						.workSpace(workSpace)
 						.Server(server)
-						.build();
+						.build(doNotValidateCertificate);
 		final EntityMetadata work_items_root = octanePrivate.metadata()
 				.entities("work_item_root")
 				.execute()
@@ -141,7 +164,7 @@ public class GenerateModels {
 				.sharedSpace(sharedSpace)
 				.workSpace(workSpace)
 				.Server(server)
-				.build();
+				.build(doNotValidateCertificate);
 		final Metadata metadata = octane.metadata();
 		final Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
 		entityMetadata.add(work_items_root);
