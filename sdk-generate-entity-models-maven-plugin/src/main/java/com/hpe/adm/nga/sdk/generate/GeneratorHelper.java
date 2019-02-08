@@ -308,4 +308,142 @@ public final class GeneratorHelper {
 		entityMetadataWrapper.url = restFeature.getUrl();
 		return entityMetadataWrapper;
 	}
+
+	/**
+	 * Replaces accented characters in a String by unaccented equivalents.
+	 *
+	 * @see https://www.mail-archive.com/java-user@lucene.apache.org/msg23562.html
+	 * @param input - String
+	 * @return cleaned String
+	 */
+	public final static String removeAccents(final String input) {
+		final StringBuffer result = new StringBuffer();
+		for (int i = 0; i < input.length(); i++) {
+			switch (input.charAt(i)) {
+			case '\u00C0': // À
+			case '\u00C1': // Á
+			case '\u00C2': // Â
+			case '\u00C3': // Ã
+			case '\u00C5': // Å
+				result.append("A");
+				break;
+			case '\u00C4': // Ä
+			case '\u00C6': // Æ
+				result.append("AE");
+				break;
+			case '\u00C7': // Ç
+				result.append("C");
+				break;
+			case '\u00C8': // È
+			case '\u00C9': // É
+			case '\u00CA': // Ê
+			case '\u00CB': // Ë
+				result.append("E");
+				break;
+			case '\u00CC': // Ì
+			case '\u00CD': // Í
+			case '\u00CE': // Î
+			case '\u00CF': // Ï
+				result.append("I");
+				break;
+			case '\u00D0': // Ð
+				result.append("D");
+				break;
+			case '\u00D1': // Ñ
+				result.append("N");
+				break;
+			case '\u00D2': // Ò
+			case '\u00D3': // Ó
+			case '\u00D4': // Ô
+			case '\u00D5': // Õ
+			case '\u00D8': // Ø
+				result.append("O");
+				break;
+			case '\u00D6': // Ö
+			case '\u0152': // Œ
+				result.append("OE");
+				break;
+			case '\u00DE': // Þ
+				result.append("TH");
+				break;
+			case '\u00D9': // Ù
+			case '\u00DA': // Ú
+			case '\u00DB': // Û
+				result.append("U");
+				break;
+			case '\u00DC': // Ü
+				result.append("UE");
+				break;
+			case '\u00DD': // Ý
+			case '\u0178': // Ÿ
+				result.append("Y");
+				break;
+			case '\u00E0': // à
+			case '\u00E1': // á
+			case '\u00E2': // â
+			case '\u00E3': // ã
+			case '\u00E5': // å
+				result.append("a");
+				break;
+			case '\u00E4': // ä
+			case '\u00E6': // æ
+				result.append("ae");
+				break;
+			case '\u00E7': // ç
+				result.append("c");
+				break;
+			case '\u00E8': // è
+			case '\u00E9': // é
+			case '\u00EA': // ê
+			case '\u00EB': // ë
+				result.append("e");
+				break;
+			case '\u00EC': // ì
+			case '\u00ED': // í
+			case '\u00EE': // î
+			case '\u00EF': // ï
+				result.append("i");
+				break;
+			case '\u00F0': // ð
+				result.append("d");
+				break;
+			case '\u00F1': // ñ
+				result.append("n");
+				break;
+			case '\u00F2': // ò
+			case '\u00F3': // ó
+			case '\u00F4': // ô
+			case '\u00F5': // õ
+			case '\u00F8': // ø
+				result.append("o");
+				break;
+			case '\u00F6': // ö
+			case '\u0153': // œ
+				result.append("oe");
+				break;
+			case '\u00DF': // ß
+				result.append("ss");
+				break;
+			case '\u00FE': // þ
+				result.append("th");
+				break;
+			case '\u00F9': // ù
+			case '\u00FA': // ú
+			case '\u00FB': // û
+				result.append("u");
+				break;
+			case '\u00FC': // ü
+				result.append("ue");
+				break;
+			case '\u00FD': // ý
+			case '\u00FF': // ÿ
+				result.append("y");
+				break;
+			default:
+				result.append(input.charAt(i));
+				break;
+			}
+		}
+		return result.toString();
+	}
 }

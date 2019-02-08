@@ -57,10 +57,10 @@
 
     <modules>
         <module>sdk-src</module>
-        <module>sdk-integration-tests</module>
-        <module>sdk-usage-examples</module>
+<!--        <module>sdk-integration-tests</module>-->
+<!--        <module>sdk-usage-examples</module>-->
         <module>sdk-generate-entity-models-maven-plugin</module>
-        <module>sdk-extension</module>
+<!--        <module>sdk-extension</module>-->
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
