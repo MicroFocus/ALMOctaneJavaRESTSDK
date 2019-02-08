@@ -1,22 +1,41 @@
 package com.hpe.adm.nga.sdk.enums;
 
+import java.util.Arrays;
+
+import javax.annotation.Generated;
+
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
-import java.util.Arrays;
 
 /**
  * Generated class - do not edit!
  */
+@Generated("sdk-generate-entity-models-maven-plugin")
 public final class Lists {
 
 #foreach($listItemsSet in ${listNodes.entrySet()})
     #set($listItems = $listItemsSet.getValue())
     #set($rootModel = $listItems.get(0))
     #set($rootModelName = ${rootModel[0]})
+
+    /**
+     * #if($listItems.size() <= 1)EMPTY! #end${rootModel[2]}
+     */
     public enum $rootModelName {
         #foreach($listModel in $listItems)#if(!$foreach.first)
-        #if($foreach.count > 2), #end${listModel[0]}("${listModel[1]}")#end
-        #end;
+        /**
+         * ${listModel[2]}
+         */
+        ${listModel[0]}("${listModel[1]}")#if($foreach.hasNext),#else;#end
+        #end#end
+
+        #if($listItems.size() <= 1)
+        /**
+         * List is empty!
+         * @deprecated this list should be regenerated
+         */
+        DEADBEEF("$rootModelName is empty!!1");
+        #end
 
         public static final String ROOT_ID = "${rootModel[1]}";
 

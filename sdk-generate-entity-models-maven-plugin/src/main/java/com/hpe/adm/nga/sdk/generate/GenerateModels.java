@@ -187,32 +187,42 @@ public class GenerateModels {
 		final Collection<EntityModel> listNodes = octane.entityList("list_nodes")
 				.get()
 				.addFields("name", "list_root", "id", "logical_name")
+				.query(Query.not("list_root", QueryMethod.EqualTo, null).build())
 				.execute();
 		final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
 		final Map<String, String> logicalNameToNameMap = new HashMap<>();
 
-		listNodes.stream().sorted(Comparator.comparing(this::getEntityModelName)).forEach(listNode -> {
-			final String rootId;
-			final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
-			final EntityModel list_rootValue = list_root.getValue();
-			final String name;
-			if (list_rootValue != null) {
-				rootId = list_rootValue.getId();
-				name = getEntityModelName(listNode);
-			} else {
-				rootId = listNode.getId();
-				name = GeneratorHelper.camelCaseFieldName(
-						((StringFieldModel) listNode.getValue("name")).getValue().replaceAll("\\W", "_"));
-				logicalNameToNameMap.put(((StringFieldModel) listNode.getValue("logical_name")).getValue(), name);
-			}
-			final List<String[]> listHierarchy = mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>());
+		listNodes.stream()
+				.sorted(Comparator.comparing(listNode -> ((StringFieldModel) listNode.getValue("name")).getValue()))
+				.forEach(listNode -> {
+					final String rootId;
+					final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
+					final EntityModel list_rootValue = list_root.getValue();
+					rootId = list_rootValue.getId();
+					mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>()).add(new String[] { //
+							getEntityModelName(listNode), //
+							((StringFieldModel) listNode.getValue("id")).getValue(), //
+							((StringFieldModel) listNode.getValue("name")).getValue() //
+					});
+				});
 
-			final String[] listNodeInfo = { name, ((StringFieldModel) listNode.getValue("id")).getValue() };
-			if (list_rootValue == null) {
-				listHierarchy.add(0, listNodeInfo);
-			} else {
-				listHierarchy.add(listNodeInfo);
-			}
+		// since octane v12.60.35.103 does not return root list_nodes with
+		// previus call, we need to query them
+		final Collection<EntityModel> rootNodes = octane.entityList("list_nodes")
+				.get()
+				.addFields("name", "id", "logical_name")
+				.query(Query.statement("list_root", QueryMethod.EqualTo, null).build())
+				.execute();
+
+		rootNodes.forEach(rootNode -> {
+			final String name = getEntityModelName(rootNode);
+			logicalNameToNameMap.put(((StringFieldModel) rootNode.getValue("logical_name")).getValue(), name);
+			final List<String[]> strings = mappedListNodes.computeIfAbsent(rootNode.getId(), k -> new ArrayList<>());
+			strings.add(0, new String[] { //
+					name, //
+					rootNode.getId(), //
+					((StringFieldModel) rootNode.getValue("name")).getValue() //
+			});
 		});
 
 		final Map<String, List<String[]>> sortedMappedListNodes = new TreeMap<>();
@@ -228,7 +238,7 @@ public class GenerateModels {
 	}
 
 	private String getEntityModelName(EntityModel listNode) {
-		return ((StringFieldModel) listNode.getValue("name")).getValue()
+		return GeneratorHelper.removeAccents(((StringFieldModel) listNode.getValue("name")).getValue())
 				.replaceAll(" ", "_")
 				.replaceAll("^\\d", "_$0")
 				.replaceAll("\\W", "_")
