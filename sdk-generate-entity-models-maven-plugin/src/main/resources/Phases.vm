@@ -1,19 +1,31 @@
 package com.hpe.adm.nga.sdk.enums;
 
+import java.util.Arrays;
+
+import javax.annotation.Generated;
+
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
-import java.util.Arrays;
 
 /**
  * Generated class - do not edit!
  */
+@Generated("sdk-generate-entity-models-maven-plugin")
 public final class Phases {
 
 #foreach($phase in ${phaseMap.entrySet()})
     #set($phaseType = $phase.getKey())
+
+    /**
+     * Phases for "$phase.getValue().get(0)[3]" entity
+     */
     public enum ${phaseType}Phase {
         #foreach($phaseValue in $phase.getValue())
-        #if($foreach.count > 1), #end${phaseValue[1]}("${phaseValue[0]}")#end;
+        /**
+         * ${phaseValue[2]}
+         */
+        ${phaseValue[1]}("${phaseValue[0]}")#if($foreach.hasNext),#else;#end
+        #end
 
         private final String id;
 

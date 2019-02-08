@@ -255,11 +255,12 @@ public class GenerateModels {
 				.sorted(Comparator.comparing(phase -> ((StringFieldModel) phase.getValue("name")).getValue()))
 				.forEach(phase -> {
 					final List<String[]> phaseValueList = new ArrayList<>();
-					phaseValueList.add(new String[] { phase.getId(),
-							((StringFieldModel) phase.getValue("name")).getValue()
-									.replaceAll(" ", "_")
-									.replaceAll("&", "N")
-									.toUpperCase() });
+					phaseValueList.add(new String[] { //
+							phase.getId(), //
+							getEntityModelName(phase).toUpperCase(), //
+							((StringFieldModel) phase.getValue("name")).getValue(), //
+							((StringFieldModel) phase.getValue("entity")).getValue() //
+					});
 					phaseMap.merge(
 							GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(),
 									true),
