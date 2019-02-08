@@ -272,13 +272,23 @@ public class Octane {
          * @return a new Octane instance which has the set context and is correctly authenticated
          */
         public Octane build() {
+            return this.build(false);
+        }
+
+        /**
+         * The main build procedure which creates the {@link Octane} object and authenticates against the server
+         *
+         * @param doNotValidateCertificate - Disables validating server SSL certificates
+         * @return a new Octane instance which has the set context and is correctly authenticated
+         */
+        public Octane build(final boolean doNotValidateCertificate) {
 
             Octane objOctane = null;
 
             logger.info("Building Octane context using {}", this);
 
             // Init default http client if it wasn't specified
-            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
+            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, doNotValidateCertificate) : this.octaneHttpClient;
 
             if (octaneHttpClient.authenticate(authentication)) {
                 objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);

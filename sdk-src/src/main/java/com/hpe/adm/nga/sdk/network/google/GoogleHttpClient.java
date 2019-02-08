@@ -13,25 +13,51 @@
  */
 package com.hpe.adm.nga.sdk.network.google;
 
-import com.google.api.client.http.*;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
-import com.hpe.adm.nga.sdk.exception.OctaneException;
-import com.hpe.adm.nga.sdk.exception.OctanePartialException;
-import com.hpe.adm.nga.sdk.model.*;
-import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
-import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpCookie;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
-import java.util.*;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.api.client.http.ByteArrayContent;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpContent;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpMediaType;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
+import com.google.api.client.http.HttpStatusCodes;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.InputStreamContent;
+import com.google.api.client.http.MultipartContent;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.exception.OctaneException;
+import com.hpe.adm.nga.sdk.exception.OctanePartialException;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
+import com.hpe.adm.nga.sdk.model.ModelParser;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
+import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
+import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 
 /**
  * HTTP Client using Google's API
@@ -98,13 +124,26 @@ public class GoogleHttpClient implements OctaneHttpClient {
     };
 
     public GoogleHttpClient(final String urlDomain) {
+        this(urlDomain, false);
+    }
+
+    public GoogleHttpClient(final String urlDomain, final boolean doNotValidateCertificate) {
         this.urlDomain = urlDomain;
 
         logProxySystemProperties();
         logSystemProxyForUrlDomain(urlDomain);
 
-        HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-        requestFactory = HTTP_TRANSPORT.createRequestFactory(requestInitializer);
+        try {
+            final HttpTransport HTTP_TRANSPORT;
+            if (doNotValidateCertificate) {
+                HTTP_TRANSPORT = new NetHttpTransport.Builder().doNotValidateCertificate().build();
+            } else {
+                HTTP_TRANSPORT = new NetHttpTransport();
+            }
+            requestFactory = HTTP_TRANSPORT.createRequestFactory(requestInitializer);
+        } catch (final GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
