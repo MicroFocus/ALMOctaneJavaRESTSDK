@@ -200,6 +200,8 @@
                 <version>1.17.0</version>
                 <configuration>
                     <java>
+                        <trimTrailingWhitespace/>
+                        <removeUnusedImports/>
                         <includes>
                             <include>sdk-generate-entity-models-maven-plugin/src/**/java/**/*.java</include>
                         </includes>
