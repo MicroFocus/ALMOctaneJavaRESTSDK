@@ -380,6 +380,7 @@ public class GenerateModels {
 				.findAny();
 
 		interfaceVelocityContext.put("interfaceName", interfaceName);
+		interfaceVelocityContext.put("name", name);
 		interfaceVelocityContext.put("superInterfaceName",
 				(subTypeOfFeature
 						.map(feature -> GeneratorHelper.camelCaseFieldName(((SubTypesOfFeature) feature).getType()))

@@ -1,3 +1,9 @@
 package com.hpe.adm.nga.sdk.model;
 
+import javax.annotation.Generated;
+
+/**
+ * ${name} entity
+ */
+@Generated("sdk-generate-entity-models-maven-plugin")
 interface ${interfaceName} extends ${superInterfaceName} {}
