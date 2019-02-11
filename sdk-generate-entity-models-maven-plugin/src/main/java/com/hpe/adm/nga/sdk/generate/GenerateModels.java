@@ -342,6 +342,7 @@ public class GenerateModels {
 		velocityContext.put("logicalNameToListsMap", logicalNameToListsMap);
 		velocityContext.put("entityMetadataCollection", entityMetadata);
 		velocityContext.put("GeneratorHelper", GeneratorHelper.class);
+		velocityContext.put("SortHelper", SortHelper.class);
 		velocityContext.put("entityMetadataWrapper", GeneratorHelper.entityMetadataWrapper(entityMetadatum));
 		velocityContext.put("availablePhases", availablePhases);
 		velocityContext.put("requiredFields", requiredFields);

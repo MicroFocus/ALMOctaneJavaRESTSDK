@@ -144,7 +144,7 @@ public final class GeneratorHelper {
 		private final Set<String> allowedReferencesForAnnotation = new HashSet<>();
 		private boolean hasNonTypedReturn = false;
 		private boolean hasTypedReturn = false;
-		private final Set<String> referenceTypes = new HashSet<>();
+		private final Set<String> referenceTypes = new TreeSet<>();
 		private String typedType;
 
 		public String getReferenceClassForSignature() {

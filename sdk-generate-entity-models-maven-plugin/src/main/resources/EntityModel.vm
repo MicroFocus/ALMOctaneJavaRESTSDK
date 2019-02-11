@@ -27,7 +27,7 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
     #requiredFieldsForConstructor()
 
 #macro (requiredFieldsForConstructor)
-    #foreach($requiredFieldList in $requiredFields)
+    #foreach($requiredFieldList in ${SortHelper.sortRequiredFieldsByFieldName($requiredFields, 'parent')})
     public ${className}EntityModel(#outputRequiredFieldsConstructorSignature($requiredFieldList)) {
         this();
         #outputRequiredFieldsSetters($requiredFieldList)
