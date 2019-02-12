@@ -34,6 +34,7 @@ import org.apache.velocity.app.VelocityEngine;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
+import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -160,6 +161,7 @@ public class GenerateModels {
 		final Collection<FieldMetadata> work_items_rootFields = octanePrivate.metadata()
 				.fields("work_item_root")
 				.execute();
+
 		octanePrivate.signOut();
 
 		final Octane octane = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret))
@@ -186,11 +188,26 @@ public class GenerateModels {
 	}
 
 	private Map<String, String> generateLists(Octane octane) throws IOException {
-		final Collection<EntityModel> listNodes = octane.entityList("list_nodes")
+		// since octane v12.60.35.103 does not return root list_nodes within
+		// list_nodes call
+		final Collection<EntityModel> rootNodes = octane.entityList("list_nodes")
 				.get()
-				.addFields("name", "list_root", "id", "logical_name")
-				.query(Query.not("list_root", QueryMethod.EqualTo, null).build())
+				.addFields("name", "id", "logical_name")
+				.query(Query.statement("list_root", QueryMethod.EqualTo, null).build())
 				.execute();
+
+		final List<EntityModel> listNodes = new ArrayList<>(4000);
+		rootNodes.forEach(rootNode -> {
+			final OctaneCollection<EntityModel> models = octane.entityList("list_nodes")
+					.get()
+					.addFields("name", "list_root", "id", "logical_name")
+					.query(Query
+							.statement("list_root", QueryMethod.EqualTo,
+									Query.statement("id", QueryMethod.EqualTo, rootNode.getId()))
+							.build())
+					.execute();
+			listNodes.addAll(models);
+		});
 
 		final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
 		final Map<String, String> logicalNameToNameMap = new HashMap<>();
@@ -208,14 +225,6 @@ public class GenerateModels {
 							((StringFieldModel) listNode.getValue("name")).getValue() //
 					});
 				});
-
-		// since octane v12.60.35.103 does not return root list_nodes with
-		// previus call, we need to query them
-		final Collection<EntityModel> rootNodes = octane.entityList("list_nodes")
-				.get()
-				.addFields("name", "id", "logical_name")
-				.query(Query.statement("list_root", QueryMethod.EqualTo, null).build())
-				.execute();
 
 		rootNodes.forEach(rootNode -> {
 			final String name = getEntityModelName(rootNode);
