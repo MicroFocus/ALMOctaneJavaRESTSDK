@@ -6,4 +6,4 @@ import javax.annotation.Generated;
  * ${name} entity
  */
 @Generated("sdk-generate-entity-models-maven-plugin")
-interface ${interfaceName} extends ${superInterfaceName} {}
+public interface ${interfaceName} extends ${superInterfaceName} {}
