@@ -257,11 +257,12 @@ public class GenerateModels {
 				.toUpperCase();
 	}
 
-	private Set<String> generatePhases(Octane octane) throws IOException {
+	private Set<String> generatePhases(final Octane octane) throws IOException {
 		final Map<String, List<String[]>> phaseMap = new TreeMap<>();
 		final Collection<EntityModel> phases = octane.entityList("phases")
 				.get()
 				.addFields("id", "name", "entity")
+				.query(Query.statement("activity_level", QueryMethod.EqualTo, 0).build())
 				.execute();
 
 		phases.stream()
