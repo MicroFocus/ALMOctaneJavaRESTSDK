@@ -26,7 +26,7 @@ public final class Lists {
         /**
          * ${listModel[2]}
          */
-        ${listModel[0]}("${listModel[1]}")#if($foreach.hasNext),#else;#end
+        ${listModel[0]}("${listModel[1]}", "${listModel[2]}")#if($foreach.hasNext),#else;#end
         #end#end
 
         #if($listItems.size() <= 1)
@@ -40,17 +40,27 @@ public final class Lists {
         public static final String ROOT_ID = "${rootModel[1]}";
 
         private final String id;
+        private final String value;
 
-        $rootModelName(final String id) {
+        $rootModelName(final String id, final String value) {
             this.id = id;
+            this.value = value;
         }
 
         public final String getId() {
             return id;
         }
 
-        public static $rootModelName getListNodeFromId(String id) {
-            return Arrays.stream(${rootModelName}.values()).filter(listNode -> listNode.id.equals(id)).findFirst().orElse(null);
+        public final String getValue() {
+            return value;
+        }
+
+        public static $rootModelName getListNodeFromId(final String id) {
+            return Arrays.stream(${rootModelName}.values()).filter(listNode -> listNode.getId().equals(id)).findFirst().orElse(null);
+        }
+
+        public static $rootModelName getListNodeFromValue(final String value) {
+            return Arrays.stream(${rootModelName}.values()).filter(listNode -> listNode.getValue().equalsIgnoreCase(value)).findFirst().orElse(null);
         }
 
         public final EntityModel getAsEntityModel() {

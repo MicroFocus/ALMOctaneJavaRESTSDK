@@ -196,7 +196,7 @@ public class GenerateModels {
 				.query(Query.statement("list_root", QueryMethod.EqualTo, null).build())
 				.execute();
 
-		final List<EntityModel> listNodes = new ArrayList<>(4000);
+		final List<EntityModel> listNodes = new ArrayList<>();
 		rootNodes.forEach(rootNode -> {
 			final OctaneCollection<EntityModel> models = octane.entityList("list_nodes")
 					.get()
