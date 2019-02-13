@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.velocity.Template;
@@ -212,19 +213,33 @@ public class GenerateModels {
 		final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
 		final Map<String, String> logicalNameToNameMap = new HashMap<>();
 
-		listNodes.stream()
-				.sorted(Comparator.comparing(listNode -> ((StringFieldModel) listNode.getValue("name")).getValue()))
-				.forEach(listNode -> {
-					final String rootId;
-					final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
-					final EntityModel list_rootValue = list_root.getValue();
-					rootId = list_rootValue.getId();
-					mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>()).add(new String[] { //
-							getEntityModelName(listNode), //
-							((StringFieldModel) listNode.getValue("id")).getValue(), //
-							((StringFieldModel) listNode.getValue("name")).getValue() //
+		listNodes.stream().sorted(Comparator.comparing(this::getEntityModelName)).forEach(listNode -> {
+			final String rootId;
+			final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
+			final EntityModel list_rootValue = list_root.getValue();
+			rootId = list_rootValue.getId();
+			mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>()).add(new String[] { //
+					getEntityModelName(listNode), //
+					((StringFieldModel) listNode.getValue("id")).getValue(), //
+					((StringFieldModel) listNode.getValue("name")).getValue() //
+			});
+		});
+
+		// deduplicate list entries
+		mappedListNodes.forEach((key, value) -> {
+			final Map<String, List<String[]>> deDupMap = new TreeMap<>();
+			value.forEach(strings -> {
+				deDupMap.computeIfAbsent(strings[0], k -> new ArrayList<>()).add(strings);
+			});
+			value = deDupMap.values().stream().peek(list -> {
+				if (list.size() > 1) {
+					final AtomicInteger counter = new AtomicInteger();
+					list.forEach(strings -> {
+						strings[0] += "__" + (counter.getAndIncrement() + 1);
 					});
-				});
+				}
+			}).flatMap(Collection::stream).collect(Collectors.toList());
+		});
 
 		rootNodes.forEach(rootNode -> {
 			final String name = getEntityModelName(rootNode);
