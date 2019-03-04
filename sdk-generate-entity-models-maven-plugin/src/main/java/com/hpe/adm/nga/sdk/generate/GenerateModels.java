@@ -265,11 +265,12 @@ public class GenerateModels {
 	}
 
 	private String getEntityModelName(EntityModel listNode) {
-		return GeneratorHelper.removeAccents(((StringFieldModel) listNode.getValue("name")).getValue())
-				.replaceAll(" ", "_")
-				.replaceAll("^\\d", "_$0")
-				.replaceAll("\\W", "_")
-				.toUpperCase();
+		return GeneratorHelper.handleSingeUnderscoreEnum(
+				GeneratorHelper.removeAccents(((StringFieldModel) listNode.getValue("name")).getValue())
+						.replaceAll(" ", "_")
+						.replaceAll("^\\d", "_$0")
+						.replaceAll("\\W", "_")
+						.toUpperCase());
 	}
 
 	private Set<String> generatePhases(final Octane octane) throws IOException {

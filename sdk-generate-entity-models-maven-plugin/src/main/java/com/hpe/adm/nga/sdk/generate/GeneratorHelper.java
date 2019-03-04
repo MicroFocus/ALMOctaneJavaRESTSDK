@@ -441,4 +441,19 @@ public final class GeneratorHelper {
 		}
 		return result.toString();
 	}
+
+	/**
+	 * Takes care of wild enums containing only '_' in name. deduplication
+	 * should run after this step
+	 *
+	 * @param input
+	 *            enum name
+	 * @return "_NONE" if enum has name '_', else original name wil be returned
+	 */
+	public final static String handleSingeUnderscoreEnum(final String input) {
+		if (input.replaceAll("\\_", "").length() == 0) {
+			return "_NONE";
+		}
+		return input;
+	}
 }
