@@ -60,6 +60,7 @@ public class FieldMetadata {
 	private boolean filterable;
 	private boolean groupable;
 	private boolean sortable;
+	private boolean selectable;
 	private boolean auditable;
 	private boolean can_modify_auditable;
 	private boolean returned_by_default;
@@ -320,4 +321,8 @@ public class FieldMetadata {
 	 * @return whether the sanitization can be modified
 	 */
 	public boolean canModifySanitization() {return can_modify_sanitization;}
+
+	public boolean isSelectable() {
+		return selectable;
+	}
 }
