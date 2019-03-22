@@ -19,12 +19,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>sdk-root</artifactId>
-        <groupId>com.microfocus.adm.octane.sdk</groupId>
+        <groupId>com.microfocus.adm.almoctane.sdk</groupId>
         <version>12.60.35-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.microfocus.adm.octane.sdk.extension</groupId>
+    <groupId>com.microfocus.adm.almoctane.sdk.extension</groupId>
     <artifactId>sdk-extension-root</artifactId>
     <packaging>pom</packaging>
 
@@ -47,7 +47,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.microfocus.adm.octane.sdk</groupId>
+            <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
             <version>${project.version}</version>
         </dependency>
