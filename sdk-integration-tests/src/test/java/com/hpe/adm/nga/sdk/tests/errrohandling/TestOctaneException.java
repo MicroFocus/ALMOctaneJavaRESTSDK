@@ -1,9 +1,8 @@
 /*
- * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -17,6 +16,7 @@ package com.hpe.adm.nga.sdk.tests.errrohandling;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
@@ -91,7 +91,7 @@ public class TestOctaneException extends TestBase {
 
             OctaneException octaneException = (OctaneException) ex;
             assertEquals("platform.modify_non_editable_field", octaneException.getError().getValue("error_code").getValue());
-            assertEquals(403L, octaneException.getError().getValue("http_status_code").getValue());
+            assertEquals(403L, octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME).getValue());
             return;
         }
 

@@ -1,9 +1,8 @@
 /*
- * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -24,6 +23,8 @@ import java.util.Set;
  * entities.
  */
 public class ErrorModel extends EntityModel{
+
+	public static final String HTTP_STATUS_CODE_PROPERTY_NAME = "http_status_code";
 
 	/**
 	 * Creates a new ErrorModel object with given field models

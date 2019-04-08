@@ -1,9 +1,8 @@
 /*
- * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -12,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.hpe.adm.nga.sdk.network.google;
 
 import com.google.api.client.http.HttpRequest;
@@ -55,7 +53,7 @@ public class TestGoogleHttpClient {
         //Create timeout exception, the same way octane does
         ErrorModel errorModel = new ErrorModel(new HashSet<>());
         errorModel.setValue(new StringFieldModel("errorCode", "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT"));
-        errorModel.setValue(new LongFieldModel("httpStatusCode", 401L));
+        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, 401L));
         OctaneException octaneException = new OctaneException(errorModel);
 
         doThrow(octaneException)

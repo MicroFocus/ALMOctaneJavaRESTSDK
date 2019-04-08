@@ -1,5 +1,18 @@
 # ALM Octane REST API Java SDK
 
+#### Maven
+```xml
+<dependency>
+    <groupId>com.microfocus.adm.almoctane.sdk</groupId>
+    <artifactId>sdk-src</artifactId>
+    <version>12.60.41</version>
+</dependency>
+```
+#### Gradle
+```groovy
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '12.60.41'
+```
+
 ## Introduction
 
 A Java SDK that can be used to connect to ALM Octane's REST API.  See the Javadoc for more information of how to use the SDK.
@@ -38,15 +51,15 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 12.60.16 being the SDK version):
+To enable this add the following to your project's POM file (assuming 12.60.21 being the SDK version):
 
 ```xml
  <build>
         <plugins>
             <plugin>
-                <groupId>com.hpe.adm.nga.sdk</groupId>
+                <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>12.60.16</version>
+                <version>12.60.41</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -152,9 +165,9 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 ```xml
     <dependencies>
         <dependency>
-            <groupId>com.hpe.adm.nga.sdk</groupId>
+            <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>12.60.16</version>
+            <version>12.60.41</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -166,7 +179,10 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
-* 12.60.16
+* 12.60.41
+  * Float fields now supported via FloatFieldModel if they are enabled on the Octane server.
+  * Change to maven group id: com.microfocus.adm.almoctane.sdk
+* 12.60.21
   * Fixed bug where etag header was not being set properly
   * Fixed null pointer if the sdk encountered un-parsable entity JSON
   * Octane.OctaneBuilder now has constructor that allows passing a specific instance of OctaneHttpClient for the Octane object

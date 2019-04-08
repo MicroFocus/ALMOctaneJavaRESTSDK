@@ -1,9 +1,8 @@
 /*
- * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
+ * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -53,7 +52,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_FORMAT = "form-data; name=\"%s\"; filename=\"blob\"";
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
+
     private static final String ERROR_CODE_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT";
+    private static final String ERROR_CODE_GLOBAL_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_GLOBAL_TIME_OUT";
 
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
 
@@ -112,6 +113,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     public boolean authenticate(Authentication authentication) {
         //reset so it's not sent to auth request, server might return 304
         lwssoValue = null;
+        octaneUserValue = null;
         lastUsedAuthentication = authentication;
         try {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
@@ -257,9 +259,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
             if(retryCount > 0 && exception instanceof OctaneException) {
                 OctaneException octaneException = (OctaneException) exception;
                 StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
+                LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
 
                 //Handle session timeout
-                if (errorCodeFieldModel != null && ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) && lastUsedAuthentication != null) {
+                if (errorCodeFieldModel != null && httpStatusCode.getValue() == 401 &&
+                        (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())) &&
+                        lastUsedAuthentication != null) {
+
                     logger.debug("Auth token expired, trying to re-authenticate");
                     try {
                         authenticate(lastUsedAuthentication);
@@ -314,7 +320,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         return new OctanePartialException(errorModels, entities);
                     } else {
                         ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
-                        errorModel.setValue(new LongFieldModel("http_status_code", (long) httpResponseException.getStatusCode()));
+                        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
                         return new OctaneException(errorModel);
                     }
                 } catch (Exception ignored) {}
