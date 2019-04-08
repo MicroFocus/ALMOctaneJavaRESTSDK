@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>12.60.35</version>
+    <version>12.60.41</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '12.60.35'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '12.60.41'
 ```
 
 ## Introduction
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 12.60.21 b
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>12.60.35</version>
+                <version>12.60.41</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -167,7 +167,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>12.60.35</version>
+            <version>12.60.41</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -179,7 +179,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
-* 12.60.35
+* 12.60.41
   * Float fields now supported via FloatFieldModel if they are enabled on the Octane server.
   * Change to maven group id: com.microfocus.adm.almoctane.sdk
 * 12.60.21
