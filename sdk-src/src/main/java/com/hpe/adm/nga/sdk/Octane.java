@@ -17,6 +17,7 @@ import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
+import com.hpe.adm.nga.sdk.manualtests.TestStepList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
@@ -90,8 +91,9 @@ public class Octane {
 
     /**
      * Creates a new {@link TypedEntityList} context.  The class is the concrete instance of the TypedEntityList
+     *
      * @param entityListClass The class that is the instance of the TypedEntityList
-     * @param <T> The type of class
+     * @param <T>             The type of class
      * @return The instance that can then be set as the context
      */
     public <T extends TypedEntityList> T entityList(Class<T> entityListClass) {
@@ -125,11 +127,21 @@ public class Octane {
     }
 
     /**
+     * Creates a new TestStepList object.
+     *
+     * @param testId The id where the steps will be added to or downloaded from
+     * @return A testStepList for updating or getting the steps of the test
+     */
+    public TestStepList testStepList(final String testId) {
+        return new TestStepList(octaneHttpClient, getBaseDomainFormat(), testId);
+    }
+
+    /**
      * get the base domain based on workSpaceId and idsharedSpaceId
      *
      * @return base domain
      */
-    protected String getBaseDomainFormat() {
+    private String getBaseDomainFormat() {
 
         String baseDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
 
@@ -185,7 +197,7 @@ public class Octane {
         /**
          * Creates a new Builder object using the correct authentication
          *
-         * @param authentication - Authentication object.  Cannot be null
+         * @param authentication   - Authentication object.  Cannot be null
          * @param octaneHttpClient - Implementation of {@link OctaneHttpClient}. Cannot be null
          * @throws AssertionError if the authentication or octaneHttpClient is null
          */
@@ -245,7 +257,7 @@ public class Octane {
          */
         public Builder Server(String domain, int port) {
 
-            urlDomain = domain + ":" + String.valueOf(port);
+            urlDomain = domain + ":" + port;
 
             return this;
         }
