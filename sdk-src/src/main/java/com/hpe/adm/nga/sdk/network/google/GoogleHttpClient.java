@@ -204,6 +204,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     /**
      * Convert google implementation of {@link HttpResponse} to an implementation abstract {@link OctaneHttpResponse}
+     *
      * @param httpResponse implementation specific {@link HttpResponse}
      * @return {@link OctaneHttpResponse} created from the impl response object
      */
@@ -247,7 +248,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         } catch (RuntimeException exception) {
 
             //Return cached response
-            if(exception.getCause() instanceof HttpResponseException) {
+            if (exception.getCause() instanceof HttpResponseException) {
                 HttpResponseException httpResponseException = (HttpResponseException) exception.getCause();
                 final int statusCode = httpResponseException.getStatusCode();
                 if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
@@ -256,7 +257,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             }
 
             //Handle session timeout exception
-            if(retryCount > 0 && exception instanceof OctaneException) {
+            if (retryCount > 0 && exception instanceof OctaneException) {
                 OctaneException octaneException = (OctaneException) exception;
                 StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
                 LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
@@ -303,7 +304,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     }
 
     private static RuntimeException wrapException(Exception exception) {
-        if(exception instanceof HttpResponseException) {
+        if (exception instanceof HttpResponseException) {
 
             HttpResponseException httpResponseException = (HttpResponseException) exception;
             logger.debug(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString());
@@ -312,9 +313,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
             exceptionContentList.add(httpResponseException.getStatusMessage());
             exceptionContentList.add(httpResponseException.getContent());
 
-            for(String exceptionContent : exceptionContentList) {
+            for (String exceptionContent : exceptionContentList) {
                 try {
-                    if(ModelParser.getInstance().hasErrorModels(exceptionContent)) {
+                    if (ModelParser.getInstance().hasErrorModels(exceptionContent)) {
                         Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
                         Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
                         return new OctanePartialException(errorModels, entities);
@@ -323,7 +324,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
                         return new OctaneException(errorModel);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
@@ -407,22 +409,22 @@ public class GoogleHttpClient implements OctaneHttpClient {
      */
     private boolean updateLWSSOCookieValue(HttpHeaders headers) {
         boolean renewed = false;
-        List<String> strHPSSOCookieCsrf1 = headers.getHeaderStringValues(SET_COOKIE);
-        if (strHPSSOCookieCsrf1.isEmpty()) {
+        List<String> cookieHeaderValue = headers.getHeaderStringValues(SET_COOKIE);
+        if (cookieHeaderValue.isEmpty()) {
             return false;
         }
 
         /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
-        String strCookies = strHPSSOCookieCsrf1.toString();
+        String strCookies = cookieHeaderValue.toString();
         List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
         lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();*/
-        for (String strCookie : strHPSSOCookieCsrf1) {
+        for (String strCookie : cookieHeaderValue) {
             List<HttpCookie> cookies;
             try {
                 // Sadly the server seems to send back empty cookies for some reason
                 cookies = HttpCookie.parse(strCookie);
             } catch (Exception ex) {
-                logger.error("Failed to parse HPSSOCookieCsrf: " + ex.getMessage());
+                logger.error("Failed to parse SET_COOKIE header, issue with cookie: \"" + strCookie + "\", " + ex);
                 continue;
             }
             Optional<HttpCookie> lwssoCookie = cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst();
@@ -444,17 +446,18 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * Log jvm proxy system properties for debugging connection issues
      */
-    private static void logProxySystemProperties(){
-        String[]  proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
+    private static void logProxySystemProperties() {
+        String[] proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
         Arrays.stream(proxySysProperties)
                 .forEach(sysProp -> logger.debug(sysProp + ": " + System.getProperty(sysProp)));
     }
 
     /**
      * Log proxy for octane url domain using system wide {@link ProxySelector}
+     *
      * @param urlDomain base url of octane server
      */
-    private static void logSystemProxyForUrlDomain(String urlDomain){
+    private static void logSystemProxyForUrlDomain(String urlDomain) {
         try {
             List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(urlDomain));
             logger.debug("System proxies for " + urlDomain + ": " + proxies.toString());
