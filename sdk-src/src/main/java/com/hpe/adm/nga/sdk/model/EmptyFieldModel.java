@@ -1,8 +1,9 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * Copyright 2017 Hewlett-Packard Enterprise Development Company, L.P.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,16 +16,34 @@ package com.hpe.adm.nga.sdk.model;
 
 /**
  *
- * Interface of FieldModel
- *
+ * This class represents an Empty Field
  *
  */
-public interface FieldModel<T> {
+public class EmptyFieldModel implements FieldModel<Object> {
 
-	T getValue();
-	void setValue(String name, T value);
-	String getName();
-	default boolean hasValue() {
-		return true;
+	private String name;
+
+	public EmptyFieldModel(String strKey) {
+		setValue(strKey, null);
+	}
+
+	@Override
+	public Object getValue() {
+		return null;
+	}
+
+	@Override
+	public void setValue(String name, Object value) {
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public boolean hasValue() {
+		return false;
 	}
 }
