@@ -29,6 +29,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import java.util.Date;
 import java.util.HashSet;
 
 import static org.mockito.Matchers.any;
@@ -49,6 +50,7 @@ public class TestGoogleHttpClient {
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
         doReturn(true).when(googleHttpClientSpy, "authenticate", any(Authentication.class));
         Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
+        Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", new Date(0));
 
         //Create timeout exception, the same way octane does
         ErrorModel errorModel = new ErrorModel(new HashSet<>());
