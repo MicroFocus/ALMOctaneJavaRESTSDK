@@ -50,12 +50,7 @@ public class TestComments extends TestBase {
 
     private Collection<EntityModel> createComments(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {
         EntityModel entity = entityModels.iterator().next();
-
-        Collection<EntityModel> users = octane.entityList("workspace_users").get().execute();
-
-        EntityModel user = users.iterator().next();
         Set<FieldModel> fields = new HashSet<>();
-        fields.add(new ReferenceFieldModel("author", user));
         fields.add(new ReferenceFieldModel(fieldEntityType, entity));
 
         Collection<EntityModel> comments = new ArrayList<>();
