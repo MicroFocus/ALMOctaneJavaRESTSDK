@@ -96,13 +96,10 @@ public class TestGoogleHttpClient {
     public void testParallelRequestRetry() throws InterruptedException {
         ClientAndServer clientAndServer = new ClientAndServer();
         Octane octane;
-        long totalExecutionTime = 1000;
-        long cookieExpirationTime = 500;
+        long totalExecutionTime = 500;
+        long cookieExpirationTime = 250;
 
-//        Properties props = System.getProperties();
-//        props.setProperty("mockserver.logLevel","OFF");
-//
-        setServerResponse(clientAndServer,cookieExpirationTime);
+        setServerResponse(clientAndServer, cookieExpirationTime);
         Authentication authentication = new SimpleUserAuthentication("", "");
         String url = "http://localhost:" + clientAndServer.getLocalPort();
         GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url));
@@ -111,7 +108,7 @@ public class TestGoogleHttpClient {
         int nrCores = Runtime.getRuntime().availableProcessors();
         Thread[] threads = new Thread[nrCores];
         for (int i = 0; i < nrCores; i++) {
-            threads[i] = new Thread(() -> runGetRequest(octane,totalExecutionTime));
+            threads[i] = new Thread(() -> runGetRequest(octane, totalExecutionTime));
             threads[i].start();
         }
         for (int i = 0; i < nrCores; i++) {
@@ -120,11 +117,12 @@ public class TestGoogleHttpClient {
         clientAndServer.stop();
 
         //Exactly 2 authentications are done: one for 1st log in and 2nd for cookie refresh
-        Mockito.verify(spyGoogleHttpClient,times(2)).authenticate(any());
+        Mockito.verify(spyGoogleHttpClient, times(2)).authenticate(any());
 
         //There are more execution invocations than there are threads
-        Mockito.verify(spyGoogleHttpClient,atLeast(nrCores+1)).execute(any());
+        Mockito.verify(spyGoogleHttpClient, atLeast(nrCores + 1)).execute(any());
     }
+
     public void runGetRequest(Octane octane, long totalExecutionTime) {
         LocalDateTime pastTime = LocalDateTime.now();
         LocalDateTime currentTime = LocalDateTime.now();
