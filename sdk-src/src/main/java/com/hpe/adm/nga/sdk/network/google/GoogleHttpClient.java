@@ -426,22 +426,22 @@ public class GoogleHttpClient implements OctaneHttpClient {
      */
     private boolean updateLWSSOCookieValue(HttpHeaders headers) {
         boolean renewed = false;
-        List<String> strHPSSOCookieCsrf1 = headers.getHeaderStringValues(SET_COOKIE);
-        if (strHPSSOCookieCsrf1.isEmpty()) {
+        List<String> cookieHeaderValue = headers.getHeaderStringValues(SET_COOKIE);
+        if (cookieHeaderValue.isEmpty()) {
             return false;
         }
 
         /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
-        String strCookies = strHPSSOCookieCsrf1.toString();
+        String strCookies = cookieHeaderValue.toString();
         List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
         lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();*/
-        for (String strCookie : strHPSSOCookieCsrf1) {
+        for (String strCookie : cookieHeaderValue) {
             List<HttpCookie> cookies;
             try {
                 // Sadly the server seems to send back empty cookies for some reason
                 cookies = HttpCookie.parse(strCookie);
             } catch (Exception ex) {
-                logger.error("Failed to parse HPSSOCookieCsrf: " + ex.getMessage());
+                logger.error("Failed to parse SET_COOKIE header, issue with cookie: \"" + strCookie + "\", " + ex);
                 continue;
             }
             Optional<HttpCookie> lwssoCookie = cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst();
