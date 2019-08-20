@@ -26,10 +26,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockserver.configuration.ConfigurationProperties;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.TimeToLive;
 import org.mockserver.matchers.Times;
 import org.mockserver.model.Cookie;
+import org.mockserver.model.Delay;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -46,6 +48,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.powermock.api.mockito.PowerMockito.*;
@@ -94,7 +97,9 @@ public class TestGoogleHttpClient {
 
     @Test
     public void testParallelRequestRetry() throws InterruptedException {
-        ClientAndServer clientAndServer = new ClientAndServer();
+        ConfigurationProperties.logLevel("WARN");
+
+        ClientAndServer clientAndServer = startClientAndServer();
         Octane octane;
         long totalExecutionTime = 500;
         long cookieExpirationTime = 250;
@@ -135,6 +140,7 @@ public class TestGoogleHttpClient {
     public void setServerResponse(ClientAndServer clientAndServer, long cookieExpirationTime) {
         Cookie firstCookie = new Cookie("LWSSO_COOKIE_KEY", "one");
         Cookie secondCookie = new Cookie("LWSSO_COOKIE_KEY", "two");
+        Delay serverDelay = Delay.milliseconds(10);
 
         //First cookie given only once to the main octane object
         clientAndServer
@@ -142,21 +148,21 @@ public class TestGoogleHttpClient {
                         request().withPath("/authentication/sign_in"),
                         Times.once())
                 .respond(
-                        response().withStatusCode(200).withCookie(firstCookie));
+                        response().withStatusCode(200).withCookie(firstCookie).withDelay(serverDelay));
 
         //Second cookie given every time a new authentication request is made
         clientAndServer
                 .when(
                         request().withPath("/authentication/sign_in"))
                 .respond(
-                        response().withStatusCode(200).withCookie(secondCookie));
+                        response().withStatusCode(200).withCookie(secondCookie).withDelay(serverDelay));
 
         //Accept request with second cookie
         clientAndServer
                 .when(
                         request().withCookie(secondCookie))
                 .respond(
-                        response().withStatusCode(200));
+                        response().withStatusCode(200).withDelay(serverDelay));
 
         //Requests with the first cookie are accepted cookieExpirationTime milliseconds
         clientAndServer
@@ -165,7 +171,7 @@ public class TestGoogleHttpClient {
                         Times.unlimited(),
                         TimeToLive.exactly(TimeUnit.MILLISECONDS, cookieExpirationTime))
                 .respond(
-                        response().withStatusCode(200));
+                        response().withStatusCode(200).withDelay(serverDelay));
 
         //Requests with first cookies (after cookieExpirationTime milliseconds) get IDLE TIME OUT
         clientAndServer
@@ -173,7 +179,7 @@ public class TestGoogleHttpClient {
                         request().withMethod("GET").withCookie(firstCookie),
                         Times.unlimited())
                 .respond(
-                        response().withStatusCode(401)
+                        response().withStatusCode(401).withDelay(serverDelay)
                                 .withBody("{\"errorCode\":\"VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT\"," +
                                         "\"accumulatedMessage\":\"Previous validation errors " +
                                         "(non mandatory validators): \"}"));
