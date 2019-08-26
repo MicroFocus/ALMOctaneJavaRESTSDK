@@ -43,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -104,21 +105,15 @@ public class TestGoogleHttpClient {
         long totalExecutionTime = 500;
         long cookieExpirationTime = 250;
 
-        setServerResponse(clientAndServer, cookieExpirationTime);
+        initServerResponse(clientAndServer, cookieExpirationTime);
         Authentication authentication = new SimpleUserAuthentication("", "");
         String url = "http://localhost:" + clientAndServer.getLocalPort();
         GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url));
         octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 
         int nrCores = Runtime.getRuntime().availableProcessors();
-        Thread[] threads = new Thread[nrCores];
-        for (int i = 0; i < nrCores; i++) {
-            threads[i] = new Thread(() -> runGetRequest(octane, totalExecutionTime));
-            threads[i].start();
-        }
-        for (int i = 0; i < nrCores; i++) {
-            threads[i].join();
-        }
+        IntStream.rangeClosed(1, nrCores).parallel().forEach((nr) -> runGetRequests(octane, totalExecutionTime));
+
         clientAndServer.stop();
 
         //Exactly 2 authentications are done: one for 1st log in and 2nd for cookie refresh
@@ -128,7 +123,7 @@ public class TestGoogleHttpClient {
         Mockito.verify(spyGoogleHttpClient, atLeast(nrCores + 1)).execute(any());
     }
 
-    public void runGetRequest(Octane octane, long totalExecutionTime) {
+    public void runGetRequests(Octane octane, long totalExecutionTime) {
         LocalDateTime pastTime = LocalDateTime.now();
         LocalDateTime currentTime = LocalDateTime.now();
         while (Duration.between(pastTime, currentTime).toMillis() < totalExecutionTime) {
@@ -137,7 +132,7 @@ public class TestGoogleHttpClient {
         }
     }
 
-    public void setServerResponse(ClientAndServer clientAndServer, long cookieExpirationTime) {
+    public void initServerResponse(ClientAndServer clientAndServer, long cookieExpirationTime) {
         Cookie firstCookie = new Cookie("LWSSO_COOKIE_KEY", "one");
         Cookie secondCookie = new Cookie("LWSSO_COOKIE_KEY", "two");
         Delay serverDelay = Delay.milliseconds(10);
