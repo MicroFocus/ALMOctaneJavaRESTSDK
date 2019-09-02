@@ -34,7 +34,7 @@ public final class Lists {
          * List is empty!
          * @deprecated this list should be regenerated
          */
-        DEADBEEF("$rootModelName is empty!!!");
+        DEADBEEF("$rootModelName is empty!!1");
         #end
 
         public static final String ROOT_ID = "${rootModel[1]}";
