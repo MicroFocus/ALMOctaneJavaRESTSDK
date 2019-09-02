@@ -44,7 +44,7 @@ public final class Lists {
 
         $rootModelName(final String id) {
             this.id = id;
-            this.value = null;
+            this.value = "DEADBEEF";
         }
         
         $rootModelName(final String id, final String value) {
