@@ -34,7 +34,7 @@ public final class Lists {
          * List is empty!
          * @deprecated this list should be regenerated
          */
-        DEADBEEF("$rootModelName is empty!!1");
+        DEADBEEF("$rootModelName is empty!!!");
         #end
 
         public static final String ROOT_ID = "${rootModel[1]}";
@@ -42,6 +42,11 @@ public final class Lists {
         private final String id;
         private final String value;
 
+        $rootModelName(final String id) {
+            this.id = id;
+            this.value = null;
+        }
+        
         $rootModelName(final String id, final String value) {
             this.id = id;
             this.value = value;
