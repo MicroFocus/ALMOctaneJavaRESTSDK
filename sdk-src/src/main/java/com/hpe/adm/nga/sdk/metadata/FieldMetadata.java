@@ -275,6 +275,14 @@ public class FieldMetadata {
 	public FieldType getFieldType(){return field_type;}
 
 	/**
+	 * set {@link FieldMetadata} field Type
+	 * @param fieldType the type of the field
+	 */
+	public void setFieldType(FieldType fieldType){
+		field_type = fieldType;
+	}
+
+	/**
 	 * get FieldMetadata's Field Type data
 	 * @return the typedata of the field
 	 */
