@@ -23,6 +23,7 @@ import com.hpe.adm.nga.sdk.metadata.features.Feature;
 import com.hpe.adm.nga.sdk.metadata.features.RestFeature;
 import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
 import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.query.Query;
@@ -172,7 +173,7 @@ public class GenerateModels {
 		// list_nodes call
 		final Collection<EntityModel> rootNodes = octane.entityList("list_nodes")
 				.get()
-				.addFields("name", "id", "logical_name")
+				.addFields("name", "id", "logical_name", "activity_level")
 				.query(Query.statement("list_root", QueryMethod.EqualTo, null).build())
 				.execute();
 
@@ -180,9 +181,11 @@ public class GenerateModels {
 		rootNodes.forEach(rootNode -> {
 			final OctaneCollection<EntityModel> models = octane.entityList("list_nodes")
 					.get()
-					.addFields("name", "list_root", "id", "logical_name")
+					.addFields("name", "list_root", "id", "logical_name", "activity_level")
 					.query(Query.statement("list_root", QueryMethod.EqualTo,
-							Query.statement("id", QueryMethod.EqualTo, rootNode.getId())).build())
+							Query.statement("id", QueryMethod.EqualTo, rootNode.getId()))
+							.and(Query.statement("activity_level", QueryMethod.LessThan, 2))
+							.build())
 					.execute();
 			listNodes.addAll(models);
 		});
@@ -195,11 +198,17 @@ public class GenerateModels {
 			final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
 			final EntityModel list_rootValue = list_root.getValue();
 			rootId = list_rootValue.getId();
+
+			if (((LongFieldModel) listNode.getValue("activity_level")).getValue().equals(1L)) {
+				System.out.println(((StringFieldModel) listNode.getValue("name")).getValue());
+			}
+
 			mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>()).add(new String[] { //
 					getEntityModelName(listNode), //
 					((StringFieldModel) listNode.getValue("id")).getValue(), //
-					((StringFieldModel) listNode.getValue("name")).getValue() //
-			});
+					((StringFieldModel) listNode.getValue("name")).getValue(), //
+					((LongFieldModel) listNode.getValue("activity_level")).getValue().toString() });
+
 		});
 
 		// deduplicate list entries
@@ -225,7 +234,8 @@ public class GenerateModels {
 			strings.add(0, new String[] { //
 					name, //
 					rootNode.getId(), //
-					((StringFieldModel) rootNode.getValue("name")).getValue() //
+					((StringFieldModel) rootNode.getValue("name")).getValue(), //
+					((LongFieldModel) rootNode.getValue("activity_level")).getValue().toString()
 			});
 		});
 

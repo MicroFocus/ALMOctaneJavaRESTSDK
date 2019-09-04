@@ -21,11 +21,17 @@ public final class Lists {
     /**
      * #if($listItems.size() <= 1)EMPTY! #end${rootModel[2]}
      */
+    #if($rootModel[3] == "1")
+    @Deprecated
+    #end
     public enum $rootModelName {
         #foreach($listModel in $listItems)#if(!$foreach.first)
         /**
          * ${listModel[2]}
          */
+        #if($listModel[3] == "1")
+        @Deprecated
+        #end
         ${listModel[0]}("${listModel[1]}", "${listModel[2]}")#if($foreach.hasNext),#else;#end
         #end#end
 
@@ -34,7 +40,7 @@ public final class Lists {
          * List is empty!
          * @deprecated this list should be regenerated
          */
-        DEADBEEF("$rootModelName is empty!!1");
+        DEADBEEF("$rootModelName is empty!!");
         #end
 
         public static final String ROOT_ID = "${rootModel[1]}";
