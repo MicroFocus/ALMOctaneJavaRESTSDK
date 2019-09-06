@@ -78,7 +78,8 @@ public class GenerateModels {
 	 * Initialise the class with the output directory. This should normally be
 	 * in a project that would be imported into the main Java project
 	 *
-	 * @param outputDirectory Where all the generated files will be placed
+	 * @param outputDirectory
+	 *            Where all the generated files will be placed
 	 */
 	public GenerateModels(final File outputDirectory) {
 		final File packageDirectory = new File(outputDirectory, "/com/hpe/adm/nga/sdk");
@@ -108,12 +109,18 @@ public class GenerateModels {
 	/**
 	 * Run the actual generation
 	 *
-	 * @param clientId     The client id
-	 * @param clientSecret The client secret
-	 * @param server       The server including the protocol and port
-	 * @param sharedSpace  The SS id
-	 * @param workSpace    The WS id
-	 * @throws IOException A problem with the generation of the entities
+	 * @param clientId
+	 *            The client id
+	 * @param clientSecret
+	 *            The client secret
+	 * @param server
+	 *            The server including the protocol and port
+	 * @param sharedSpace
+	 *            The SS id
+	 * @param workSpace
+	 *            The WS id
+	 * @throws IOException
+	 *             A problem with the generation of the entities
 	 */
 	public void generate(final String clientId, final String clientSecret, final String server, final long sharedSpace,
 			final long workSpace) throws IOException {
@@ -123,20 +130,30 @@ public class GenerateModels {
 	/**
 	 * Run the actual generation
 	 *
-	 * @param clientId                 The client id
-	 * @param clientSecret             The client secret
-	 * @param server                   The server including the protocol and port
-	 * @param sharedSpace              The SS id
-	 * @param workSpace                The WS id
-	 * @param doNotValidateCertificate Disables validating server SSL certificates
-	 * @throws IOException A problem with the generation of the entities
+	 * @param clientId
+	 *            The client id
+	 * @param clientSecret
+	 *            The client secret
+	 * @param server
+	 *            The server including the protocol and port
+	 * @param sharedSpace
+	 *            The SS id
+	 * @param workSpace
+	 *            The WS id
+	 * @param doNotValidateCertificate
+	 *            Disables validating server SSL certificates
+	 * @throws IOException
+	 *             A problem with the generation of the entities
 	 */
 	public void generate(final String clientId, final String clientSecret, final String server, final long sharedSpace,
 			final long workSpace, final boolean doNotValidateCertificate) throws IOException {
 		// work around for work_items_root
 		final Octane octanePrivate = new Octane.Builder(
-				new SimpleClientAuthentication(clientId, clientSecret, "HPE_REST_API_TECH_PREVIEW")).sharedSpace(
-				sharedSpace).workSpace(workSpace).Server(server).build(doNotValidateCertificate);
+				new SimpleClientAuthentication(clientId, clientSecret, "HPE_REST_API_TECH_PREVIEW"))
+						.sharedSpace(sharedSpace)
+						.workSpace(workSpace)
+						.Server(server)
+						.build(doNotValidateCertificate);
 		final EntityMetadata work_items_root = octanePrivate.metadata()
 				.entities("work_item_root")
 				.execute()
@@ -148,8 +165,11 @@ public class GenerateModels {
 
 		octanePrivate.signOut();
 
-		final Octane octane = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret)).sharedSpace(
-				sharedSpace).workSpace(workSpace).Server(server).build(doNotValidateCertificate);
+		final Octane octane = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret))
+				.sharedSpace(sharedSpace)
+				.workSpace(workSpace)
+				.Server(server)
+				.build(doNotValidateCertificate);
 		final Metadata metadata = octane.metadata();
 		final Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
 		entityMetadata.add(work_items_root);
@@ -182,8 +202,9 @@ public class GenerateModels {
 			final OctaneCollection<EntityModel> models = octane.entityList("list_nodes")
 					.get()
 					.addFields("name", "list_root", "id", "logical_name", "activity_level")
-					.query(Query.statement("list_root", QueryMethod.EqualTo,
-							Query.statement("id", QueryMethod.EqualTo, rootNode.getId()))
+					.query(Query
+							.statement("list_root", QueryMethod.EqualTo,
+									Query.statement("id", QueryMethod.EqualTo, rootNode.getId()))
 							.and(Query.statement("activity_level", QueryMethod.LessThan, 2))
 							.build())
 					.execute();
@@ -235,8 +256,7 @@ public class GenerateModels {
 					name, //
 					rootNode.getId(), //
 					((StringFieldModel) rootNode.getValue("name")).getValue(), //
-					((LongFieldModel) rootNode.getValue("activity_level")).getValue().toString()
-			});
+					((LongFieldModel) rootNode.getValue("activity_level")).getValue().toString() });
 		});
 
 		final Map<String, List<String[]>> sortedMappedListNodes = new TreeMap<>();
@@ -280,7 +300,8 @@ public class GenerateModels {
 					});
 					phaseMap.merge(
 							GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(),
-									true), phaseValueList, //
+									true),
+							phaseValueList, //
 							(existingValues, newValues) -> {
 								existingValues.addAll(newValues);
 								return existingValues;
@@ -311,14 +332,14 @@ public class GenerateModels {
 					if (fieldMetadata1.getName().equals("phase") && availablePhases.contains(className)) {
 						references.add("com.hpe.adm.nga.sdk.enums.Phases." + className + "Phase");
 					} else if (fieldMetadata1.getFieldType() == FieldMetadata.FieldType.Reference) {
-						if ((!entityMetadatum.getName().equals("list_node")) && (fieldMetadata1.getFieldTypedata()
-								.getTargets()[0].getType().equals("list_node"))) {
-							final String listName = logicalNameToListsMap.get(
-									fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName());
+						if ((!entityMetadatum.getName().equals("list_node"))
+								&& (fieldMetadata1.getFieldTypedata().getTargets()[0].getType().equals("list_node"))) {
+							final String listName = logicalNameToListsMap
+									.get(fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName());
 							references.add("com.hpe.adm.nga.sdk.enums.Lists." + listName);
 						} else {
-							final GeneratorHelper.ReferenceMetadata referenceMetadata = GeneratorHelper.getAllowedSuperTypesForReference(
-									fieldMetadata1, entityMetadata);
+							final GeneratorHelper.ReferenceMetadata referenceMetadata = GeneratorHelper
+									.getAllowedSuperTypesForReference(fieldMetadata1, entityMetadata);
 							if (fieldMetadata1.getFieldTypedata().isMultiple()) {
 								references.add(referenceMetadata.getReferenceClassForSignature());
 							} else {
@@ -346,7 +367,8 @@ public class GenerateModels {
 		if (!collectedReferences.isEmpty()) {
 			expandCollectedReferences(collectedReferences, new int[collectedReferences.size()], 0, requiredFields);
 		}
-		// Die Id muss immer vom Typ String sein, da es sonst Compile fehler gibt. siehe com.hpe.adm.nga.sdk.model.Entity
+		// Die Id muss immer vom Typ String sein, da es sonst Compile fehler
+		// gibt. siehe com.hpe.adm.nga.sdk.model.Entity
 
 		fieldMetadata.forEach(field -> {
 			if (field.getName().equalsIgnoreCase("id")) {
@@ -405,9 +427,10 @@ public class GenerateModels {
 
 		interfaceVelocityContext.put("interfaceName", interfaceName);
 		interfaceVelocityContext.put("name", name);
-		interfaceVelocityContext.put("superInterfaceName", (subTypeOfFeature.map(
-				feature -> GeneratorHelper.camelCaseFieldName(((SubTypesOfFeature) feature).getType())).orElse(""))
-				+ "Entity");
+		interfaceVelocityContext.put("superInterfaceName",
+				(subTypeOfFeature
+						.map(feature -> GeneratorHelper.camelCaseFieldName(((SubTypesOfFeature) feature).getType()))
+						.orElse("")) + "Entity");
 
 		final FileWriter interfaceFileWriter = new FileWriter(
 				new File(modelDirectory, GeneratorHelper.camelCaseFieldName(name) + "Entity.java"));
@@ -431,13 +454,14 @@ public class GenerateModels {
 			entityListVelocityContext.put("helper", GeneratorHelper.class);
 			entityListVelocityContext.put("type", GeneratorHelper.camelCaseFieldName(name));
 			entityListVelocityContext.put("url", restFeature.getUrl());
-			entityListVelocityContext.put("availableFields", fieldMetadata.stream()
-					.sorted(Comparator.comparing(FieldMetadata::getName))
-					.collect(Collectors.toList()));
-			entityListVelocityContext.put("sortableFields", fieldMetadata.stream()
-					.filter(FieldMetadata::isSortable)
-					.sorted(Comparator.comparing(FieldMetadata::getName))
-					.collect(Collectors.toList()));
+			entityListVelocityContext.put("availableFields",
+					fieldMetadata.stream().sorted(Comparator.comparing(FieldMetadata::getName)).collect(
+							Collectors.toList()));
+			entityListVelocityContext.put("sortableFields",
+					fieldMetadata.stream()
+							.filter(FieldMetadata::isSortable)
+							.sorted(Comparator.comparing(FieldMetadata::getName))
+							.collect(Collectors.toList()));
 
 			final String[] restFeatureMethods = restFeature.getMethods();
 			for (final String restFeatureMethod : restFeatureMethods) {
