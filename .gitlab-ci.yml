@@ -15,14 +15,6 @@
 stages:
   - publish
 
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-
-cache:
-  paths:
-    - .m2/repository/
-    - target/
-
 publish-sdk:
   image: maven:3-jdk-8-slim
   stage: publish
