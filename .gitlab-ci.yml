@@ -23,6 +23,6 @@ publish-sdk:
   script:
     - mvn versions:set -DnewVersion=${CI_COMMIT_TAG}
     - mvn clean install -DskipTests
-    - mvn deploy -DskipTests -Dmaven.install.skip=true
+    - mvn deploy --settings .m2/settings.xml -DskipTests -Dmaven.install.skip=true
 
 
