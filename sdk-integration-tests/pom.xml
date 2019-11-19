@@ -46,6 +46,16 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.microfocus.adm.almoctane.sdk</groupId>
+            <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>

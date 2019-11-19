@@ -14,6 +14,7 @@
 package com.hpe.adm.nga.sdk.generate;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
@@ -21,9 +22,7 @@ import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.metadata.features.Feature;
 import com.hpe.adm.nga.sdk.metadata.features.RestFeature;
 import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
+import com.hpe.adm.nga.sdk.model.*;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -44,10 +43,10 @@ import java.util.stream.Collectors;
  * The user that calls the generation must have the workspace member of the given workspace.
  * </p>
  * <p>
- *     UDFs are generated if they are part of the metadata for that workspace.  That means that the generated
- *     entities should be able to be reused over different workspaces within the same shared space.  However
- *     some business rules could cause different behaviour in different Workspaces.  See the ALM Octane documentation
- *     for more information
+ * UDFs are generated if they are part of the metadata for that workspace.  That means that the generated
+ * entities should be able to be reused over different workspaces within the same shared space.  However
+ * some business rules could cause different behaviour in different Workspaces.  See the ALM Octane documentation
+ * for more information
  * </p>
  */
 public class GenerateModels {
@@ -58,8 +57,10 @@ public class GenerateModels {
     /**
      * Initialise the class with the output directory.  This should normally be in a project that would be
      * imported into the main Java project
+     *
      * @param outputDirectory Where all the generated files will be placed
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public GenerateModels(final File outputDirectory) {
         final File packageDirectory = new File(outputDirectory, "/com/hpe/adm/nga/sdk");
         modelDirectory = new File(packageDirectory, "model");
@@ -86,24 +87,17 @@ public class GenerateModels {
 
     /**
      * Run the actual generation
-     * @param clientId The client id
-     * @param clientSecret The client secret
-     * @param server The server including the protocol and port
-     * @param sharedSpace The SS id
-     * @param workSpace The WS id
+     *
+     * @param authentication The authentication object
+     * @param server         The server including the protocol and port
+     * @param sharedSpace    The SS id
+     * @param workSpace      The WS id
      * @throws IOException A problem with the generation of the entities
      */
-    public void generate(String clientId, String clientSecret, String server, long sharedSpace, long workSpace) throws IOException {
-        // work around for work_items_root
-        final Octane octanePrivate = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret, "HPE_REST_API_TECH_PREVIEW")).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();
-        final EntityMetadata work_items_root = octanePrivate.metadata().entities("work_item_root").execute().iterator().next();
-        final Collection<FieldMetadata> work_items_rootFields = octanePrivate.metadata().fields("work_item_root").execute();
-        octanePrivate.signOut();
-
-        final Octane octane = new Octane.Builder(new SimpleClientAuthentication(clientId, clientSecret)).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();
+    public void generate(Authentication authentication, String server, long sharedSpace, long workSpace) throws IOException {
+        final Octane octane = new Octane.Builder(authentication).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();
         final Metadata metadata = octane.metadata();
         final Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
-        entityMetadata.add(work_items_root);
 
         final Map<String, String> logicalNameToListsMap = generateLists(octane);
         final Set<String> availablePhases = generatePhases(octane);
@@ -111,7 +105,7 @@ public class GenerateModels {
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
-            final Collection<FieldMetadata> fieldMetadata = generateEntity(work_items_rootFields, metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
+            final Collection<FieldMetadata> fieldMetadata = generateEntity(metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
             generateInterface(entityMetadatum, name, interfaceName);
             generateEntityList(entityMetadatum, name, fieldMetadata);
         }
@@ -123,21 +117,22 @@ public class GenerateModels {
         final Map<String, String> logicalNameToNameMap = new HashMap<>();
         listNodes.forEach(listNode -> {
             final String rootId;
-            final ReferenceFieldModel list_root = (ReferenceFieldModel) listNode.getValue("list_root");
-            final EntityModel list_rootValue = list_root.getValue();
+
+            final FieldModel listRootFieldModel = listNode.getValue("list_root");
             final String name;
-            if (list_rootValue != null) {
-                rootId = list_rootValue.getId();
-                name = ((StringFieldModel) listNode.getValue("name")).getValue().replaceAll(" ", "_").replaceAll("^\\d", "_$0").replaceAll("\\W", "_").toUpperCase();
-            } else {
+            if (listRootFieldModel instanceof EmptyFieldModel) {
                 rootId = listNode.getId();
                 name = GeneratorHelper.camelCaseFieldName(((StringFieldModel) listNode.getValue("name")).getValue().replaceAll("\\W", "_"));
                 logicalNameToNameMap.put(((StringFieldModel) listNode.getValue("logical_name")).getValue(), name);
+            } else {
+                final EntityModel list_rootValue = ((ReferenceFieldModel) listRootFieldModel).getValue();
+                rootId = list_rootValue.getId();
+                name = ((StringFieldModel) listNode.getValue("name")).getValue().replaceAll(" ", "_").replaceAll("^\\d", "_$0").replaceAll("\\W", "_").toUpperCase();
             }
             final List<String[]> listHierarchy = mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>());
 
             final String[] listNodeInfo = {name, ((StringFieldModel) listNode.getValue("id")).getValue()};
-            if (list_rootValue == null) {
+            if (listRootFieldModel instanceof EmptyFieldModel) {
                 listHierarchy.add(0, listNodeInfo);
             } else {
                 listHierarchy.add(listNodeInfo);
@@ -177,8 +172,8 @@ public class GenerateModels {
         return phaseMap.keySet();
     }
 
-    private Collection<FieldMetadata> generateEntity(Collection<FieldMetadata> work_items_rootFields, Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
-        final Collection<FieldMetadata> fieldMetadata = name.equals("work_item_root") ? work_items_rootFields : metadata.fields(name).execute();
+    private Collection<FieldMetadata> generateEntity(Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
+        final Collection<FieldMetadata> fieldMetadata = metadata.fields(name).execute();
 
         final TreeMap<String, List<String>> collectedReferences = fieldMetadata.stream()
                 .filter(FieldMetadata::isRequired)
@@ -194,8 +189,10 @@ public class GenerateModels {
                         } else {
                             final GeneratorHelper.ReferenceMetadata referenceMetadata = GeneratorHelper.getAllowedSuperTypesForReference(fieldMetadata1, entityMetadata);
                             if (fieldMetadata1.getFieldTypedata().isMultiple()) {
+                                assert referenceMetadata != null;
                                 references.add(referenceMetadata.getReferenceClassForSignature());
                             } else {
+                                assert referenceMetadata != null;
                                 if (referenceMetadata.hasTypedReturn()) {
                                     references.addAll(referenceMetadata.getReferenceTypes()
                                             .stream()
@@ -240,13 +237,13 @@ public class GenerateModels {
     }
 
     private void expandCollectedReferences(final TreeMap<String, List<String>> collectedReferences, final int[] positions, final int pointer, final Set<List<String[]>> output) {
-        final Object[] keyArray = collectedReferences.keySet().toArray();
-        final Object o = keyArray[pointer];
+        final String[] keyArray = collectedReferences.keySet().toArray(new String[0]);
+        final String o = keyArray[pointer];
         for (int i = 0; i < collectedReferences.get(o).size(); ++i) {
             if (pointer == positions.length - 1) {
                 final List<String[]> outputLine = new ArrayList<>(positions.length);
                 for (int j = 0; j < positions.length; ++j) {
-                    outputLine.add(new String[]{(String) keyArray[j], collectedReferences.get(keyArray[j]).get(positions[j])});
+                    outputLine.add(new String[]{keyArray[j], collectedReferences.get(keyArray[j]).get(positions[j])});
                 }
                 output.add(outputLine);
             } else {

@@ -73,6 +73,7 @@
 
         <commons-configuration.version>2.0</commons-configuration.version>
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
+        <commons-io.version>2.6</commons-io.version>
 
         <maven-release.version>2.5.3</maven-release.version>
         <maven-surefire.version>2.19.1</maven-surefire.version>
@@ -175,6 +176,12 @@
                 <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
                 <version>${org.javassist.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
