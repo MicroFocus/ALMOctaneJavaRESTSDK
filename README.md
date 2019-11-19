@@ -182,6 +182,8 @@ This will make the sdk use log4j as an slf4j implementation, configuring a log4j
 * 15.0.20
   * When generating entities the enums that represent Lists will now be constucted from their logical name as opposed to just their name.  This was done due Octane
   enabling list names to be non-unique.  Enums names have to be unique.  This is therefore a **breaking change** where the name of the Enum could change.
+  * Due to a bug on Octane - the *run_history* entity's ID is marked as an integer as opposed to a string.  This causes an issue in the entity generation.
+  Therefore the *run_history* entity will not be generated until this bug is fixed in Octane
 * 12.60.41
   * Float fields now supported via FloatFieldModel if they are enabled on the Octane server.
   * Change to maven group id: com.microfocus.adm.almoctane.sdk

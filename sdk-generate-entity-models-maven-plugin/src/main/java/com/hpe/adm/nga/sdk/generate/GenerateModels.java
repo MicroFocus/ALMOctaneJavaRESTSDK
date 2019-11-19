@@ -104,6 +104,14 @@ public class GenerateModels {
 
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
+            /**
+             * @Since 15.0.20
+             * The run_history's id is integer even though it should be string.  It would be extremely complicated to make a special case for run_history id as long
+             * Therefore until this is fixed in Octane - the entity will be ignored
+             */
+            if (name.equals("run_history")) {
+                continue;
+            }
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
             final Collection<FieldMetadata> fieldMetadata = generateEntity(metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
             generateInterface(entityMetadatum, name, interfaceName);
