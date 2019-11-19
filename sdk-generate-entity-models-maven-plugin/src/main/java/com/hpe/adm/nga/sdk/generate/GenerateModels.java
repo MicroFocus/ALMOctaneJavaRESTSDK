@@ -122,7 +122,7 @@ public class GenerateModels {
             final String name;
             if (listRootFieldModel instanceof EmptyFieldModel) {
                 rootId = listNode.getId();
-                name = GeneratorHelper.camelCaseFieldName(((StringFieldModel) listNode.getValue("name")).getValue().replaceAll("\\W", "_"));
+                name = GeneratorHelper.camelCaseFieldName(((StringFieldModel) listNode.getValue("logical_name")).getValue().substring(10).replaceAll("\\W", "_"));
                 logicalNameToNameMap.put(((StringFieldModel) listNode.getValue("logical_name")).getValue(), name);
             } else {
                 final EntityModel list_rootValue = ((ReferenceFieldModel) listRootFieldModel).getValue();

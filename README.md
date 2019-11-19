@@ -179,8 +179,9 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
-* 12.60.47
-  * TBD
+* 15.0.20
+  * When generating entities the enums that represent Lists will now be constucted from their logical name as opposed to just their name.  This was done due Octane
+  enabling list names to be non-unique.  Enums names have to be unique.  This is therefore a **breaking change** where the name of the Enum could change.
 * 12.60.41
   * Float fields now supported via FloatFieldModel if they are enabled on the Octane server.
   * Change to maven group id: com.microfocus.adm.almoctane.sdk
