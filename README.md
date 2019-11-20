@@ -183,8 +183,11 @@ This will make the sdk use log4j as an slf4j implementation, configuring a log4j
 
 ## What's New
 * 15.0.20
-  * When generating entities the enums that represent Lists will now be constructed from their logical name as opposed to just their name.  This was done due Octane
-  enabling list names to be non-unique.  Enums names have to be unique.  This is therefore a **breaking change** where the name of the Enum could change.
+  * Lists are now created in their own classes.  The package name is based on the list's logical name.  This was necessary due to non-unique list names.   In order
+  to try to preserve backward compatibility the actual class name should be the same but are now in separate packages.  That means that in the best case only
+  imports need to be changed.
+    * In addition to this list names need to conform to Java standards. If a list name starts with an illegal character such as a number then the name will start with 
+    a '$'.   
   * Due to a bug on Octane - the *run_history* entity's ID is marked as an integer as opposed to a string.  This causes an issue in the entity generation.
   Therefore the *run_history* entity will not be generated until this bug is fixed in Octane
 * 12.60.41
