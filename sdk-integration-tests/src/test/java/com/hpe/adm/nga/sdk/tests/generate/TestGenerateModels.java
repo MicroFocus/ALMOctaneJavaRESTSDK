@@ -5,10 +5,7 @@ import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.entities.get.GetTypedEntity;
 import com.hpe.adm.nga.sdk.generate.GenerateModels;
-import com.hpe.adm.nga.sdk.model.EntityModel;
-import com.hpe.adm.nga.sdk.model.FieldModel;
-import com.hpe.adm.nga.sdk.model.StringFieldModel;
-import com.hpe.adm.nga.sdk.model.TypedEntityModel;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
@@ -101,27 +98,34 @@ public class TestGenerateModels {
 
         final Octane octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
 
-        final Set<FieldModel> fields = new HashSet<>();
-        fields.add(new StringFieldModel("name", TEST_NAME));
-        fields.add(new StringFieldModel("description", TEST_DESCRIPTION));
-        final Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects", fields);
+        final Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects", new HashSet<>());
         final Collection<EntityModel> entityModels = octane.entityList("defects").create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
-        String entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        final String entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        final String entityName = CommonUtils.getValueFromEntityModel(generatedEntity.iterator().next(), "name");
 
         final URLClassLoader classLoader = new URLClassLoader(new URL[]{generatedDirectory.toURI().toURL()}, this.getClass().getClassLoader());
         classLoader.clearAssertionStatus();
-        final Class loadedClass = classLoader.loadClass("com.hpe.adm.nga.sdk.entities.DefectEntityList");
+        final Class defectEntityListClass = classLoader.loadClass("com.hpe.adm.nga.sdk.entities.DefectEntityList");
 
-        final TypedEntityList typedEntityList = octane.entityList(loadedClass);
+        final TypedEntityList typedEntityList = octane.entityList(defectEntityListClass);
 
         final Object defectEntitiesObject = typedEntityList.getClass().getMethod("at", String.class).invoke(typedEntityList, entityId);
+
         final GetTypedEntity getDefectEntityModel = (GetTypedEntity) defectEntitiesObject.getClass().getMethod("get").invoke(defectEntitiesObject);
+        final Class defectEntityAvailableFieldsEnumClass = classLoader.loadClass("com.hpe.adm.nga.sdk.entities.DefectEntityList$AvailableFields");
+        final TypedEntityList.AvailableFields nameDefectField = (TypedEntityList.AvailableFields) Enum.valueOf(defectEntityAvailableFieldsEnumClass, "NAME");
+        final TypedEntityList.AvailableFields authorDefectField = (TypedEntityList.AvailableFields) Enum.valueOf(defectEntityAvailableFieldsEnumClass, "AUTHOR");
+
+        getDefectEntityModel.addFields(nameDefectField, authorDefectField);
+
         final TypedEntityModel defectTypedEntityModel = getDefectEntityModel.execute();
         final String getName = (String) defectTypedEntityModel.getClass().getMethod("getName").invoke(defectTypedEntityModel);
         final String getDescription = (String) defectTypedEntityModel.getClass().getMethod("getDescription").invoke(defectTypedEntityModel);
+        final Object getAuthor = defectTypedEntityModel.getClass().getMethod("getAuthor").invoke(defectTypedEntityModel);
 
-        Assert.assertEquals(TEST_NAME, getName);
-        Assert.assertEquals(TEST_DESCRIPTION, getDescription);
+        Assert.assertEquals(entityName, getName);
+        Assert.assertNull(getDescription);
+        Assert.assertNotNull(getAuthor);
     }
 }
