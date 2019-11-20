@@ -156,6 +156,9 @@ See the following example for how to use the generated code:
         defectEntityList.update().entities(Collections.singleton(defect)).execute();
 ```
 
+Please note that due to the way that the Octane REST API works only a limited number of fields will be automatically retrieved from the server.  Due to this the `addFields` method
+should be used to explicitly state which fields should be retrieved.  You can see more information [here](https://admhelp.microfocus.com/octane/en/latest/Online/Content/API/fields_clause.htm)
+
 ## Logging
 
 The SDK uses [SLF4J](https://www.slf4j.org/) internally for all logging. This means that the users of the library can control the logging framework used for the implementation. 
@@ -180,7 +183,7 @@ This will make the sdk use log4j as an slf4j implementation, configuring a log4j
 
 ## What's New
 * 15.0.20
-  * When generating entities the enums that represent Lists will now be constucted from their logical name as opposed to just their name.  This was done due Octane
+  * When generating entities the enums that represent Lists will now be constructed from their logical name as opposed to just their name.  This was done due Octane
   enabling list names to be non-unique.  Enums names have to be unique.  This is therefore a **breaking change** where the name of the Enum could change.
   * Due to a bug on Octane - the *run_history* entity's ID is marked as an integer as opposed to a string.  This causes an issue in the entity generation.
   Therefore the *run_history* entity will not be generated until this bug is fixed in Octane
