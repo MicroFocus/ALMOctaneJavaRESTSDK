@@ -72,6 +72,25 @@ public final class GeneratorHelper {
         return getSanitisedFieldName(stringBuffer.toString());
     }
 
+    public static String getJavaCompliantIdentifier(final String name) {
+        final char[] chars = name.toCharArray();
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < chars.length; ++i) {
+            final char character = chars[i];
+            if (i == 0) {
+                if (!Character.isJavaIdentifierStart(character)) {
+                    stringBuilder.append("$");
+                }
+            }
+
+            stringBuilder.append(Character.isJavaIdentifierPart(character) ?
+                    character :
+                    '_');
+        }
+
+        return stringBuilder.toString();
+    }
+
     public static String convertToUpperCase(final String fieldName) {
         final StringBuffer stringBuffer = new StringBuffer();
         final String[] splitFields = fieldName.split("_");

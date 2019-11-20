@@ -30,6 +30,8 @@ import org.apache.velocity.app.VelocityEngine;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,6 +106,14 @@ public class GenerateModels {
 
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
+            /**
+             * @Since 15.0.20
+             * The run_history's id is integer even though it should be string.  It would be extremely complicated to make a special case for run_history id as long
+             * Therefore until this is fixed in Octane - the entity will be ignored
+             */
+            if (name.equals("run_history")) {
+                continue;
+            }
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
             final Collection<FieldMetadata> fieldMetadata = generateEntity(metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
             generateInterface(entityMetadatum, name, interfaceName);
@@ -122,12 +132,12 @@ public class GenerateModels {
             final String name;
             if (listRootFieldModel instanceof EmptyFieldModel) {
                 rootId = listNode.getId();
-                name = GeneratorHelper.camelCaseFieldName(((StringFieldModel) listNode.getValue("name")).getValue().replaceAll("\\W", "_"));
-                logicalNameToNameMap.put(((StringFieldModel) listNode.getValue("logical_name")).getValue(), name);
+                name = GeneratorHelper.camelCaseFieldName(GeneratorHelper.getJavaCompliantIdentifier(((StringFieldModel) listNode.getValue("name")).getValue()));
+                logicalNameToNameMap.put(((StringFieldModel) listNode.getValue("logical_name")).getValue(), getPackageForList(rootId).concat(".").concat(name));
             } else {
                 final EntityModel list_rootValue = ((ReferenceFieldModel) listRootFieldModel).getValue();
                 rootId = list_rootValue.getId();
-                name = ((StringFieldModel) listNode.getValue("name")).getValue().replaceAll(" ", "_").replaceAll("^\\d", "_$0").replaceAll("\\W", "_").toUpperCase();
+                name = GeneratorHelper.getJavaCompliantIdentifier(((StringFieldModel) listNode.getValue("name")).getValue()).toUpperCase();
             }
             final List<String[]> listHierarchy = mappedListNodes.computeIfAbsent(rootId, k -> new ArrayList<>());
 
@@ -139,13 +149,37 @@ public class GenerateModels {
             }
         });
 
-        final VelocityContext velocityContext = new VelocityContext();
-        velocityContext.put("listNodes", mappedListNodes);
-        final FileWriter fileWriter = new FileWriter(new File(enumsDirectory, "Lists.java"));
-        listsTemplate.merge(velocityContext, fileWriter);
-        fileWriter.close();
+        for (final Map.Entry<String, List<String[]>> entry : mappedListNodes.entrySet()) {
+            final String rootId = entry.getKey();
+            final List<String[]> nodes = entry.getValue();
+            final String className = nodes.get(0)[0];
+
+            final Path listDirectoryPath = enumsDirectory.toPath().resolve(Paths.get("lists", rootId.split("\\.")));
+            final File listDirectoryPathFile = listDirectoryPath.toFile();
+            listDirectoryPathFile.mkdirs();
+            final File listFile = new File(listDirectoryPathFile, className + ".java");
+
+            final VelocityContext velocityContext = new VelocityContext();
+            velocityContext.put("listItemsSet", entry);
+            velocityContext.put("className", className);
+            velocityContext.put("packageName", getPackageForList(rootId));
+            final FileWriter fileWriter = new FileWriter(listFile);
+            listsTemplate.merge(velocityContext, fileWriter);
+            fileWriter.close();
+        }
 
         return logicalNameToNameMap;
+    }
+
+    private String getPackageForList(final String rootId) {
+        final String[] splitRootIds = rootId.split("\\.");
+        final StringBuilder packageStringBuilder = new StringBuilder("com.hpe.adm.nga.sdk.enums.lists.");
+        for (int i = 0; i < splitRootIds.length - 1; i++) {
+            packageStringBuilder.append(splitRootIds[i]).append(".");
+        }
+        packageStringBuilder.append(splitRootIds[splitRootIds.length - 1]);
+
+        return packageStringBuilder.toString();
     }
 
     private Set<String> generatePhases(Octane octane) throws IOException {
@@ -185,7 +219,7 @@ public class GenerateModels {
                     } else if (fieldMetadata1.getFieldType() == FieldMetadata.FieldType.Reference) {
                         if ((!entityMetadatum.getName().equals("list_node")) && (fieldMetadata1.getFieldTypedata().getTargets()[0].getType().equals("list_node"))) {
                             final String listName = logicalNameToListsMap.get(fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName());
-                            references.add("com.hpe.adm.nga.sdk.enums.Lists." + listName);
+                            references.add(listName);
                         } else {
                             final GeneratorHelper.ReferenceMetadata referenceMetadata = GeneratorHelper.getAllowedSuperTypesForReference(fieldMetadata1, entityMetadata);
                             if (fieldMetadata1.getFieldTypedata().isMultiple()) {

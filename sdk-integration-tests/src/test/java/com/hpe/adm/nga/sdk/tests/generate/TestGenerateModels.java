@@ -1,25 +1,33 @@
 package com.hpe.adm.nga.sdk.tests.generate;
 
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.entities.TypedEntityList;
+import com.hpe.adm.nga.sdk.entities.get.GetTypedEntity;
 import com.hpe.adm.nga.sdk.generate.GenerateModels;
+import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
+import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
+import com.hpe.adm.nga.sdk.utils.ContextUtils;
+import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.tools.*;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 
 public class TestGenerateModels {
 
+    private static final String TEST_NAME = "testName";
+    private static final String TEST_DESCRIPTION = "testDescription";
+
     @Test
-    public void testGenerateModels() throws IOException {
+    public void testGenerateModels() throws Exception {
         final File generatedSourcesDirectory = new File("target/test-test-sources");
         FileUtils.deleteDirectory(generatedSourcesDirectory);
         //noinspection ResultOfMethodCallIgnored
@@ -27,6 +35,7 @@ public class TestGenerateModels {
 
         generateSources(generatedSourcesDirectory);
         compileClasses(generatedSourcesDirectory);
+        testGeneratedClass(generatedSourcesDirectory);
     }
 
     private void compileClasses(File generatedDirectory) {
@@ -68,15 +77,55 @@ public class TestGenerateModels {
 
     private void generateSources(File generatedDirectory) {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
-        String url = configuration.getString("sdk.url");
-        Authentication authentication = AuthenticationUtils.getAuthentication(false);
-        String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
-        String workspaceId = configuration.getString("sdk.workspaceId");
+        final String url = configuration.getString("sdk.url");
+        final Authentication authentication = AuthenticationUtils.getAuthentication(false);
+        final String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
+        final String workspaceId = configuration.getString("sdk.workspaceId");
 
         try {
             new GenerateModels(generatedDirectory).generate(authentication, url, Long.parseLong(sharedSpaceId), Long.parseLong(workspaceId));
         } catch (Exception e) {
-            Assert.fail("Test failed whilst building test sources; "+e.getMessage());
+            Assert.fail("Test failed whilst building test sources; " + e.getMessage());
         }
+    }
+
+    private void testGeneratedClass(File generatedDirectory) throws Exception {
+        final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
+        final String url = configuration.getString("sdk.url");
+        final Authentication authentication = AuthenticationUtils.getAuthentication(false);
+        final String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
+        final String workspaceId = configuration.getString("sdk.workspaceId");
+
+        final Octane octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
+
+        final Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects", new HashSet<>());
+        final Collection<EntityModel> entityModels = octane.entityList("defects").create().entities(generatedEntity).execute();
+        EntityModel entityModel = entityModels.iterator().next();
+        final String entityId = CommonUtils.getIdFromEntityModel(entityModel);
+        final String entityName = CommonUtils.getValueFromEntityModel(generatedEntity.iterator().next(), "name");
+
+        final URLClassLoader classLoader = new URLClassLoader(new URL[]{generatedDirectory.toURI().toURL()}, this.getClass().getClassLoader());
+        classLoader.clearAssertionStatus();
+        final Class defectEntityListClass = classLoader.loadClass("com.hpe.adm.nga.sdk.entities.DefectEntityList");
+
+        final TypedEntityList typedEntityList = octane.entityList(defectEntityListClass);
+
+        final Object defectEntitiesObject = typedEntityList.getClass().getMethod("at", String.class).invoke(typedEntityList, entityId);
+
+        final GetTypedEntity getDefectEntityModel = (GetTypedEntity) defectEntitiesObject.getClass().getMethod("get").invoke(defectEntitiesObject);
+        final Class defectEntityAvailableFieldsEnumClass = classLoader.loadClass("com.hpe.adm.nga.sdk.entities.DefectEntityList$AvailableFields");
+        final TypedEntityList.AvailableFields nameDefectField = (TypedEntityList.AvailableFields) Enum.valueOf(defectEntityAvailableFieldsEnumClass, "NAME");
+        final TypedEntityList.AvailableFields authorDefectField = (TypedEntityList.AvailableFields) Enum.valueOf(defectEntityAvailableFieldsEnumClass, "AUTHOR");
+
+        getDefectEntityModel.addFields(nameDefectField, authorDefectField);
+
+        final TypedEntityModel defectTypedEntityModel = getDefectEntityModel.execute();
+        final String getName = (String) defectTypedEntityModel.getClass().getMethod("getName").invoke(defectTypedEntityModel);
+        final String getDescription = (String) defectTypedEntityModel.getClass().getMethod("getDescription").invoke(defectTypedEntityModel);
+        final Object getAuthor = defectTypedEntityModel.getClass().getMethod("getAuthor").invoke(defectTypedEntityModel);
+
+        Assert.assertEquals(entityName, getName);
+        Assert.assertNull(getDescription);
+        Assert.assertNotNull(getAuthor);
     }
 }
