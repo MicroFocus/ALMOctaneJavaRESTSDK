@@ -22,7 +22,7 @@ import com.hpe.adm.nga.sdk.query.Query;
 /**
  * This class hold the GetEntities objects and serve all functions concern to REST
  * GetEntities.
- * <br/>
+ * <br>
  * As of Octane version 12.60.60 only a limited number of fields are returned by default. Therefore the {@link #addFields(String...)}
  * method should be used.  @see <a href="https://admhelp.microfocus.com/octane/en/latest/Online/Content/API/fields_clause.htm">here</a> for more information
  */
