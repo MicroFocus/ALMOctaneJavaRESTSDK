@@ -1,4 +1,4 @@
-package com.hpe.adm.nga.sdk.enums;
+package $packageName;
 
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
@@ -7,43 +7,39 @@ import java.util.Arrays;
 /**
  * Generated class - do not edit!
  */
-public final class Lists {
+public enum $className {
 
-#foreach($listItemsSet in ${listNodes.entrySet()})
-    #set($listItems = $listItemsSet.getValue())
-    #set($rootModel = $listItems.get(0))
-    #set($rootModelName = ${rootModel[0]})
-    public enum $rootModelName {
-        #foreach($listModel in $listItems)#if(!$foreach.first)
-        #if($foreach.count > 2), #end${listModel[0]}("${listModel[1]}")#end
-        #end;
+#set($listItems = $listItemsSet.getValue())
+#set($rootModel = $listItems.get(0))
+#set($rootModelName = ${rootModel[0]})
+    #foreach($listModel in $listItems)#if(!$foreach.first)
+    #if($foreach.count > 2), #end${listModel[0]}("${listModel[1]}")#end
+    #end;
 
-        public static final String ROOT_ID = "${rootModel[1]}";
+    public static final String ROOT_ID = "${rootModel[1]}";
 
-        private final String id;
+    private final String id;
 
-        $rootModelName(final String id) {
-            this.id = id;
-        }
-
-        public final String getId() {
-            return id;
-        }
-
-        public static $rootModelName getListNodeFromId(String id) {
-            return Arrays.stream(${rootModelName}.values()).filter(listNode -> listNode.id.equals(id)).findFirst().orElse(null);
-        }
-
-        public final EntityModel getAsEntityModel() {
-            final EntityModel entityModel = new EntityModel();
-            entityModel.setValue(new StringFieldModel("id", id));
-            entityModel.setValue(new StringFieldModel("type", "list_node"));
-            return entityModel;
-        }
-
-        public static $rootModelName getFromEntityModel(final EntityModel entityModel) {
-            return ${rootModelName}.getListNodeFromId(entityModel.getId());
-        }
+    $rootModelName(final String id) {
+        this.id = id;
     }
-#end
+
+    public final String getId() {
+        return id;
+    }
+
+    public static $rootModelName getListNodeFromId(String id) {
+        return Arrays.stream(${rootModelName}.values()).filter(listNode -> listNode.id.equals(id)).findFirst().orElse(null);
+    }
+
+    public final EntityModel getAsEntityModel() {
+        final EntityModel entityModel = new EntityModel();
+        entityModel.setValue(new StringFieldModel("id", id));
+        entityModel.setValue(new StringFieldModel("type", "list_node"));
+        return entityModel;
+    }
+
+    public static $rootModelName getFromEntityModel(final EntityModel entityModel) {
+        return ${rootModelName}.getListNodeFromId(entityModel.getId());
+    }
 }

@@ -26,7 +26,6 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
- *
  * Created by Guy Guetta on 21/04/2016.
  */
 public class DataGenerator {
@@ -54,10 +53,11 @@ public class DataGenerator {
         }
         return entities;
     }
-    public static Collection<EntityModel> getAllDataForEntities(Collection<EntityModel> entities, Octane octane, String entityType){
+
+    public static Collection<EntityModel> getAllDataForEntities(Collection<EntityModel> entities, Octane octane, String entityType) {
         Collection<EntityModel> entitiesWithData = new ArrayList<>();
-        for(EntityModel entityModel : entities){
-            EntityModel entityModelWithData =  octane.entityList(entityType).at(CommonUtils.getValueFromEntityModel(entityModel, "id")).get().execute();
+        for (EntityModel entityModel : entities) {
+            EntityModel entityModelWithData = octane.entityList(entityType).at(CommonUtils.getValueFromEntityModel(entityModel, "id")).get().execute();
             entitiesWithData.add(entityModelWithData);
         }
         return entitiesWithData;
@@ -87,7 +87,7 @@ public class DataGenerator {
     }
 
 
-    private static EntityModel generatePA(Octane octane, Set<FieldModel> fields) throws Exception {
+    private static EntityModel generatePA(Octane octane, Set<FieldModel> fields) {
         Collection<EntityModel> pas = octane.entityList("product_areas").get().execute();
         EntityModel parentEntity = CommonUtils.getEntityWithStringValue(pas, "parent", null);
         String parentId = CommonUtils.getIdFromEntityModel(parentEntity);
@@ -104,7 +104,7 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateFeature(Octane octane, Set<FieldModel> fields) throws Exception {
+    private static EntityModel generateFeature(Octane octane, Set<FieldModel> fields) {
         Collection<EntityModel> phases = octane.entityList("phases").get().execute();
         EntityModel phase = phases.iterator().next();
         Collection<EntityModel> themes = octane.entityList("themes").get().execute();
@@ -120,7 +120,7 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateDefect(Octane octane, Set<FieldModel> fields) throws Exception {
+    private static EntityModel generateDefect(Octane octane, Set<FieldModel> fields) {
         Query query = Query.statement("subtype", QueryMethod.EqualTo, "work_item_root").build();
         Collection<EntityModel> roots = octane.entityList("work_items").get().query(query).execute();
         EntityModel root = roots.iterator().next();
@@ -149,7 +149,7 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateRelease() throws ParseException {
+    private static EntityModel generateRelease() {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_release_" + UUID.randomUUID());
         FieldModel startDate = new DateFieldModel("start_date", ZonedDateTime.parse("2015-03-14T12:00:00Z"));
@@ -160,7 +160,7 @@ public class DataGenerator {
         return new EntityModel(fields);
     }
 
-    private static EntityModel generateMilestone() throws ParseException {
+    private static EntityModel generateMilestone() {
         Set<FieldModel> fields = new HashSet<>();
         FieldModel name = new StringFieldModel("name", "sdk_milestone_" + UUID.randomUUID());
         FieldModel date = new DateFieldModel("date", ZonedDateTime.parse("2016-03-17T12:00:00Z"));

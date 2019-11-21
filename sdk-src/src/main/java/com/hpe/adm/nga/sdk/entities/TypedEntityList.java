@@ -25,9 +25,6 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
  */
 public abstract class TypedEntityList {
 
-    protected final OctaneHttpClient octaneHttpClient;
-    protected final String baseDomain;
-
     /**
      * An interface that marks the fields in the entity that can be selected in queries and field selection
      */
@@ -69,16 +66,5 @@ public abstract class TypedEntityList {
                 throw new IllegalArgumentException("Cannot instantiate", e);
             }
         }
-    }
-
-    /**
-     * Creates a new object.  This represents an entity collection
-     *
-     * @param octaneHttpClient - Http Client
-     * @param baseDomain - Domain Name
-     */
-    public TypedEntityList(OctaneHttpClient octaneHttpClient, String baseDomain) {
-        this.octaneHttpClient = octaneHttpClient;
-        this.baseDomain = baseDomain;
     }
 }
