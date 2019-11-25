@@ -119,6 +119,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
         try {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
+
+            // Authenticate request should never set the HPE_CLIENT_TYPE header.
+            // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
+            // Using this kind of header for future requests will still work.
+            httpRequest.getHeaders().remove(HPE_CLIENT_TYPE);
+
             HttpResponse response = executeRequest(httpRequest);
 
             if (response.isSuccessStatusCode()) {
