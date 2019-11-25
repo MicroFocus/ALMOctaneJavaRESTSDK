@@ -31,21 +31,30 @@ public class FieldMetadata {
 		@SerializedName("float")
 		Float,
 		@SerializedName("boolean")
-	    Boolean, 
-	    @SerializedName("date_time")
-	    DateTime,
-	    @SerializedName("date")
-	    Date, 
-	    @SerializedName("string")
-	    String, 
-	    @SerializedName("memo")
-	    Memo, 
-	    @SerializedName("object")
-	    Object,
-	    @SerializedName("reference")
+		Boolean, 
+		@SerializedName("date_time")
+		DateTime,
+		@SerializedName("date")
+		Date, 
+		@SerializedName("string")
+		String, 
+		@SerializedName("memo")
+		Memo, 
+		@SerializedName("object")
+		Object,
+		@SerializedName("reference")
 		Reference
 	}
 	
+	public enum AccessLevel {
+		@SerializedName("PUBLIC")
+		Public,
+		@SerializedName("PRIVATE")
+		Private,
+		@SerializedName("PUBLIC_TECH_PREVIEW")
+		TechPreview;
+	}
+
 	// Private
 	private static final String type = "field_metadata";
 	private String name;
@@ -54,10 +63,12 @@ public class FieldMetadata {
 	private String entity_name;
 	private boolean is_user_defined;
 	private boolean visible_in_ui;
+	private AccessLevel access_level;
 	private boolean accessible_via_business_rules;
 	private String description;
 	private boolean can_modify_description;
 	private boolean filterable;
+	private boolean selectable;
 	private boolean groupable;
 	private boolean sortable;
 	private boolean auditable;
@@ -142,6 +153,12 @@ public class FieldMetadata {
 	public boolean isFilterable(){return filterable;}
 
 	/**
+	 * get FieldMetadata's Selectable state
+	 * @return is selectable
+	 */
+	public boolean isSelectable(){return selectable;}
+	
+	/**
 	 * get FieldMetadata's Editable state
 	 * @return is editable
 	 */
@@ -176,6 +193,12 @@ public class FieldMetadata {
 	 * @return whether thr field is visible in UI
      */
 	public boolean isVisibleInUI() {return visible_in_ui;}
+
+	/**
+	 * get FieldMetadata's Access Level
+	 * @return access_level
+	 */
+	public AccessLevel getAccessLevel() {return access_level;}
 
 	/**
 	 * get FieldMetadata's VisibleInUI

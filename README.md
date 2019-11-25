@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>12.60.41</version>
+    <version>15.0.20</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '12.60.41'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.0.20'
 ```
 
 ## Introduction
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 12.60.21 b
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>12.60.41</version>
+                <version>15.0.20</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -156,6 +156,9 @@ See the following example for how to use the generated code:
         defectEntityList.update().entities(Collections.singleton(defect)).execute();
 ```
 
+Please note that due to the way that the Octane REST API works only a limited number of fields will be automatically retrieved from the server.  Due to this the `addFields` method
+should be used to explicitly state which fields should be retrieved.  You can see more information [here](https://admhelp.microfocus.com/octane/en/latest/Online/Content/API/fields_clause.htm)
+
 ## Logging
 
 The SDK uses [SLF4J](https://www.slf4j.org/) internally for all logging. This means that the users of the library can control the logging framework used for the implementation. 
@@ -167,7 +170,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>12.60.41</version>
+            <version>15.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -179,6 +182,14 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
+* 15.0.20
+  * Lists are now created in their own classes.  The package name is based on the list's logical name.  This was necessary due to non-unique list names.   In order
+  to try to preserve backward compatibility the actual class name should be the same but are now in separate packages.  That means that in the best case only
+  imports need to be changed.
+    * In addition to this list names need to conform to Java standards. If a list name starts with an illegal character such as a number then the name will start with 
+    a '$'.   
+  * Due to a bug on Octane - the *run_history* entity's ID is marked as an integer as opposed to a string.  This causes an issue in the entity generation.
+  Therefore the *run_history* entity will not be generated until this bug is fixed in Octane
 * 12.60.41
   * Float fields now supported via FloatFieldModel if they are enabled on the Octane server.
   * Change to maven group id: com.microfocus.adm.almoctane.sdk

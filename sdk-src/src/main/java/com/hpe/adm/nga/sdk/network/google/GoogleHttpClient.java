@@ -63,6 +63,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
+    protected Date lastSuccessfulAuthTimestamp;
     private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
     private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
@@ -110,7 +111,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
-    public boolean authenticate(Authentication authentication) {
+    public synchronized boolean authenticate(Authentication authentication) {
         //reset so it's not sent to auth request, server might return 304
         lwssoValue = null;
         octaneUserValue = null;
@@ -119,10 +120,19 @@ public class GoogleHttpClient implements OctaneHttpClient {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
 
+            // Authenticate request should never set the HPE_CLIENT_TYPE header.
+            // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
+            // Using this kind of header for future requests will still work.
+            httpRequest.getHeaders().remove(HPE_CLIENT_TYPE);
+
             HttpResponse response = executeRequest(httpRequest);
 
-            // Initialize Cookies keys
-            return response.isSuccessStatusCode();
+            if (response.isSuccessStatusCode()) {
+                lastSuccessfulAuthTimestamp = new Date();
+                return true;
+            } else {
+                return false;
+            }
         } catch (RuntimeException e) {
             lastUsedAuthentication = null; //not reusable
             throw e;
@@ -131,7 +141,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
     }
 
-    public void signOut() {
+    public synchronized void signOut() {
         GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_SIGNOUT_URL);
         try {
             HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
@@ -262,19 +272,32 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
                 LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
 
+
                 //Handle session timeout
                 if (errorCodeFieldModel != null && httpStatusCode.getValue() == 401 &&
                         (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())) &&
                         lastUsedAuthentication != null) {
 
-                    logger.debug("Auth token expired, trying to re-authenticate");
-                    try {
-                        authenticate(lastUsedAuthentication);
-                    } catch (OctaneException ex) {
-                        logger.debug("Exception while retrying authentication: {}", ex.getMessage());
+                    Date currentTimestamp = new Date();
+
+                    // The same http client should not attempt re-auth from multiple threads
+                    synchronized (this) {
+
+                        // If another thread already handled session timeout, skip the re-auth and just retry the request
+                        if (lastSuccessfulAuthTimestamp.getTime() < currentTimestamp.getTime()) {
+                            logger.debug("Auth token expired, trying to re-authenticate");
+                            try {
+                                authenticate(lastUsedAuthentication);
+                            } catch (OctaneException ex) {
+                                logger.debug("Exception while retrying authentication: {}", ex.getMessage());
+                            }
+                        } else {
+                            logger.debug("Auth token expired, but re-authentication was handled by another thread, will not re-authenticate");
+                        }
+
+                        logger.debug("Retrying request, retries left: {}", retryCount);
+                        return execute(octaneHttpRequest, --retryCount);
                     }
-                    logger.debug("Retrying request, retries left: {}", retryCount);
-                    return execute(octaneHttpRequest, --retryCount);
                 }
             }
 
