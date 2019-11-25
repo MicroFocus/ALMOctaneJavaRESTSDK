@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>12.60.47</version>
+    <version>15.0.20</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '12.60.47'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.0.20'
 ```
 
 ## Introduction
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 12.60.21 b
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>12.60.47</version>
+                <version>15.0.20</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -170,7 +170,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>12.60.47</version>
+            <version>15.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
