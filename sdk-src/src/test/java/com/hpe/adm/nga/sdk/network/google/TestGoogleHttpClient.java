@@ -22,6 +22,7 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -97,6 +98,7 @@ public class TestGoogleHttpClient {
 
 
     @Test
+    @Ignore
     public void testParallelRequestRetry() throws InterruptedException {
         ConfigurationProperties.logLevel("WARN");
 
