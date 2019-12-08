@@ -48,13 +48,13 @@ public class TestQueryMethod {
     @Test
     public void testBetweenNumber() {
         final String queryResult = QueryMethod.Between.getAction().apply("testField", new QueryMethod.Between("1000", "1020"));
-        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000'...'1020')", queryResult);
+        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000' ...'1020')", queryResult);
     }
 
     @Test
     public void testBetweenDate() {
         final String queryResult = QueryMethod.Between.getAction().apply("testField", new QueryMethod.Between("1000", "1020"));
-        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000'...'1020')", queryResult);
+        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000' ...'1020')", queryResult);
     }
 
 }
