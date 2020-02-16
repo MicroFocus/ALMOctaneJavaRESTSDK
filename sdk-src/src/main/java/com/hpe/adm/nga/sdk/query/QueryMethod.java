@@ -142,7 +142,7 @@ public enum QueryMethod {
             return "";
         }
         return "(" + field + " " + COMPARISON_OPERATOR_BETWEEN + " "
-                + toString(lowerAndUpper.lower) + "..." + toString(lowerAndUpper.upper)
+                + toString(lowerAndUpper.lower) + " ..." + toString(lowerAndUpper.upper)
                 + ")";
     }
 
