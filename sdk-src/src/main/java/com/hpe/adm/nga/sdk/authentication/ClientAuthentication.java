@@ -13,31 +13,23 @@
  */
 package com.hpe.adm.nga.sdk.authentication;
 
+import com.hpe.adm.nga.sdk.APIMode;
+
 /**
- *
+ * Used for api key authentications
  * Created by brucesp on 19-Dec-16.
  */
-abstract class ClientAuthentication implements Authentication {
+abstract class ClientAuthentication extends ModedAuthentication implements Authentication {
 
-    private static final String JSON_STRING = "{\"client_id\":\"%s\",\"client_secret\":\"%s\"}";
-
-    private final String clientTypeHeader;
-
-    ClientAuthentication(final String clientTypeHeader) {
-        this.clientTypeHeader = clientTypeHeader;
+    ClientAuthentication(final APIMode apiMode) {
+        super(apiMode);
     }
 
-    @Override
-    public final String getClientHeader() {
-        return clientTypeHeader;
+    final protected String getAuthenticationIdKey() {
+        return "client_id";
     }
 
-    @Override
-    public final String getAuthenticationString() {
-        return String.format(JSON_STRING, getClientId(), getClientSecret());
+    final protected String getAuthenticationSecretKey() {
+        return "client_secret";
     }
-
-    abstract protected String getClientId();
-
-    abstract protected String getClientSecret();
 }
