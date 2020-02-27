@@ -1,3 +1,16 @@
+/*
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.authentication.Authentication;
@@ -7,6 +20,11 @@ import com.hpe.adm.nga.sdk.siteadmin.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents the octane site admin APIs.  This is different from the {@link Octane} instance in that there are no
+ * spaces or workspaces that can be referenced.  See the REST API documentation for more information as to what can
+ * be garnered from the site admin api
+ */
 public class SiteAdmin {
 
     private static final String SITE_ADMIN_DOMAIN_FORMAT = "/admin/";
@@ -21,16 +39,21 @@ public class SiteAdmin {
         urlDomain = domain + SITE_ADMIN_DOMAIN_FORMAT;
     }
 
+    /**
+     * Gets an instance of the server API.  Used for getting the server version as an example
+     *
+     * @return A new server instance
+     */
     public Server getServer() {
         return new Server(octaneHttpClient, urlDomain);
     }
 
     /**
-     * This class is used to create an {@link Octane} instance for site admin API usage.  It is initialised using the correct {@link Authentication}
+     * This class is used to create an {@link SiteAdmin} instance for site admin API usage.  It is initialised using the correct {@link Authentication}
      * <br>
-     * The {@code AdminBuilder} class uses the builder pattern.  This builds up the correct Octane REST API context.
+     * The {@code Builder} class uses the builder pattern.  This builds up the correct Octane REST API context.
      * <br>
-     * Once the correct context has been built up use the {@link #build()} method to create the {@code Octane} instance
+     * Once the correct context has been built up use the {@link #build()} method to create the {@code SiteAdmin} instance
      */
     public static class Builder {
         //Private
@@ -78,7 +101,7 @@ public class SiteAdmin {
          */
         public Builder Server(String domain, int port) {
 
-            urlDomain = domain + ":" + String.valueOf(port);
+            urlDomain = domain + ":" + port;
 
             return this;
         }
@@ -100,9 +123,9 @@ public class SiteAdmin {
         }
 
         /**
-         * The main build procedure which creates the {@link Octane} object and authenticates against the server
+         * The main build procedure which creates the {@link SiteAdmin} object and authenticates against the server
          *
-         * @return a new Octane instance which has the set context and is correctly authenticated
+         * @return a new SiteAdmin instance which has the set context and is correctly authenticated
          */
         public SiteAdmin build() {
 
