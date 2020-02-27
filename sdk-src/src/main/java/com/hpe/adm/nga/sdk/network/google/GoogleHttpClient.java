@@ -338,6 +338,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             exceptionContentList.add(httpResponseException.getStatusMessage());
             exceptionContentList.add(httpResponseException.getContent());
 
+            // TODO: spencer FIX THE STUPID quotssssssss
             for (String exceptionContent : exceptionContentList) {
                 try {
                     if (ModelParser.getInstance().hasErrorModels(exceptionContent)) {
