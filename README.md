@@ -182,6 +182,8 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
+* 15.0.40
+  * Get the server version using the `SiteAdmin` API.  This matches the `serverurl/admin/server/version` REST call
 * 15.0.20
   * Lists are now created in their own classes.  The package name is based on the list's logical name.  This was necessary due to non-unique list names.   In order
   to try to preserve backward compatibility the actual class name should be the same but are now in separate packages.  That means that in the best case only
