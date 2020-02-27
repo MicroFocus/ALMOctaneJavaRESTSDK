@@ -90,10 +90,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         request.getHeaders().setCookie(cookieBuilder.toString());
 
         if (lastUsedAuthentication != null) {
-            String clientTypeHeader = lastUsedAuthentication.getClientHeader();
-            if (clientTypeHeader != null && !clientTypeHeader.isEmpty()) {
-                request.getHeaders().set(HPE_CLIENT_TYPE, clientTypeHeader);
-            }
+            lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
         }
         request.setReadTimeout(60000);
     };
@@ -120,10 +117,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
             final ByteArrayContent content = ByteArrayContent.fromString("application/json", authentication.getAuthenticationString());
             HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
 
-            // Authenticate request should never set the HPE_CLIENT_TYPE header.
+            // Authenticate request should never set the api mode header.
             // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
             // Using this kind of header for future requests will still work.
-            httpRequest.getHeaders().remove(HPE_CLIENT_TYPE);
+            lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
+                    httpRequest.getHeaders().remove(apiMode.getHeaderKey())
+            );
 
             HttpResponse response = executeRequest(httpRequest);
 
@@ -171,6 +170,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
                     httpRequest = requestFactory.buildGetRequest(domain);
                     httpRequest.getHeaders().setAccept(((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType());
+                    httpRequest.getHeaders().setAcceptEncoding("utf-8");
                     final String eTagHeader = requestToEtagMap.get(octaneHttpRequest);
                     if (eTagHeader != null) {
                         httpRequest.getHeaders().setETag(eTagHeader);
@@ -342,8 +342,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
                         Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
                         return new OctanePartialException(errorModels, entities);
-                    } else {
+                    } else if (ModelParser.getInstance().hasErrorModel(exceptionContent)) {
                         ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
+                        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
+                        return new OctaneException(errorModel);
+                    } else if (ModelParser.getInstance().hasServletError(exceptionContent)) {
+                        ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromServletJson(exceptionContent);
                         errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
                         return new OctaneException(errorModel);
                     }

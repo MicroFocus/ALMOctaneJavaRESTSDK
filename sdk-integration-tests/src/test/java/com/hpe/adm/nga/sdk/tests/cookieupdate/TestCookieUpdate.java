@@ -42,10 +42,10 @@ public class TestCookieUpdate extends TestBase {
         String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         int counter = 0;
-        while (counter < 10) {
+        while (counter < 2) {
+            sleepTime(70);
             EntityModel getEntity = entityList.at(entityId).get().execute();
             Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
-            sleepTime(10);
             counter++;
         }
     }
