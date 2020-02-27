@@ -42,44 +42,42 @@ public class TestCreateEntities {
 	private final static String JSON_DATA_NAME = "data";
 
 	private static Octane octane;
-	
+
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	public static void setUpBeforeClass() {
 		octane = CommonMethods.getOctaneForTest();
 
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Test
-	public void testCreateEntity(){		
+	public void testCreateEntity() {
 		final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"moris2\"}],\"total_count\":1}";
 
 		EntityList defects = octane.entityList("defects");
 		CreateEntities spiedCreateEntity = PowerMockito.spy(defects.create());
-		
-		try{
+
+		try {
 			Collection<EntityModel> entityModelsIn = testGetEntityModels(jsonCreateString);
 
 			spiedCreateEntity.entities(entityModelsIn);
-			
+
 			Collection<EntityModel> internalModels = (Collection<EntityModel>) Whitebox.getInternalState(spiedCreateEntity, "entityModels");
 			JSONObject jsonEntity = ModelParser.getInstance().getEntitiesJSONObject(internalModels);
 
 			Collection<EntityModel> entityModelsOut = testGetEntityModels(jsonEntity.toString());
 			Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModelsIn, entityModelsOut));
-		}
-		catch(Exception ex){
+		} catch (Exception ex) {
 			fail("Failed with exception: " + ex);
 		}
-		
+
 	}
 
-	private Collection<EntityModel> testGetEntityModels(String jason) throws Exception{
+	private Collection<EntityModel> testGetEntityModels(String jason) {
 		JSONObject jasonObj = new JSONObject(jason);
 		JSONArray jasoDataArr = jasonObj.getJSONArray(JSON_DATA_NAME);
 		Collection<EntityModel> entityModels = new ArrayList<>();
-		IntStream.range(0, jasoDataArr.length()).forEach((i) -> {entityModels.add(ModelParser.getInstance().getEntityModel(jasoDataArr.getJSONObject(i)));
-
-		});
+		IntStream.range(0, jasoDataArr.length()).forEach((i) -> entityModels.add(ModelParser.getInstance().getEntityModel(jasoDataArr.getJSONObject(i))));
 
 		return entityModels;
 	}

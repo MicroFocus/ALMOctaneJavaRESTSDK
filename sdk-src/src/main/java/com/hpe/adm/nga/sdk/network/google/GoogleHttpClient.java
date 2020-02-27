@@ -171,8 +171,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
                     httpRequest = requestFactory.buildGetRequest(domain);
                     httpRequest.getHeaders().setAccept(((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType());
-                    // TODO: probably not even needed
-                    // httpRequest.getHeaders().setAcceptEncoding("utf-8");
+                    httpRequest.getHeaders().setAcceptEncoding("utf-8");
                     final String eTagHeader = requestToEtagMap.get(octaneHttpRequest);
                     if (eTagHeader != null) {
                         httpRequest.getHeaders().setETag(eTagHeader);
@@ -338,15 +337,18 @@ public class GoogleHttpClient implements OctaneHttpClient {
             exceptionContentList.add(httpResponseException.getStatusMessage());
             exceptionContentList.add(httpResponseException.getContent());
 
-            // TODO: spencer FIX THE STUPID quotssssssss
             for (String exceptionContent : exceptionContentList) {
                 try {
                     if (ModelParser.getInstance().hasErrorModels(exceptionContent)) {
                         Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
                         Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
                         return new OctanePartialException(errorModels, entities);
-                    } else {
+                    } else if (ModelParser.getInstance().hasErrorModel(exceptionContent)) {
                         ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
+                        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
+                        return new OctaneException(errorModel);
+                    } else if (ModelParser.getInstance().hasServletError(exceptionContent)) {
+                        ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromServletJson(exceptionContent);
                         errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
                         return new OctaneException(errorModel);
                     }
