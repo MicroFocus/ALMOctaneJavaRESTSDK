@@ -14,16 +14,16 @@
 package com.hpe.adm.nga.sdk.utils;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.SiteAdmin;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 
 /**
- *
  * Created by Dmitry Zavyalov on 03/05/2016.
  */
 public class ContextUtils {
 
-    public static Octane getContextSiteAdmin(String url, Authentication authentication) {
-        return getContext(url, authentication, "", "");
+    public static SiteAdmin getContextSiteAdmin(String url, Authentication authentication) {
+        return new SiteAdmin.Builder(authentication).Server(url).build();
     }
 
     public static Octane getContextSharedSpace(String url, Authentication authentication, String sharedSpaceId) {
@@ -35,16 +35,16 @@ public class ContextUtils {
     }
 
     private static Octane getContext(String url, Authentication authentication, String sharedSpaceId, String workspaceId) {
-        Octane octane = null;
+        Octane octane;
         try {
             Octane.Builder builder = new Octane.Builder(authentication).Server(url);
 
             if (!sharedSpaceId.isEmpty()) {
-                builder = builder.sharedSpace(Long.valueOf(sharedSpaceId));
+                builder = builder.sharedSpace(Long.parseLong(sharedSpaceId));
             }
 
             if (!workspaceId.isEmpty()) {
-                builder = builder.workSpace(Long.valueOf(workspaceId));
+                builder = builder.workSpace(Long.parseLong(workspaceId));
             }
 
             octane = builder.build();
