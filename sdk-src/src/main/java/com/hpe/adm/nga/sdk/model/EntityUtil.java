@@ -127,6 +127,7 @@ public class EntityUtil {
      *
      * @param collection  collection of entity models
      * @param entityModel target entity model
+     * @param entityEquator interface for checking equality between two entity models
      * @return true if the entity is in the collection, false otherwise
      */
     public static boolean containsEntityModel(Collection<EntityModel> collection, EntityModel entityModel, EntityEquator entityEquator) {
@@ -183,6 +184,7 @@ public class EntityUtil {
      *
      * @param collection  collection of entity models
      * @param entityModel target entity model
+     * @param entityEquator interface for checking equality between two entity models
      * @return true if the entity has been removed, false otherwise
      */
     public static boolean removeEntityModel(Collection<EntityModel> collection, EntityModel entityModel, EntityEquator entityEquator) {

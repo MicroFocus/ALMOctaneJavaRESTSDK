@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This returns an instance to get the version from the server
- * Corresponds to <a href="server/admin/server/version"/>
+ * Corresponds to <a href="server/admin/server/version"></a>
  */
 public class GetServerVersion {
     private final Logger logger = LoggerFactory.getLogger(GetServerVersion.class.getName());
