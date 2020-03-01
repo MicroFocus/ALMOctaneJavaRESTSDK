@@ -41,12 +41,12 @@ public interface APIMode {
     APIMode TechnicalPreviewAPIMode = new APIMode() {
         @Override
         public String getHeaderValue() {
-            return "ALM_OCTANE_TECH_PREVIEW";
+            return "true";
         }
 
         @Override
         public String getHeaderKey() {
-            return "true";
+            return "ALM_OCTANE_TECH_PREVIEW";
         }
     };
 
@@ -60,12 +60,12 @@ public interface APIMode {
 
         @Override
         public String getHeaderValue() {
-            return "HPECLIENTTYPE";
+            return "ALM_OCTANE_TECH_PREVIEW";
         }
 
         @Override
         public String getHeaderKey() {
-            return "ALM_OCTANE_TECH_PREVIEW";
+            return "HPECLIENTTYPE";
         }
     };
 }
