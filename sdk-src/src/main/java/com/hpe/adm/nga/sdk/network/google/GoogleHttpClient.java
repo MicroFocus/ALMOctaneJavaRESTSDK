@@ -142,8 +142,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     public synchronized void signOut() {
         GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_SIGNOUT_URL);
+        HttpRequest httpRequest = null;
         try {
-            HttpRequest httpRequest = requestFactory.buildPostRequest(genericUrl, null);
+            httpRequest = requestFactory.buildPostRequest(genericUrl, null);
             HttpResponse response = executeRequest(httpRequest);
 
             if (response.isSuccessStatusCode()) {
@@ -152,7 +153,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {
-            throw wrapException(e);
+            throw wrapException(e, httpRequest);
         }
     }
 
@@ -319,18 +320,40 @@ public class GoogleHttpClient implements OctaneHttpClient {
         try {
             response = httpRequest.execute();
         } catch (Exception e) {
-            throw wrapException(e);
+            throw wrapException(e, httpRequest);
         }
 
         logger.debug(LOGGER_RESPONSE_FORMAT, response.getStatusCode(), response.getStatusMessage(), response.getHeaders().toString());
         return response;
     }
 
-    private static RuntimeException wrapException(Exception exception) {
+    private static RuntimeException wrapException(Exception exception, HttpRequest httpRequest) {
         if (exception instanceof HttpResponseException) {
 
             HttpResponseException httpResponseException = (HttpResponseException) exception;
             logger.debug(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString());
+
+            // It seems that Octane returns a message in 401 but this is swallowed by the HttpConnection as expected by the HTTP spec
+            // So the only way to know if this should be re-authenticated is to see if there is a cookie in the request.  If so - we can fake the error and
+            // ensure re-authentication
+            if (httpResponseException.getStatusCode() == 401) {
+                try {
+                    final String cookie = httpRequest.getHeaders().getCookie();
+                    if (cookie != null) {
+                        for (String splitCookie : cookie.split(";")) {
+                            if (splitCookie.startsWith(LWSSO_COOKIE_KEY)) {
+                                final LongFieldModel statusFieldModel = new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode());
+                                final ErrorModel errorModel = new ErrorModel(Collections.singleton(statusFieldModel));
+                                // assuming that we have a cookie and therefore can go for re-authentication...
+                                errorModel.setValue(new StringFieldModel("errorCode", ERROR_CODE_TOKEN_EXPIRED));
+                                return new OctaneException(errorModel);
+                            }
+                        }
+                    }
+                } catch (NullPointerException e) {
+                    // do nothing
+                }
+            }
 
             List<String> exceptionContentList = new ArrayList<>();
             exceptionContentList.add(httpResponseException.getStatusMessage());
