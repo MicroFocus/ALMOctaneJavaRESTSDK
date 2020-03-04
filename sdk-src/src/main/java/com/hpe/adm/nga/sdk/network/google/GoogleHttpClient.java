@@ -31,6 +31,8 @@ import java.net.HttpCookie;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -170,7 +172,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
                     httpRequest = requestFactory.buildGetRequest(domain);
                     httpRequest.getHeaders().setAccept(((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType());
-                    httpRequest.getHeaders().setAcceptEncoding("utf-8");
                     final String eTagHeader = requestToEtagMap.get(octaneHttpRequest);
                     if (eTagHeader != null) {
                         httpRequest.getHeaders().setETag(eTagHeader);
@@ -220,7 +221,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
      */
     protected OctaneHttpResponse convertHttpResponseToOctaneHttpResponse(HttpResponse httpResponse) {
         try {
-            return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), httpResponse.getContentCharset());
+            // According to the {@link https://tools.ietf.org/html/rfc2616#section-3.7.1} spec the correct encoding should be returned.
+            // Currently Octane does not return UTF-8 for the REST API even though that is the encoding.  Manually changing here to fix some encoding issues
+            // {@See https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79}
+            final Charset charset = (httpResponse.getContentType().equals("application/json")) ? StandardCharsets.UTF_8 : httpResponse.getContentCharset();
+            return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), charset);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
