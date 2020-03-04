@@ -57,4 +57,15 @@ public class TestCookieUpdate extends TestBase {
             System.out.println("Sleep exception...");
         }
     }
+
+    @Test
+    public void testCookieUpdateForPost() throws Exception {
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
+        int counter = 0;
+        while (counter < 2) {
+            sleepTime(70);
+            entityList.create().entities(generatedEntity).execute();
+            counter++;
+        }
+    }
 }
