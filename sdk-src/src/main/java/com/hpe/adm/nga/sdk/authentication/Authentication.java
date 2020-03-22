@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,11 @@
  */
 package com.hpe.adm.nga.sdk.authentication;
 
+import com.hpe.adm.nga.sdk.APIMode;
+
+import java.util.Optional;
+
 /**
- *
  * Interface of Authentication , hold contract functions. <br>
  * Provided implementations: {@link SimpleUserAuthentication}, {@link ClientAuthentication} <br>
  * Note that the default implementations keep the credentials in memory. <br>
@@ -24,17 +27,20 @@ public interface Authentication {
 
     /**
      * Holds the string that will be sent in the body of the authentication post
+     *
      * @return The authentication string.  Either user/pass or client/secret
      */
     String getAuthenticationString();
 
     /**
-     * Returns the HPECLIENTTYPE header that is added to all calls to the REST API.  See the REST API documentation for
+     * Returns the API Mode header that is added to all calls to the REST API.  This usually refers to whether this should use
+     * the technical preview or not (however other non-documented modes are possible) See the REST API documentation for
      * further information
      * This will only be used if it is non-empty
-     * @return The String that will be sent as the HPECLIENTTYPE.  If none is sent then this should be null
+     *
+     * @return The API mode header.  If none is sent then this should be null
      */
-    String getClientHeader();
+    Optional<APIMode> getAPIMode();
 }
 
 

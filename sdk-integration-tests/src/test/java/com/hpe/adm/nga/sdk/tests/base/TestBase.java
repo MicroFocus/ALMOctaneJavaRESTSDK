@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package com.hpe.adm.nga.sdk.tests.base;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.SiteAdmin;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -30,6 +31,7 @@ import org.junit.BeforeClass;
  */
 public class TestBase {
     protected static Octane octane;
+    protected static SiteAdmin siteAdmin;
     protected static String entityName = "";
     private static String entityTypeOld = "";
     protected static EntityList entityList;
@@ -54,6 +56,7 @@ public class TestBase {
         String workspaceId = configuration.getString("sdk.workspaceId");
 
         octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
+        siteAdmin = ContextUtils.getContextSiteAdmin(url, authentication);
         metadata = octane.metadata();
     }
 

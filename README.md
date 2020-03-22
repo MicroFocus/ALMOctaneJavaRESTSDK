@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>15.0.20</version>
+    <version>15.0.40</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.0.20'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.0.40'
 ```
 
 ## Introduction
@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 12.60.21 being the SDK version):
+To enable this add the following to your project's POM file (assuming 15.0.40 being the SDK version):
 
 ```xml
  <build>
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 12.60.21 b
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>15.0.20</version>
+                <version>15.0.40</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -170,7 +170,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>15.0.20</version>
+            <version>15.0.40</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -182,6 +182,10 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
+* 15.0.40
+  * Get the server version using the `SiteAdmin` API.  This matches the `serverurl/admin/server/version` REST call
+  * The way that the API mode can be set has changed.  It is now easier to set the technical preview by using the *APIMode* interface and 
+  default classes.  Other modes can be set as well.  See Javadoc for more details
 * 15.0.20
   * Lists are now created in their own classes.  The package name is based on the list's logical name.  This was necessary due to non-unique list names.   In order
   to try to preserve backward compatibility the actual class name should be the same but are now in separate packages.  That means that in the best case only

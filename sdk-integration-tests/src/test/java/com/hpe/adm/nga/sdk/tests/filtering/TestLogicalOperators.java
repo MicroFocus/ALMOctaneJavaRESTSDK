@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,7 +45,7 @@ public class TestLogicalOperators extends TestBase {
 
 
     @Test
-    public void testQueryWithOr() throws Exception {
+    public void testQueryWithOr() {
         Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).or("id", QueryMethod.EqualTo, defectIds.get(1)).build();
         Collection<EntityModel> getEntity = entityList.get().query(query).execute();
         Assert.assertEquals("Wrong amount of defects in response", 2, getEntity.size());
@@ -54,7 +54,7 @@ public class TestLogicalOperators extends TestBase {
     }
 
     @Test
-    public void testQueryWithAnd() throws Exception {
+    public void testQueryWithAnd() {
         Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).build();
         Collection<EntityModel> getEntity = entityList.get().query(query).execute();
         Assert.assertEquals("Wrong amount of defects in response", 1, getEntity.size());
@@ -62,14 +62,13 @@ public class TestLogicalOperators extends TestBase {
     }
 
     @Test
-    public void testQueryWithAndPlusOr() throws Exception {
+    public void testQueryWithAndPlusOr() {
         Query query1 = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).or("id", QueryMethod.EqualTo, defectIds.get(1)).and("name", QueryMethod.EqualTo, defectNames.get(1)).build();
         Collection<EntityModel> getEntity = entityList.get().query(query1).execute();
         Assert.assertEquals("Wrong amount of defects in response", 2, getEntity.size());
         Assert.assertTrue("Wrong defect id in response", defectIds.containsAll(CommonUtils.getIdFromEntityModelCollection(getEntity)));
     }
 
-    @Ignore("BTW is broken on Octane")
     @Test
     public void testQueryWithBtw() {
         final Query query = Query.statement("story_points", QueryMethod.Between, new QueryMethod.Between(time - 1L, time + 2L)).build();

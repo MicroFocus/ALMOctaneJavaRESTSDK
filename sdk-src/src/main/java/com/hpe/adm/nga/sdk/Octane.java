@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,6 @@ import java.util.UUID;
 public class Octane {
 
     //Constants
-    private static final String SITE_ADMIN_DOMAIN_FORMAT = "/api/siteadmin/";
     private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
     private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
     private static final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
@@ -90,8 +89,9 @@ public class Octane {
 
     /**
      * Creates a new {@link TypedEntityList} context.  The class is the concrete instance of the TypedEntityList
+     *
      * @param entityListClass The class that is the instance of the TypedEntityList
-     * @param <T> The type of class
+     * @param <T>             The type of class
      * @return The instance that can then be set as the context
      */
     public <T extends TypedEntityList> T entityList(Class<T> entityListClass) {
@@ -131,8 +131,7 @@ public class Octane {
      */
     protected String getBaseDomainFormat() {
 
-        String baseDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
-
+        String baseDomain = "";
         if (idsharedSpaceId != null && !idsharedSpaceId.isEmpty()) {
             baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain, idsharedSpaceId);
 
@@ -151,7 +150,7 @@ public class Octane {
     }
 
     /**
-     * This class is used to create an {@link Octane} instance.  It is initialised using the correct {@link Authentication}
+     * This class is used to create an {@link Octane} instance for normal API usage.  It is initialised using the correct {@link Authentication}
      * <br>
      * The {@code Builder} class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
      * necessary to add a sharedspace or workspace and will work with entities under that context.
