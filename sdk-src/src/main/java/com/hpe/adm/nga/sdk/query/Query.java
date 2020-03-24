@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ package com.hpe.adm.nga.sdk.query;
  *       be used in conjunction with entity or other contexts
  *   </p>
  *   <p>
- *       {@code Query} objects can be chained together (and/or) by using the correct methods such as {@link QueryBuilder#and(QueryBuilder)} or
+ *       {@code Query} objects can be chained together (and/or) by using the correct methods such as {@link QueryBuilder#and(QueryBuilder)} (QueryBuilder)} or
  *       {@link QueryBuilder#orNot(String, QueryMethod, Object)}
  *       <br>
  *       {@link QueryBuilder#build()} should be called once the entire query has been built

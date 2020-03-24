@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,6 @@ public interface OctaneHttpClient {
     String OAUTH_SIGNOUT_URL = "/authentication/sign_out";
     String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
     String OCTANE_USER_COOKIE_KEY = "OCTANE_USER";
-    String HPE_CLIENT_TYPE = "HPECLIENTTYPE";
 
     /**
      * Authenticate with the Octane server using an implementation of the {@link Authentication} class

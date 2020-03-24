@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,12 +50,7 @@ public class TestComments extends TestBase {
 
     private Collection<EntityModel> createComments(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {
         EntityModel entity = entityModels.iterator().next();
-
-        Collection<EntityModel> users = octane.entityList("workspace_users").get().execute();
-
-        EntityModel user = users.iterator().next();
         Set<FieldModel> fields = new HashSet<>();
-        fields.add(new ReferenceFieldModel("author", user));
         fields.add(new ReferenceFieldModel(fieldEntityType, entity));
 
         Collection<EntityModel> comments = new ArrayList<>();

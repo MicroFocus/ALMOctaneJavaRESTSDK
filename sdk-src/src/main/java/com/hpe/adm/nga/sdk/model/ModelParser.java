@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,6 +60,7 @@ public final class ModelParser {
      * @param onlyDirty   Return only dirty fields (used for updates)
      * @return new json object based on a given EntityModel object
      */
+    @SuppressWarnings("rawtypes")
     public final JSONObject getEntityJSONObject(EntityModel entityModel, boolean onlyDirty) {
 
         Collection<FieldModel> fieldModels = onlyDirty ? entityModel.getDirtyValues() : entityModel.getValues();
@@ -104,6 +105,7 @@ public final class ModelParser {
      * @param fieldModel the source fieldModel
      * @return field value
      */
+    @SuppressWarnings("rawtypes")
     private Object getFieldValue(FieldModel fieldModel) {
 
         Object fieldValue;
@@ -135,6 +137,7 @@ public final class ModelParser {
      * @param jsonEntityObj - json object
      * @return new EntityModel object
      */
+    @SuppressWarnings("rawtypes")
     public EntityModel getEntityModel(JSONObject jsonEntityObj) {
 
         Set<FieldModel> fieldModels = new HashSet<>();
@@ -143,11 +146,11 @@ public final class ModelParser {
 
         while (keys.hasNext()) {
 
-            FieldModel fldModel = null;
+            FieldModel fldModel;
             String strKey = (String) keys.next();
             Object aObj = jsonEntityObj.get(strKey);
             if (aObj == JSONObject.NULL) {
-                fldModel = new ReferenceFieldModel(strKey, null);
+                fldModel = new EmptyFieldModel(strKey);
             } else if (aObj instanceof Long || aObj instanceof Integer) {
                 fldModel = new LongFieldModel(strKey, Long.parseLong(aObj.toString()));
             } else if (aObj instanceof Double || aObj instanceof Float) {
@@ -216,10 +219,40 @@ public final class ModelParser {
         return entityModels;
     }
 
+    /**
+     * Checks the message for a list of errors
+     *
+     * @param json The json to parse
+     * @return Whether there is a list of errors
+     */
     public boolean hasErrorModels(String json) {
         JSONTokener tokener = new JSONTokener(json);
         JSONObject jsonObj = new JSONObject(tokener);
         return jsonObj.has(JSON_ERRORS_NAME) && jsonObj.get(JSON_ERRORS_NAME) instanceof JSONArray;
+    }
+
+    /**
+     * Checks the message for an error
+     *
+     * @param json The json to parse
+     * @return Whether there is an error
+     */
+    public boolean hasErrorModel(String json) {
+        JSONTokener tokener = new JSONTokener(json);
+        JSONObject jsonObj = new JSONObject(tokener);
+        return jsonObj.has("error_code") && jsonObj.get("error_code") instanceof String;
+    }
+
+    /**
+     * Checks the message for a higher-level servlet error
+     *
+     * @param json The json to parse
+     * @return Whether there is a higher level servlet error
+     */
+    public boolean hasServletError(String json) {
+        JSONTokener tokener = new JSONTokener(json);
+        JSONObject jsonObj = new JSONObject(tokener);
+        return jsonObj.has("message") && jsonObj.get("message") instanceof String;
     }
 
     /**
@@ -245,6 +278,7 @@ public final class ModelParser {
      * @param json - json string with error information
      * @return error model
      */
+    @SuppressWarnings("rawtypes")
     public ErrorModel getErrorModelFromjson(String json) {
 
         JSONTokener tokener = new JSONTokener(json);
@@ -262,7 +296,7 @@ public final class ModelParser {
 
             if (aObj == JSONObject.NULL) {
                 fldModel = new ReferenceErrorModel(strKey, null);
-            } else if (aObj instanceof JSONObject || aObj == JSONObject.NULL) {
+            } else if (aObj instanceof JSONObject) {
                 EntityModel ref = getEntityModel(jsonErrObj.getJSONObject(strKey));
                 fldModel = new ReferenceFieldModel(strKey, ref);
             } else {
@@ -276,5 +310,21 @@ public final class ModelParser {
 
 
         return new ErrorModel(fieldModels);
+    }
+
+    /**
+     * Parses the servlet error and extracts the underlying message that was set by Octane that can then be used by the
+     * exception
+     *
+     * @param json The json to parse
+     * @return The errormodel with all extracted errors
+     */
+    public ErrorModel getErrorModelFromServletJson(String json) {
+        final ErrorModel firstLevelModel = getErrorModelFromjson(json);
+        final String messageInJson = firstLevelModel.getValue("message").getValue().toString();
+        final ErrorModel errorModelFromjson = getErrorModelFromjson(messageInJson.replaceAll("&quot;", "\""));
+        errorModelFromjson.getValues().forEach(firstLevelModel::setValue);
+
+        return firstLevelModel;
     }
 }

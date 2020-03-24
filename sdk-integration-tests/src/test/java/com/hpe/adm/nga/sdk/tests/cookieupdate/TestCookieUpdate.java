@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,10 +42,10 @@ public class TestCookieUpdate extends TestBase {
         String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
         int counter = 0;
-        while (counter < 10) {
+        while (counter < 2) {
+            sleepTime(70);
             EntityModel getEntity = entityList.at(entityId).get().execute();
             Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
-            sleepTime(10);
             counter++;
         }
     }
@@ -55,6 +55,17 @@ public class TestCookieUpdate extends TestBase {
             Thread.sleep(sleepTimeInSec * 1000);
         } catch (Exception e) {
             System.out.println("Sleep exception...");
+        }
+    }
+
+    @Test
+    public void testCookieUpdateForPost() throws Exception {
+        Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
+        int counter = 0;
+        while (counter < 2) {
+            sleepTime(70);
+            entityList.create().entities(generatedEntity).execute();
+            counter++;
         }
     }
 }

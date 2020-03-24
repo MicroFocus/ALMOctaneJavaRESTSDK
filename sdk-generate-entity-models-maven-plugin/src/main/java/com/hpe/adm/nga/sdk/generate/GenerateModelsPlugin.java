@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.generate;
 
+import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -40,10 +41,10 @@ public class GenerateModelsPlugin extends AbstractMojo {
     private long workSpace;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException {
         getLog().info("Starting to generate entities");
         try {
-            new GenerateModels(generatedSourcesDirectory).generate(clientId, clientSecret, server, sharedSpace, workSpace);
+            new GenerateModels(generatedSourcesDirectory).generate(new SimpleClientAuthentication(clientId, clientSecret), server, sharedSpace, workSpace);
         } catch (IOException e) {
             throw new MojoExecutionException("Problem generating entities", e);
         }

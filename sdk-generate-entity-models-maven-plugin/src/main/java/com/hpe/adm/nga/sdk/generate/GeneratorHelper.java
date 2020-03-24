@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,6 +70,25 @@ public final class GeneratorHelper {
         }
 
         return getSanitisedFieldName(stringBuffer.toString());
+    }
+
+    public static String getJavaCompliantIdentifier(final String name) {
+        final char[] chars = name.toCharArray();
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < chars.length; ++i) {
+            final char character = chars[i];
+            if (i == 0) {
+                if (!Character.isJavaIdentifierStart(character)) {
+                    stringBuilder.append("$");
+                }
+            }
+
+            stringBuilder.append(Character.isJavaIdentifierPart(character) ?
+                    character :
+                    '_');
+        }
+
+        return stringBuilder.toString();
     }
 
     public static String convertToUpperCase(final String fieldName) {

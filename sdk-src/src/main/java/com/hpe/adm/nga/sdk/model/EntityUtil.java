@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -127,6 +127,7 @@ public class EntityUtil {
      *
      * @param collection  collection of entity models
      * @param entityModel target entity model
+     * @param entityEquator interface for checking equality between two entity models
      * @return true if the entity is in the collection, false otherwise
      */
     public static boolean containsEntityModel(Collection<EntityModel> collection, EntityModel entityModel, EntityEquator entityEquator) {
@@ -183,6 +184,7 @@ public class EntityUtil {
      *
      * @param collection  collection of entity models
      * @param entityModel target entity model
+     * @param entityEquator interface for checking equality between two entity models
      * @return true if the entity has been removed, false otherwise
      */
     public static boolean removeEntityModel(Collection<EntityModel> collection, EntityModel entityModel, EntityEquator entityEquator) {

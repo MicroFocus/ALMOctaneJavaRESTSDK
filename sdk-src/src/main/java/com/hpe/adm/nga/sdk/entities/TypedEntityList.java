@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,6 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
  * @see EntityList
  */
 public abstract class TypedEntityList {
-
-    protected final OctaneHttpClient octaneHttpClient;
-    protected final String baseDomain;
 
     /**
      * An interface that marks the fields in the entity that can be selected in queries and field selection
@@ -69,16 +66,5 @@ public abstract class TypedEntityList {
                 throw new IllegalArgumentException("Cannot instantiate", e);
             }
         }
-    }
-
-    /**
-     * Creates a new object.  This represents an entity collection
-     *
-     * @param octaneHttpClient - Http Client
-     * @param baseDomain - Domain Name
-     */
-    public TypedEntityList(OctaneHttpClient octaneHttpClient, String baseDomain) {
-        this.octaneHttpClient = octaneHttpClient;
-        this.baseDomain = baseDomain;
     }
 }

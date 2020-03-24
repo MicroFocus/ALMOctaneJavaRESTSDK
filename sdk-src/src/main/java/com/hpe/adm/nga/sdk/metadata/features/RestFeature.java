@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 EntIT Software LLC, a Micro Focus company, L.P.
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.metadata.features;
 
+import com.hpe.adm.nga.sdk.metadata.FieldMetadata.AccessLevel;
 
 /**
  *
@@ -23,9 +24,11 @@ public class RestFeature extends Feature{
 	
 	private String url; 
 	private String[] methods;
+	private AccessLevel access_level;
 	
 	/**
 	 * get url
+	 * 
 	 * @return The url of the rest feature
 	 */
 	public String getUrl(){
@@ -34,11 +37,21 @@ public class RestFeature extends Feature{
 	
 	/**
 	 * get supported methods
+	 * 
 	 * @return the supported methods (GET, POST, PUT, DELETE)
 	 */
 	public String[] getMethods(){
 		return methods;
 	}
+
+	/**
+	 * get access level of the methods
+	 * 
+	 * @return the Access Level of the Feature
+	 */
+	public AccessLevel getAccessLevel() {
+		return access_level;
+    }
 }
 
 

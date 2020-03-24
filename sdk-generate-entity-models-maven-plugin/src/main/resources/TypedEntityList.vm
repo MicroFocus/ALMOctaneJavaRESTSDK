@@ -15,6 +15,9 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 */
 public final class ${type}EntityList extends TypedEntityList {
 
+    private final OctaneHttpClient octaneHttpClient;
+    private final String baseDomain;
+
     public enum AvailableFields implements TypedEntityList.AvailableFields {
         #foreach($field in $availableFields)
             #if($foreach.count > 1), #end${helper.convertToUpperCase(${field})}("${field}")
@@ -47,8 +50,15 @@ public final class ${type}EntityList extends TypedEntityList {
         }
     }
 
+    /**
+    * Creates a new object.  This represents an entity collection
+    *
+    * @param octaneHttpClient - Http Client
+    * @param baseDomain - Domain Name
+    */
     public ${type}EntityList(final OctaneHttpClient octaneHttpClient, final String baseDomain) {
-        super(octaneHttpClient, baseDomain);
+        this.octaneHttpClient = octaneHttpClient;
+        this.baseDomain = baseDomain;
     }
 
     public ${type}Entities at(String entityId) {
