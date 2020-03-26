@@ -17,7 +17,6 @@ import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
-import com.hpe.adm.nga.sdk.manualtests.TestStepList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
@@ -126,16 +125,6 @@ public class Octane {
     }
 
     /**
-     * Creates a new TestStepList object.
-     *
-     * @param testId The id where the steps will be added to or downloaded from
-     * @return A testStepList for updating or getting the steps of the test
-     */
-    public TestStepList testStepList(final String testId) {
-        return new TestStepList(octaneHttpClient, getBaseDomainFormat(), testId);
-    }
-
-    /**
      * get the base domain based on workSpaceId and idsharedSpaceId
      *
      * @return base domain
@@ -147,7 +136,7 @@ public class Octane {
             baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain, idsharedSpaceId);
 
             if (workSpaceId != 0)
-                baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT, String.valueOf(workSpaceId));
+                baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT, workSpaceId);
         }
 
         return baseDomain;

@@ -17,10 +17,14 @@ public abstract class AbstractTestStep {
     }
 
     public final String getTestStepString() {
-        return getTestStepPrefix() + escapeMetaCharacters(testStep) + System.lineSeparator();
+        return getTestStepPrefix() + escapeMetaCharacters(testStep) + "\n";
     }
 
     abstract String getTestStepPrefix();
+
+    public final String getTestStep() {
+        return testStep;
+    }
 
     private String escapeMetaCharacters(String inputString) {
         if (!escapeTestStep) {
