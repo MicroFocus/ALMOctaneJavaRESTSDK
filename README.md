@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>15.0.40</version>
+    <version>15.0.40.1-SNAPSHOT</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.0.40'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.0.40.1-SNAPSHOT'
 ```
 
 ## Introduction
@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 15.0.40 being the SDK version):
+To enable this add the following to your project's POM file (assuming 15.0.40.1-SNAPSHOT being the SDK version):
 
 ```xml
  <build>
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 15.0.40 be
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>15.0.40</version>
+                <version>15.0.40.1-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -170,7 +170,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>15.0.40</version>
+            <version>15.0.40.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -182,6 +182,9 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
+* 15.0.40.1
+  * FIX for [Bug 79](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79).  User defined lists are now created with a `_` in front of the
+  package name when using the generator to ensure Java convention is followed
 * 15.0.40
   * Get the server version using the `SiteAdmin` API.  This matches the `serverurl/admin/server/version` REST call
   * The way that the API mode can be set has changed.  It is now easier to set the technical preview by using the *APIMode* interface and 
@@ -221,7 +224,7 @@ This will make the sdk use log4j as an slf4j implementation, configuring a log4j
     * The total count of entities (not including the current limit)
     * Whether the number of requested entities exceeds the total count of entities.
   * Added support for IN and BTW for queries
-  * [SDK extension](https://github.com/HPSoftware/sdk-extension) moved, now part of the sdk repository, 
+  * [SDK extension](https://github.com/Microfocus/sdk-extension) moved, now part of the sdk repository, 
   * SDK now uses SLF4J internally for all logging
   
   See the ALM Octane documentation for more information
