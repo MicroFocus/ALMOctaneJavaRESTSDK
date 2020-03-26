@@ -98,6 +98,11 @@ public class EntityList {
         return new DeleteEntities(octaneHttpClient, urlDomain);
     }
 
+    /**
+     * This is hard-coded.  Only manual tests have steps
+     *
+     * @return whether this is a test entity that has steps
+     */
     private boolean isTestEntity() {
         return urlDomain.endsWith("manual_tests");
     }
@@ -149,6 +154,9 @@ public class EntityList {
 
     }
 
+    /**
+     * This class hold the Entities object but as a test for the manipulation of test scripts (An object that represent one Entity )
+     */
     public class TestEntities extends Entities {
 
         /**

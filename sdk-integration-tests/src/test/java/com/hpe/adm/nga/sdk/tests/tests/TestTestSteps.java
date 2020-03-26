@@ -1,3 +1,16 @@
+/*
+ * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hpe.adm.nga.sdk.tests.tests;
 
 import com.hpe.adm.nga.sdk.entities.EntityList;
@@ -31,21 +44,21 @@ public class TestTestSteps extends TestBase {
 
         final GetTestScriptModel getTestScriptModel = testSteps.get().execute();
         final String asString = getTestScriptModel.getTestStepsAsString();
-        Assert.assertTrue("Returned test script is not correct!", asString.equals("- Step 1\n- ?Validating Step 1\n- @2002 link to test\n"));
+        Assert.assertEquals("Returned test script is not correct!", "- Step 1\n- ?Validating Step 1\n- @2002 link to test\n", asString);
 
         final List<AbstractTestStep> testStepsAsObjects = getTestScriptModel.getTestStepsAsObjects();
         Assert.assertNotNull("test script as objects is null", testStepsAsObjects);
-        Assert.assertTrue("test script as objects is not length 3", testStepsAsObjects.size() == 3);
+        Assert.assertEquals("test script as objects is not length 3", 3, testStepsAsObjects.size());
 
         final TestStep testStep = (TestStep) testStepsAsObjects.get(0);
-        Assert.assertTrue("TestStep object string is incorrect", testStep.getTestStep().equals("Step 1"));
+        Assert.assertEquals("TestStep object string is incorrect", "Step 1", testStep.getTestStep());
 
         final ValidationTestStep validationTestStep = (ValidationTestStep) testStepsAsObjects.get(1);
-        Assert.assertTrue("ValidationTestStep object string is incorrect", validationTestStep.getTestStep().equals("Validating Step 1"));
+        Assert.assertEquals("ValidationTestStep object string is incorrect", "Validating Step 1", validationTestStep.getTestStep());
 
         final CallTestStep callTestStep = (CallTestStep) testStepsAsObjects.get(2);
-        Assert.assertTrue("CallTestStep object string is incorrect", callTestStep.getCallStepString().equals("link to test"));
-        Assert.assertTrue("CallTestStep object test id is incorrect", callTestStep.getTestId().equals("2002"));
+        Assert.assertEquals("CallTestStep object string is incorrect", "link to test", callTestStep.getCallStepString());
+        Assert.assertEquals("CallTestStep object test id is incorrect", "2002", callTestStep.getTestId());
     }
 
     private void updateTestSteps(TestStepList testSteps) {
