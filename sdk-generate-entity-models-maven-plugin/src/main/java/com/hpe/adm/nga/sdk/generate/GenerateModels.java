@@ -336,8 +336,8 @@ public class GenerateModels {
                 }
             }
 
-            // add test script support for test_manual only
-            if (name.equals("test_manual")) {
+            // add test script support for test_manual or gherkin tests only
+            if (name.equals("test_manual") || name.equals("gherkin_tests")) {
                 entityListVelocityContext.put("hasTestScript", true);
             }
 

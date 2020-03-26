@@ -47,6 +47,7 @@ public final class UpdateTestScriptModel extends TypedEntityModel {
 
     /**
      * Sets the test steps to update represented as objects
+     * Do NOT use for gherkin tests - they should be uploaded as a simple string with the Gherkin script
      *
      * @param testSteps The list of objects
      * @return The model for chaining

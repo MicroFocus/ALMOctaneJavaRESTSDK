@@ -99,12 +99,12 @@ public class EntityList {
     }
 
     /**
-     * This is hard-coded.  Only manual tests have steps
+     * This is hard-coded.  Only manual tests or gherkin tests have a script
      *
-     * @return whether this is a test entity that has steps
+     * @return whether this is a test entity that has a script
      */
     private boolean isTestEntity() {
-        return urlDomain.endsWith("manual_tests");
+        return urlDomain.endsWith("manual_tests") || urlDomain.endsWith("gherkin_tests");
     }
 
     // **** Classes ***

@@ -65,7 +65,8 @@ public class GetTestScriptModel extends TypedEntityModel {
     }
 
     /**
-     * Returns the test steps from the server as objects
+     * Returns the test steps from the server as objects.  This will only work for manual tests
+     * Do NOT use for gherkin tests - they should be edited using the string and with a Gherkin parser
      *
      * @return List
      */
