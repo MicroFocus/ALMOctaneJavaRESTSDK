@@ -57,13 +57,24 @@ public class TestExample {
                 .orElseThrow(() -> new RuntimeException("Could not create test!"))
                 .getId();
 
+        /*
+        If you have generated entities then the above can be replaced by:
+          final TestManualEntityModel testManualEntityModel = new TestManualEntityModel("newTest", Phases.TestManualPhase.NEW);
+        final String createdTestId =  octane
+                .entityList(TestManualEntityList.class)
+                .create()
+                .entities(Collections.singleton(testManualEntityModel))
+                .execute()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Could not create test!"))
+                .getId();
+         */
+
+        // see TestTestSteps test for more usage examples
 
         final List<AbstractTestStep> testStepList = new ArrayList<>();
         testStepList.add(new TestStep("Step 1"));
         testStepList.add(new ValidationTestStep("Validating Step 1"));
-        octane.testStepList(createdTestId).update().testSteps(testStepList).execute();
     }
-
-
-
 }
