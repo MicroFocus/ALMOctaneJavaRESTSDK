@@ -108,35 +108,47 @@ public final class ${type}EntityList extends TypedEntityList {
         /**
         * getter of a ${crudMethod}${type}Entity object with specific entity
         *
-        * @return The ${crudMethod}${type}Entity object
-        */
-        public ${crudMethod}${type}Entity ${crudMethod.toLowerCase()}() {
-            return new ${crudMethod}${type}Entity(octaneHttpClient, baseDomain, entityId);
-        }
+* @return The ${crudMethod}${type}Entity object
+*/
+public ${crudMethod}${type}Entity ${crudMethod.toLowerCase()}() {
+return new ${crudMethod}${type}Entity(octaneHttpClient, baseDomain, entityId);
+}
 #end
 
-        #if(${hasGet})
-        #outputEntityGetter('Get', $type)
+#if(${hasGet})
+    #outputEntityGetter('Get', $type)
 
-        #end
-        #if(${hasUpdate})
-        #outputEntityGetter('Update', $type)
+#end
+#if(${hasUpdate})
+    #outputEntityGetter('Update', $type)
 
-        #end
-        #if(${hasDelete})
-        #outputEntityGetter('Delete', $type)
+#end
+#if(${hasDelete})
+    #outputEntityGetter('Delete', $type)
 
-        #end
-    }
+#end
+#if(${hasTestScript})
+/**
+* An instance of {@link TestStepList} for access to the script of the test
+* @return Instance of TestStepList
+*/
+public com.hpe.adm.nga.sdk.manualtests.TestStepList getTestSteps() {
+return new com.hpe.adm.nga.sdk.manualtests.TestStepList(octaneHttpClient, baseDomain, entityId);
+}
+
+#end
+}
 
 #macro (outputClassInstance $crudMethod $type $url $isMultiple)
     #if($isMultiple)#set($entityEntities = 'Entities')#else#set($entityEntities = 'Entity')#end
-    public final class ${crudMethod}${type}${entityEntities} extends ${crudMethod}Typed${entityEntities}<${type}EntityModel
+public final class ${crudMethod}${type}${entityEntities} extends ${crudMethod}Typed${entityEntities}
+<${type}EntityModel
     #if(${crudMethod} == 'Delete' && !${isMultiple})#else, ${crudMethod}${type}${entityEntities}#end
-        #if(${crudMethod} == 'Get'), AvailableFields#if(${isMultiple}), SortableFields#end#end> {
-    ${crudMethod}${type}${entityEntities}(final OctaneHttpClient octaneHttpClient, final String baseDomain#if(!${isMultiple}), final String entityId#end) {
-            super(${type}EntityModel.class, octaneHttpClient, baseDomain + "${url}"#if(!${isMultiple}), entityId#end);
-        }
+    #if(${crudMethod} == 'Get'), AvailableFields#if(${isMultiple}), SortableFields#end#end> {
+    ${crudMethod}${type}${entityEntities}(final OctaneHttpClient octaneHttpClient, final String
+    baseDomain#if(!${isMultiple}), final String entityId#end) {
+    super(${type}EntityModel.class, octaneHttpClient, baseDomain + "${url}"#if(!${isMultiple}), entityId#end);
+    }
     }
 #end
 
