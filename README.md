@@ -182,6 +182,8 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
 ## What's New
+* 15.0.60
+  * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
 * 15.0.40
   * Get the server version using the `SiteAdmin` API.  This matches the `serverurl/admin/server/version` REST call
   * The way that the API mode can be set has changed.  It is now easier to set the technical preview by using the *APIMode* interface and 

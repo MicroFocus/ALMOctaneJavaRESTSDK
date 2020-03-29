@@ -129,14 +129,14 @@ public class Octane {
      *
      * @return base domain
      */
-    protected String getBaseDomainFormat() {
+    private String getBaseDomainFormat() {
 
         String baseDomain = "";
         if (idsharedSpaceId != null && !idsharedSpaceId.isEmpty()) {
             baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain, idsharedSpaceId);
 
             if (workSpaceId != 0)
-                baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT, String.valueOf(workSpaceId));
+                baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT, workSpaceId);
         }
 
         return baseDomain;
@@ -184,7 +184,7 @@ public class Octane {
         /**
          * Creates a new Builder object using the correct authentication
          *
-         * @param authentication - Authentication object.  Cannot be null
+         * @param authentication   - Authentication object.  Cannot be null
          * @param octaneHttpClient - Implementation of {@link OctaneHttpClient}. Cannot be null
          * @throws AssertionError if the authentication or octaneHttpClient is null
          */
@@ -244,7 +244,7 @@ public class Octane {
          */
         public Builder Server(String domain, int port) {
 
-            urlDomain = domain + ":" + String.valueOf(port);
+            urlDomain = domain + ":" + port;
 
             return this;
         }

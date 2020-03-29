@@ -15,7 +15,6 @@ package com.hpe.adm.nga.sdk.generate;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
-import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -335,6 +334,11 @@ public class GenerateModels {
                         entityListVelocityContext.put("hasDelete", true);
                         break;
                 }
+            }
+
+            // add test script support for test_manual or gherkin tests only
+            if (name.equals("test_manual") || name.equals("gherkin_tests")) {
+                entityListVelocityContext.put("hasTestScript", true);
             }
 
             final FileWriter entityListFileWriter = new FileWriter(new File(entitiesDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityList.java"));
