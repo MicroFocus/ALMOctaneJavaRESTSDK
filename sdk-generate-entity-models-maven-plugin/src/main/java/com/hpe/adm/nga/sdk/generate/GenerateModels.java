@@ -105,7 +105,7 @@ public class GenerateModels {
 
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
-            /**
+            /*
              * @Since 15.0.20
              * The run_history's id is integer even though it should be string.  It would be extremely complicated to make a special case for run_history id as long
              * Therefore until this is fixed in Octane - the entity will be ignored
@@ -127,7 +127,7 @@ public class GenerateModels {
         listNodes.forEach(listNode -> {
             final String rootId;
 
-            final FieldModel listRootFieldModel = listNode.getValue("list_root");
+            final FieldModel<?> listRootFieldModel = listNode.getValue("list_root");
             final String name;
             if (listRootFieldModel instanceof EmptyFieldModel) {
                 rootId = listNode.getId();
@@ -153,8 +153,9 @@ public class GenerateModels {
             final List<String[]> nodes = entry.getValue();
             final String className = nodes.get(0)[0];
 
-            final Path listDirectoryPath = enumsDirectory.toPath().resolve(Paths.get("lists", rootId.split("\\.")));
+            final Path listDirectoryPath = enumsDirectory.toPath().resolve(Paths.get("lists", getPackageForRootIdForList(rootId).split("\\.")));
             final File listDirectoryPathFile = listDirectoryPath.toFile();
+            //noinspection ResultOfMethodCallIgnored
             listDirectoryPathFile.mkdirs();
             final File listFile = new File(listDirectoryPathFile, className + ".java");
 
@@ -171,14 +172,23 @@ public class GenerateModels {
     }
 
     private String getPackageForList(final String rootId) {
+        return "com.hpe.adm.nga.sdk.enums.lists.".concat(getPackageForRootIdForList(rootId));
+    }
+
+    private String getPackageForRootIdForList(String rootId) {
         final String[] splitRootIds = rootId.split("\\.");
-        final StringBuilder packageStringBuilder = new StringBuilder("com.hpe.adm.nga.sdk.enums.lists.");
+        final StringBuilder packageStringBuilder = new StringBuilder();
         for (int i = 0; i < splitRootIds.length - 1; i++) {
-            packageStringBuilder.append(splitRootIds[i]).append(".");
+            final String splitRootId = getPackagePrefixForLists(splitRootIds[i]);
+            packageStringBuilder.append(splitRootId).append(".");
         }
-        packageStringBuilder.append(splitRootIds[splitRootIds.length - 1]);
+        packageStringBuilder.append(getPackagePrefixForLists(splitRootIds[splitRootIds.length - 1]));
 
         return packageStringBuilder.toString();
+    }
+
+    private String getPackagePrefixForLists(String packageName) {
+        return Character.isJavaIdentifierStart(packageName.charAt(0)) ? packageName : "_" + packageName;
     }
 
     private Set<String> generatePhases(Octane octane) throws IOException {

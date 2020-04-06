@@ -191,6 +191,9 @@ Currently the admin sections are not available using generated entities - but th
 * 15.0.60
   * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
   * Able to get the context for space and workspace admins
+* 15.0.40.1
+  * FIX for [Bug 79](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79).  User defined lists are now created with a `_` in front of the
+  package name when using the generator to ensure Java convention is followed
 * 15.0.40
   * Get the server version using the `SiteAdmin` API.  This matches the `serverurl/admin/server/version` REST call
   * The way that the API mode can be set has changed.  It is now easier to set the technical preview by using the *APIMode* interface and 
@@ -230,7 +233,7 @@ Currently the admin sections are not available using generated entities - but th
     * The total count of entities (not including the current limit)
     * Whether the number of requested entities exceeds the total count of entities.
   * Added support for IN and BTW for queries
-  * [SDK extension](https://github.com/HPSoftware/sdk-extension) moved, now part of the sdk repository, 
+  * [SDK extension](https://github.com/Microfocus/sdk-extension) moved, now part of the sdk repository, 
   * SDK now uses SLF4J internally for all logging
   
   See the ALM Octane documentation for more information
