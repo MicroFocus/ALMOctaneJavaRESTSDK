@@ -30,7 +30,7 @@ public final class ModelParser {
     private static final String JSON_TOTAL_COUNT_NAME = "total_count";
     private static final String JSON_EXCEEDS_TOTAL_COUNT_NAME = "exceeds_total_count";
     private static final String REGEX_DATE_FORMAT = "\\d{4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z";
-    private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = " field scheme is invalid";
+    private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = "{} field scheme is invalid";
 
     private final Logger logger = LoggerFactory.getLogger(ModelParser.class.getName());
 
@@ -184,7 +184,7 @@ public final class ModelParser {
                     fldModel = new StringFieldModel(strKey, aObj.toString());
                 }
             } else {
-                logger.debug(strKey + LOGGER_INVALID_FIELD_SCHEME_FORMAT);
+                logger.debug(LOGGER_INVALID_FIELD_SCHEME_FORMAT, strKey);
                 continue; //do not put it inside the model object to avoid a null pointer exception
             }
 
