@@ -161,16 +161,23 @@ public class Octane {
      * @return base domain
      */
     private String getBaseDomainFormat() {
+        // this is the same as SERVER/api/shared_spaces.  Used to get information about all spaces (such as IDs)
         String baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain);
+        // if there is a shared space ID that means that we are entering a specific space
         if (idsharedSpaceId != null && !idsharedSpaceId.isEmpty()) {
+            // this is the same as SERVER/api/shared_spaces/id.
             baseDomain = String.format(ID_FORMAT, baseDomain, idsharedSpaceId);
+            // this is the same as SERVER/api/shared_spaces/id/workspaces.  Used to get information about all workspaces (such as IDs) within a specific space
             if (workSpaceId == NO_WORKSPACE_ID) {
-                baseDomain = String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain).concat("/");
-            } else if (workSpaceId != ONLY_SHAREDSPACE_WORKSPACE_ID) {
-                baseDomain = String.format(ID_FORMAT, String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain), workSpaceId).concat("/");
-            } else {
-                baseDomain = baseDomain.concat("/");
+                baseDomain = String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain);
             }
+            // this is the same as SERVER/api/shared_spaces/id/workspaces/id  Normal workspace context
+            else if (workSpaceId != ONLY_SHAREDSPACE_WORKSPACE_ID) {
+                baseDomain = String.format(ID_FORMAT, String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain), workSpaceId);
+            }
+            // if neither of the above are triggered then we remain in a space id but without any workspace context
+            // here we just add the end / to ensure the correct URL
+            baseDomain = baseDomain.concat("/");
         }
 
         return baseDomain;
