@@ -204,34 +204,34 @@ public final class GeneratorHelper {
         final FieldMetadata.FieldTypeData fieldTypedata = fieldMetadata.getFieldTypedata();
         final FieldMetadata.Target[] targets = fieldTypedata.getTargets();
 
+        String camelCaseFieldName = null;
         for (FieldMetadata.Target target : targets) {
             final String type = target.getType();
             final Optional<EntityMetadata> matchingEntityMetadata = entityMetadataCollection.stream().filter(entityMetadata -> entityMetadata.getName().equals(type)).findAny();
             if (matchingEntityMetadata.isPresent()) {
-                String camelCaseFieldName = camelCaseFieldName(type);
+                camelCaseFieldName = camelCaseFieldName(type);
                 referenceMetadata.allowedReferencesForAnnotation.add(camelCaseFieldName + "EntityModel.class");
                 referenceMetadata.referenceTypes.add(type);
                 final EntityMetadata matchedEntityMetadata = matchingEntityMetadata.get();
                 final Optional<Feature> subTypeOfFeature = getSubTypeOfFeature(matchedEntityMetadata);
                 final String typedType = camelCaseFieldName(subTypeOfFeature.isPresent() ? (((SubTypesOfFeature) subTypeOfFeature.get()).getType()) : type);
                 referenceMetadata.typedType = typedType + "Entity";
-
-                boolean hasMultipleTypes = false;
-                if (!referenceMetadata.hasNonTypedReturn) {
-                    if (referenceMetadata.hasTypedReturn) {
-                        camelCaseFieldName = typedType;
-                        hasMultipleTypes = true;
-                    }
-                    referenceMetadata.referenceClassForSignature =
-                            getReferenceSignature(fieldTypedata.isMultiple(), hasMultipleTypes, camelCaseFieldName + "Entity");
-                }
                 referenceMetadata.hasTypedReturn = true;
             } else {
                 referenceMetadata.allowedReferencesForAnnotation.add("EntityModel.class");
                 referenceMetadata.hasNonTypedReturn = true;
-                referenceMetadata.referenceClassForSignature =
-                        getReferenceSignature(fieldTypedata.isMultiple(), referenceMetadata.hasTypedReturn, "Entity");
             }
+        }
+
+        // has non-typed return
+        if (referenceMetadata.hasNonTypedReturn) {
+            referenceMetadata.referenceClassForSignature =
+                    getReferenceSignature(fieldTypedata.isMultiple(), referenceMetadata.hasTypedReturn, "Entity");
+        }
+        // has typed return
+        else {
+            referenceMetadata.referenceClassForSignature =
+                    getReferenceSignature(fieldTypedata.isMultiple(), targets.length > 1, targets.length > 1 ? referenceMetadata.typedType : camelCaseFieldName + "Entity");
         }
 
         return referenceMetadata;
