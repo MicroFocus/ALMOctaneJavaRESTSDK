@@ -181,9 +181,16 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 ```
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
+## Space and Workspace admin
+By various combinations of not setting the space id, or setting the space id and not the workspace id, the admin of those
+spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin` tests for examples of how these can be used.
+
+Currently the admin sections are not available using generated entities - but the CRUD functions are available
+
 ## What's New
 * 15.0.60
   * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
+  * Able to get the context for space and workspace admins
   * FIX for [Bug 97](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/97).  Logging uses the slf4j paradigm for formatting strings
 * 15.0.40.1
   * FIX for [Bug 79](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79).  User defined lists are now created with a `_` in front of the

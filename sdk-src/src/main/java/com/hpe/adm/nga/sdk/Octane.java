@@ -35,7 +35,6 @@ import java.util.UUID;
  * <li>Authentication object</li>
  * </ul>
  * <br>
- * <p>
  * This represents the following URL in the Octane REST API:
  * <br>
  * {@code
@@ -43,6 +42,22 @@ import java.util.UUID;
  * server_url:port/api/shared_spaces/[sharedspace_id]/workspaces/[workspace_id]
  * }
  * </p>
+ * However if both the sharedspace and workspace ids are omitted the context will be assumed to be the space admin:
+ * <br>
+ * {@code
+ * <p>
+ * server_url:port/api/shared_spaces
+ * }
+ * </p>
+ * <br>
+ * If only the workspace id is omitted the context is assumed to be workspace admin
+ * <br>
+ * {@code
+ * <p>
+ * server_url:port/api/shared_spaces/[sharedspace_id]
+ * }
+ * </p>
+ * <br>
  * <p>
  * The {@code Octane} class is instantialized using the {@link Octane.Builder} class.  Once that instance has been
  * obtained the Octane context can be used to create further entity, metadata, attachment contexts or to sign out of the server.
@@ -54,9 +69,13 @@ import java.util.UUID;
 public class Octane {
 
     //Constants
-    private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
-    private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
+    private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces";
+    private static final String ID_FORMAT = "%s/%s";
+    private static final String WORKSPACES_DOMAIN_FORMAT = "%s/workspaces";
     private static final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
+    public static final long NO_WORKSPACE_ID = Long.MIN_VALUE;
+    public static final String NO_ENTITY = "";
+    private static final long ONLY_SHAREDSPACE_WORKSPACE_ID = 0L;
 
     //private members
     private final String urlDomain;
@@ -70,6 +89,15 @@ public class Octane {
         urlDomain = domain;
         idsharedSpaceId = sharedSpaceId;
         workSpaceId = workId;
+        logger.info("Setting context to: domain=" + urlDomain + "; spaceid=" + idsharedSpaceId + "; workspaceid=" + workSpaceId);
+    }
+
+    private Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId) {
+        this(octaneHttpClient, domain, sharedSpaceId, ONLY_SHAREDSPACE_WORKSPACE_ID);
+    }
+
+    private Octane(OctaneHttpClient octaneHttpClient, String domain) {
+        this(octaneHttpClient, domain, null);
     }
 
     /**
@@ -79,6 +107,9 @@ public class Octane {
      * </p>
      * This method creates a new separate entity context each time that can be reused or used in parallel
      * <p>
+     * <p>
+     * By using {@link Octane#NO_ENTITY} this is set to be the admin context to get the list of spaces or workspaces
+     * </p>
      *
      * @param entityName - The name of the entity as a collection
      * @return A new EntityList object that list of entities
@@ -130,13 +161,23 @@ public class Octane {
      * @return base domain
      */
     private String getBaseDomainFormat() {
-
-        String baseDomain = "";
+        // this is the same as SERVER/api/shared_spaces.  Used to get information about all spaces (such as IDs)
+        String baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain);
+        // if there is a shared space ID that means that we are entering a specific space
         if (idsharedSpaceId != null && !idsharedSpaceId.isEmpty()) {
-            baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain, idsharedSpaceId);
-
-            if (workSpaceId != 0)
-                baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT, workSpaceId);
+            // this is the same as SERVER/api/shared_spaces/id.
+            baseDomain = String.format(ID_FORMAT, baseDomain, idsharedSpaceId);
+            // this is the same as SERVER/api/shared_spaces/id/workspaces.  Used to get information about all workspaces (such as IDs) within a specific space
+            if (workSpaceId == NO_WORKSPACE_ID) {
+                baseDomain = String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain);
+            }
+            // this is the same as SERVER/api/shared_spaces/id/workspaces/id  Normal workspace context
+            else if (workSpaceId != ONLY_SHAREDSPACE_WORKSPACE_ID) {
+                baseDomain = String.format(ID_FORMAT, String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain), workSpaceId);
+            }
+            // if neither of the above are triggered then we remain in a space id but without any workspace context
+            // here we just add the end / to ensure the correct URL
+            baseDomain = baseDomain.concat("/");
         }
 
         return baseDomain;
@@ -221,7 +262,13 @@ public class Octane {
         }
 
         /**
-         * Sets the workspace id to be a long
+         * Sets the workspace id to be a long.
+         * <p>
+         * This can be set to be {@link Octane#NO_WORKSPACE_ID} which means that the context is set to be the space
+         * admin to get the list of workspaces
+         * <br>
+         * If this is not set and the space id is set the context is assumed to be the space admin
+         * </p>
          *
          * @param lId - workSpace id
          * @return this instance
@@ -280,7 +327,11 @@ public class Octane {
             this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
 
             if (octaneHttpClient.authenticate(authentication)) {
-                objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
+                if (idsharedSpaceId == null) {
+                    objOctane = new Octane(octaneHttpClient, urlDomain);
+                } else {
+                    objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
+                }
             }
 
             return objOctane;
