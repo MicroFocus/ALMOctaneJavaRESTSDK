@@ -24,7 +24,7 @@ import com.hpe.adm.nga.sdk.query.QueryMethod;
 abstract class MetadataOctaneRequest {
 
     protected static final String JSON_DATA_FIELD_NAME = "data";
-    protected static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
+    protected static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: {}";
     protected final OctaneRequest octaneRequest;
     protected final OctaneHttpClient octaneHttpClient;
 

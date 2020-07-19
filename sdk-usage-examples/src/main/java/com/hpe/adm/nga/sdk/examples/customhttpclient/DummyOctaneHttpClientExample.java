@@ -49,7 +49,7 @@ public class DummyOctaneHttpClientExample {
 
         //Fetch defects as an example a print them to the console
         Collection<EntityModel> defects = octane.entityList("work_items").get().execute();
-        defects.forEach(defect -> logger.info(defect.getValue("id").getValue() + " " + defect.getValue("name").getValue()));
+        defects.forEach(defect -> logger.info("{} {}", defect.getValue("id").getValue(), defect.getValue("name").getValue()));
 
         assert defects.size() == dummyDefectCount;
 

@@ -31,7 +31,7 @@ public class Util {
      * @param entities {@link Collection} of {@link EntityModel}s to print
      */
     public static void printEntities(Collection<EntityModel> entities) {
-        logger.info("Collection size: " + entities.size());
+        logger.info("Collection size: {}", entities.size());
         if (entities.size() != 0) {
             entities
                 .stream()

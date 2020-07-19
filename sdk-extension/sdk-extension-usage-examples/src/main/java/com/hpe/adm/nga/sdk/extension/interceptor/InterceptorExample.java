@@ -63,7 +63,7 @@ public class InterceptorExample {
             public Map<String, Object> headers( Map<String, Object> headers) {
                 logger.info("Intercepting request headers: (printing)");
                 headers.put("DUMMY", "HEADER");
-                headers.forEach((key, value) -> logger.info(key +": " + value));
+                headers.forEach((key, value) -> logger.info("{}: {}", key, value));
                 return headers;
             }
         });
@@ -73,7 +73,7 @@ public class InterceptorExample {
             public Map<String, Object> headers( Map<String, Object> headers) {
                 logger.info("Intercepting response headers: (printing)");
                 headers.put("DUMMY", "HEADER");
-                headers.forEach((key, value) -> logger.info(key +": " + value));
+                headers.forEach((key, value) -> logger.info("{}: {}", key, value));
                 return headers;
             }
         });

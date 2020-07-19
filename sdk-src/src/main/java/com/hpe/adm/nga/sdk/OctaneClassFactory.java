@@ -62,7 +62,7 @@ public interface OctaneClassFactory {
                 //noinspection unchecked
                 clazz = (Class<OctaneClassFactory>) Class.forName(octaneClassFactoryClassName);
             } catch (ClassNotFoundException e) {
-                logger.error("Failed to instantiate OctaneClassFactory class from name: " + octaneClassFactoryClassName + ": " + e.getMessage());
+                logger.error("Failed to instantiate OctaneClassFactory class from name: {}: {}", octaneClassFactoryClassName, e.getMessage());
                 throw new RuntimeException("Failed to find class with name: " + octaneClassFactoryClassName, e);
             }
 
@@ -71,10 +71,8 @@ public interface OctaneClassFactory {
                 Method method = clazz.getDeclaredMethod("getInstance");
                 return (OctaneClassFactory) method.invoke(null);
             } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                String message = "Failed to instantiate class "
-                        + octaneClassFactoryClassName
-                        + ", the class must be a singleton and have a static getInstance() method";
-                logger.error(message);
+                String message = "Failed to instantiate class {}, the class must be a singleton and have a static getInstance() method";
+                logger.error(message, octaneClassFactoryClassName);
                 throw new RuntimeException(message, e);
             }
         } else {

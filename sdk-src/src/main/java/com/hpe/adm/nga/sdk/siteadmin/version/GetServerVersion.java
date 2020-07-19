@@ -54,7 +54,7 @@ public class GetServerVersion {
 
         if (response.isSuccessStatusCode()) {
             final String json = response.getContent();
-            logger.debug(String.format("Response_Json: %s", json));
+            logger.debug("Response_Json: {}", json);
 
             final JSONTokener tokener = new JSONTokener(json);
             final JSONObject jsonObj = new JSONObject(tokener);
