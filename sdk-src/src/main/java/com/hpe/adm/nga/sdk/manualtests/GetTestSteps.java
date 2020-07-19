@@ -57,7 +57,7 @@ public class GetTestSteps {
         String json = "";
         if (response.isSuccessStatusCode()) {
             json = response.getContent();
-            logger.debug(String.format("Response_Json: %s", json));
+            logger.debug("Response_Json: {}", json);
         }
 
         final JSONTokener tokener = new JSONTokener(json);

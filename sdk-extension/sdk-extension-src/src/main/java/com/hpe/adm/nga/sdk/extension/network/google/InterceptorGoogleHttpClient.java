@@ -78,7 +78,7 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
      * @param httpRequest        target {@link HttpRequest}
      */
     private static void applyRequestInterceptor(RequestInterceptor requestInterceptor, HttpRequest httpRequest) {
-        logger.debug("Applying responseInterceptor " + (responseInterceptors.indexOf(requestInterceptor) + 1) + " of " + responseInterceptors.size());
+        logger.debug("Applying responseInterceptor {} of {}", responseInterceptors.indexOf(requestInterceptor) + 1, responseInterceptors.size());
 
         //URL
         String newUrl = requestInterceptor.url(httpRequest.getUrl().toString());
@@ -113,7 +113,7 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
      * @param httpResponse        target {@link HttpResponse}
      */
     private static void applyResponseInterceptor(ResponseInterceptor responseInterceptor, HttpResponse httpResponse) {
-        logger.debug("Applying responseInterceptor " + (responseInterceptors.indexOf(responseInterceptor) + 1) + " of " + responseInterceptors.size());
+        logger.debug("Applying responseInterceptor {} of {}", responseInterceptors.indexOf(responseInterceptor) + 1, responseInterceptors.size());
 
         //HEADERS
         final Map<String, Object> oldHeaders = new HashMap<>();
