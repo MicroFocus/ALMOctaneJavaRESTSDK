@@ -216,7 +216,7 @@ public class GenerateModels {
     }
 
     private Collection<FieldMetadata> generateEntity(Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
-        final Collection<FieldMetadata> fieldMetadata = metadata.fields(name).execute();
+        final Collection<FieldMetadata> fieldMetadata = sanitiseMetaData(metadata.fields(name).execute());
 
         final TreeMap<String, List<String>> collectedReferences = fieldMetadata.stream()
                 .filter(FieldMetadata::isRequired)
@@ -277,6 +277,13 @@ public class GenerateModels {
 
         fileWriter.close();
         return fieldMetadata;
+    }
+
+    private Collection<FieldMetadata> sanitiseMetaData(Collection<FieldMetadata> fieldMetadataCollection) {
+        return fieldMetadataCollection.stream()
+                // filter out entities that have references without a target - like public to protected
+                .filter(fieldMetadata -> fieldMetadata.getFieldType() != FieldMetadata.FieldType.Reference || fieldMetadata.getFieldTypedata().getTargets() != null)
+                .collect(Collectors.toList());
     }
 
     private void expandCollectedReferences(final TreeMap<String, List<String>> collectedReferences, final int[] positions, final int pointer, final Set<List<String[]>> output) {
