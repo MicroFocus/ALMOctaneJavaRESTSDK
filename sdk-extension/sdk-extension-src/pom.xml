@@ -19,7 +19,7 @@
 	<parent>
         <groupId>com.microfocus.adm.almoctane.sdk.extension</groupId>
         <artifactId>sdk-extension-root</artifactId>
-        <version>15.0.60-SNAPSHOT</version>
+        <version>15.1.20-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
