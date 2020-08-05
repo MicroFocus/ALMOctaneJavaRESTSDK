@@ -18,7 +18,7 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 /**
  * An object that enables getting or updating (or creating) test steps using the SDK
  *
- * @see <a href="https://admhelp.microfocus.com/octane/en/15.0.40/Online/Content/API/Create_Manual_Test.htm#mt-item-3">Create Manual Test Steps</a>}
+ * @see <a href="https://admhelp.microfocus.com/octane/en/15.0.40/Online/Content/API/Create_Manual_Test.htm#mt-item-3">Create Manual Test Steps</a>
  */
 public class TestStepList {
 

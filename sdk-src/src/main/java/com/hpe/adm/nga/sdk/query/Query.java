@@ -39,7 +39,7 @@ package com.hpe.adm.nga.sdk.query;
  *       be used in conjunction with entity or other contexts
  *   </p>
  *   <p>
- *       {@code Query} objects can be chained together (and/or) by using the correct methods such as {@link QueryBuilder#and(QueryBuilder)} (QueryBuilder)} or
+ *       {@code Query} objects can be chained together (and/or) by using the correct methods such as {@link QueryBuilder#and(QueryBuilder)} or
  *       {@link QueryBuilder#orNot(String, QueryMethod, Object)}
  *       <br>
  *       {@link QueryBuilder#build()} should be called once the entire query has been built
@@ -112,7 +112,7 @@ public class Query {
      */
     public static class QueryBuilder {
 
-        private String queryString = "";
+        private String queryString;
 
         private QueryBuilder(String queryString) {
             this.queryString = queryString;
@@ -128,7 +128,8 @@ public class Query {
 
         /**
          * Builds a query from the current builder
-         * @return builded query
+         *
+         * @return built query
          */
         public Query build() {
             return new Query(this);

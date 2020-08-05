@@ -37,25 +37,19 @@ import java.util.UUID;
  * <br>
  * This represents the following URL in the Octane REST API:
  * <br>
- * {@code
  * <p>
- * server_url:port/api/shared_spaces/[sharedspace_id]/workspaces/[workspace_id]
- * }
+ * {@code server_url:port/api/shared_spaces/[sharedspace_id]/workspaces/[workspace_id]}
  * </p>
  * However if both the sharedspace and workspace ids are omitted the context will be assumed to be the space admin:
  * <br>
- * {@code
  * <p>
- * server_url:port/api/shared_spaces
- * }
+ * {@code server_url:port/api/shared_spaces}
  * </p>
  * <br>
  * If only the workspace id is omitted the context is assumed to be workspace admin
  * <br>
- * {@code
  * <p>
- * server_url:port/api/shared_spaces/[sharedspace_id]
- * }
+ * {@code server_url:port/api/shared_spaces/[sharedspace_id]}
  * </p>
  * <br>
  * <p>
@@ -106,7 +100,6 @@ public class Octane {
      * For example {@code defects, tests, releases}
      * </p>
      * This method creates a new separate entity context each time that can be reused or used in parallel
-     * <p>
      * <p>
      * By using {@link Octane#NO_ENTITY} this is set to be the admin context to get the list of spaces or workspaces
      * </p>

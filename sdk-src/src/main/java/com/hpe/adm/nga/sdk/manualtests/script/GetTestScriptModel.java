@@ -47,6 +47,8 @@ public class GetTestScriptModel extends TypedEntityModel {
     /**
      * Label: Creation Time
      * Description: The date and time the script was created, according to the ISO-8601 date format.
+     *
+     * @return The creation time of this script
      */
     @SuppressWarnings("unchecked")
     public java.time.ZonedDateTime getCreationTime() {
@@ -57,6 +59,8 @@ public class GetTestScriptModel extends TypedEntityModel {
     /**
      * Label: Last modified
      * Description: The date and time the script was last modified, according to the ISO-8601 date format.
+     *
+     * @return Last Modified date
      */
     @SuppressWarnings("unchecked")
     public java.time.ZonedDateTime getLastModified() {
