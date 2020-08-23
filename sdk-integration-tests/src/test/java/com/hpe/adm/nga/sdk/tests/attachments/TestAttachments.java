@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -88,6 +90,39 @@ public class TestAttachments extends TestBase {
 
         checkAttachmentJson(initialAttachment, uploadedAttachment, ownerFieldName);
         checkAttachmentContent(attachmentText.getBytes(), uploadedAttachment);
+    }
+
+    /**
+     * Create a text attachment using ISO-8859-1 encoding. File extensions has to be .txt
+     */
+    @Test
+    public void testAttachmentName() {
+        String defaultCharset = Charset.defaultCharset().displayName();
+        setEncoding("ISO-8859-1");
+
+        EntityModel initialAttachment = new EntityModel();
+        initialAttachment.setValue(new StringFieldModel("name", "è" + UUID.randomUUID().toString() + ".txt"));
+        initialAttachment.setValue(new StringFieldModel("description", UUID.randomUUID().toString()));
+        initialAttachment.setValue(new ReferenceFieldModel(ownerFieldName, attachmentParent));
+
+        String attachmentText = UUID.randomUUID().toString();
+
+        Collection<EntityModel> entities =
+                octane.attachmentList()
+                        .create()
+                        .attachment(
+                                initialAttachment,
+                                new ByteArrayInputStream(attachmentText.getBytes()),
+                                "text/plain",
+                                "")
+                        .execute();
+
+        EntityModel uploadedAttachment = reloadEntityModel(entities, ownerFieldName);
+
+        checkAttachmentJson(initialAttachment, uploadedAttachment, ownerFieldName);
+        checkAttachmentContent(attachmentText.getBytes(), uploadedAttachment);
+
+        setEncoding(defaultCharset);
     }
 
     /**
@@ -312,4 +347,17 @@ public class TestAttachments extends TestBase {
         return (255 << 24) | (r << 16) | (g << 8) | b;
     }
 
+    /**
+     * Set a specific default encoding
+     */
+    private static void setEncoding(String encoding) {
+        System.setProperty("file.encoding", encoding);
+        try {
+            Field charset = Charset.class.getDeclaredField("defaultCharset");
+            charset.setAccessible(true);
+            charset.set(null, null);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to set encoding to" + encoding);
+        }
+    }
 }
