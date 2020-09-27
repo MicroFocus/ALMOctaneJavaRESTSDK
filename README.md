@@ -74,6 +74,7 @@ To enable this add the following to your project's POM file (assuming 15.0.60-SN
                     <server>http[s]://server[:port]</server>
                     <sharedSpace>SSID</sharedSpace>
                     <workSpace>WSID</workSpace>
+                    <techPreview>boolean (default false)</techPreview>
                     <!--
                         By default the plugin will generate the sources to the generated-source directory under
                         the target.  If you wish to place this in a different place then use this parameter
@@ -188,7 +189,8 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
-* 15.0.60
+* 15.1.20
+  * Enable entity generation using the tech preview api mode.  Adds more entities and fields
   * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
   * Able to get the context for space and workspace admins
   * FIX for [Bug 97](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/97).  Logging uses the slf4j paradigm for formatting strings

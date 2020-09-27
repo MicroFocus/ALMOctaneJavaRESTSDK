@@ -251,9 +251,9 @@ public final class GeneratorHelper {
               Else if >1 type of non definitive
                ? extends Entity
              */
-            if (hasMulipleTypes) {
-                stringBuilder.append("? extends ");
-            }
+//            if (hasMulipleTypes) {
+//                stringBuilder.append("? extends ");
+//            }
             stringBuilder.append(referenceEntity);
             if (!hasMulipleTypes) {
                 stringBuilder.append("Model");
