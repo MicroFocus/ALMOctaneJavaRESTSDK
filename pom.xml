@@ -209,6 +209,8 @@
                         <exclude>**/**.properties</exclude>
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>***/src/main/resources/**</exclude>
+                        <!-- Taken from third-party -->
+                        <exclude>**/SLF4JLogChute.java</exclude>
                     </excludes>
                     <mapping>
                         <!--Do not use javadoc comments for .java files, use only /* -->
