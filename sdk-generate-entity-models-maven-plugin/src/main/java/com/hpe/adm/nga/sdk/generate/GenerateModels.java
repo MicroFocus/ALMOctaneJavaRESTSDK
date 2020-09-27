@@ -115,7 +115,7 @@ public class GenerateModels {
     }
 
     /**
-     * There are a few fields that cannot be generated due to inconsistencies.  These could haev special cases but it is simpler to exclude them
+     * There are a few fields that cannot be generated due to inconsistencies.  These could have special cases but it is simpler to exclude them
      * from generation.  If there is a problem then they can be checked on an individual basis
      *
      * @param name The entity that should be checked
