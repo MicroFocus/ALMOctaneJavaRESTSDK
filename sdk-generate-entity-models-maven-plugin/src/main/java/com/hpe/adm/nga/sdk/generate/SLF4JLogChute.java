@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  * an existing category, or just do a simple rolling file log.
  *
  * @author Mandus Elfving
- * @see <a href="https://jira.spring.io/browse/SES-5">here</> for the source
+ * @see <a href="https://jira.spring.io/browse/SES-5">here</a> for the source
  */
 public class SLF4JLogChute implements LogChute {
 
