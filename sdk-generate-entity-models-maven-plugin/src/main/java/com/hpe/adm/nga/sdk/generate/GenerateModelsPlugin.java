@@ -39,12 +39,13 @@ public class GenerateModelsPlugin extends AbstractMojo {
     private long sharedSpace;
     @Parameter(required = true)
     private long workSpace;
-    @Parameter(defaultValue = "false")
-    private final boolean techPreview = false;
+    @Parameter
+    private boolean techPreview;
 
     @Override
     public void execute() throws MojoExecutionException {
         getLog().info("Starting to generate entities");
+        getLog().debug("Tech Preview is: " + techPreview);
         try {
             new GenerateModels(generatedSourcesDirectory).generate(
                     new SimpleClientAuthentication(clientId, clientSecret,

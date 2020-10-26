@@ -13,7 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.extension;
 
-import com.hpe.adm.nga.sdk.OctaneClassFactory;
+import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
 
 /**
  * Util class, will toggle extension,

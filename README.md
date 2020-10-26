@@ -194,6 +194,7 @@ Currently the admin sections are not available using generated entities - but th
   * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
   * Able to get the context for space and workspace admins
   * FIX for [Bug 97](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/97).  Logging uses the slf4j paradigm for formatting strings
+  * Internal fix to enable OctaneClassFactory too be set by the Builder
 * 15.0.40.1
   * FIX for [Bug 79](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79).  User defined lists are now created with a `_` in front of the
   package name when using the generator to ensure Java convention is followed

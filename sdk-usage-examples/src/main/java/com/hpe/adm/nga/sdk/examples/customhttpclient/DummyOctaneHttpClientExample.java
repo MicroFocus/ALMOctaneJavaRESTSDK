@@ -14,9 +14,9 @@
 package com.hpe.adm.nga.sdk.examples.customhttpclient;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
+import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
