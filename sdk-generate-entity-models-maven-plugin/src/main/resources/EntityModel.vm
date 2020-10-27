@@ -105,9 +105,10 @@ public ${listName} get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
 public java.util.Collection<${listName}> get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
     final MultiReferenceFieldModel ${GeneratorHelper.getSanitisedFieldName(${field.name})} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
     if (${GeneratorHelper.getSanitisedFieldName(${field.name})} == null) {
-        return java.util.Collections.emptyList();
-    }
-	final java.util.Collection<EntityModel> value = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
+return new java.util.ArrayList();
+}
+final java.util.Collection
+<EntityModel> value = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
 	return value.stream().map(${listName}::getFromEntityModel)
 	    .collect(java.util.stream.Collectors.toList());
 
@@ -145,9 +146,10 @@ final StringFieldModel type = (StringFieldModel) referenceFieldModel.getValue("t
 public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
         final MultiReferenceFieldModel ${GeneratorHelper.getSanitisedFieldName(${field.name})} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
         if (${GeneratorHelper.getSanitisedFieldName(${field.name})} == null) {
-            return java.util.Collections.emptyList();
-        }
-        final java.util.Collection<EntityModel> value = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
+    return new java.util.ArrayList();
+    }
+    final java.util.Collection
+<EntityModel> value = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
         #if (${referenceMetadata.hasTypedReturn()})
         #if ((${referenceMetadata.getReferenceTypes().size()} > 1) || (${referenceMetadata.hasNonTypedReturn()}))
         return value.stream().map(entityModel -> {

@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>15.0.40.1</version>
+    <version>15.1.20</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.0.40.1'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.1.20'
 ```
 
 ## Introduction
@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 15.0.40.1 being the SDK version):
+To enable this add the following to your project's POM file (assuming 15.1.20 being the SDK version):
 
 ```xml
  <build>
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 15.0.40.1 
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>15.0.40.1</version>
+                <version>15.1.20</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -74,6 +74,7 @@ To enable this add the following to your project's POM file (assuming 15.0.40.1 
                     <server>http[s]://server[:port]</server>
                     <sharedSpace>SSID</sharedSpace>
                     <workSpace>WSID</workSpace>
+                    <techPreview>boolean (default false)</techPreview>
                     <!--
                         By default the plugin will generate the sources to the generated-source directory under
                         the target.  If you wish to place this in a different place then use this parameter
@@ -170,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>15.0.40.1</version>
+            <version>15.1.20</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -181,7 +182,19 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
 ```
 This will make the sdk use log4j as an slf4j implementation, configuring a log4j.xml in your project will also take effect on the sdk.
 
+## Space and Workspace admin
+By various combinations of not setting the space id, or setting the space id and not the workspace id, the admin of those
+spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin` tests for examples of how these can be used.
+
+Currently the admin sections are not available using generated entities - but the CRUD functions are available
+
 ## What's New
+* 15.1.20
+  * Enable entity generation using the tech preview api mode.  Adds more entities and fields
+  * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
+  * Able to get the context for space and workspace admins
+  * FIX for [Bug 97](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/97).  Logging uses the slf4j paradigm for formatting strings
+  * Internal fix to enable OctaneClassFactory too be set by the Builder
 * 15.0.40.1
   * FIX for [Bug 79](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79).  User defined lists are now created with a `_` in front of the
   package name when using the generator to ensure Java convention is followed

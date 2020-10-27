@@ -14,10 +14,7 @@
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
-import com.hpe.adm.nga.sdk.entities.EntityList;
-import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
@@ -59,6 +56,7 @@ public class CommonMethods {
     }
 
 
+    @SuppressWarnings("rawtypes")
     public static boolean isErrorAInErrorB(ErrorModel entityA, ErrorModel entityB) {
         if (entityA == null) {
             return true;

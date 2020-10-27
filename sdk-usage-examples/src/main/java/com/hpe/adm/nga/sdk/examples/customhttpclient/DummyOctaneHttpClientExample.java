@@ -14,9 +14,9 @@
 package com.hpe.adm.nga.sdk.examples.customhttpclient;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
+import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class DummyOctaneHttpClientExample {
 
         //Fetch defects as an example a print them to the console
         Collection<EntityModel> defects = octane.entityList("work_items").get().execute();
-        defects.forEach(defect -> logger.info(defect.getValue("id").getValue() + " " + defect.getValue("name").getValue()));
+        defects.forEach(defect -> logger.info("{} {}", defect.getValue("id").getValue(), defect.getValue("name").getValue()));
 
         assert defects.size() == dummyDefectCount;
 

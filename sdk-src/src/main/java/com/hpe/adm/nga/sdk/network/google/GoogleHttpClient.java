@@ -397,22 +397,22 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static void logHttpContent(HttpContent content) {
         if (content instanceof MultipartContent) {
             MultipartContent multipartContent = ((MultipartContent) content);
-            logger.debug("MultipartContent: " + content.getType());
+            logger.debug("MultipartContent: {}", content.getType());
             multipartContent.getParts().forEach(part -> {
-                logger.debug("Part: encoding: " + part.getEncoding() + ", headers: " + part.getHeaders());
+                logger.debug("Part: encoding: {}, headers: {}", part.getEncoding(), part.getHeaders());
                 logHttpContent(part.getContent());
             });
         } else if (content instanceof InputStreamContent) {
-            logger.debug("InputStreamContent: type: " + content.getType());
+            logger.debug("InputStreamContent: type: {}", content.getType());
         } else if (content instanceof FileContent) {
-            logger.debug("FileContent: type: " + content.getType() + ", filepath: " + ((FileContent) content).getFile().getAbsolutePath());
+            logger.debug("FileContent: type: {}, filepath: {}", content.getType(), ((FileContent) content).getFile().getAbsolutePath());
         } else {
             try {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 content.writeTo(byteArrayOutputStream);
-                logger.debug("Content: type: " + content.getType() + ", " + byteArrayOutputStream.toString());
+                logger.debug("Content: type: {}, {}", content.getType(), byteArrayOutputStream.toString());
             } catch (IOException ex) {
-                logger.error("Failed to log content of " + content, ex);
+                logger.error("Failed to log content of {} {}", content, ex);
             }
         }
     }
@@ -439,7 +439,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
                         .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
 
-        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", octaneHttpRequest.getContent().getBytes());
+        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", octaneHttpRequest.getContent().getBytes(StandardCharsets.UTF_8));
         MultipartContent.Part part1 = new MultipartContent.Part(byteArrayContent);
         String contentDisposition = String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT, HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE);
         HttpHeaders httpHeaders = new HttpHeaders()
@@ -479,7 +479,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 // Sadly the server seems to send back empty cookies for some reason
                 cookies = HttpCookie.parse(strCookie);
             } catch (Exception ex) {
-                logger.error("Failed to parse SET_COOKIE header, issue with cookie: \"" + strCookie + "\", " + ex);
+                logger.error("Failed to parse SET_COOKIE header, issue with cookie: \"{}\", {}", strCookie, ex);
                 continue;
             }
             Optional<HttpCookie> lwssoCookie = cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst();
@@ -502,9 +502,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * Log jvm proxy system properties for debugging connection issues
      */
     private static void logProxySystemProperties() {
-        String[] proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
-        Arrays.stream(proxySysProperties)
-                .forEach(sysProp -> logger.debug(sysProp + ": " + System.getProperty(sysProp)));
+        if (logger.isDebugEnabled()) {
+            String[] proxySysProperties = new String[]{"java.net.useSystemProxies", "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort"};
+            Arrays.stream(proxySysProperties)
+                    .forEach(sysProp -> logger.debug("{}: {}", sysProp, System.getProperty(sysProp)));
+        }
     }
 
     /**
@@ -513,11 +515,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @param urlDomain base url of octane server
      */
     private static void logSystemProxyForUrlDomain(String urlDomain) {
-        try {
-            List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(urlDomain));
-            logger.debug("System proxies for " + urlDomain + ": " + proxies.toString());
-        } catch (SecurityException ex) {
-            logger.debug("SecurityException when trying to access system wide proxy selector: " + ex);
+        if (logger.isDebugEnabled()) {
+            try {
+                List<Proxy> proxies = ProxySelector.getDefault().select(URI.create(urlDomain));
+                logger.debug("System proxies for {}: {}", urlDomain, proxies.toString());
+            } catch (SecurityException ex) {
+                logger.debug("SecurityException when trying to access system wide proxy selector: ", ex);
+            }
         }
     }
 

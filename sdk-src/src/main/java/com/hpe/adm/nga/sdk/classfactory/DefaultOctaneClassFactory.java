@@ -11,17 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hpe.adm.nga.sdk;
+package com.hpe.adm.nga.sdk.classfactory;
 
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Default implementation of the {@link OctaneClassFactory}, used by {@link OctaneClassFactory#getSystemParamImplementation()} when no system property is specified
+ * Default implementation of the {@link OctaneClassFactory}, used by {@link OctaneClassFactory#getImplementation(String)}
+ * when no string or system property is specified
  */
 final class DefaultOctaneClassFactory implements OctaneClassFactory{
 

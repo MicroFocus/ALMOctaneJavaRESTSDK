@@ -32,7 +32,7 @@ public final class OctaneRequest {
     protected final OctaneHttpClient octaneHttpClient;
 
     // constant
-    private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: %s";
+    private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: {}";
 
     public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
         octaneUrl = new OctaneUrl(urlDomain);
@@ -65,7 +65,7 @@ public final class OctaneRequest {
         OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
         String json = response.getContent();
-        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
+        logger.debug(LOGGER_RESPONSE_JSON_FORMAT, json);
 
         if (response.isSuccessStatusCode() && json != null && !json.isEmpty()) {
             newEntityModels = ModelParser.getInstance().getEntities(json);
@@ -88,7 +88,7 @@ public final class OctaneRequest {
         OctaneHttpResponse response = octaneHttpClient.execute(octaneHttpRequest);
 
         String json = response.getContent();
-        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
+        logger.debug(LOGGER_RESPONSE_JSON_FORMAT, json);
         if (response.isSuccessStatusCode() && (json != null && !json.isEmpty())) {
 
             JSONTokener tokener = new JSONTokener(json);

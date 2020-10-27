@@ -13,10 +13,10 @@
  */
 package com.hpe.adm.nga.sdk.generate;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -39,12 +39,18 @@ public class GenerateModelsPlugin extends AbstractMojo {
     private long sharedSpace;
     @Parameter(required = true)
     private long workSpace;
+    @Parameter
+    private boolean techPreview;
 
     @Override
     public void execute() throws MojoExecutionException {
         getLog().info("Starting to generate entities");
+        getLog().debug("Tech Preview is: " + techPreview);
         try {
-            new GenerateModels(generatedSourcesDirectory).generate(new SimpleClientAuthentication(clientId, clientSecret), server, sharedSpace, workSpace);
+            new GenerateModels(generatedSourcesDirectory).generate(
+                    new SimpleClientAuthentication(clientId, clientSecret,
+                            techPreview ? APIMode.TechnicalPreviewAPIMode : null),
+                    server, sharedSpace, workSpace);
         } catch (IOException e) {
             throw new MojoExecutionException("Problem generating entities", e);
         }

@@ -71,7 +71,7 @@ public final class GetFieldMetadata extends MetadataOctaneRequest {
             colEntitiesMetadata = getFieldMetadata(json);
         }
 
-        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
+        logger.debug(LOGGER_RESPONSE_JSON_FORMAT, json);
         return colEntitiesMetadata;
 
     }

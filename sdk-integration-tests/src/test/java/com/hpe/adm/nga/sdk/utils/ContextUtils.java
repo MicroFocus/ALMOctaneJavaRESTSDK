@@ -39,11 +39,11 @@ public class ContextUtils {
         try {
             Octane.Builder builder = new Octane.Builder(authentication).Server(url);
 
-            if (!sharedSpaceId.isEmpty()) {
+            if (sharedSpaceId != null && !sharedSpaceId.isEmpty()) {
                 builder = builder.sharedSpace(Long.parseLong(sharedSpaceId));
             }
 
-            if (!workspaceId.isEmpty()) {
+            if (workspaceId != null && !workspaceId.isEmpty()) {
                 builder = builder.workSpace(Long.parseLong(workspaceId));
             }
 

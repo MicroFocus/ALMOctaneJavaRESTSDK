@@ -20,13 +20,13 @@ import com.hpe.adm.nga.sdk.entities.get.GetEntities;
 import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
 import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
+import com.hpe.adm.nga.sdk.manualtests.TestStepList;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 
 
 /**
  * This class represents the entity context and carries out the actual server requests.  It builds the correct URL as
  * appropriate
- *
  */
 public class EntityList {
 
@@ -55,7 +55,7 @@ public class EntityList {
      * @return a new Entities object with specific id
      */
     public Entities at(String entityId) {
-        return new Entities(entityId);
+        return isTestEntity() ? new TestEntities(entityId) : new Entities(entityId);
     }
 
     /**
@@ -98,6 +98,14 @@ public class EntityList {
         return new DeleteEntities(octaneHttpClient, urlDomain);
     }
 
+    /**
+     * This is hard-coded.  Only manual tests or gherkin tests have a script
+     *
+     * @return whether this is a test entity that has a script
+     */
+    private boolean isTestEntity() {
+        return urlDomain.endsWith("manual_tests") || urlDomain.endsWith("gherkin_tests");
+    }
 
     // **** Classes ***
 
@@ -106,7 +114,7 @@ public class EntityList {
      */
     public class Entities {
 
-        private final String entityId;
+        protected final String entityId;
 
         /**
          * Set entityId parameter
@@ -144,6 +152,30 @@ public class EntityList {
             return new DeleteEntity(octaneHttpClient, urlDomain, entityId);
         }
 
+    }
+
+    /**
+     * This class hold the Entities object but as a test for the manipulation of test scripts (An object that represent one Entity )
+     */
+    public class TestEntities extends Entities {
+
+        /**
+         * Set entityId parameter
+         *
+         * @param entityId The entity id
+         */
+        public TestEntities(String entityId) {
+            super(entityId);
+        }
+
+        /**
+         * An instance of {@link TestStepList} for access to the script of the test
+         *
+         * @return Instance of TestStepList
+         */
+        public TestStepList getTestSteps() {
+            return new TestStepList(octaneHttpClient, urlDomain.substring(0, urlDomain.lastIndexOf('/') + 1), entityId);
+        }
     }
 
 }

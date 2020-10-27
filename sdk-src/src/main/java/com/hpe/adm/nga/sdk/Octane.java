@@ -15,6 +15,7 @@ package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -35,14 +36,23 @@ import java.util.UUID;
  * <li>Authentication object</li>
  * </ul>
  * <br>
- * <p>
  * This represents the following URL in the Octane REST API:
  * <br>
- * {@code
  * <p>
- * server_url:port/api/shared_spaces/[sharedspace_id]/workspaces/[workspace_id]
- * }
+ * {@code server_url:port/api/shared_spaces/[sharedspace_id]/workspaces/[workspace_id]}
  * </p>
+ * However if both the sharedspace and workspace ids are omitted the context will be assumed to be the space admin:
+ * <br>
+ * <p>
+ * {@code server_url:port/api/shared_spaces}
+ * </p>
+ * <br>
+ * If only the workspace id is omitted the context is assumed to be workspace admin
+ * <br>
+ * <p>
+ * {@code server_url:port/api/shared_spaces/[sharedspace_id]}
+ * </p>
+ * <br>
  * <p>
  * The {@code Octane} class is instantialized using the {@link Octane.Builder} class.  Once that instance has been
  * obtained the Octane context can be used to create further entity, metadata, attachment contexts or to sign out of the server.
@@ -54,22 +64,35 @@ import java.util.UUID;
 public class Octane {
 
     //Constants
-    private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces/%s/";
-    private static final String WORKSPACES_DOMAIN_FORMAT = "workspaces/%s/";
+    private static final String SHARED_SPACES_DOMAIN_FORMAT = "%s/api/shared_spaces";
+    private static final String ID_FORMAT = "%s/%s";
+    private static final String WORKSPACES_DOMAIN_FORMAT = "%s/workspaces";
     private static final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
+    public static final long NO_WORKSPACE_ID = Long.MIN_VALUE;
+    public static final String NO_ENTITY = "";
+    private static final long ONLY_SHAREDSPACE_WORKSPACE_ID = 0L;
 
     //private members
     private final String urlDomain;
     private final String idsharedSpaceId;
     private final long workSpaceId;
-    private final OctaneHttpClient octaneHttpClient;
+    private final OctaneInternalConfiguration octaneInternalConfiguration;
 
     // functions
-    private Octane(OctaneHttpClient octaneHttpClient, String domain, String sharedSpaceId, long workId) {
-        this.octaneHttpClient = octaneHttpClient;
+    private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId, long workId) {
+        this.octaneInternalConfiguration = octaneInternalConfiguration;
         urlDomain = domain;
         idsharedSpaceId = sharedSpaceId;
         workSpaceId = workId;
+        logger.info("Setting context to: domain=" + urlDomain + "; spaceid=" + idsharedSpaceId + "; workspaceid=" + workSpaceId);
+    }
+
+    private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId) {
+        this(octaneInternalConfiguration, domain, sharedSpaceId, ONLY_SHAREDSPACE_WORKSPACE_ID);
+    }
+
+    private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain) {
+        this(octaneInternalConfiguration, domain, null);
     }
 
     /**
@@ -79,12 +102,15 @@ public class Octane {
      * </p>
      * This method creates a new separate entity context each time that can be reused or used in parallel
      * <p>
+     * By using {@link Octane#NO_ENTITY} this is set to be the admin context to get the list of spaces or workspaces
+     * </p>
      *
      * @param entityName - The name of the entity as a collection
      * @return A new EntityList object that list of entities
      */
     public EntityList entityList(String entityName) {
-        return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityName);
+        return OctaneClassFactory.getImplementation(octaneInternalConfiguration.octaneClassFactoryClassName)
+                .getEntityList(octaneInternalConfiguration.octaneHttpClient, getBaseDomainFormat(), entityName);
     }
 
     /**
@@ -95,7 +121,8 @@ public class Octane {
      * @return The instance that can then be set as the context
      */
     public <T extends TypedEntityList> T entityList(Class<T> entityListClass) {
-        return OctaneClassFactory.getSystemParamImplementation().getEntityList(octaneHttpClient, getBaseDomainFormat(), entityListClass);
+        return OctaneClassFactory.getImplementation(octaneInternalConfiguration.octaneClassFactoryClassName)
+                .getEntityList(octaneInternalConfiguration.octaneHttpClient, getBaseDomainFormat(), entityListClass);
     }
 
     /**
@@ -110,7 +137,7 @@ public class Octane {
      * @return A new Metadata object that holds the metadata context
      */
     public Metadata metadata() {
-        return new Metadata(octaneHttpClient, getBaseDomainFormat());
+        return new Metadata(octaneInternalConfiguration.octaneHttpClient, getBaseDomainFormat());
     }
 
     /**
@@ -121,7 +148,7 @@ public class Octane {
      * @return A new attachmentList object that holds the attachments context
      */
     public AttachmentList attachmentList() {
-        return new AttachmentList(octaneHttpClient, getBaseDomainFormat());
+        return new AttachmentList(octaneInternalConfiguration, getBaseDomainFormat());
     }
 
     /**
@@ -129,14 +156,24 @@ public class Octane {
      *
      * @return base domain
      */
-    protected String getBaseDomainFormat() {
-
-        String baseDomain = "";
+    private String getBaseDomainFormat() {
+        // this is the same as SERVER/api/shared_spaces.  Used to get information about all spaces (such as IDs)
+        String baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain);
+        // if there is a shared space ID that means that we are entering a specific space
         if (idsharedSpaceId != null && !idsharedSpaceId.isEmpty()) {
-            baseDomain = String.format(SHARED_SPACES_DOMAIN_FORMAT, urlDomain, idsharedSpaceId);
-
-            if (workSpaceId != 0)
-                baseDomain = baseDomain + String.format(WORKSPACES_DOMAIN_FORMAT, String.valueOf(workSpaceId));
+            // this is the same as SERVER/api/shared_spaces/id.
+            baseDomain = String.format(ID_FORMAT, baseDomain, idsharedSpaceId);
+            // this is the same as SERVER/api/shared_spaces/id/workspaces.  Used to get information about all workspaces (such as IDs) within a specific space
+            if (workSpaceId == NO_WORKSPACE_ID) {
+                baseDomain = String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain);
+            }
+            // this is the same as SERVER/api/shared_spaces/id/workspaces/id  Normal workspace context
+            else if (workSpaceId != ONLY_SHAREDSPACE_WORKSPACE_ID) {
+                baseDomain = String.format(ID_FORMAT, String.format(WORKSPACES_DOMAIN_FORMAT, baseDomain), workSpaceId);
+            }
+            // if neither of the above are triggered then we remain in a space id but without any workspace context
+            // here we just add the end / to ensure the correct URL
+            baseDomain = baseDomain.concat("/");
         }
 
         return baseDomain;
@@ -146,7 +183,7 @@ public class Octane {
      * Signs out of the Octane server.  Any cookies that are held are deleted
      */
     public void signOut() {
-        octaneHttpClient.signOut();
+        octaneInternalConfiguration.octaneHttpClient.signOut();
     }
 
     /**
@@ -167,6 +204,7 @@ public class Octane {
         private long workSpaceId = 0;
         private OctaneHttpClient octaneHttpClient;
         private final Authentication authentication;
+        private String octaneClassFactoryClassName;
 
         //Functions
 
@@ -184,7 +222,7 @@ public class Octane {
         /**
          * Creates a new Builder object using the correct authentication
          *
-         * @param authentication - Authentication object.  Cannot be null
+         * @param authentication   - Authentication object.  Cannot be null
          * @param octaneHttpClient - Implementation of {@link OctaneHttpClient}. Cannot be null
          * @throws AssertionError if the authentication or octaneHttpClient is null
          */
@@ -221,7 +259,13 @@ public class Octane {
         }
 
         /**
-         * Sets the workspace id to be a long
+         * Sets the workspace id to be a long.
+         * <p>
+         * This can be set to be {@link Octane#NO_WORKSPACE_ID} which means that the context is set to be the space
+         * admin to get the list of workspaces
+         * <br>
+         * If this is not set and the space id is set the context is assumed to be the space admin
+         * </p>
          *
          * @param lId - workSpace id
          * @return this instance
@@ -244,7 +288,7 @@ public class Octane {
          */
         public Builder Server(String domain, int port) {
 
-            urlDomain = domain + ":" + String.valueOf(port);
+            urlDomain = domain + ":" + port;
 
             return this;
         }
@@ -266,6 +310,31 @@ public class Octane {
         }
 
         /**
+         * Sets the OctaneClassFactoryName.
+         * See {@link OctaneClassFactory} for more details
+         *
+         * @param octaneClassFactoryClassName The name of the {@link OctaneClassFactory} to use
+         * @return An instance of this builder object
+         */
+        public Builder OctaneClassFactoryClassName(String octaneClassFactoryClassName) {
+            this.octaneClassFactoryClassName = octaneClassFactoryClassName;
+
+            return this;
+        }
+
+        /**
+         * Sets the {@link OctaneHttpClient} instance.
+         *
+         * @param octaneHttpClient The instance to use
+         * @return An instance of this builder object
+         */
+        public Builder OctaneHttpClient(OctaneHttpClient octaneHttpClient) {
+            this.octaneHttpClient = octaneHttpClient;
+
+            return this;
+        }
+
+        /**
          * The main build procedure which creates the {@link Octane} object and authenticates against the server
          *
          * @return a new Octane instance which has the set context and is correctly authenticated
@@ -276,11 +345,17 @@ public class Octane {
 
             logger.info("Building Octane context using {}", this);
 
+            final OctaneInternalConfiguration octaneInternalConfiguration = new OctaneInternalConfiguration();
             // Init default http client if it wasn't specified
-            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
+            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
+            octaneInternalConfiguration.octaneClassFactoryClassName = this.octaneClassFactoryClassName;
 
-            if (octaneHttpClient.authenticate(authentication)) {
-                objOctane = new Octane(octaneHttpClient, urlDomain, idsharedSpaceId, workSpaceId);
+            if (octaneInternalConfiguration.octaneHttpClient.authenticate(authentication)) {
+                if (idsharedSpaceId == null) {
+                    objOctane = new Octane(octaneInternalConfiguration, urlDomain);
+                } else {
+                    objOctane = new Octane(octaneInternalConfiguration, urlDomain, idsharedSpaceId, workSpaceId);
+                }
             }
 
             return objOctane;
@@ -292,4 +367,29 @@ public class Octane {
         }
     }
 
+    /**
+     * Used to aggregate internal configurations that need to be passed around
+     */
+    public static final class OctaneInternalConfiguration {
+        private OctaneHttpClient octaneHttpClient;
+        private String octaneClassFactoryClassName;
+
+        /**
+         * Returns the instance of the {@link OctaneHttpClient}
+         *
+         * @return instance
+         */
+        public OctaneHttpClient getOctaneHttpClient() {
+            return octaneHttpClient;
+        }
+
+        /**
+         * Returns the class string of the {@link OctaneClassFactory}
+         *
+         * @return class string
+         */
+        public String getOctaneClassFactoryClassName() {
+            return octaneClassFactoryClassName;
+        }
+    }
 }

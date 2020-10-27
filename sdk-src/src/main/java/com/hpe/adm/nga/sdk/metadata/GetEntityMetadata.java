@@ -41,7 +41,7 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
 
     private static final String JSON_NAME_FIELD_NAME = "name";
     private static final String JSON_LABEL_FIELD_NAME = "label";
-    private static final String LOGGER_INVALID_FEATURE_FORMAT = ": not a valid feature";
+    private static final String LOGGER_INVALID_FEATURE_FORMAT = "{}: not a valid feature";
     private static final String JSON_FEATURES_FIELD_NAME = "features";
     private static final String FEATURE_REST_NAME = "rest";
     private static final String FEATURE_MAILING_NAME = "mailing";
@@ -89,7 +89,7 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
             entitiesMetadata = getEntitiesMetadata(json);
         }
 
-        logger.debug(String.format(LOGGER_RESPONSE_JSON_FORMAT, json));
+        logger.debug(LOGGER_RESPONSE_JSON_FORMAT, json);
         return entitiesMetadata;
     }
 
@@ -188,7 +188,7 @@ public final class GetEntityMetadata extends MetadataOctaneRequest {
                 feature = new Gson().fromJson(jsonFeatureObj.toString(), AuditingFeature.class);
                 break;
             default:
-                logger.debug(featureName + LOGGER_INVALID_FEATURE_FORMAT);
+                logger.debug(LOGGER_INVALID_FEATURE_FORMAT, featureName);
                 break;
         }
 

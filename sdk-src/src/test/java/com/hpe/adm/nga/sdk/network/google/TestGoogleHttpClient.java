@@ -87,8 +87,8 @@ public class TestGoogleHttpClient {
             //this is supposed to fail, eventually
         }
 
-        /**
-         * Check if the method retried the right amount of times
+        /*
+          Check if the method retried the right amount of times
          */
         verifyPrivate(
                 googleHttpClientSpy,
@@ -99,7 +99,7 @@ public class TestGoogleHttpClient {
 
     @Test
     @Ignore
-    public void testParallelRequestRetry() throws InterruptedException {
+    public void testParallelRequestRetry() {
         ConfigurationProperties.logLevel("WARN");
 
         ClientAndServer clientAndServer = startClientAndServer();

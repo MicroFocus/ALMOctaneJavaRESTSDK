@@ -74,7 +74,7 @@ public class GenerateModels {
         final VelocityEngine velocityEngine = new VelocityEngine();
         velocityEngine.setProperty("resource.loader", "class");
         velocityEngine.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
-        velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", "root");
+        velocityEngine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new SLF4JLogChute());
         velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 
         velocityEngine.init();
@@ -105,19 +105,57 @@ public class GenerateModels {
 
         for (EntityMetadata entityMetadatum : entityMetadata) {
             final String name = entityMetadatum.getName();
-            /*
-             * @Since 15.0.20
-             * The run_history's id is integer even though it should be string.  It would be extremely complicated to make a special case for run_history id as long
-             * Therefore until this is fixed in Octane - the entity will be ignored
-             */
-            if (name.equals("run_history")) {
-                continue;
-            }
+            if (entityShouldNotBeGenerated(name)) continue;
+
             final String interfaceName = GeneratorHelper.camelCaseFieldName(name) + "Entity";
             final Collection<FieldMetadata> fieldMetadata = generateEntity(metadata, entityMetadata, entityMetadatum, name, interfaceName, logicalNameToListsMap, availablePhases);
             generateInterface(entityMetadatum, name, interfaceName);
             generateEntityList(entityMetadatum, name, fieldMetadata);
         }
+    }
+
+    /**
+     * There are a few fields that cannot be generated due to inconsistencies.  These could have special cases but it is simpler to exclude them
+     * from generation.  If there is a problem then they can be checked on an individual basis
+     *
+     * @param name The entity that should be checked
+     * @return Whether this entity should be ignored and therefore not generated
+     */
+    private boolean entityShouldNotBeGenerated(String name) {
+        /*
+         * @Since 15.0.20
+         * The run_history's id is integer even though it should be string.  It would be extremely complicated to make a special case for run_history id as long
+         * Therefore until this is fixed in Octane - the entity will be ignored
+         */
+        if (name.equals("run_history")) {
+            return true;
+        }
+
+        /*
+         * @Since 15.1.20
+         * field_metadata is a special case in that it is used when defining UDFs.  It causes problems in the entity generation due to the list node
+         * not having a reference.  It is unlikely that this would be used by the SDK so is ignored for now.  If this does cause an issue we could
+         * look into fixing this in the future
+         */
+        if (name.startsWith("field_metadata")) {
+            return true;
+        }
+
+        /*
+         * @Since 15.1.20
+         * log entities have the ID marked as an integer and not as a string.  This causes issues with creating the entity.
+         * A defect has been raised in Octane to fix this
+         */
+        if (name.startsWith("log")) {
+            return true;
+        }
+
+        /*
+         * @Since 15.1.20
+         * This entity "overrides" the type field for its own use which causes issues.
+         * A defect has been raised in Octane to fix this
+         */
+        return name.equals("ci_parameter");
     }
 
     private Map<String, String> generateLists(Octane octane) throws IOException {
@@ -216,7 +254,7 @@ public class GenerateModels {
     }
 
     private Collection<FieldMetadata> generateEntity(Metadata metadata, Collection<EntityMetadata> entityMetadata, EntityMetadata entityMetadatum, String name, String interfaceName, Map<String, String> logicalNameToListsMap, Set<String> availablePhases) throws IOException {
-        final Collection<FieldMetadata> fieldMetadata = metadata.fields(name).execute();
+        final Collection<FieldMetadata> fieldMetadata = sanitiseMetaData(metadata.fields(name).execute());
 
         final TreeMap<String, List<String>> collectedReferences = fieldMetadata.stream()
                 .filter(FieldMetadata::isRequired)
@@ -277,6 +315,13 @@ public class GenerateModels {
 
         fileWriter.close();
         return fieldMetadata;
+    }
+
+    private Collection<FieldMetadata> sanitiseMetaData(Collection<FieldMetadata> fieldMetadataCollection) {
+        return fieldMetadataCollection.stream()
+                // filter out entities that have references without a target - like public to protected
+                .filter(fieldMetadata -> fieldMetadata.getFieldType() != FieldMetadata.FieldType.Reference || fieldMetadata.getFieldTypedata().getTargets() != null)
+                .collect(Collectors.toList());
     }
 
     private void expandCollectedReferences(final TreeMap<String, List<String>> collectedReferences, final int[] positions, final int pointer, final Set<List<String[]>> output) {
@@ -344,6 +389,11 @@ public class GenerateModels {
                         entityListVelocityContext.put("hasDelete", true);
                         break;
                 }
+            }
+
+            // add test script support for test_manual or gherkin tests only
+            if (name.equals("test_manual") || name.equals("gherkin_tests")) {
+                entityListVelocityContext.put("hasTestScript", true);
             }
 
             final FileWriter entityListFileWriter = new FileWriter(new File(entitiesDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityList.java"));
