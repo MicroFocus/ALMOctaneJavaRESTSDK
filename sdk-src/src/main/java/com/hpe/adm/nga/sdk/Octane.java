@@ -78,6 +78,8 @@ public class Octane {
     private final long workSpaceId;
     private final OctaneInternalConfiguration octaneInternalConfiguration;
 
+    private final static OctaneCustomSettings defaultOctaneSettings = new OctaneCustomSettings();
+
     // functions
     private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId, long workId) {
         this.octaneInternalConfiguration = octaneInternalConfiguration;
@@ -205,6 +207,7 @@ public class Octane {
         private OctaneHttpClient octaneHttpClient;
         private final Authentication authentication;
         private String octaneClassFactoryClassName;
+        private OctaneCustomSettings customSettings;
 
         //Functions
 
@@ -335,6 +338,18 @@ public class Octane {
         }
 
         /**
+         * Configure a settings provider with custom settings like: readTimeout
+         * @param settings - a plain java object with timeout settings(for now)
+         * @return An instance of this builder object
+         */
+        public Builder settings(OctaneCustomSettings settings) {
+
+            customSettings = settings;
+
+            return this;
+        }
+
+        /**
          * The main build procedure which creates the {@link Octane} object and authenticates against the server
          *
          * @return a new Octane instance which has the set context and is correctly authenticated
@@ -347,7 +362,8 @@ public class Octane {
 
             final OctaneInternalConfiguration octaneInternalConfiguration = new OctaneInternalConfiguration();
             // Init default http client if it wasn't specified
-            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
+            OctaneCustomSettings settings = customSettings != null ? customSettings : defaultOctaneSettings;
+            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, settings) : this.octaneHttpClient;
             octaneInternalConfiguration.octaneClassFactoryClassName = this.octaneClassFactoryClassName;
 
             if (octaneInternalConfiguration.octaneHttpClient.authenticate(authentication)) {
@@ -391,5 +407,14 @@ public class Octane {
         public String getOctaneClassFactoryClassName() {
             return octaneClassFactoryClassName;
         }
+    }
+
+    public static class OctaneCustomSettings {
+//        public static interface OctaneCustomSettings {
+//        public int readTimeout = 6000;
+//        public int connectionTimeout();
+        public int readTimeout = 60000;
+        public int connectionTimeout = 15000;
+
     }
 }

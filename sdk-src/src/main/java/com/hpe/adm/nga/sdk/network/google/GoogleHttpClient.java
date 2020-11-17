@@ -15,6 +15,7 @@ package com.hpe.adm.nga.sdk.network.google;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
@@ -34,6 +35,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * HTTP Client using Google's API
@@ -69,10 +71,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
     private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
-    /**
-     * Request initializer called on every request made by the requestFactory
-     */
-    protected HttpRequestInitializer requestInitializer = request -> {
+    // identity operation by default. do nothing
+    private Consumer<HttpRequest> customRequestInitializer = request -> {};
+
+    private Consumer<HttpRequest> defaultRequestInitializer = request -> {
         request.setResponseInterceptor(response -> {
             // retrieve new LWSSO in response if any
             HttpHeaders responseHeaders = response.getHeaders();
@@ -97,9 +99,28 @@ public class GoogleHttpClient implements OctaneHttpClient {
         request.setReadTimeout(60000);
     };
 
+    /**
+     * Request initializer called on every request made by the requestFactory
+     */
+    protected HttpRequestInitializer requestInitializer = request -> defaultRequestInitializer.andThen(customRequestInitializer).accept(request);
+
     public GoogleHttpClient(final String urlDomain) {
         this.urlDomain = urlDomain;
+        construct();
+    }
 
+    public GoogleHttpClient(final String urlDomain, Octane.OctaneCustomSettings settings) {
+        this(urlDomain);
+
+        customRequestInitializer = request -> {
+            request.setReadTimeout(settings.readTimeout);
+            request.setConnectTimeout(settings.connectionTimeout);
+        };
+
+        construct();
+    }
+
+    private void construct() {
         logProxySystemProperties();
         logSystemProxyForUrlDomain(urlDomain);
 

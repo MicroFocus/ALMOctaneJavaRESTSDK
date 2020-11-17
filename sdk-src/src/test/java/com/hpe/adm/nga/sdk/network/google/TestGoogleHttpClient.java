@@ -22,8 +22,10 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -39,6 +41,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -96,6 +99,31 @@ public class TestGoogleHttpClient {
                 .invoke("execute", any(), anyInt());
     }
 
+    @Test
+    public void testCustomSettings() {
+        int connTimeout = 2345;
+
+        Octane.OctaneCustomSettings settings = new Octane.OctaneCustomSettings() {{
+            readTimeout = 120000;
+            connectionTimeout = 2345;
+        }};
+
+        GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", settings );
+        OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("http://google.com:9090");
+
+        long start = System.currentTimeMillis();
+        try {
+            client.execute(request);
+        } catch (Exception e) {
+            long end = System.currentTimeMillis();
+
+            Assert.assertTrue(e.getCause() instanceof SocketTimeoutException);
+            long duration = end - start;
+            System.out.println("Error after: "  + (end - start));
+            Assert.assertTrue(duration < 3000 && duration > 2000);
+        }
+
+    }
 
     @Test
     @Ignore
