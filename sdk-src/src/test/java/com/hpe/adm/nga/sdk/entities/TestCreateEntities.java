@@ -15,8 +15,11 @@ package com.hpe.adm.nga.sdk.entities;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
+import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.json.JSONArray;
@@ -25,6 +28,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -71,6 +75,23 @@ public class TestCreateEntities {
 			fail("Failed with exception: " + ex);
 		}
 
+	}
+
+	@Test
+	public void testCustomPath(){
+		EntityList defects = octane.entityList("defects");
+
+		GetEntities get = PowerMockito.spy(defects.get());
+
+		PowerMockito.doReturn(ModelParser.getInstance().getEntities("{data:[]}")).when(get).execute();
+
+		OctaneRequest reqBefore = (OctaneRequest)Whitebox.getInternalState(get, "octaneRequest");
+		String expectedUrl = reqBefore.getOctaneUrl().toString() + "/custom/path";
+
+		get.addPath("custom").addPath("path").execute();
+
+		OctaneRequest reqAfter = (OctaneRequest)Whitebox.getInternalState(get, "octaneRequest");
+		Assert.assertEquals("Url's not equal", expectedUrl, reqAfter.getOctaneUrl().toString());
 	}
 
 	private Collection<EntityModel> testGetEntityModels(String jason) {

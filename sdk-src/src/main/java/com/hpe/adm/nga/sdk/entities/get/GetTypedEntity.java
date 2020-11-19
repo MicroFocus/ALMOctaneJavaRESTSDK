@@ -18,6 +18,8 @@ import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 
+import java.util.function.Function;
+
 /**
  * The generic super class for the context of get for typed entities.
  *
@@ -44,6 +46,18 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
      */
     public final T execute()  {
         return getEntityInstance(GetHelper.getInstance().getEntityModel(octaneRequest));
+    }
+
+    /**
+     * Append a new path element, for special cases
+     * @param path The new path section to be added
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public final E addPath(String path) {
+        // totally not elegant..
+        octaneRequest.getOctaneUrl().getPaths().add(path);
+        return (E) this;
     }
 
     /**

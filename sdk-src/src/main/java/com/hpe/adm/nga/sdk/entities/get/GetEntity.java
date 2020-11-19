@@ -47,4 +47,15 @@ public class GetEntity {
         octaneRequest.getOctaneUrl().addFieldsParam(fields);
         return this;
     }
+
+    /**
+     * Append a new path element, for special cases
+     * @param path The new path section to be added
+     * @return this
+     */
+    public GetEntity addPath(String path) {
+        // totally not elegant..
+        octaneRequest.getOctaneUrl().getPaths().add(path);
+        return this;
+    }
 }

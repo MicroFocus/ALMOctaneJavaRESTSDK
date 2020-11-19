@@ -96,4 +96,15 @@ public class GetEntities {
         octaneRequest.getOctaneUrl().setDqlQueryParam(query);
         return this;
     }
+
+    /**
+     * Append a new path element, for special cases
+     * @param path The new path section to be added
+     * @return this
+     */
+    public GetEntities addPath(String path) {
+        // totally not elegant..
+        octaneRequest.getOctaneUrl().getPaths().add(path);
+        return this;
+    }
 }
