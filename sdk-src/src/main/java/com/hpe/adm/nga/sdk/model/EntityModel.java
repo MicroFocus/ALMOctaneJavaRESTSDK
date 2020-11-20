@@ -243,11 +243,6 @@ public class EntityModel implements Entity{
 
     @Override
     public String toString() {
-        Collection<FieldModel> fieldModels = data.values();
-        String concatFieldValues = fieldModels.stream()
-                .map(field -> String.format("%s : '%s'", field.getName(), field.getValue().toString()))
-                .collect(Collectors.joining(", \n"));
-
-        return String.format("{\n%s\n}", concatFieldValues);
+        return ModelParser.getInstance().getEntityJSONObject(this).toString();
     }
 }
