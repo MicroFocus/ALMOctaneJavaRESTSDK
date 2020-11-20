@@ -240,4 +240,14 @@ public class EntityModel implements Entity{
         final StringFieldModel id = (StringFieldModel) getValue("id");
         return id == null ? null : id.getValue();
     }
+
+    @Override
+    public String toString() {
+        Collection<FieldModel> fieldModels = data.values();
+        String concatFieldValues = fieldModels.stream()
+                .map(field -> String.format("%s : '%s'", field.getName(), field.getValue().toString()))
+                .collect(Collectors.joining(", \n"));
+
+        return String.format("{\n%s\n}", concatFieldValues);
+    }
 }
