@@ -410,11 +410,8 @@ public class Octane {
     }
 
     public static class OctaneCustomSettings {
-//        public static interface OctaneCustomSettings {
-//        public int readTimeout = 6000;
-//        public int connectionTimeout();
         public int readTimeout = 60000;
         public int connectionTimeout = 15000;
-
+        public boolean trustAllCerts = false;
     }
 }

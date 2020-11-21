@@ -34,6 +34,7 @@ import java.net.ProxySelector;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -106,26 +107,43 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     public GoogleHttpClient(final String urlDomain) {
         this.urlDomain = urlDomain;
-        construct();
+        logSysProps();
+        requestFactory = buildRequestFactory();
     }
 
-    public GoogleHttpClient(final String urlDomain, Octane.OctaneCustomSettings settings) {
-        this(urlDomain);
+    public GoogleHttpClient(final String urlDomain, Octane.OctaneCustomSettings settings) throws RuntimeException {
+        this.urlDomain = urlDomain;
+        logSysProps();
 
         customRequestInitializer = request -> {
             request.setReadTimeout(settings.readTimeout);
             request.setConnectTimeout(settings.connectionTimeout);
         };
 
-        construct();
+        requestFactory = settings.trustAllCerts ? buildPermissiveRequestFactory() : buildRequestFactory();
     }
 
-    private void construct() {
+    private HttpRequestFactory buildPermissiveRequestFactory() {
+        NetHttpTransport.Builder builder = new NetHttpTransport.Builder();
+
+        try {
+            builder.doNotValidateCertificate();
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("A security exception occurred while disabling certificate validation", e);
+        }
+
+        HttpTransport httpTransport = builder.build();
+        return httpTransport.createRequestFactory(requestInitializer);
+    }
+
+    private HttpRequestFactory buildRequestFactory() {
+        HttpTransport httpTransport = new NetHttpTransport();
+        return httpTransport.createRequestFactory(requestInitializer);
+    }
+
+    private void logSysProps() {
         logProxySystemProperties();
         logSystemProxyForUrlDomain(urlDomain);
-
-        HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-        requestFactory = HTTP_TRANSPORT.createRequestFactory(requestInitializer);
     }
 
     /**
