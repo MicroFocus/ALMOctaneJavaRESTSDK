@@ -120,7 +120,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             request.setConnectTimeout(settings.connectionTimeout);
         };
 
-        if(settings.sharedHttpTransport!= null){
+        if(settings.sharedHttpTransport != null){
             requestFactory = settings.sharedHttpTransport.createRequestFactory(requestInitializer);
         } else {
             requestFactory = settings.trustAllCerts ? buildPermissiveRequestFactory() : buildRequestFactory();
