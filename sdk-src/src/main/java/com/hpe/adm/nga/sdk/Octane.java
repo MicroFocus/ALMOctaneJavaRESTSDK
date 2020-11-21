@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk;
 
+import com.google.api.client.http.HttpTransport;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
@@ -24,6 +25,7 @@ import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -413,5 +415,7 @@ public class Octane {
         public int readTimeout = 60000;
         public int connectionTimeout = 15000;
         public boolean trustAllCerts = false;
+        // downside is we're requiring the 3rd party reference here, but remains consistent with settings passing.
+        public HttpTransport sharedHttpTransport = null;
     }
 }
