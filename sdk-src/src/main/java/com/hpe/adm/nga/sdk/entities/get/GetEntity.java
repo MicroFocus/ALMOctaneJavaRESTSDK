@@ -54,8 +54,20 @@ public class GetEntity {
      * @return this
      */
     public GetEntity addPath(String path) {
-        // totally not elegant..
         octaneRequest.getOctaneUrl().getPaths().add(path);
         return this;
     }
+
+    /**
+     * Adds a HTTP header with the given value to the final http request.
+     * @param headerName the HTTP header name
+     * @param headerValue the value of the header
+     * @return this
+     */
+    public GetEntity withHeader(String headerName, String headerValue) {
+        octaneRequest.addHeader(headerName, headerValue);
+        return this;
+    }
+
+
 }

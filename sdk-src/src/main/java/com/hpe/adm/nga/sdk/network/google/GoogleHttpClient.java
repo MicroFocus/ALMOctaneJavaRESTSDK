@@ -208,6 +208,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     throw new IllegalArgumentException("Request method not known!");
                 }
             }
+
+            octaneHttpRequest.getHeaders().entrySet()
+                    .forEach(header -> httpRequest.getHeaders().set(header.getKey(), header.getValue()));
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

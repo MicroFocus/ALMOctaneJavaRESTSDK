@@ -21,6 +21,11 @@ import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * An abstract representation of a request
  */
@@ -30,6 +35,7 @@ public final class OctaneRequest {
 
     private final OctaneUrl octaneUrl;
     protected final OctaneHttpClient octaneHttpClient;
+    private final Map<String, String> httpHeaders = new HashMap<>();
 
     // constant
     private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: {}";
@@ -42,6 +48,14 @@ public final class OctaneRequest {
     public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
         this(octaneHttpClient, urlDomain);
         octaneUrl.addPaths(entityId);
+    }
+
+    public void addHeader(String headerName, String headerValue) {
+        httpHeaders.put(headerName, headerValue);
+    }
+
+    public Map<String,String> getHeaders() {
+        return Collections.unmodifiableMap(httpHeaders);
     }
 
     public final OctaneUrl getOctaneUrl() {

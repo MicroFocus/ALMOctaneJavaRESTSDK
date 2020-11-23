@@ -15,6 +15,8 @@ package com.hpe.adm.nga.sdk.network;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * HTTP request.
@@ -36,10 +38,19 @@ public abstract class OctaneHttpRequest {
 
     private final String requestUrl;
     private final OctaneRequestMethod octaneRequestMethod;
+    private Map<String, String> httpHeaders = new HashMap<>();
 
     private OctaneHttpRequest(String requestUrl, OctaneRequestMethod octaneRequestMethod) {
         this.requestUrl = requestUrl;
         this.octaneRequestMethod = octaneRequestMethod;
+    }
+
+    public final void setHeaders(Map<String, String> headers) {
+        httpHeaders = headers;
+    }
+
+    public Map<String, String> getHeaders() {
+        return httpHeaders;
     }
 
     public final String getRequestUrl() {
