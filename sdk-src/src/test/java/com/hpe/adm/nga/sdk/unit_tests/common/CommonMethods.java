@@ -39,8 +39,8 @@ public class CommonMethods {
         return new Octane.Builder(new SimpleUserAuthentication("user", "password"), octaneHttpClient)
                 .Server(getDomain())
                 .settings(new Octane.OctaneCustomSettings() {{
-                    readTimeout = 120000;
-                    connectionTimeout = 2345;
+                    set(Setting.READ_TIMEOUT,5000);
+                    set(Setting.CONNECTION_TIMEOUT,2000);
                 }})
                 .sharedSpace(Long.parseLong(getSharedSpace()))
                 .workSpace(getWorkSpace())

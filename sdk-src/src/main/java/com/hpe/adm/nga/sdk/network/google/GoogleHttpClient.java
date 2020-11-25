@@ -62,6 +62,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String ERROR_CODE_GLOBAL_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_GLOBAL_TIME_OUT";
 
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
+    private static final int HTTP_REQUEST_DEFAULT_READ_TIMEOUT = 60000;
+    private static final int HTTP_REQUEST_DEFAULT_CONNECTION_TIMEOUT = 10000;
 
     protected HttpRequestFactory requestFactory;
     protected String lwssoValue = "";
@@ -97,7 +99,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
         if (lastUsedAuthentication != null) {
             lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
         }
-        request.setReadTimeout(60000);
+        request.setReadTimeout(HTTP_REQUEST_DEFAULT_READ_TIMEOUT);
+        request.setConnectTimeout(HTTP_REQUEST_DEFAULT_CONNECTION_TIMEOUT);
     };
 
     /**
@@ -107,26 +110,39 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     public GoogleHttpClient(final String urlDomain) {
         this.urlDomain = urlDomain;
-        logSysProps();
+        logSystemProperties();
         requestFactory = buildRequestFactory();
     }
 
+    /**
+     * Constructor accepting custom settings for the underlying http transport layer
+     * @param urlDomain the Octane domain
+     * @param settings the object containing he custom settings
+     * @throws RuntimeException in case of an underlying security exception
+     */
     public GoogleHttpClient(final String urlDomain, Octane.OctaneCustomSettings settings) throws RuntimeException {
         this.urlDomain = urlDomain;
-        logSysProps();
+        logSystemProperties();
 
         customRequestInitializer = request -> {
-            request.setReadTimeout(settings.readTimeout);
-            request.setConnectTimeout(settings.connectionTimeout);
+            request.setReadTimeout((int)settings.get(Octane.OctaneCustomSettings.Setting.READ_TIMEOUT));
+            request.setConnectTimeout((int)settings.get(Octane.OctaneCustomSettings.Setting.CONNECTION_TIMEOUT));
         };
 
-        if(settings.sharedHttpTransport != null){
-            requestFactory = settings.sharedHttpTransport.createRequestFactory(requestInitializer);
+        HttpTransport httpTransport = (HttpTransport) settings.get(Octane.OctaneCustomSettings.Setting.SHARED_HTTP_TRANSPORT);
+        boolean trustAllCerts = (boolean) settings.get(Octane.OctaneCustomSettings.Setting.TRUST_ALL_CERTS);
+
+        if(httpTransport != null) {
+            requestFactory = httpTransport.createRequestFactory(requestInitializer);
         } else {
-            requestFactory = settings.trustAllCerts ? buildPermissiveRequestFactory() : buildRequestFactory();
+            requestFactory = trustAllCerts ? buildPermissiveRequestFactory() : buildRequestFactory();
         }
     }
 
+    /**
+     * Builds a HttpRequestFactory that accepts self-signed certificates
+     * @return an http request factory
+     */
     private HttpRequestFactory buildPermissiveRequestFactory() {
         NetHttpTransport.Builder builder = new NetHttpTransport.Builder();
 
@@ -140,12 +156,19 @@ public class GoogleHttpClient implements OctaneHttpClient {
         return httpTransport.createRequestFactory(requestInitializer);
     }
 
+    /**
+     * Builds a regular HttpRequestFactory
+     * @return an http request factory
+     */
     private HttpRequestFactory buildRequestFactory() {
         HttpTransport httpTransport = new NetHttpTransport();
         return httpTransport.createRequestFactory(requestInitializer);
     }
 
-    private void logSysProps() {
+    /**
+     * Logs proxy system properties
+     */
+    private void logSystemProperties() {
         logProxySystemProperties();
         logSystemProxyForUrlDomain(urlDomain);
     }

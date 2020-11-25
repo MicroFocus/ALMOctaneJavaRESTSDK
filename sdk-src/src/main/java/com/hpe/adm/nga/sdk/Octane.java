@@ -13,7 +13,6 @@
  */
 package com.hpe.adm.nga.sdk;
 
-import com.google.api.client.http.HttpTransport;
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
@@ -25,7 +24,8 @@ import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -411,11 +411,34 @@ public class Octane {
         }
     }
 
+    /**
+     * Octane settings holder containing lower level configurations
+     */
     public static class OctaneCustomSettings {
-        public int readTimeout = 60000;
-        public int connectionTimeout = 15000;
-        public boolean trustAllCerts = false;
-        // downside is we're requiring the 3rd party reference here, but remains consistent with settings passing.
-        public HttpTransport sharedHttpTransport = null;
+
+        public enum Setting {
+            READ_TIMEOUT,
+            CONNECTION_TIMEOUT,
+            TRUST_ALL_CERTS,
+            SHARED_HTTP_TRANSPORT
+        }
+
+        private Map<Setting, Object> settings = new HashMap<>();
+
+        // Initialize defaults
+        {
+            settings.put(Setting.READ_TIMEOUT, 60000);
+            settings.put(Setting.CONNECTION_TIMEOUT, 10000);
+            settings.put(Setting.TRUST_ALL_CERTS, false);
+            settings.put(Setting.SHARED_HTTP_TRANSPORT, null);
+        }
+
+        public void set(Setting setting, Object value) {
+            settings.put(setting, value);
+        }
+
+        public Object get(Setting setting) {
+            return settings.get(setting);
+        }
     }
 }

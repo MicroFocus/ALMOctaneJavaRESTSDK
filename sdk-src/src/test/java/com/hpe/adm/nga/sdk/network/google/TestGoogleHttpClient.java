@@ -25,7 +25,6 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -104,8 +103,8 @@ public class TestGoogleHttpClient {
         int connTimeout = 2345;
 
         Octane.OctaneCustomSettings settings = new Octane.OctaneCustomSettings() {{
-            readTimeout = 120000;
-            connectionTimeout = 2345;
+                set(Setting.READ_TIMEOUT,55000);
+                set(Setting.CONNECTION_TIMEOUT,2345);
         }};
 
         GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", settings );
