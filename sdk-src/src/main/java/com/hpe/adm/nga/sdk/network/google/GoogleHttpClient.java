@@ -209,8 +209,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 }
             }
 
-            octaneHttpRequest.getHeaders().entrySet()
-                    .forEach(header -> httpRequest.getHeaders().set(header.getKey(), header.getValue()));
+            // Process any custom set headers
+            octaneHttpRequest.getHeaders()
+                    .forEach(header -> httpRequest.getHeaders().set(header.getHeaderKey(), header.getHeaderValue()));
 
         } catch (IOException e) {
             throw new RuntimeException(e);

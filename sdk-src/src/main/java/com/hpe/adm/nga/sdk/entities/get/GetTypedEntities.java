@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.get;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -55,6 +56,18 @@ public abstract class GetTypedEntities<T extends TypedEntityModel, E extends Get
                 .stream()
                 .map(this::getEntityInstance)
                 .collect(Collectors.toCollection(new OctaneCollectionSupplier<>(entityModels)));
+    }
+
+    /**
+     * Carries out the execution and returns the entities, using a custom http header
+     *
+     * @return The entities
+     */
+    public final OctaneCollection<T> execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        OctaneCollection<T> result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
     }
 
     /**
@@ -113,18 +126,6 @@ public abstract class GetTypedEntities<T extends TypedEntityModel, E extends Get
     @SuppressWarnings("unchecked")
     public final E query(final Query query) {
         octaneRequest.getOctaneUrl().setDqlQueryParam(query);
-        return (E) this;
-    }
-
-    /**
-     * Append a new path element, for special cases
-     * @param path The new path section to be added
-     * @return this
-     */
-    @SuppressWarnings("unchecked")
-    public final E addPath(String path) {
-        // totally not elegant..
-        octaneRequest.getOctaneUrl().getPaths().add(path);
         return (E) this;
     }
 }

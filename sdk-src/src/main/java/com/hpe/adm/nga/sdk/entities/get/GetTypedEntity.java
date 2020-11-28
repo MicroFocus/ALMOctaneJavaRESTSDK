@@ -13,12 +13,12 @@
  */
 package com.hpe.adm.nga.sdk.entities.get;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
+import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
-
-import java.util.function.Function;
 
 /**
  * The generic super class for the context of get for typed entities.
@@ -42,22 +42,21 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
      * Carries out the execution and returns the entity
      *
      * @return The entity
-
      */
     public final T execute()  {
         return getEntityInstance(GetHelper.getInstance().getEntityModel(octaneRequest));
     }
 
     /**
-     * Append a new path element, for special cases
-     * @param path The new path section to be added
-     * @return this
+     * Carries out the execution and returns the entity, using a custom http header
+     *
+     * @return The entity
      */
-    @SuppressWarnings("unchecked")
-    public final E addPath(String path) {
-        // totally not elegant..
-        octaneRequest.getOctaneUrl().getPaths().add(path);
-        return (E) this;
+    public final T execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        T result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
     }
 
     /**

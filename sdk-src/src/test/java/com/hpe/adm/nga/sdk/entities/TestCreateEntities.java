@@ -13,13 +13,16 @@
  */
 package com.hpe.adm.nga.sdk.entities;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
 import com.hpe.adm.nga.sdk.entities.get.GetEntities;
-import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
+import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.json.JSONArray;
@@ -28,8 +31,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.matchers.Times;
+import org.mockserver.model.Cookie;
+import org.mockserver.model.Header;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -38,7 +44,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.IntStream;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
+import static org.powermock.api.mockito.PowerMockito.spy;
+
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 public class TestCreateEntities {
@@ -91,7 +102,61 @@ public class TestCreateEntities {
 		get.addPath("custom").addPath("path").execute();
 
 		OctaneRequest reqAfter = (OctaneRequest)Whitebox.getInternalState(get, "octaneRequest");
-		Assert.assertEquals("Url's not equal", expectedUrl, reqAfter.getOctaneUrl().toString());
+		Assert.assertEquals("Url's don't match", expectedUrl, reqAfter.getOctaneUrl().toString());
+	}
+
+	@Test
+	public void testCustomHeader() {
+		ClientAndServer clientAndServer = new ClientAndServer(666);
+		Cookie firstCookie = new Cookie("LWSSO_COOKIE_KEY", "one");
+
+		clientAndServer
+				.when(request()
+					.withPath("/authentication/sign_in"),
+					Times.once())
+				.respond(response()
+					.withStatusCode(200)
+					.withCookie(firstCookie));
+
+		try {
+			Authentication authentication = new SimpleUserAuthentication("", "");
+			String url = "http://localhost:" + clientAndServer.getLocalPort();
+			GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url));
+
+			Octane octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
+			EntityList defects = octane.entityList("defects");
+			GetEntities get = PowerMockito.spy(defects.get());
+
+			final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"}," +
+				 	"\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},"+
+					"\"id\":1,\"name\":\"list1\"}],\"total_count\":1}";
+
+			clientAndServer
+					.when(request()
+						.withMethod("GET").withPath("/api/shared_spaces/1001/workspaces/1002/defects")
+						.withHeaders(Header.header("testHeader","testHeaderValue")))
+					.respond(response()
+						.withStatusCode(200)
+						.withHeader("Content-Type", "application/json")
+						.withBody(jsonCreateString));
+
+			OctaneCollection<EntityModel> result = get.execute(new APIMode() {
+				@Override
+				public String getHeaderValue() {
+					return "testHeaderValue";
+				}
+
+				@Override
+				public String getHeaderKey() {
+					return "testHeader";
+				}
+			});
+
+			assertEquals("list1", result.iterator().next().getValue("name").getValue());
+		} catch (Exception e) {
+			clientAndServer.stop();
+			throw e;
+		}
 	}
 
 	private Collection<EntityModel> testGetEntityModels(String jason) {

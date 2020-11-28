@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.get;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -41,6 +42,18 @@ public class GetEntities {
      */
     public OctaneCollection<EntityModel> execute()  {
         return GetHelper.getInstance().getEntityModels(octaneRequest);
+    }
+
+    /**
+     * 1. Request GetEntities Execution <br> using a custom header value
+     * 2. Parse response to a new Collection object
+     * @return a collection of entities models that have been retrieved
+     */
+    public OctaneCollection<EntityModel> execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        OctaneCollection<EntityModel> result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
     }
 
     /**
@@ -103,7 +116,6 @@ public class GetEntities {
      * @return this
      */
     public GetEntities addPath(String path) {
-        // totally not elegant..
         octaneRequest.getOctaneUrl().getPaths().add(path);
         return this;
     }

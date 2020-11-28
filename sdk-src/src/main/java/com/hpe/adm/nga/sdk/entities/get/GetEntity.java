@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.get;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -38,6 +39,18 @@ public class GetEntity {
     }
 
     /**
+     * 1. GetEntities Request execution with json data , using a custom http header
+     * 2. Parse response to a new EntityModel object
+     * @return EntityModel from the server
+     */
+    public EntityModel execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        EntityModel result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
+    }
+
+    /**
      * Set Fields Parameters
      *
      * @param fields An array or comma separated list of fields to be retrieved
@@ -57,17 +70,4 @@ public class GetEntity {
         octaneRequest.getOctaneUrl().getPaths().add(path);
         return this;
     }
-
-    /**
-     * Adds a HTTP header with the given value to the final http request.
-     * @param headerName the HTTP header name
-     * @param headerValue the value of the header
-     * @return this
-     */
-    public GetEntity withHeader(String headerName, String headerValue) {
-        octaneRequest.addHeader(headerName, headerValue);
-        return this;
-    }
-
-
 }
