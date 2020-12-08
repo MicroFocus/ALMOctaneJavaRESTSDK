@@ -118,7 +118,6 @@ public class TestGoogleHttpClient {
 
             Assert.assertTrue(e.getCause() instanceof SocketTimeoutException);
             long duration = end - start;
-            System.out.println("Error after: "  + (end - start));
             Assert.assertTrue(duration < 3000 && duration > 2000);
         }
 

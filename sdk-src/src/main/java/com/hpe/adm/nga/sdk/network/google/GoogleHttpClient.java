@@ -62,8 +62,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String ERROR_CODE_GLOBAL_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_GLOBAL_TIME_OUT";
 
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
-    private static final int HTTP_REQUEST_DEFAULT_READ_TIMEOUT = 60000;
-    private static final int HTTP_REQUEST_DEFAULT_CONNECTION_TIMEOUT = 10000;
 
     protected HttpRequestFactory requestFactory;
     protected String lwssoValue = "";
@@ -99,8 +97,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         if (lastUsedAuthentication != null) {
             lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
         }
-        request.setReadTimeout(HTTP_REQUEST_DEFAULT_READ_TIMEOUT);
-        request.setConnectTimeout(HTTP_REQUEST_DEFAULT_CONNECTION_TIMEOUT);
+        request.setReadTimeout(60000);
     };
 
     /**
