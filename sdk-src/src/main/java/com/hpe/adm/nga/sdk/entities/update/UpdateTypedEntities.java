@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.update;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -57,6 +58,18 @@ public abstract class UpdateTypedEntities <T extends TypedEntityModel, E extends
                 .stream()
                 .map(this::getEntityInstance)
                 .collect(Collectors.toCollection(new OctaneCollectionSupplier<>(updatedEntities)));
+    }
+
+    /**
+     * Carries out the execution and returns the entities, using a custom api mode
+     *
+     * @return The entities
+     */
+    public final OctaneCollection<T> execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        OctaneCollection<T> result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
     }
 
     /**

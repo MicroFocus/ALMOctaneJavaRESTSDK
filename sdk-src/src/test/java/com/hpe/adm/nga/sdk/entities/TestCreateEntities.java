@@ -21,7 +21,6 @@ import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
 import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
 import com.hpe.adm.nga.sdk.entities.get.GetEntities;
 import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
-import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -47,7 +46,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -55,6 +53,7 @@ import static org.junit.Assert.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
@@ -113,7 +112,8 @@ public class TestCreateEntities {
 
 	@Test
 	public void testEntitiesCustomApiMode() throws Exception {
-		ClientAndServer clientAndServer = new ClientAndServer(666);
+
+		ClientAndServer clientAndServer = startClientAndServer();
 		Cookie firstCookie = new Cookie("LWSSO_COOKIE_KEY", "one");
 
 		clientAndServer

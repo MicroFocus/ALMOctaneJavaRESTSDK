@@ -48,7 +48,7 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
     }
 
     /**
-     * Carries out the execution and returns the entity, using a custom http header
+     * Carries out the execution and returns the entity, using a custom api mode
      *
      * @return The entity
      */
