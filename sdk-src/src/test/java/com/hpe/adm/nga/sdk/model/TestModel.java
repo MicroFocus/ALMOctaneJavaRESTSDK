@@ -199,6 +199,8 @@ public class TestModel {
         try {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
+            assertEquals(expectedResult, gotResult);
+            assertEquals(expectedResult, model.toString());
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
         }

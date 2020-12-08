@@ -240,4 +240,9 @@ public class EntityModel implements Entity{
         final StringFieldModel id = (StringFieldModel) getValue("id");
         return id == null ? null : id.getValue();
     }
+
+    @Override
+    public String toString() {
+        return ModelParser.getInstance().getEntityJSONObject(this).toString();
+    }
 }
