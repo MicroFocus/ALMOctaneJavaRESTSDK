@@ -15,6 +15,7 @@ package com.hpe.adm.nga.sdk.network.google;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
@@ -33,7 +34,9 @@ import java.net.ProxySelector;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * HTTP Client using Google's API
@@ -69,10 +72,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
     private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
-    /**
-     * Request initializer called on every request made by the requestFactory
-     */
-    protected HttpRequestInitializer requestInitializer = request -> {
+    // identity operation by default. do nothing
+    private Consumer<HttpRequest> customRequestInitializer = request -> {};
+
+    private Consumer<HttpRequest> defaultRequestInitializer = request -> {
         request.setResponseInterceptor(response -> {
             // retrieve new LWSSO in response if any
             HttpHeaders responseHeaders = response.getHeaders();
@@ -97,14 +100,74 @@ public class GoogleHttpClient implements OctaneHttpClient {
         request.setReadTimeout(60000);
     };
 
+    /**
+     * Request initializer called on every request made by the requestFactory
+     */
+    protected HttpRequestInitializer requestInitializer = request -> defaultRequestInitializer.andThen(customRequestInitializer).accept(request);
+
     public GoogleHttpClient(final String urlDomain) {
         this.urlDomain = urlDomain;
+        logSystemProperties();
+        requestFactory = buildRequestFactory();
+    }
 
+    /**
+     * Constructor accepting custom settings for the underlying http transport layer
+     * @param urlDomain the Octane domain
+     * @param settings the object containing he custom settings
+     * @throws RuntimeException in case of an underlying security exception
+     */
+    public GoogleHttpClient(final String urlDomain, Octane.OctaneCustomSettings settings) throws RuntimeException {
+        this.urlDomain = urlDomain;
+        logSystemProperties();
+
+        customRequestInitializer = request -> {
+            request.setReadTimeout((int)settings.get(Octane.OctaneCustomSettings.Setting.READ_TIMEOUT));
+            request.setConnectTimeout((int)settings.get(Octane.OctaneCustomSettings.Setting.CONNECTION_TIMEOUT));
+        };
+
+        HttpTransport httpTransport = (HttpTransport) settings.get(Octane.OctaneCustomSettings.Setting.SHARED_HTTP_TRANSPORT);
+        boolean trustAllCerts = (boolean) settings.get(Octane.OctaneCustomSettings.Setting.TRUST_ALL_CERTS);
+
+        if(httpTransport != null) {
+            requestFactory = httpTransport.createRequestFactory(requestInitializer);
+        } else {
+            requestFactory = trustAllCerts ? buildPermissiveRequestFactory() : buildRequestFactory();
+        }
+    }
+
+    /**
+     * Builds a HttpRequestFactory that accepts self-signed certificates
+     * @return an http request factory
+     */
+    private HttpRequestFactory buildPermissiveRequestFactory() {
+        NetHttpTransport.Builder builder = new NetHttpTransport.Builder();
+
+        try {
+            builder.doNotValidateCertificate();
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("A security exception occurred while disabling certificate validation", e);
+        }
+
+        HttpTransport httpTransport = builder.build();
+        return httpTransport.createRequestFactory(requestInitializer);
+    }
+
+    /**
+     * Builds a regular HttpRequestFactory
+     * @return an http request factory
+     */
+    private HttpRequestFactory buildRequestFactory() {
+        HttpTransport httpTransport = new NetHttpTransport();
+        return httpTransport.createRequestFactory(requestInitializer);
+    }
+
+    /**
+     * Logs proxy system properties
+     */
+    private void logSystemProperties() {
         logProxySystemProperties();
         logSystemProxyForUrlDomain(urlDomain);
-
-        HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-        requestFactory = HTTP_TRANSPORT.createRequestFactory(requestInitializer);
     }
 
     /**

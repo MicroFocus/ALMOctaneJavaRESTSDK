@@ -24,6 +24,8 @@ import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -77,6 +79,8 @@ public class Octane {
     private final String idsharedSpaceId;
     private final long workSpaceId;
     private final OctaneInternalConfiguration octaneInternalConfiguration;
+
+    private final static OctaneCustomSettings defaultOctaneSettings = new OctaneCustomSettings();
 
     // functions
     private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId, long workId) {
@@ -205,6 +209,7 @@ public class Octane {
         private OctaneHttpClient octaneHttpClient;
         private final Authentication authentication;
         private String octaneClassFactoryClassName;
+        private OctaneCustomSettings customSettings;
 
         //Functions
 
@@ -335,6 +340,18 @@ public class Octane {
         }
 
         /**
+         * Configure a settings provider with custom settings like: readTimeout
+         * @param settings - a plain java object with timeout settings(for now)
+         * @return An instance of this builder object
+         */
+        public Builder settings(OctaneCustomSettings settings) {
+
+            customSettings = settings;
+
+            return this;
+        }
+
+        /**
          * The main build procedure which creates the {@link Octane} object and authenticates against the server
          *
          * @return a new Octane instance which has the set context and is correctly authenticated
@@ -347,7 +364,8 @@ public class Octane {
 
             final OctaneInternalConfiguration octaneInternalConfiguration = new OctaneInternalConfiguration();
             // Init default http client if it wasn't specified
-            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
+            OctaneCustomSettings settings = customSettings != null ? customSettings : defaultOctaneSettings;
+            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, settings) : this.octaneHttpClient;
             octaneInternalConfiguration.octaneClassFactoryClassName = this.octaneClassFactoryClassName;
 
             if (octaneInternalConfiguration.octaneHttpClient.authenticate(authentication)) {
@@ -390,6 +408,37 @@ public class Octane {
          */
         public String getOctaneClassFactoryClassName() {
             return octaneClassFactoryClassName;
+        }
+    }
+
+    /**
+     * Octane settings holder containing lower level configurations
+     */
+    public static class OctaneCustomSettings {
+
+        public enum Setting {
+            READ_TIMEOUT,
+            CONNECTION_TIMEOUT,
+            TRUST_ALL_CERTS,
+            SHARED_HTTP_TRANSPORT
+        }
+
+        private Map<Setting, Object> settings = new HashMap<>();
+
+        // Initialize defaults
+        {
+            settings.put(Setting.READ_TIMEOUT, 60000);
+            settings.put(Setting.CONNECTION_TIMEOUT, 10000);
+            settings.put(Setting.TRUST_ALL_CERTS, false);
+            settings.put(Setting.SHARED_HTTP_TRANSPORT, null);
+        }
+
+        public void set(Setting setting, Object value) {
+            settings.put(setting, value);
+        }
+
+        public Object get(Setting setting) {
+            return settings.get(setting);
         }
     }
 }
