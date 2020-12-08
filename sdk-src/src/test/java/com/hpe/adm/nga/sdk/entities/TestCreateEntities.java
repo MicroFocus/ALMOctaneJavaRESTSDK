@@ -13,10 +13,18 @@
  */
 package com.hpe.adm.nga.sdk.entities;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
+import com.hpe.adm.nga.sdk.network.OctaneRequest;
+import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.json.JSONArray;
@@ -26,15 +34,27 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.internal.util.reflection.Whitebox;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.matchers.Times;
+import org.mockserver.model.Cookie;
+import org.mockserver.model.Header;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 public class TestCreateEntities {
@@ -71,6 +91,104 @@ public class TestCreateEntities {
 			fail("Failed with exception: " + ex);
 		}
 
+	}
+
+	@Test
+	public void testCustomPath(){
+		EntityList defects = octane.entityList("defects");
+
+		GetEntities get = PowerMockito.spy(defects.get());
+
+		PowerMockito.doReturn(ModelParser.getInstance().getEntities("{data:[]}")).when(get).execute();
+
+		OctaneRequest reqBefore = (OctaneRequest)Whitebox.getInternalState(get, "octaneRequest");
+		String expectedUrl = reqBefore.getOctaneUrl().toString() + "/custom/path";
+
+		get.addPath("custom").addPath("path").execute();
+
+		OctaneRequest reqAfter = (OctaneRequest)Whitebox.getInternalState(get, "octaneRequest");
+		Assert.assertEquals("Url's don't match", expectedUrl, reqAfter.getOctaneUrl().toString());
+	}
+
+	@Test
+	public void testEntitiesCustomApiMode() throws Exception {
+
+		ClientAndServer clientAndServer = startClientAndServer();
+		Cookie firstCookie = new Cookie("LWSSO_COOKIE_KEY", "one");
+
+		clientAndServer
+				.when(request()
+					.withPath("/authentication/sign_in"),
+					Times.once())
+				.respond(response()
+					.withStatusCode(200)
+					.withCookie(firstCookie));
+
+		try {
+			Authentication authentication = new SimpleUserAuthentication("", "");
+			String url = "http://localhost:" + clientAndServer.getLocalPort();
+			GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url));
+
+			Octane octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
+			EntityList defects = octane.entityList("defects");
+			GetEntities get = PowerMockito.spy(defects.get());
+			DeleteEntities delete = PowerMockito.spy(defects.delete());
+			CreateEntities create = PowerMockito.spy(defects.create());
+			UpdateEntities update = PowerMockito.spy(defects.update());
+
+			Collection<EntityModel> models = new ArrayList<>();
+			create.entities(models);
+			update.entities(models);
+
+			String expectedEntityName = "test123";
+
+			final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"}," +
+				 	"\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},"+
+					"\"id\":1,\"name\":\""+ expectedEntityName +"\"}],\"total_count\":1}";
+
+			clientAndServer
+					.when(request()
+						//.withMethod("GET")
+						.withPath("/api/shared_spaces/1001/workspaces/1002/defects")
+						.withHeaders(Header.header("testHeader","testHeaderValue")))
+					.respond(response()
+						.withStatusCode(200)
+						.withHeader("Content-Type", "application/json")
+						.withBody(jsonCreateString));
+
+			APIMode apiMode = new APIMode() {
+				@Override
+				public String getHeaderValue() {
+					return "testHeaderValue";
+				}
+
+				@Override
+				public String getHeaderKey() {
+					return "testHeader";
+				}
+			};
+
+			OctaneCollection<EntityModel> getResult = dynamicExecute(get, apiMode);
+			OctaneCollection<EntityModel> delResult = dynamicExecute(delete, apiMode);
+			OctaneCollection<EntityModel> updResult = dynamicExecute(update, apiMode);
+			OctaneCollection<EntityModel> createResult = dynamicExecute(create, apiMode);
+
+			Predicate<OctaneCollection<EntityModel>> assertResult = result -> result.iterator().next().getValue("name").getValue().equals(expectedEntityName);
+
+			assertTrue(assertResult.test(getResult));
+			assertTrue(assertResult.test(delResult));
+			assertTrue(assertResult.test(createResult));
+			assertTrue(assertResult.test(updResult));
+
+		} catch (Exception e) {
+			clientAndServer.stop();
+			throw e;
+		}
+	}
+
+	private OctaneCollection<EntityModel> dynamicExecute(Object subject, Object argument) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		Method exec = subject.getClass().getMethod("execute", APIMode.class);
+		return (OctaneCollection<EntityModel>) exec.invoke(subject, argument);
 	}
 
 	private Collection<EntityModel> testGetEntityModels(String jason) {

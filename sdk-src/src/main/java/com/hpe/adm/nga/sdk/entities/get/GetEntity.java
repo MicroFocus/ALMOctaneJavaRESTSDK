@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.get;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -38,6 +39,18 @@ public class GetEntity {
     }
 
     /**
+     * 1. GetEntities Request execution with json data , using a custom api mode
+     * 2. Parse response to a new EntityModel object
+     * @return EntityModel from the server
+     */
+    public EntityModel execute(APIMode apiMode)  {
+        octaneRequest.addHeader(apiMode);
+        EntityModel result = execute();
+        octaneRequest.removeHeader(apiMode);
+        return result;
+    }
+
+    /**
      * Set Fields Parameters
      *
      * @param fields An array or comma separated list of fields to be retrieved
@@ -45,6 +58,16 @@ public class GetEntity {
      */
     public GetEntity addFields(String... fields) {
         octaneRequest.getOctaneUrl().addFieldsParam(fields);
+        return this;
+    }
+
+    /**
+     * Append a new path element, for special cases
+     * @param path The new path section to be added
+     * @return this
+     */
+    public GetEntity addPath(String path) {
+        octaneRequest.getOctaneUrl().getPaths().add(path);
         return this;
     }
 }

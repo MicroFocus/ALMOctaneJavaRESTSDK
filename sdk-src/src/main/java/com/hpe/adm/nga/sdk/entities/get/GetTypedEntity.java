@@ -13,7 +13,9 @@
  */
 package com.hpe.adm.nga.sdk.entities.get;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
+import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -40,10 +42,21 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
      * Carries out the execution and returns the entity
      *
      * @return The entity
-
      */
     public final T execute()  {
         return getEntityInstance(GetHelper.getInstance().getEntityModel(octaneRequest));
+    }
+
+    /**
+     * Carries out the execution and returns the entity, using a custom api mode
+     *
+     * @return The entity
+     */
+    public final T execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        T result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
     }
 
     /**

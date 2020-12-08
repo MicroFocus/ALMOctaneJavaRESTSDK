@@ -13,6 +13,8 @@
  */
 package com.hpe.adm.nga.sdk.entities.update;
 
+import com.hpe.adm.nga.sdk.APIMode;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -39,6 +41,18 @@ public class UpdateEntity {
     }
 
     /**
+     * 1. UpdateEntities Request execution with json data , using a custom api mode
+     * 2. Parse response to a new EntityModel object
+     * @return EntityModel from the server
+     */
+    public EntityModel execute(APIMode apiMode)  {
+        octaneRequest.addHeader(apiMode);
+        EntityModel result = execute();
+        octaneRequest.removeHeader(apiMode);
+        return result;
+    }
+
+    /**
      * set a new entity for updating
      *
      * @param entityModel The entity model to be updated
@@ -46,6 +60,16 @@ public class UpdateEntity {
      */
     public UpdateEntity entity(EntityModel entityModel) {
         this.entityModel = entityModel;
+        return this;
+    }
+
+    /**
+     * Append a new path element, for special cases
+     * @param path The new path section to be added
+     * @return this
+     */
+    public UpdateEntity addPath(String path) {
+        octaneRequest.getOctaneUrl().getPaths().add(path);
         return this;
     }
 }

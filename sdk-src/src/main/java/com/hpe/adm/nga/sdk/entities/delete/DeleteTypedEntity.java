@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.delete;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -40,5 +41,17 @@ public abstract class DeleteTypedEntity<T extends TypedEntityModel> extends Type
      */
     public final T execute()  {
         return getEntityInstance(DeleteHelper.getInstance().deleteEntityModel(octaneRequest));
+    }
+
+    /**
+     * Carries out the execution and returns the entity, using a custom api mode
+     *
+     * @return The entity
+     */
+    public final T execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        T result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
     }
 }

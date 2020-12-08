@@ -52,6 +52,7 @@ final class UpdateHelper {
                         OctaneHttpRequest.JSON_CONTENT_TYPE,
                         jsonEntityModel)
                         .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        octaneHttpRequest.setHeaders(octaneRequest.getHeaders());
 
         return octaneRequest.getEntityResponse(octaneHttpRequest);
     }
@@ -72,6 +73,8 @@ final class UpdateHelper {
                 octaneRequest.getFinalRequestUrl(),
                 OctaneHttpRequest.JSON_CONTENT_TYPE, jsonEntityModel)
                 .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        octaneHttpRequest.setHeaders(octaneRequest.getHeaders());
+
         newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
 
         //TODO: partial support exception handling

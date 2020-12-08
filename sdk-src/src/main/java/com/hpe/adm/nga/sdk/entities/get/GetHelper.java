@@ -38,6 +38,7 @@ final class GetHelper {
      */
     final OctaneCollection<EntityModel> getEntityModels(final OctaneRequest octaneRequest)  {
         OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl()).setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        octaneHttpRequest.setHeaders(octaneRequest.getHeaders());
         return octaneRequest.getEntitiesResponse(octaneHttpRequest);
     }
 
@@ -49,6 +50,7 @@ final class GetHelper {
         OctaneHttpRequest octaneHttpRequest =
                 new OctaneHttpRequest.GetOctaneHttpRequest(octaneRequest.getFinalRequestUrl())
                         .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
+        octaneHttpRequest.setHeaders(octaneRequest.getHeaders());
         return octaneRequest.getEntityResponse(octaneHttpRequest);
     }
 
