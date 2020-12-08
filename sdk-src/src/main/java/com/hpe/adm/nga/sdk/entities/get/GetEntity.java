@@ -39,14 +39,14 @@ public class GetEntity {
     }
 
     /**
-     * 1. GetEntities Request execution with json data , using a custom http header
+     * 1. GetEntities Request execution with json data , using a custom api mode
      * 2. Parse response to a new EntityModel object
      * @return EntityModel from the server
      */
-    public EntityModel execute(APIMode header)  {
-        octaneRequest.addHeader(header);
+    public EntityModel execute(APIMode apiMode)  {
+        octaneRequest.addHeader(apiMode);
         EntityModel result = execute();
-        octaneRequest.removeHeader(header);
+        octaneRequest.removeHeader(apiMode);
         return result;
     }
 

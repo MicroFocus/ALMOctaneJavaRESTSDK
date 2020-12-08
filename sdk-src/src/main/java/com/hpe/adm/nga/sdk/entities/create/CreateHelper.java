@@ -52,7 +52,7 @@ final class CreateHelper {
         OctaneHttpRequest octaneHttpRequest =
                 new OctaneHttpRequest.PostOctaneHttpRequest(octaneRequest.getFinalRequestUrl(), OctaneHttpRequest.JSON_CONTENT_TYPE, strJsonEntityModel)
                         .setAcceptType(OctaneHttpRequest.JSON_CONTENT_TYPE);
-
+        octaneHttpRequest.setHeaders(octaneRequest.getHeaders());
         newEntityModels = octaneRequest.getEntitiesResponse(octaneHttpRequest);
 
         //TODO: partial support

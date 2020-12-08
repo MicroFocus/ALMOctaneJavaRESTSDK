@@ -45,14 +45,14 @@ public class GetEntities {
     }
 
     /**
-     * 1. Request GetEntities Execution <br> using a custom header value
+     * 1. Request GetEntities Execution <br> using a custom api mode value
      * 2. Parse response to a new Collection object
      * @return a collection of entities models that have been retrieved
      */
-    public OctaneCollection<EntityModel> execute(APIMode header)  {
-        octaneRequest.addHeader(header);
+    public OctaneCollection<EntityModel> execute(APIMode apiMode)  {
+        octaneRequest.addHeader(apiMode);
         OctaneCollection<EntityModel> result = execute();
-        octaneRequest.removeHeader(header);
+        octaneRequest.removeHeader(apiMode);
         return result;
     }
 
