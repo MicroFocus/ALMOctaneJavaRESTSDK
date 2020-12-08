@@ -18,7 +18,10 @@ import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
+import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
 import com.hpe.adm.nga.sdk.entities.get.GetEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntities;
+import com.hpe.adm.nga.sdk.entities.update.UpdateEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -40,12 +43,15 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.powermock.api.mockito.PowerMockito.spy;
@@ -106,7 +112,7 @@ public class TestCreateEntities {
 	}
 
 	@Test
-	public void testCustomHeader() {
+	public void testEntitiesCustomApiMode() throws Exception {
 		ClientAndServer clientAndServer = new ClientAndServer(666);
 		Cookie firstCookie = new Cookie("LWSSO_COOKIE_KEY", "one");
 
@@ -126,21 +132,31 @@ public class TestCreateEntities {
 			Octane octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 			EntityList defects = octane.entityList("defects");
 			GetEntities get = PowerMockito.spy(defects.get());
+			DeleteEntities delete = PowerMockito.spy(defects.delete());
+			CreateEntities create = PowerMockito.spy(defects.create());
+			UpdateEntities update = PowerMockito.spy(defects.update());
+
+			Collection<EntityModel> models = new ArrayList<>();
+			create.entities(models);
+			update.entities(models);
+
+			String expectedEntityName = "test123";
 
 			final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"}," +
 				 	"\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},"+
-					"\"id\":1,\"name\":\"list1\"}],\"total_count\":1}";
+					"\"id\":1,\"name\":\""+ expectedEntityName +"\"}],\"total_count\":1}";
 
 			clientAndServer
 					.when(request()
-						.withMethod("GET").withPath("/api/shared_spaces/1001/workspaces/1002/defects")
+						//.withMethod("GET")
+						.withPath("/api/shared_spaces/1001/workspaces/1002/defects")
 						.withHeaders(Header.header("testHeader","testHeaderValue")))
 					.respond(response()
 						.withStatusCode(200)
 						.withHeader("Content-Type", "application/json")
 						.withBody(jsonCreateString));
 
-			OctaneCollection<EntityModel> result = get.execute(new APIMode() {
+			APIMode apiMode = new APIMode() {
 				@Override
 				public String getHeaderValue() {
 					return "testHeaderValue";
@@ -150,13 +166,29 @@ public class TestCreateEntities {
 				public String getHeaderKey() {
 					return "testHeader";
 				}
-			});
+			};
 
-			assertEquals("list1", result.iterator().next().getValue("name").getValue());
+			OctaneCollection<EntityModel> getResult = dynamicExecute(get, apiMode);
+			OctaneCollection<EntityModel> delResult = dynamicExecute(delete, apiMode);
+			OctaneCollection<EntityModel> updResult = dynamicExecute(update, apiMode);
+			OctaneCollection<EntityModel> createResult = dynamicExecute(create, apiMode);
+
+			Predicate<OctaneCollection<EntityModel>> assertResult = result -> result.iterator().next().getValue("name").getValue().equals(expectedEntityName);
+
+			assertTrue(assertResult.test(getResult));
+			assertTrue(assertResult.test(delResult));
+			assertTrue(assertResult.test(createResult));
+			assertTrue(assertResult.test(updResult));
+
 		} catch (Exception e) {
 			clientAndServer.stop();
 			throw e;
 		}
+	}
+
+	private OctaneCollection<EntityModel> dynamicExecute(Object subject, Object argument) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		Method exec = subject.getClass().getMethod("execute", APIMode.class);
+		return (OctaneCollection<EntityModel>) exec.invoke(subject, argument);
 	}
 
 	private Collection<EntityModel> testGetEntityModels(String jason) {
