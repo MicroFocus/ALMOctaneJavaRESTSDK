@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>15.1.40-SNAPSHOT</version>
+    <version>15.1.40</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.1.40-SNAPSHOT'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.1.40'
 ```
 
 ## Introduction
@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 15.1.40-SNAPSHOT being the SDK version):
+To enable this add the following to your project's POM file (assuming 15.1.40 being the SDK version):
 
 ```xml
  <build>
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 15.1.40-SN
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>15.1.40-SNAPSHOT</version>
+                <version>15.1.40</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -171,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>15.1.40-SNAPSHOT</version>
+            <version>15.1.40</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,6 +189,13 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* 15.1.40
+  * EntityModel now has a toString() for easier logging. [Enhancement 102](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/102)
+  * Added possibility to add a header to a single request and extend the current url. [Enhancement 104](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/104)
+  * Added a way of setting:
+    * the connection and read timeouts [Enhancement 101](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/101),
+    * the HttpTransport [Enhancement 103](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/103)
+    * a boolean for accepting self-signed ssl certificates [64](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/64)
 * 15.1.20
   * Enable entity generation using the tech preview api mode.  Adds more entities and fields
   * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
