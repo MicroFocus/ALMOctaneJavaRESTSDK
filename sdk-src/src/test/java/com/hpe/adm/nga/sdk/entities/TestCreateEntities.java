@@ -49,11 +49,12 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
@@ -127,7 +128,7 @@ public class TestCreateEntities {
 		try {
 			Authentication authentication = new SimpleUserAuthentication("", "");
 			String url = "http://localhost:" + clientAndServer.getLocalPort();
-			GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url));
+			GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, authentication));
 
 			Octane octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 			EntityList defects = octane.entityList("defects");

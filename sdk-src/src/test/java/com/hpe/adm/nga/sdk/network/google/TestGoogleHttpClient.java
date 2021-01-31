@@ -65,10 +65,10 @@ public class TestGoogleHttpClient {
     @Test
     public void testRequestRetry() throws Exception {
 
-        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com"));
+        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com", any(Authentication.class)));
 
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
-        doReturn(true).when(googleHttpClientSpy, "authenticate", any(Authentication.class));
+        doReturn(true).when(googleHttpClientSpy, "authenticate");
         Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
         Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", new Date(0));
 
@@ -107,7 +107,7 @@ public class TestGoogleHttpClient {
                 set(Setting.CONNECTION_TIMEOUT,2345);
         }};
 
-        GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", settings );
+        GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", any(Authentication.class), settings);
         OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("http://google.com:9090");
 
         long start = System.currentTimeMillis();
@@ -136,7 +136,7 @@ public class TestGoogleHttpClient {
         initServerResponse(clientAndServer, cookieExpirationTime);
         Authentication authentication = new SimpleUserAuthentication("", "");
         String url = "http://localhost:" + clientAndServer.getLocalPort();
-        GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url));
+        GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, any(Authentication.class)));
         octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 
         int nrCores = Runtime.getRuntime().availableProcessors();
@@ -145,7 +145,7 @@ public class TestGoogleHttpClient {
         clientAndServer.stop();
 
         //Exactly 2 authentications are done: one for 1st log in and 2nd for cookie refresh
-        Mockito.verify(spyGoogleHttpClient, times(2)).authenticate(any());
+        Mockito.verify(spyGoogleHttpClient, times(2)).authenticate();
 
         //There are more execution invocations than there are threads
         Mockito.verify(spyGoogleHttpClient, atLeast(nrCores + 1)).execute(any());

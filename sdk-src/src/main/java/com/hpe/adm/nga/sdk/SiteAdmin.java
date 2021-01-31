@@ -134,9 +134,9 @@ public class SiteAdmin {
             logger.info("Building SiteAdmin Octane context using {}", this);
 
             // Init default http client if it wasn't specified
-            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain) : this.octaneHttpClient;
+            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, authentication) : this.octaneHttpClient;
 
-            if (octaneHttpClient.authenticate(authentication)) {
+            if (octaneHttpClient.authenticate()) {
                 objOctane = getSiteAdmin();
             }
 

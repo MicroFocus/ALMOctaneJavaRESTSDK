@@ -81,9 +81,9 @@
         <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
         <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
         <maven-compiler.version>3.5.1</maven-compiler.version>
-        <maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
-        <maven-plugin-api.version>3.2.1</maven-plugin-api.version>
-        <maven-plugin-annotations.version>3.4</maven-plugin-annotations.version>
+        <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
+        <maven-plugin-api.version>3.6.0</maven-plugin-api.version>
+        <maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
         <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
 
         <org.javassist.version>3.20.0-GA</org.javassist.version>
@@ -113,19 +113,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.google.api-client</groupId>
-                <artifactId>google-api-client</artifactId>
-                <version>${google-api-client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.api-client</groupId>
-                <artifactId>google-api-client-jackson2</artifactId>
-                <version>${google-api-client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.api-client</groupId>
-                <artifactId>google-api-client-gson</artifactId>
-                <version>${google-api-client.version}</version>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>16.3.0</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.json</groupId>

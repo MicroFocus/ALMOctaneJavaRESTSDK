@@ -19,18 +19,24 @@ import java.util.Optional;
 
 /**
  * Interface of Authentication , hold contract functions. <br>
- * Provided implementations: {@link SimpleUserAuthentication}, {@link ClientAuthentication} <br>
+ * Provided implementations: {@link SimpleUserAuthentication}, {@link SimpleClientAuthentication},
+ * {@link SimpleBasicAuthentication} <br>
  * Note that the default implementations keep the credentials in memory. <br>
- * It is recommended that you implement {@link #getAuthenticationString() getAuthenticationString} so that the credentials are not stored in memory.
  */
-public interface Authentication {
+public abstract class Authentication {
+
+    private final APIMode apiMode;
+    private final boolean isBasicAuthentication;
 
     /**
-     * Holds the string that will be sent in the body of the authentication post
+     * The mode to use or null if none is needed
      *
-     * @return The authentication string.  Either user/pass or client/secret
+     * @param apiMode The mode
      */
-    String getAuthenticationString();
+    Authentication(final APIMode apiMode, final boolean isBasicAuthentication) {
+        this.apiMode = apiMode;
+        this.isBasicAuthentication = isBasicAuthentication;
+    }
 
     /**
      * Returns the API Mode header that is added to all calls to the REST API.  This usually refers to whether this should use
@@ -40,7 +46,13 @@ public interface Authentication {
      *
      * @return The API mode header.  If none is sent then this should be null
      */
-    Optional<APIMode> getAPIMode();
+    public final Optional<APIMode> getAPIMode() {
+        return Optional.ofNullable(apiMode);
+    }
+
+    public final boolean isBasicAuthentication() {
+        return isBasicAuthentication;
+    }
 }
 
 

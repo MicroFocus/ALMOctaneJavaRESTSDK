@@ -19,7 +19,7 @@ import com.hpe.adm.nga.sdk.APIMode;
  * Used for user/password authentications
  * Created by brucesp on 19-Dec-16.
  */
-abstract class UserAuthentication extends ModedAuthentication implements Authentication {
+abstract class UserAuthentication extends JSONAuthentication {
 
     UserAuthentication(final APIMode apiMode) {
         super(apiMode);

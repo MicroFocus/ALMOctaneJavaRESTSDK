@@ -13,7 +13,6 @@
  */
 package com.hpe.adm.nga.sdk.examples.customhttpclient;
 
-import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
@@ -40,7 +39,7 @@ public class DummyOctaneHttpClient implements OctaneHttpClient {
     public DummyOctaneHttpClient(String ignored){}
 
     @Override
-    public boolean authenticate(Authentication authentication) {
+    public boolean authenticate() {
         return true;
     }
 
