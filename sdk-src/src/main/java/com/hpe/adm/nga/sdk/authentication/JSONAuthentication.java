@@ -17,7 +17,7 @@ package com.hpe.adm.nga.sdk.authentication;
 import com.hpe.adm.nga.sdk.APIMode;
 
 /**
- * An abstract class to use the authentication with a mode set
+ * An abstract class to use the authentication with a mode set for implementing JSON Authentication
  * This can be overidden if the authentication details are kept obtained in a different manner
  */
 abstract public class JSONAuthentication extends Authentication {

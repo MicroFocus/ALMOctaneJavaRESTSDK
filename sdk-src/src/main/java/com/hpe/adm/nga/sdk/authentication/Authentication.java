@@ -50,6 +50,11 @@ public abstract class Authentication {
         return Optional.ofNullable(apiMode);
     }
 
+    /**
+     * Returns whether this authentication type supports basic authentication
+     *
+     * @return Supports basic authentication
+     */
     public final boolean isBasicAuthentication() {
         return isBasicAuthentication;
     }
