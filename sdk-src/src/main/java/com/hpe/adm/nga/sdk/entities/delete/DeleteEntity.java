@@ -13,6 +13,8 @@
  */
 package com.hpe.adm.nga.sdk.entities.delete;
 
+import com.hpe.adm.nga.sdk.APIMode;
+import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -28,10 +30,32 @@ public class DeleteEntity {
     }
 
     /**
-     * 1. GetEntities Request execution with json data 2. Parse response to a
+     * 1. DeleteEntity Request execution with json data 2. Parse response to a
      * @return new EntityModel object for the entity that's been deleted
      */
     public EntityModel execute()  {
         return DeleteHelper.getInstance().deleteEntityModel(octaneRequest);
+    }
+
+    /**
+     * 1. DeleteEntity Request execution with json data , using a custom api mode
+     * 2. Parse response to a new EntityModel object
+     * @return EntityModel from the server
+     */
+    public EntityModel execute(APIMode apiMode)  {
+        octaneRequest.addHeader(apiMode);
+        EntityModel result = execute();
+        octaneRequest.removeHeader(apiMode);
+        return result;
+    }
+
+    /**
+     * Append a new path element, for special cases
+     * @param path The new path section to be added
+     * @return this
+     */
+    public DeleteEntity addPath(String path) {
+        octaneRequest.getOctaneUrl().getPaths().add(path);
+        return this;
     }
 }

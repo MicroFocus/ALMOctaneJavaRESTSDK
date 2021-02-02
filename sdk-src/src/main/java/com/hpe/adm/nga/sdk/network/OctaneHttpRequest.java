@@ -13,8 +13,10 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
+import com.hpe.adm.nga.sdk.APIMode;
+
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * HTTP request.
@@ -36,10 +38,19 @@ public abstract class OctaneHttpRequest {
 
     private final String requestUrl;
     private final OctaneRequestMethod octaneRequestMethod;
+    private Set<APIMode> httpHeaders = new HashSet<>();
 
     private OctaneHttpRequest(String requestUrl, OctaneRequestMethod octaneRequestMethod) {
         this.requestUrl = requestUrl;
         this.octaneRequestMethod = octaneRequestMethod;
+    }
+
+    public final void setHeaders(Set<APIMode> headers) {
+        httpHeaders = headers;
+    }
+
+    public Set<APIMode> getHeaders() {
+        return httpHeaders;
     }
 
     public final String getRequestUrl() {

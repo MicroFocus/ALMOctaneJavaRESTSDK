@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
@@ -20,6 +21,8 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * An abstract representation of a request
@@ -30,6 +33,7 @@ public final class OctaneRequest {
 
     private final OctaneUrl octaneUrl;
     protected final OctaneHttpClient octaneHttpClient;
+    private final Set<APIMode> httpHeaders = new HashSet<>();
 
     // constant
     private static final String LOGGER_RESPONSE_JSON_FORMAT = "Response_Json: {}";
@@ -42,6 +46,18 @@ public final class OctaneRequest {
     public OctaneRequest(final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
         this(octaneHttpClient, urlDomain);
         octaneUrl.addPaths(entityId);
+    }
+
+    public void addHeader(APIMode header) {
+        httpHeaders.add(header);
+    }
+
+    public void removeHeader(APIMode header) {
+        httpHeaders.remove(header);
+    }
+
+    public Set<APIMode> getHeaders() {
+        return Collections.unmodifiableSet(httpHeaders);
     }
 
     public final OctaneUrl getOctaneUrl() {

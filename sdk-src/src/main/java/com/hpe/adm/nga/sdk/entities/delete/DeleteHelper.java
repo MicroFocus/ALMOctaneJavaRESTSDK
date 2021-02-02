@@ -40,6 +40,7 @@ final class DeleteHelper {
      */
     EntityModel deleteEntityModel(OctaneRequest octaneRequest)  {
         OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
+        octaneHttpRequest.setHeaders(octaneRequest.getHeaders());
         return octaneRequest.getEntityResponse(octaneHttpRequest);
     }
 
@@ -51,6 +52,7 @@ final class DeleteHelper {
      */
     OctaneCollection<EntityModel> deleteEntityModels(OctaneRequest octaneRequest)  {
         OctaneHttpRequest octaneHttpRequest = new OctaneHttpRequest.DeleteOctaneHttpRequest(octaneRequest.getFinalRequestUrl());
+        octaneHttpRequest.setHeaders(octaneRequest.getHeaders());
         return octaneRequest.getEntitiesResponse(octaneHttpRequest);
     }
 }

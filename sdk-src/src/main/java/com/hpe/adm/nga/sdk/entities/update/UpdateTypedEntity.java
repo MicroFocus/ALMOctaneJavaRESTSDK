@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.entities.update;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
@@ -44,6 +45,18 @@ public abstract class UpdateTypedEntity<T extends TypedEntityModel, E extends Up
      */
     public final T execute() {
         return getEntityInstance(UpdateHelper.getInstance().updateEntityModel(entityModel.getWrappedEntityModel(), octaneRequest));
+    }
+
+    /**
+     * Carries out the execution and returns the entity, using a custom api mode
+     *
+     * @return The entity
+     */
+    public final T execute(APIMode header)  {
+        octaneRequest.addHeader(header);
+        T result = execute();
+        octaneRequest.removeHeader(header);
+        return result;
     }
 
     /**
