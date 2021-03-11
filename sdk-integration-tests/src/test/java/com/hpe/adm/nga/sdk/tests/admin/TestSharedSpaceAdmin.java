@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.UUID;
 
 public class TestSharedSpaceAdmin {
     static {
@@ -73,8 +74,9 @@ public class TestSharedSpaceAdmin {
         Octane octane = ContextUtils.getContextSharedSpace(url, authentication, sharedSpaceId);
 
         final EntityModel userEntityModel = new EntityModel();
-        userEntityModel.setValue(new StringFieldModel("email", "test@nga.com"));
-        userEntityModel.setValue(new StringFieldModel("first_name", "Tester"));
+        String uuid = UUID.randomUUID().toString();
+        userEntityModel.setValue(new StringFieldModel("email", "test"+uuid+"@nga.com"));
+        userEntityModel.setValue(new StringFieldModel("first_name", "Tester"+uuid));
         userEntityModel.setValue(new StringFieldModel("last_name", "McTestface"));
         userEntityModel.setValue(new StringFieldModel("password", "Welcome1"));
 
