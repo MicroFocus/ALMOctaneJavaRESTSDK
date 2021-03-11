@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>15.1.40-SNAPSHOT</version>
+    <version>15.1.40</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.1.40-SNAPSHOT'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.1.40'
 ```
 
 ## Introduction
@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this add the following to your project's POM file (assuming 15.1.40-SNAPSHOT being the SDK version):
+To enable this add the following to your project's POM file (assuming 15.1.40 being the SDK version):
 
 ```xml
  <build>
@@ -59,7 +59,7 @@ To enable this add the following to your project's POM file (assuming 15.1.40-SN
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>15.1.40-SNAPSHOT</version>
+                <version>15.1.40</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -171,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>15.1.40-SNAPSHOT</version>
+            <version>15.1.40</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -190,30 +190,33 @@ Currently the admin sections are not available using generated entities - but th
 
 ## What's New
 * 15.1.40
-  * Added support for basic authentication
+  * EntityModel now has a toString() for easier logging. [Enhancement 102](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/102)
+  * Added possibility to add a header to a single request and extend the current url. [Enhancement 104](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/104)
+  * Added a way of setting:
+    * the connection and read timeouts [Enhancement 101](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/101),
+    * the HttpTransport [Enhancement 103](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/103)
+    * a boolean for accepting self-signed ssl certificates [64](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/64)
 * 15.1.20
-  * Enable entity generation using the tech preview api mode. Adds more entities and fields
-  * Manipulate test scripts using the SDK. See `TestExample` in the `sdk-usage-examples` module for more information
+  * Enable entity generation using the tech preview api mode.  Adds more entities and fields
+  * Manipulate test scripts using the SDK.  See `TestExample` in the `sdk-usage-examples` module for more information
   * Able to get the context for space and workspace admins
-  * FIX for [Bug 97](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/97). Logging uses the slf4j paradigm for
-    formatting strings
+  * FIX for [Bug 97](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/97).  Logging uses the slf4j paradigm for formatting strings
   * Internal fix to enable OctaneClassFactory too be set by the Builder
 * 15.0.40.1
-  * FIX for [Bug 79](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79). User defined lists are now created
-    with a `_` in front of the package name when using the generator to ensure Java convention is followed
+  * FIX for [Bug 79](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79).  User defined lists are now created with a `_` in front of the
+  package name when using the generator to ensure Java convention is followed
 * 15.0.40
-  * Get the server version using the `SiteAdmin` API. This matches the `serverurl/admin/server/version` REST call
-  * The way that the API mode can be set has changed. It is now easier to set the technical preview by using the *
-    APIMode* interface and default classes. Other modes can be set as well. See Javadoc for more details
+  * Get the server version using the `SiteAdmin` API.  This matches the `serverurl/admin/server/version` REST call
+  * The way that the API mode can be set has changed.  It is now easier to set the technical preview by using the *APIMode* interface and 
+  default classes.  Other modes can be set as well.  See Javadoc for more details
 * 15.0.20
-  * Lists are now created in their own classes. The package name is based on the list's logical name. This was necessary
-    due to non-unique list names. In order to try to preserve backward compatibility the actual class name should be the
-    same but are now in separate packages. That means that in the best case only imports need to be changed.
-    * In addition to this list names need to conform to Java standards. If a list name starts with an illegal character
-      such as a number then the name will start with a '$'.
-  * Due to a bug on Octane - the *run_history* entity's ID is marked as an integer as opposed to a string. This causes
-    an issue in the entity generation. Therefore the *run_history* entity will not be generated until this bug is fixed
-    in Octane
+  * Lists are now created in their own classes.  The package name is based on the list's logical name.  This was necessary due to non-unique list names.   In order
+  to try to preserve backward compatibility the actual class name should be the same but are now in separate packages.  That means that in the best case only
+  imports need to be changed.
+    * In addition to this list names need to conform to Java standards. If a list name starts with an illegal character such as a number then the name will start with 
+    a '$'.   
+  * Due to a bug on Octane - the *run_history* entity's ID is marked as an integer as opposed to a string.  This causes an issue in the entity generation.
+  Therefore the *run_history* entity will not be generated until this bug is fixed in Octane
 * 12.60.41
   * Float fields now supported via FloatFieldModel if they are enabled on the Octane server.
   * Change to maven group id: com.microfocus.adm.almoctane.sdk
@@ -232,18 +235,18 @@ Currently the admin sections are not available using generated entities - but th
   * HTTP proxy settings are now logged
 * 12.55.5
   * Added Entity Generation
-  * Added Etag support. If the server resource has an etag then it is cached by the SDK for as long as the process is
-    alive. The cache is destroyed once the process ends
-  * All entity ids are now Strings. IDs are strings according to the metadata but there was some code that assumed IDs
-    were integers
-  * Entity collection now returns an `OctaneCollection` which is an extension of `Collection`. This includes important
-    metadata about the returned collection:
+  * Added Etag support.  If the server resource has an etag then it is cached by the SDK for as long as the process is alive.
+  The cache is destroyed once the process ends
+  * All entity ids are now Strings.  IDs are strings according to the metadata but there was some code that assumed IDs were
+   integers
+  * Entity collection now returns an `OctaneCollection` which is an extension of `Collection`.  This includes important 
+  metadata about the returned collection:
     * The total count of entities (not including the current limit)
     * Whether the number of requested entities exceeds the total count of entities.
   * Added support for IN and BTW for queries
-  * [SDK extension](https://github.com/Microfocus/sdk-extension) moved, now part of the sdk repository,
+  * [SDK extension](https://github.com/Microfocus/sdk-extension) moved, now part of the sdk repository, 
   * SDK now uses SLF4J internally for all logging
-
+  
   See the ALM Octane documentation for more information
   
 ## Disclaimer
