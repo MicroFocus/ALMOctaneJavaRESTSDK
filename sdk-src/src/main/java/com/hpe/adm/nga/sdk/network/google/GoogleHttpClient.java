@@ -307,7 +307,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             // According to the {@link https://tools.ietf.org/html/rfc2616#section-3.7.1} spec the correct encoding should be returned.
             // Currently Octane does not return UTF-8 for the REST API even though that is the encoding.  Manually changing here to fix some encoding issues
             // {@See https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/79}
-            final Charset charset = (httpResponse.getContentType().equals("application/json")) ? StandardCharsets.UTF_8 : httpResponse.getContentCharset();
+            final Charset charset = (Objects.nonNull(httpResponse.getContentType()) && httpResponse.getContentType().equals("application/json")) ? StandardCharsets.UTF_8 : httpResponse.getContentCharset();
             return new OctaneHttpResponse(httpResponse.getStatusCode(), httpResponse.getContent(), charset);
         } catch (IOException e) {
             throw new RuntimeException(e);

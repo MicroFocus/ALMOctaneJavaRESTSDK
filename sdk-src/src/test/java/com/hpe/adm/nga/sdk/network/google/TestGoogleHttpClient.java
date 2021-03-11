@@ -65,7 +65,8 @@ public class TestGoogleHttpClient {
     @Test
     public void testRequestRetry() throws Exception {
 
-        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com", any(Authentication.class)));
+        Authentication authentication = new SimpleUserAuthentication("", "");
+        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com", authentication));
 
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
         doReturn(true).when(googleHttpClientSpy, "authenticate");
@@ -107,7 +108,7 @@ public class TestGoogleHttpClient {
                 set(Setting.CONNECTION_TIMEOUT,2345);
         }};
 
-        GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", any(Authentication.class), settings);
+        GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", null, settings);
         OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("http://google.com:9090");
 
         long start = System.currentTimeMillis();
@@ -126,8 +127,6 @@ public class TestGoogleHttpClient {
     @Test
     @Ignore
     public void testParallelRequestRetry() {
-        ConfigurationProperties.logLevel("WARN");
-
         ClientAndServer clientAndServer = startClientAndServer();
         Octane octane;
         long totalExecutionTime = 500;
@@ -136,10 +135,10 @@ public class TestGoogleHttpClient {
         initServerResponse(clientAndServer, cookieExpirationTime);
         Authentication authentication = new SimpleUserAuthentication("", "");
         String url = "http://localhost:" + clientAndServer.getLocalPort();
-        GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, any(Authentication.class)));
+        GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, authentication));
         octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 
-        int nrCores = Runtime.getRuntime().availableProcessors();
+        int nrCores = Math.max(Runtime.getRuntime().availableProcessors(),2);
         IntStream.rangeClosed(1, nrCores).parallel().forEach((nr) -> runGetRequests(octane, totalExecutionTime));
 
         clientAndServer.stop();
