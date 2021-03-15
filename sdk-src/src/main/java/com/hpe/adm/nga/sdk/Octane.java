@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2021 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -365,10 +365,10 @@ public class Octane {
             final OctaneInternalConfiguration octaneInternalConfiguration = new OctaneInternalConfiguration();
             // Init default http client if it wasn't specified
             OctaneCustomSettings settings = customSettings != null ? customSettings : defaultOctaneSettings;
-            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, settings) : this.octaneHttpClient;
+            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, authentication, settings) : this.octaneHttpClient;
             octaneInternalConfiguration.octaneClassFactoryClassName = this.octaneClassFactoryClassName;
 
-            if (octaneInternalConfiguration.octaneHttpClient.authenticate(authentication)) {
+            if (octaneInternalConfiguration.octaneHttpClient.authenticate()) {
                 if (idsharedSpaceId == null) {
                     objOctane = new Octane(octaneInternalConfiguration, urlDomain);
                 } else {
@@ -423,7 +423,7 @@ public class Octane {
             SHARED_HTTP_TRANSPORT
         }
 
-        private Map<Setting, Object> settings = new HashMap<>();
+        private final Map<Setting, Object> settings = new HashMap<>();
 
         // Initialize defaults
         {

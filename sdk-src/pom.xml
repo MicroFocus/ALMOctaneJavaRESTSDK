@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    © Copyright 2016-2020 Micro Focus or one of its affiliates.
+    © Copyright 2016-2021 Micro Focus or one of its affiliates.
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -25,16 +25,16 @@
     <artifactId>sdk-src</artifactId>
     <dependencies>
         <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client-jackson2</artifactId>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client-gson</artifactId>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-gson</artifactId>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>

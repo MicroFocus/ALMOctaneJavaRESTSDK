@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2021 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@ package com.hpe.adm.nga.sdk.extension.network.google;
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.io.CharStreams;
+import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.extension.network.RequestInterceptor;
 import com.hpe.adm.nga.sdk.extension.network.ResponseInterceptor;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
@@ -41,11 +42,11 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
 
     private static final Logger logger = LoggerFactory.getLogger(InterceptorGoogleHttpClient.class.getName());
 
-    private static List<RequestInterceptor> requestInterceptors = new ArrayList<>(1);
-    private static List<ResponseInterceptor> responseInterceptors = new ArrayList<>(1);
+    private static final List<RequestInterceptor> requestInterceptors = new ArrayList<>(1);
+    private static final List<ResponseInterceptor> responseInterceptors = new ArrayList<>(1);
 
-    public InterceptorGoogleHttpClient(String urlDomain) {
-        super(urlDomain);
+    public InterceptorGoogleHttpClient(String urlDomain, Authentication authentication) {
+        super(urlDomain, authentication);
     }
 
     /**
@@ -100,7 +101,7 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
 
         //HEADERS
         final Map<String, Object> oldHeaders = new HashMap<>();
-        httpRequest.getHeaders().forEach((key, value) -> oldHeaders.put(key, value));
+        httpRequest.getHeaders().forEach(oldHeaders::put);
         final Map<String, Object> newHeaders = requestInterceptor.headers(oldHeaders);
         httpRequest.getHeaders().clear();
         newHeaders.forEach((key, value) -> httpRequest.getHeaders().set(key, value));
@@ -117,7 +118,7 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
 
         //HEADERS
         final Map<String, Object> oldHeaders = new HashMap<>();
-        httpResponse.getHeaders().forEach((key, value) -> oldHeaders.put(key, value));
+        httpResponse.getHeaders().forEach(oldHeaders::put);
         final Map<String, Object> newHeaders = responseInterceptor.headers(oldHeaders);
         httpResponse.getHeaders().clear();
         newHeaders.forEach((key, value) -> httpResponse.getHeaders().set(key, value));

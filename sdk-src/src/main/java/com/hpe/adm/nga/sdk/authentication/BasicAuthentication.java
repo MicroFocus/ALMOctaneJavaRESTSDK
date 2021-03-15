@@ -16,20 +16,30 @@ package com.hpe.adm.nga.sdk.authentication;
 import com.hpe.adm.nga.sdk.APIMode;
 
 /**
- * Used for user/password authentications
- * Created by brucesp on 19-Dec-16.
+ * Represents basic authentication
  */
-abstract class UserAuthentication extends JSONAuthentication {
+public abstract class BasicAuthentication extends Authentication {
 
-    UserAuthentication(final APIMode apiMode) {
-        super(apiMode);
+    /**
+     * Represents basic authentication
+     *
+     * @param apiMode The mode to use if necessary
+     */
+    BasicAuthentication(final APIMode apiMode) {
+        super(apiMode, true);
     }
 
-    final protected String getAuthenticationIdKey() {
-        return "user";
-    }
+    /**
+     * The id that is used for the authentication
+     *
+     * @return client id or username
+     */
+    abstract public String getAuthenticationId();
 
-    final protected String getAuthenticationSecretKey() {
-        return "password";
-    }
+    /**
+     * The secret that is used for the authentication
+     *
+     * @return client secret or password
+     */
+    abstract public String getAuthenticationSecret();
 }

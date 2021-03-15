@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2021 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
 
 /**
  *
@@ -30,11 +30,13 @@ public interface OctaneHttpClient {
     String OCTANE_USER_COOKIE_KEY = "OCTANE_USER";
 
     /**
-     * Authenticate with the Octane server using an implementation of the {@link Authentication} class
-     * @param authentication implementation of {@link Authentication}
+     * Authenticate with the Octane server using an implementation of the {@link JSONAuthentication} class.
+     * If basic authentication is being used then the authentication is an inherent part of execute and therefore
+     * authentication does not need to be called explicitly.  True will be returned in this case
+     *
      * @return true if the authentication was successful, false otherwise
      */
-    boolean authenticate(Authentication authentication);
+    boolean authenticate();
 
     /**
      * Signs out and removes cookies

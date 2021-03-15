@@ -15,41 +15,37 @@ package com.hpe.adm.nga.sdk.authentication;
 
 import com.hpe.adm.nga.sdk.APIMode;
 
-/**
- * Default class to enable user authentications
- * Created by brucesp on 23/05/2016.
+/***
+ * Basic implementation for using basic authentication with Octane.  This stores the user and password in memory
  */
-public class SimpleUserAuthentication extends UserAuthentication {
-
+public class SimpleBasicAuthentication extends BasicAuthentication {
     private final String userName;
     private final String password;
 
     /**
-     *
      * @param userName The user
      * @param password The password
-     * @param apiMode API Mode - can be nullable
+     * @param apiMode  API Mode - can be nullable
      */
-    public SimpleUserAuthentication(final String userName, final String password, final APIMode apiMode) {
+    public SimpleBasicAuthentication(final String userName, final String password, final APIMode apiMode) {
         super(apiMode);
         this.userName = userName;
         this.password = password;
     }
 
     /**
-     *
      * @param userName The user
      * @param password The password
      */
-    public SimpleUserAuthentication(final String userName, final String password) {
+    public SimpleBasicAuthentication(final String userName, final String password) {
         this(userName, password, null);
     }
 
-    protected String getAuthenticationId() {
+    public String getAuthenticationId() {
         return userName;
     }
 
-    protected String getAuthenticationSecret() {
+    public String getAuthenticationSecret() {
         return password;
     }
 }

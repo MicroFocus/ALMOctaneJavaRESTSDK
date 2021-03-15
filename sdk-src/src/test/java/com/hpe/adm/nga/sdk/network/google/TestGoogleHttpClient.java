@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2021 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -65,10 +65,11 @@ public class TestGoogleHttpClient {
     @Test
     public void testRequestRetry() throws Exception {
 
-        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com"));
+        Authentication authentication = new SimpleUserAuthentication("", "");
+        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com", authentication));
 
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
-        doReturn(true).when(googleHttpClientSpy, "authenticate", any(Authentication.class));
+        doReturn(true).when(googleHttpClientSpy, "authenticate");
         Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
         Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", new Date(0));
 
@@ -107,7 +108,7 @@ public class TestGoogleHttpClient {
                 set(Setting.CONNECTION_TIMEOUT,2345);
         }};
 
-        GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", settings );
+        GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", null, settings);
         OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("http://google.com:9090");
 
         long start = System.currentTimeMillis();
@@ -126,8 +127,6 @@ public class TestGoogleHttpClient {
     @Test
     @Ignore
     public void testParallelRequestRetry() {
-        ConfigurationProperties.logLevel("WARN");
-
         ClientAndServer clientAndServer = startClientAndServer();
         Octane octane;
         long totalExecutionTime = 500;
@@ -136,16 +135,16 @@ public class TestGoogleHttpClient {
         initServerResponse(clientAndServer, cookieExpirationTime);
         Authentication authentication = new SimpleUserAuthentication("", "");
         String url = "http://localhost:" + clientAndServer.getLocalPort();
-        GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url));
+        GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, authentication));
         octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 
-        int nrCores = Runtime.getRuntime().availableProcessors();
+        int nrCores = Math.max(Runtime.getRuntime().availableProcessors(),2);
         IntStream.rangeClosed(1, nrCores).parallel().forEach((nr) -> runGetRequests(octane, totalExecutionTime));
 
         clientAndServer.stop();
 
         //Exactly 2 authentications are done: one for 1st log in and 2nd for cookie refresh
-        Mockito.verify(spyGoogleHttpClient, times(2)).authenticate(any());
+        Mockito.verify(spyGoogleHttpClient, times(2)).authenticate();
 
         //There are more execution invocations than there are threads
         Mockito.verify(spyGoogleHttpClient, atLeast(nrCores + 1)).execute(any());

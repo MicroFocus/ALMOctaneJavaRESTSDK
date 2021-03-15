@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2021 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,6 @@ import com.hpe.adm.nga.sdk.query.QueryMethod;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -91,17 +90,24 @@ public class DataGenerator {
         Collection<EntityModel> pas = octane.entityList("product_areas").get().execute();
         EntityModel parentEntity = CommonUtils.getEntityWithStringValue(pas, "parent", null);
         String parentId = CommonUtils.getIdFromEntityModel(parentEntity);
-        Set<FieldModel> parentFields = new HashSet<>();
-        parentFields.add(new StringFieldModel("id", parentId));
-        parentFields.add(new StringFieldModel("type", "product_area"));
-        EntityModel parent = new EntityModel(parentFields);
+        FieldModel<String> name = new StringFieldModel("name", "sdk_pa_" + UUID.randomUUID());
+        FieldModel<EntityModel> parentField = getReferenceFieldModel("parent", parentId, "product_area");
+        FieldModel<EntityModel> businessImpactField = getReferenceFieldModel("business_impact", "list_node.business_impact.no_impact", "list_node");
 
-        FieldModel name = new StringFieldModel("name", "sdk_pa_" + UUID.randomUUID());
-        FieldModel parentField = new ReferenceFieldModel("parent", parent);
 
         fields.add(name);
         fields.add(parentField);
+        fields.add(businessImpactField);
         return new EntityModel(fields);
+    }
+
+    private static FieldModel<EntityModel> getReferenceFieldModel(String fieldName, String id, String type) {
+        Set<FieldModel> businessImpactFields = new HashSet<>();
+        businessImpactFields.add(new StringFieldModel("id", id));
+        businessImpactFields.add(new StringFieldModel("type", type));
+        EntityModel businessImpact = new EntityModel(businessImpactFields);
+
+        return new ReferenceFieldModel(fieldName, businessImpact);
     }
 
     private static EntityModel generateFeature(Octane octane, Set<FieldModel> fields) {

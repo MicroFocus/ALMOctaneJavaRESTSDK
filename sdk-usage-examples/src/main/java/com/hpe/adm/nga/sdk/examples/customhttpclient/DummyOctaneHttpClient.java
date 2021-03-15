@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2020 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2021 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,6 @@
  */
 package com.hpe.adm.nga.sdk.examples.customhttpclient;
 
-import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
@@ -40,7 +39,7 @@ public class DummyOctaneHttpClient implements OctaneHttpClient {
     public DummyOctaneHttpClient(String ignored){}
 
     @Override
-    public boolean authenticate(Authentication authentication) {
+    public boolean authenticate() {
         return true;
     }
 

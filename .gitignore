@@ -126,4 +126,4 @@ local.properties
 
 # Code Recommenders
 .recommenders/
-/sdk-src/mockserver.log
+/sdk-src/mockserver*.log
