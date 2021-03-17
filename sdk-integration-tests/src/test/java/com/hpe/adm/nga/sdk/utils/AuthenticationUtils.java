@@ -14,7 +14,7 @@
 package com.hpe.adm.nga.sdk.utils;
 
 import com.hpe.adm.nga.sdk.APIMode;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.ExplicitAuthentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 
@@ -22,7 +22,7 @@ import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
  * Created by brucesp on 06/06/2016.
  */
 public class AuthenticationUtils {
-    public static Authentication getAuthentication(boolean useTechnicalPreviewAPI) {
+    public static ExplicitAuthentication getAuthentication(boolean useTechnicalPreviewAPI) {
         final APIMode apiMode = useTechnicalPreviewAPI ? APIMode.TechnicalPreviewAPIMode : null;
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String authenticationType = configuration.getString("sdk.authenticationType");
@@ -35,7 +35,7 @@ public class AuthenticationUtils {
         }
     }
 
-    public static Authentication getAuthentication() {
+    public static ExplicitAuthentication getAuthentication() {
         return getAuthentication(true);
     }
 }

@@ -13,9 +13,7 @@
  */
 package com.hpe.adm.nga.sdk;
 
-import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import com.hpe.adm.nga.sdk.siteadmin.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +32,9 @@ public class SiteAdmin {
     private final OctaneHttpClient octaneHttpClient;
 
     // functions
-    private SiteAdmin(OctaneHttpClient octaneHttpClient, String domain) {
+    private SiteAdmin(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
         this.octaneHttpClient = octaneHttpClient;
-        urlDomain = domain + SITE_ADMIN_DOMAIN_FORMAT;
+        this.urlDomain = urlDomain + SITE_ADMIN_DOMAIN_FORMAT;
     }
 
     /**
@@ -49,7 +47,7 @@ public class SiteAdmin {
     }
 
     /**
-     * This class is used to create an {@link SiteAdmin} instance for site admin API usage.  It is initialised using the correct {@link Authentication}
+     * This class is used to create an {@link SiteAdmin} instance for site admin API usage.  It is initialised using the correct Authentication method
      * <br>
      * The {@code Builder} class uses the builder pattern.  This builds up the correct Octane REST API context.
      * <br>
@@ -58,68 +56,19 @@ public class SiteAdmin {
     public static class Builder {
         //Private
         private final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
-        protected String urlDomain = "";
+        protected String urlDomain;
         protected OctaneHttpClient octaneHttpClient;
-        private final Authentication authentication;
 
         //Functions
 
         /**
          * Creates a new Builder object using the correct authentication
          *
-         * @param authentication - Authentication object.  Cannot be null
          * @throws NullPointerException if the authentication object is null
          */
-        public Builder(Authentication authentication) {
-            assert authentication != null;
-            this.authentication = authentication;
-        }
-
-        /**
-         * Creates a new Builder object using the correct authentication
-         *
-         * @param authentication   - Authentication object.  Cannot be null
-         * @param octaneHttpClient - Implementation of {@link OctaneHttpClient}. Cannot be null
-         * @throws AssertionError if the authentication or octaneHttpClient is null
-         */
-        public Builder(Authentication authentication, OctaneHttpClient octaneHttpClient) {
-            assert authentication != null;
-            assert octaneHttpClient != null;
-            this.authentication = authentication;
+        public Builder(final OctaneHttpClient octaneHttpClient, final String urlDomain) {
             this.octaneHttpClient = octaneHttpClient;
-        }
-
-        /**
-         * Sets the domain and the port.  The domain should include the full http scheme (http/https)
-         * <br>
-         * eg {@code http://octane.server.com}
-         *
-         * @param domain - domain name including http scheme
-         * @param port   - port number
-         * @return this object
-         * @throws NullPointerException if the domain is null
-         */
-        public Builder Server(String domain, int port) {
-
-            urlDomain = domain + ":" + port;
-
-            return this;
-        }
-
-        /**
-         * Sets the domain and the port.  The domain should include the full http scheme (http/https)
-         * <br>
-         * eg {@code http://octane.server.com}
-         *
-         * @param domain - domain name including http scheme
-         * @return this object
-         * @throws NullPointerException if the domain is null
-         */
-        public Builder Server(String domain) {
-
-            urlDomain = domain;
-
-            return this;
+            this.urlDomain = urlDomain;
         }
 
         /**
@@ -129,16 +78,10 @@ public class SiteAdmin {
          */
         public SiteAdmin build() {
 
-            SiteAdmin objOctane = null;
+            SiteAdmin objOctane;
 
             logger.info("Building SiteAdmin Octane context using {}", this);
-
-            // Init default http client if it wasn't specified
-            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, authentication) : this.octaneHttpClient;
-
-            if (octaneHttpClient.authenticate()) {
-                objOctane = getSiteAdmin();
-            }
+            objOctane = getSiteAdmin();
 
             return objOctane;
         }

@@ -14,7 +14,7 @@
 package com.hpe.adm.nga.sdk.tests.generate;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.ExplicitAuthentication;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.entities.get.GetTypedEntity;
 import com.hpe.adm.nga.sdk.generate.GenerateModels;
@@ -92,7 +92,7 @@ public class TestGenerateModels {
     private void generateSources(File generatedDirectory) {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         final String url = configuration.getString("sdk.url");
-        final Authentication authentication = AuthenticationUtils.getAuthentication(false);
+        final ExplicitAuthentication authentication = AuthenticationUtils.getAuthentication(false);
         final String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         final String workspaceId = configuration.getString("sdk.workspaceId");
 
@@ -106,7 +106,7 @@ public class TestGenerateModels {
     private void testGeneratedClass(File generatedDirectory) throws Exception {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         final String url = configuration.getString("sdk.url");
-        final Authentication authentication = AuthenticationUtils.getAuthentication(false);
+        final ExplicitAuthentication authentication = AuthenticationUtils.getAuthentication(false);
         final String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         final String workspaceId = configuration.getString("sdk.workspaceId");
 

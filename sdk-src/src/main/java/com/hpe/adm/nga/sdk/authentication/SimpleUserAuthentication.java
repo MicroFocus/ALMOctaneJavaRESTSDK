@@ -19,16 +19,15 @@ import com.hpe.adm.nga.sdk.APIMode;
  * Default class to enable user authentications
  * Created by brucesp on 23/05/2016.
  */
-public class SimpleUserAuthentication extends UserAuthentication {
+public class SimpleUserAuthentication extends UserAuthentication implements SupportsAutomaticReAuthentication {
 
     private final String userName;
     private final String password;
 
     /**
-     *
      * @param userName The user
      * @param password The password
-     * @param apiMode API Mode - can be nullable
+     * @param apiMode  API Mode - can be nullable
      */
     public SimpleUserAuthentication(final String userName, final String password, final APIMode apiMode) {
         super(apiMode);
@@ -37,7 +36,6 @@ public class SimpleUserAuthentication extends UserAuthentication {
     }
 
     /**
-     *
      * @param userName The user
      * @param password The password
      */

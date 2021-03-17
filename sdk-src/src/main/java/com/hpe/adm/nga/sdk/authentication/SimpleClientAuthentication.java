@@ -19,7 +19,7 @@ import com.hpe.adm.nga.sdk.APIMode;
  * Default class to enable api key authentications
  * Created by brucesp on 23/05/2016.
  */
-public class SimpleClientAuthentication extends ClientAuthentication {
+public class SimpleClientAuthentication extends ClientAuthentication implements SupportsAutomaticReAuthentication {
 
     private final String clientId;
     private final String clientSecret;

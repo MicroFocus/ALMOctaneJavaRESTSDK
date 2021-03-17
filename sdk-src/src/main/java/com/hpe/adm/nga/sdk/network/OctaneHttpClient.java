@@ -13,35 +13,88 @@
  */
 package com.hpe.adm.nga.sdk.network;
 
-import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
+import com.hpe.adm.nga.sdk.exception.OctaneException;
+import com.hpe.adm.nga.sdk.exception.OctanePartialException;
+import com.hpe.adm.nga.sdk.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
- *
  * HTTP Client
- *
+ * <p>
  * Created by leufl on 2/11/2016.
  */
-public interface OctaneHttpClient {
+public abstract class OctaneHttpClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(OctaneHttpClient.class.getName());
+    private static final String ERROR_CODE_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT";
+    private static final String ERROR_CODE_GLOBAL_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_GLOBAL_TIME_OUT";
+
+    protected final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
+    protected final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
     //Constants
-    String OAUTH_AUTH_URL = "/authentication/sign_in";
-    String OAUTH_SIGNOUT_URL = "/authentication/sign_out";
-    String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
-    String OCTANE_USER_COOKIE_KEY = "OCTANE_USER";
+    protected static final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
+    protected static final String OCTANE_USER_COOKIE_KEY = "OCTANE_USER";
 
-    /**
-     * Authenticate with the Octane server using an implementation of the {@link JSONAuthentication} class.
-     * If basic authentication is being used then the authentication is an inherent part of execute and therefore
-     * authentication does not need to be called explicitly.  True will be returned in this case
-     *
-     * @return true if the authentication was successful, false otherwise
-     */
-    boolean authenticate();
+    public final OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest) {
+        try {
+            return internalExecute(octaneHttpRequest);
+        } catch (Octane304Exception octane304Exception) {
+            //Return cached response
+            return cachedRequestToResponse.get(octaneHttpRequest);
+        } catch (OctaneException exception) {
+            //Handle session timeout exception
+            final StringFieldModel errorCodeFieldModel = (StringFieldModel) exception.getError().getValue("errorCode");
+            final LongFieldModel httpStatusCode = (LongFieldModel) exception.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
 
-    /**
-     * Signs out and removes cookies
-     */
-    void signOut();
+            //Handle session timeout
+            if (errorCodeFieldModel != null && httpStatusCode.getValue() == 401 &&
+                    (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())
+                            || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()))) {
+                throw new OctaneAuthenticateTimeOutException();
+            } else {
+                throw exception;
+            }
+        }
+    }
 
-    OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest);
+    protected abstract OctaneHttpResponse internalExecute(OctaneHttpRequest octaneHttpRequest);
+
+    protected final OctaneException createUnauthorisedException() {
+        final LongFieldModel statusFieldModel = new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) 401);
+        final ErrorModel errorModel = new ErrorModel(Collections.singleton(statusFieldModel));
+        // assuming that we have a cookie and therefore can go for re-authentication...
+        errorModel.setValue(new StringFieldModel("errorCode", ERROR_CODE_TOKEN_EXPIRED));
+        return new OctaneException(errorModel);
+    }
+
+    protected final RuntimeException createOctaneException(final String statusMessage, final String content, final long statusCode) {
+        List<String> exceptionContentList = new ArrayList<>();
+        exceptionContentList.add(statusMessage);
+        exceptionContentList.add(content);
+
+        for (String exceptionContent : exceptionContentList) {
+            try {
+                if (ModelParser.getInstance().hasErrorModels(exceptionContent)) {
+                    Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
+                    Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
+                    return new OctanePartialException(errorModels, entities);
+                } else if (ModelParser.getInstance().hasErrorModel(exceptionContent)) {
+                    ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
+                    errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, statusCode));
+                    return new OctaneException(errorModel);
+                } else if (ModelParser.getInstance().hasServletError(exceptionContent)) {
+                    ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromServletJson(exceptionContent);
+                    errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, statusCode));
+                    return new OctaneException(errorModel);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        return null;
+    }
 }

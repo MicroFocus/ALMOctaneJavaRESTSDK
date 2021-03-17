@@ -15,13 +15,8 @@ package com.hpe.adm.nga.sdk.network.google;
 
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
-import com.hpe.adm.nga.sdk.authentication.BasicAuthentication;
-import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
-import com.hpe.adm.nga.sdk.exception.OctaneException;
-import com.hpe.adm.nga.sdk.exception.OctanePartialException;
-import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
+import com.hpe.adm.nga.sdk.network.Octane304Exception;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
@@ -37,14 +32,16 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
  * HTTP Client using Google's API
  * <p>This will be refactored in future releases to enable the use of different underlying APIs</p>
  */
-public class GoogleHttpClient implements OctaneHttpClient {
+public class GoogleHttpClient extends OctaneHttpClient {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleHttpClient.class.getName());
 
@@ -60,22 +57,16 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private static final String HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE = "entity";
     private static final String HTTP_MULTIPART_PART2_DISPOSITION_FORMAT = "form-data; name=\"content\"; filename=\"%s\"";
 
-    private static final String ERROR_CODE_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT";
-    private static final String ERROR_CODE_GLOBAL_TOKEN_EXPIRED = "VALIDATION_TOKEN_EXPIRED_GLOBAL_TIME_OUT";
-
-    private static final int HTTP_REQUEST_RETRY_COUNT = 1;
-
     protected HttpRequestFactory requestFactory;
     protected String lwssoValue = "";
     protected String octaneUserValue;
     protected final String urlDomain;
-    protected Authentication lastUsedAuthentication;
-    protected Date lastSuccessfulAuthTimestamp;
-    private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
-    private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
     // identity operation by default. do nothing
     private Consumer<HttpRequest> customRequestInitializer = request -> {
+    };
+
+    private Consumer<HttpRequest> basicAuthenticationRequestInitializer = request -> {
     };
 
     private final Consumer<HttpRequest> defaultRequestInitializer = request -> {
@@ -97,24 +88,24 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         request.getHeaders().setCookie(cookieBuilder.toString());
 
-        if (lastUsedAuthentication != null) {
-            if (lastUsedAuthentication.isBasicAuthentication()) {
-                final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
-                request.getHeaders().setBasicAuthentication(basicAuthentication.getAuthenticationId(), basicAuthentication.getAuthenticationSecret());
-            }
-            lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
-        }
         request.setReadTimeout(60000);
     };
 
     /**
      * Request initializer called on every request made by the requestFactory
      */
-    protected HttpRequestInitializer requestInitializer = request -> defaultRequestInitializer.andThen(customRequestInitializer).accept(request);
+    protected HttpRequestInitializer requestInitializer = request -> defaultRequestInitializer
+            .andThen(customRequestInitializer)
+            .andThen(basicAuthenticationRequestInitializer)
+            .accept(request);
 
-    public GoogleHttpClient(final String urlDomain, final Authentication authentication) {
+    public GoogleHttpClient(final String urlDomain) {
+        this(urlDomain, (com.hpe.adm.nga.sdk.authentication.BasicAuthentication) null);
+    }
+
+    public GoogleHttpClient(final String urlDomain, com.hpe.adm.nga.sdk.authentication.BasicAuthentication basicAuthentication) {
         this.urlDomain = urlDomain;
-        this.lastUsedAuthentication = authentication;
+        initializeBasicAuthentication(basicAuthentication);
         logSystemProperties();
         requestFactory = buildRequestFactory();
     }
@@ -126,18 +117,34 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @param settings  the object containing he custom settings
      * @throws RuntimeException in case of an underlying security exception
      */
-    public GoogleHttpClient(final String urlDomain, final Authentication authentication, Octane.OctaneCustomSettings settings) throws RuntimeException {
-        this.urlDomain = urlDomain;
-        logSystemProperties();
-        this.lastUsedAuthentication = authentication;
+    public GoogleHttpClient(final String urlDomain, OctaneWrapper.OctaneCustomSettings settings) throws RuntimeException {
+        this(urlDomain, settings, null);
+    }
 
+    public GoogleHttpClient(final String urlDomain, OctaneWrapper.OctaneCustomSettings settings
+            , com.hpe.adm.nga.sdk.authentication.BasicAuthentication basicAuthentication) throws RuntimeException {
+        this.urlDomain = urlDomain;
+        initializeBasicAuthentication(basicAuthentication);
+        logSystemProperties();
+
+        extractCustomSettings(settings);
+    }
+
+    private void initializeBasicAuthentication(com.hpe.adm.nga.sdk.authentication.BasicAuthentication basicAuthentication) {
+        if (basicAuthentication != null) {
+            basicAuthenticationRequestInitializer = request -> request.getHeaders().setBasicAuthentication(basicAuthentication.getAuthenticationId(),
+                    basicAuthentication.getAuthenticationSecret());
+        }
+    }
+
+    private void extractCustomSettings(OctaneWrapper.OctaneCustomSettings settings) {
         customRequestInitializer = request -> {
-            request.setReadTimeout((int) settings.get(Octane.OctaneCustomSettings.Setting.READ_TIMEOUT));
-            request.setConnectTimeout((int) settings.get(Octane.OctaneCustomSettings.Setting.CONNECTION_TIMEOUT));
+            request.setReadTimeout((int) settings.get(OctaneWrapper.OctaneCustomSettings.Setting.READ_TIMEOUT));
+            request.setConnectTimeout((int) settings.get(OctaneWrapper.OctaneCustomSettings.Setting.CONNECTION_TIMEOUT));
         };
 
-        HttpTransport httpTransport = (HttpTransport) settings.get(Octane.OctaneCustomSettings.Setting.SHARED_HTTP_TRANSPORT);
-        boolean trustAllCerts = (boolean) settings.get(Octane.OctaneCustomSettings.Setting.TRUST_ALL_CERTS);
+        HttpTransport httpTransport = (HttpTransport) settings.get(OctaneWrapper.OctaneCustomSettings.Setting.SHARED_HTTP_TRANSPORT);
+        boolean trustAllCerts = (boolean) settings.get(OctaneWrapper.OctaneCustomSettings.Setting.TRUST_ALL_CERTS);
 
         if (httpTransport != null) {
             requestFactory = httpTransport.createRequestFactory(requestInitializer);
@@ -182,59 +189,22 @@ public class GoogleHttpClient implements OctaneHttpClient {
         logSystemProxyForUrlDomain(urlDomain);
     }
 
-    /**
-     * @return - Returns true if the authentication succeeded, false otherwise.
-     */
-    public synchronized boolean authenticate() {
-        if (lastUsedAuthentication == null) {
-            return false;
-        }
-        if (lastUsedAuthentication.isBasicAuthentication()) {
-            return true;
-        }
-        //reset so it's not sent to auth request, server might return 304
-        lwssoValue = null;
-        octaneUserValue = null;
-        try {
-            final ByteArrayContent content = ByteArrayContent.fromString("application/json", ((JSONAuthentication) lastUsedAuthentication).getAuthenticationString());
-            HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
-
-            // Authenticate request should never set the api mode header.
-            // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
-            // Using this kind of header for future requests will still work.
-            lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
-                    httpRequest.getHeaders().remove(apiMode.getHeaderKey())
-            );
-
-            HttpResponse response = executeRequest(httpRequest);
-
-            if (response.isSuccessStatusCode()) {
-                lastSuccessfulAuthTimestamp = new Date();
-                return true;
-            } else {
-                return false;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public synchronized void signOut() {
-        GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_SIGNOUT_URL);
-        HttpRequest httpRequest = null;
-        try {
-            httpRequest = requestFactory.buildPostRequest(genericUrl, null);
-            HttpResponse response = executeRequest(httpRequest);
-
-            if (response.isSuccessStatusCode()) {
-                HttpHeaders hdr1 = response.getHeaders();
-                updateLWSSOCookieValue(hdr1);
-                lastUsedAuthentication = null;
-            }
-        } catch (Exception e) {
-            throw wrapException(e, httpRequest);
-        }
-    }
+//    public synchronized void signOut() {
+//        GenericUrl genericUrl = new GenericUrl(urlDomain + OAUTH_SIGNOUT_URL);
+//        HttpRequest httpRequest = null;
+//        try {
+//            httpRequest = requestFactory.buildPostRequest(genericUrl, null);
+//            HttpResponse response = executeRequest(httpRequest);
+//
+//            if (response.isSuccessStatusCode()) {
+//                HttpHeaders hdr1 = response.getHeaders();
+//                updateLWSSOCookieValue(hdr1);
+//                lastUsedAuthentication = null;
+//            }
+//        } catch (Exception e) {
+//            throw wrapException(e, httpRequest);
+//        }
+//    }
 
     /**
      * Convert the abstract {@link OctaneHttpRequest}Request object to a specific {@link HttpRequest} for the google http client
@@ -314,26 +284,19 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
     }
 
-    @Override
-    public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest) {
-        return execute(octaneHttpRequest, HTTP_REQUEST_RETRY_COUNT);
-    }
-
     /**
      * This method can be used internally to retry the request in case of auth token timeout
      * Careful, this method calls itself recursively to retry the request
      *
      * @param octaneHttpRequest abstract request, has to be converted into a specific implementation of http request
-     * @param retryCount        number of times the method should retry the request if it encounters an HttpResponseException
      * @return OctaneHttpResponse
      */
-    private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, int retryCount) {
-
+    protected OctaneHttpResponse internalExecute(OctaneHttpRequest octaneHttpRequest) {
         final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
         final HttpResponse httpResponse;
 
         try {
-            httpResponse = executeRequest(httpRequest);
+            httpResponse = executeRequest(httpRequest, octaneHttpRequest.isSensitive());
 
             final OctaneHttpResponse octaneHttpResponse = convertHttpResponseToOctaneHttpResponse(httpResponse);
             final String eTag = httpResponse.getHeaders().getETag();
@@ -348,44 +311,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
             //Return cached response
             if (exception.getCause() instanceof HttpResponseException) {
                 HttpResponseException httpResponseException = (HttpResponseException) exception.getCause();
+
                 final int statusCode = httpResponseException.getStatusCode();
                 if (statusCode == HttpStatusCodes.STATUS_CODE_NOT_MODIFIED) {
-                    return cachedRequestToResponse.get(octaneHttpRequest);
-                }
-            }
-
-            //Handle session timeout exception
-            if (retryCount > 0 && exception instanceof OctaneException) {
-                OctaneException octaneException = (OctaneException) exception;
-                StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
-                LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
-
-
-                //Handle session timeout
-                if (errorCodeFieldModel != null && httpStatusCode.getValue() == 401 &&
-                        (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())) &&
-                        lastUsedAuthentication != null) {
-
-                    Date currentTimestamp = new Date();
-
-                    // The same http client should not attempt re-auth from multiple threads
-                    synchronized (this) {
-
-                        // If another thread already handled session timeout, skip the re-auth and just retry the request
-                        if (lastSuccessfulAuthTimestamp.getTime() < currentTimestamp.getTime()) {
-                            logger.debug("Auth token expired, trying to re-authenticate");
-                            try {
-                                authenticate();
-                            } catch (OctaneException ex) {
-                                logger.debug("Exception while retrying authentication: {}", ex.getMessage());
-                            }
-                        } else {
-                            logger.debug("Auth token expired, but re-authentication was handled by another thread, will not re-authenticate");
-                        }
-
-                        logger.debug("Retrying request, retries left: {}", retryCount);
-                        return execute(octaneHttpRequest, --retryCount);
-                    }
+                    throw new Octane304Exception();
                 }
             }
 
@@ -393,13 +322,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
     }
 
-    private HttpResponse executeRequest(final HttpRequest httpRequest) {
+    private HttpResponse executeRequest(final HttpRequest httpRequest, boolean isSensitive) {
         logger.debug(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(), httpRequest.getHeaders().toString());
 
         final HttpContent content = httpRequest.getContent();
 
         // Make sure you don't log any http content send to the login rest api, since you don't want credentials in the logs
-        if (content != null && logger.isDebugEnabled() && !httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL)) {
+        if (content != null && logger.isDebugEnabled() && !isSensitive) {
             logHttpContent(content);
         }
 
@@ -414,7 +343,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         return response;
     }
 
-    private static RuntimeException wrapException(Exception exception, HttpRequest httpRequest) {
+    private RuntimeException wrapException(Exception exception, HttpRequest httpRequest) {
         if (exception instanceof HttpResponseException) {
 
             HttpResponseException httpResponseException = (HttpResponseException) exception;
@@ -429,11 +358,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                     if (cookie != null) {
                         for (String splitCookie : cookie.split(";")) {
                             if (splitCookie.startsWith(LWSSO_COOKIE_KEY)) {
-                                final LongFieldModel statusFieldModel = new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode());
-                                final ErrorModel errorModel = new ErrorModel(Collections.singleton(statusFieldModel));
-                                // assuming that we have a cookie and therefore can go for re-authentication...
-                                errorModel.setValue(new StringFieldModel("errorCode", ERROR_CODE_TOKEN_EXPIRED));
-                                return new OctaneException(errorModel);
+                                return createUnauthorisedException();
                             }
                         }
                     }
@@ -442,27 +367,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 }
             }
 
-            List<String> exceptionContentList = new ArrayList<>();
-            exceptionContentList.add(httpResponseException.getStatusMessage());
-            exceptionContentList.add(httpResponseException.getContent());
-
-            for (String exceptionContent : exceptionContentList) {
-                try {
-                    if (ModelParser.getInstance().hasErrorModels(exceptionContent)) {
-                        Collection<ErrorModel> errorModels = ModelParser.getInstance().getErrorModels(exceptionContent);
-                        Collection<EntityModel> entities = ModelParser.getInstance().getEntities(exceptionContent);
-                        return new OctanePartialException(errorModels, entities);
-                    } else if (ModelParser.getInstance().hasErrorModel(exceptionContent)) {
-                        ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromjson(exceptionContent);
-                        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
-                        return new OctaneException(errorModel);
-                    } else if (ModelParser.getInstance().hasServletError(exceptionContent)) {
-                        ErrorModel errorModel = ModelParser.getInstance().getErrorModelFromServletJson(exceptionContent);
-                        errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, (long) httpResponseException.getStatusCode()));
-                        return new OctaneException(errorModel);
-                    }
-                } catch (Exception ignored) {
-                }
+            RuntimeException octaneException = createOctaneException(httpResponseException.getStatusMessage(),
+                    httpResponseException.getContent(), httpResponseException.getStatusCode());
+            if (octaneException != null) {
+                return octaneException;
             }
         }
 
@@ -574,10 +482,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
 
         return renewed;
-    }
-
-    public static int getHttpRequestRetryCount() {
-        return HTTP_REQUEST_RETRY_COUNT;
     }
 
     /**

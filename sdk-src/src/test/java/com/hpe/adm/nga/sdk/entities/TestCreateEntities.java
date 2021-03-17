@@ -15,7 +15,7 @@ package com.hpe.adm.nga.sdk.entities;
 
 import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.entities.create.CreateEntities;
 import com.hpe.adm.nga.sdk.entities.delete.DeleteEntities;
@@ -126,11 +126,14 @@ public class TestCreateEntities {
 					.withCookie(firstCookie));
 
 		try {
-			Authentication authentication = new SimpleUserAuthentication("", "");
+			SimpleUserAuthentication authentication = new SimpleUserAuthentication("", "");
 			String url = "http://localhost:" + clientAndServer.getLocalPort();
-			GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, authentication));
+			GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url
+					//	, authentication
+			));
 
-			Octane octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
+			Octane octane = new OctaneWrapper.Builder().authentication(authentication).OctaneHttpClient(spyGoogleHttpClient).Server(url).build()
+					.octane().workSpace(1002).sharedSpace(1001).build();
 			EntityList defects = octane.entityList("defects");
 			GetEntities get = PowerMockito.spy(defects.get());
 			DeleteEntities delete = PowerMockito.spy(defects.delete());

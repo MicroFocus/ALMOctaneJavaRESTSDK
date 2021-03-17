@@ -14,7 +14,7 @@
 package com.hpe.adm.nga.sdk.tests.admin;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.ExplicitAuthentication;
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
@@ -35,7 +35,7 @@ public class TestWorkSpaceAdmin {
     }
 
     private static String url;
-    private static Authentication authentication;
+    private static ExplicitAuthentication authentication;
     private static String sharedSpaceId;
     private static String workspaceId;
 

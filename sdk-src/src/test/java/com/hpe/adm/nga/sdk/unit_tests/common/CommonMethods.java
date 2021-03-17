@@ -14,6 +14,7 @@
 package com.hpe.adm.nga.sdk.unit_tests.common;
 
 import com.hpe.adm.nga.sdk.Octane;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.FieldModel;
@@ -33,14 +34,16 @@ public class CommonMethods {
 
     public static Octane getOctaneForTest() {
         final OctaneHttpClient octaneHttpClient = PowerMockito.mock(OctaneHttpClient.class);
-        PowerMockito.when(octaneHttpClient.authenticate()).thenReturn(true);
+        //PowerMockito.when(octaneHttpClient.authenticate()).thenReturn(true);
 
-        return new Octane.Builder(new SimpleUserAuthentication("user", "password"), octaneHttpClient)
+        return new OctaneWrapper.Builder().authentication(new SimpleUserAuthentication("user", "password"))
+                .OctaneHttpClient(octaneHttpClient)
                 .Server(getDomain())
-                .settings(new Octane.OctaneCustomSettings() {{
-                    set(Setting.READ_TIMEOUT,5000);
-                    set(Setting.CONNECTION_TIMEOUT,2000);
+                .settings(new OctaneWrapper.OctaneCustomSettings() {{
+                    set(Setting.READ_TIMEOUT, 5000);
+                    set(Setting.CONNECTION_TIMEOUT, 2000);
                 }})
+                .build().octane()
                 .sharedSpace(Long.parseLong(getSharedSpace()))
                 .workSpace(getWorkSpace())
                 .build();

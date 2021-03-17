@@ -29,26 +29,27 @@ import java.util.Collection;
 /**
  * Dummy implementation of {@link OctaneHttpClient} for the {@link DummyOctaneHttpClientExample}
  */
-public class DummyOctaneHttpClient implements OctaneHttpClient {
+public class DummyOctaneHttpClient extends OctaneHttpClient {
 
     /**
      * Number of dummy defects to make
      */
     public static int dummyDefectCount = 10;
 
-    public DummyOctaneHttpClient(String ignored){}
-
-    @Override
-    public boolean authenticate() {
-        return true;
+    public DummyOctaneHttpClient(String ignored) {
     }
 
-    @Override
-    public void signOut() {
-    }
+//    @Override
+//    public boolean authenticate() {
+//        return true;
+//    }
+//
+//    @Override
+//    public void signOut() {
+//    }
 
     @Override
-    public OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest) {
+    public OctaneHttpResponse internalExecute(OctaneHttpRequest octaneHttpRequest) {
         //Create some dummy entity models
         Collection<EntityModel> entities = new ArrayList<>();
         for (int i = 1; i <= dummyDefectCount; i++) {

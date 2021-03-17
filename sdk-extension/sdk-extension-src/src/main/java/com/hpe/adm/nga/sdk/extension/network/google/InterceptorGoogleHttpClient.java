@@ -17,7 +17,6 @@ package com.hpe.adm.nga.sdk.extension.network.google;
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.common.io.CharStreams;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.extension.network.RequestInterceptor;
 import com.hpe.adm.nga.sdk.extension.network.ResponseInterceptor;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
@@ -45,7 +44,11 @@ public class InterceptorGoogleHttpClient extends GoogleHttpClient {
     private static final List<RequestInterceptor> requestInterceptors = new ArrayList<>(1);
     private static final List<ResponseInterceptor> responseInterceptors = new ArrayList<>(1);
 
-    public InterceptorGoogleHttpClient(String urlDomain, Authentication authentication) {
+    public InterceptorGoogleHttpClient(String urlDomain) {
+        super(urlDomain);
+    }
+
+    public InterceptorGoogleHttpClient(String urlDomain, com.hpe.adm.nga.sdk.authentication.BasicAuthentication authentication) {
         super(urlDomain, authentication);
     }
 

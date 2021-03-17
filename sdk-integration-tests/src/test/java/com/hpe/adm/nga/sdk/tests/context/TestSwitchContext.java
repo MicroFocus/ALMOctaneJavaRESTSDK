@@ -16,7 +16,7 @@ package com.hpe.adm.nga.sdk.tests.context;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.SiteAdmin;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.ExplicitAuthentication;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -37,7 +37,7 @@ public class TestSwitchContext {
     public void contextSiteAdmin() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authentication authentication = AuthenticationUtils.getAuthentication();
+        ExplicitAuthentication authentication = AuthenticationUtils.getAuthentication();
 
         SiteAdmin siteAdmin = ContextUtils.getContextSiteAdmin(url, authentication);
     }
@@ -46,7 +46,7 @@ public class TestSwitchContext {
     public void contextSharedSpace() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authentication authentication = AuthenticationUtils.getAuthentication();
+        ExplicitAuthentication authentication = AuthenticationUtils.getAuthentication();
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
 
         Octane octane = ContextUtils.getContextSharedSpace(url, authentication, sharedSpaceId);
@@ -60,7 +60,7 @@ public class TestSwitchContext {
     public void contextWorkspace() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
-        Authentication authentication = AuthenticationUtils.getAuthentication();
+        ExplicitAuthentication authentication = AuthenticationUtils.getAuthentication();
         String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         String workspaceId = configuration.getString("sdk.workspaceId");
 

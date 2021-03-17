@@ -14,7 +14,7 @@
 package com.hpe.adm.nga.sdk.examples.customhttpclient;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -33,7 +33,7 @@ public class DummyOctaneHttpClientExample {
 
     public static void main(String[] args) {
 
-        Authentication authentication
+        SimpleUserAuthentication authentication
                 = new SimpleUserAuthentication("", "");
 
         int dummyDefectCount = ThreadLocalRandom.current().nextInt(0, 101);
@@ -41,8 +41,10 @@ public class DummyOctaneHttpClientExample {
         DummyOctaneHttpClient.dummyDefectCount = dummyDefectCount;
 
         Octane octane =
-                new Octane.Builder(authentication, new DummyOctaneHttpClient(""))
+                new OctaneWrapper.Builder().authentication(authentication).OctaneHttpClient(new DummyOctaneHttpClient(""))
                         .Server("")
+                        .build()
+                        .octane()
                         .sharedSpace(-1)
                         .workSpace(-1)
                         .build();

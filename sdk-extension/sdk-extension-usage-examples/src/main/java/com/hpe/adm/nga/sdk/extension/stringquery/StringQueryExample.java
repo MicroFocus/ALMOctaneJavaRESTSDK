@@ -15,7 +15,8 @@ package com.hpe.adm.nga.sdk.extension.stringquery;
 
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
+import com.hpe.adm.nga.sdk.authentication.ExplicitAuthentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.extension.OctaneConnectionConstants;
 import com.hpe.adm.nga.sdk.extension.StringQuery;
@@ -28,12 +29,14 @@ public class StringQueryExample {
 
     public static void main(String[] args) {
 
-        Authentication authentication
+        ExplicitAuthentication authentication
                 = new SimpleUserAuthentication(OctaneConnectionConstants.username, OctaneConnectionConstants.password);
 
         Octane octane =
-                new Octane.Builder(authentication)
+                new OctaneWrapper.Builder().authentication(authentication)
                         .Server(OctaneConnectionConstants.urlDomain)
+                        .build()
+                        .octane()
                         .sharedSpace(OctaneConnectionConstants.sharedspaceId)
                         .workSpace(OctaneConnectionConstants.workspaceId)
                         .build();

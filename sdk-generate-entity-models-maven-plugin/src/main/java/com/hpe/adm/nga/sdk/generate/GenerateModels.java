@@ -14,7 +14,8 @@
 package com.hpe.adm.nga.sdk.generate;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
+import com.hpe.adm.nga.sdk.authentication.ExplicitAuthentication;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -95,8 +96,11 @@ public class GenerateModels {
      * @param workSpace      The WS id
      * @throws IOException A problem with the generation of the entities
      */
-    public void generate(Authentication authentication, String server, long sharedSpace, long workSpace) throws IOException {
-        final Octane octane = new Octane.Builder(authentication).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();
+    public void generate(ExplicitAuthentication authentication, String server, long sharedSpace, long workSpace) throws IOException {
+        final OctaneWrapper.ExplicitAuthenticationOctaneWrapper explicitAuthenticationOctaneWrapper =
+                new OctaneWrapper.Builder().authentication(authentication).Server(server).build();
+        explicitAuthenticationOctaneWrapper.authenticate().execute();
+        final Octane octane = explicitAuthenticationOctaneWrapper.octane().sharedSpace(sharedSpace).workSpace(workSpace).build();
         final Metadata metadata = octane.metadata();
         final Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
 

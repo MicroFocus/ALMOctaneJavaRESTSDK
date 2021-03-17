@@ -14,7 +14,8 @@
 package com.hpe.adm.nga.sdk.extension;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
+import com.hpe.adm.nga.sdk.authentication.ExplicitAuthentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
 import com.hpe.adm.nga.sdk.extension.entities.ExtendedGetEntities;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -27,14 +28,16 @@ public class GetExpandQueryExample {
 
         OctaneExtensionUtil.enable();
 
-        Authentication authentication = new SimpleUserAuthentication(
+        ExplicitAuthentication authentication = new SimpleUserAuthentication(
                 OctaneConnectionConstants.username,
                 OctaneConnectionConstants.password
         );
 
         Octane octane =
-                new Octane.Builder(authentication)
+                new OctaneWrapper.Builder().authentication(authentication)
                         .Server(OctaneConnectionConstants.urlDomain)
+                        .build()
+                        .octane()
                         .sharedSpace(OctaneConnectionConstants.sharedspaceId)
                         .workSpace(OctaneConnectionConstants.workspaceId).build();
 

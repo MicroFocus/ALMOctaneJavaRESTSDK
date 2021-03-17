@@ -14,18 +14,13 @@
 package com.hpe.adm.nga.sdk;
 
 import com.hpe.adm.nga.sdk.attachments.AttachmentList;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.classfactory.OctaneClassFactory;
 import com.hpe.adm.nga.sdk.entities.EntityList;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
-import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -78,12 +73,11 @@ public class Octane {
     private final String urlDomain;
     private final String idsharedSpaceId;
     private final long workSpaceId;
-    private final OctaneInternalConfiguration octaneInternalConfiguration;
+    private final OctaneWrapper.OctaneInternalConfiguration octaneInternalConfiguration;
 
-    private final static OctaneCustomSettings defaultOctaneSettings = new OctaneCustomSettings();
 
     // functions
-    private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId, long workId) {
+    private Octane(OctaneWrapper.OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId, long workId) {
         this.octaneInternalConfiguration = octaneInternalConfiguration;
         urlDomain = domain;
         idsharedSpaceId = sharedSpaceId;
@@ -91,11 +85,11 @@ public class Octane {
         logger.info("Setting context to: domain=" + urlDomain + "; spaceid=" + idsharedSpaceId + "; workspaceid=" + workSpaceId);
     }
 
-    private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId) {
+    private Octane(OctaneWrapper.OctaneInternalConfiguration octaneInternalConfiguration, String domain, String sharedSpaceId) {
         this(octaneInternalConfiguration, domain, sharedSpaceId, ONLY_SHAREDSPACE_WORKSPACE_ID);
     }
 
-    private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain) {
+    private Octane(OctaneWrapper.OctaneInternalConfiguration octaneInternalConfiguration, String domain) {
         this(octaneInternalConfiguration, domain, null);
     }
 
@@ -113,8 +107,8 @@ public class Octane {
      * @return A new EntityList object that list of entities
      */
     public EntityList entityList(String entityName) {
-        return OctaneClassFactory.getImplementation(octaneInternalConfiguration.octaneClassFactoryClassName)
-                .getEntityList(octaneInternalConfiguration.octaneHttpClient, getBaseDomainFormat(), entityName);
+        return OctaneClassFactory.getImplementation(octaneInternalConfiguration.getOctaneClassFactoryClassName())
+                .getEntityList(octaneInternalConfiguration.getOctaneHttpClient(), getBaseDomainFormat(), entityName);
     }
 
     /**
@@ -125,8 +119,8 @@ public class Octane {
      * @return The instance that can then be set as the context
      */
     public <T extends TypedEntityList> T entityList(Class<T> entityListClass) {
-        return OctaneClassFactory.getImplementation(octaneInternalConfiguration.octaneClassFactoryClassName)
-                .getEntityList(octaneInternalConfiguration.octaneHttpClient, getBaseDomainFormat(), entityListClass);
+        return OctaneClassFactory.getImplementation(octaneInternalConfiguration.getOctaneClassFactoryClassName())
+                .getEntityList(octaneInternalConfiguration.getOctaneHttpClient(), getBaseDomainFormat(), entityListClass);
     }
 
     /**
@@ -141,7 +135,7 @@ public class Octane {
      * @return A new Metadata object that holds the metadata context
      */
     public Metadata metadata() {
-        return new Metadata(octaneInternalConfiguration.octaneHttpClient, getBaseDomainFormat());
+        return new Metadata(octaneInternalConfiguration.getOctaneHttpClient(), getBaseDomainFormat());
     }
 
     /**
@@ -187,11 +181,11 @@ public class Octane {
      * Signs out of the Octane server.  Any cookies that are held are deleted
      */
     public void signOut() {
-        octaneInternalConfiguration.octaneHttpClient.signOut();
+        // octaneInternalConfiguration.octaneHttpClient.signOut();
     }
 
     /**
-     * This class is used to create an {@link Octane} instance for normal API usage.  It is initialised using the correct {@link Authentication}
+     * This class is used to create an {@link Octane} instance for normal API usage.  It is initialised using the correct Authentication instance
      * <br>
      * The {@code Builder} class uses the builder pattern.  This builds up the correct Octane REST API context.  It is not
      * necessary to add a sharedspace or workspace and will work with entities under that context.
@@ -203,39 +197,21 @@ public class Octane {
     public static class Builder {
         //Private
         private final Logger logger = LoggerFactory.getLogger(Octane.class.getName());
-        private String urlDomain = "";
+        private final String urlDomain;
+        private final OctaneWrapper.OctaneInternalConfiguration octaneInternalConfiguration;
         private String idsharedSpaceId = null;
         private long workSpaceId = 0;
-        private OctaneHttpClient octaneHttpClient;
-        private final Authentication authentication;
-        private String octaneClassFactoryClassName;
-        private OctaneCustomSettings customSettings;
 
         //Functions
 
         /**
          * Creates a new Builder object using the correct authentication
          *
-         * @param authentication - Authentication object.  Cannot be null
          * @throws NullPointerException if the authentication object is null
          */
-        public Builder(Authentication authentication) {
-            assert authentication != null;
-            this.authentication = authentication;
-        }
-
-        /**
-         * Creates a new Builder object using the correct authentication
-         *
-         * @param authentication   - Authentication object.  Cannot be null
-         * @param octaneHttpClient - Implementation of {@link OctaneHttpClient}. Cannot be null
-         * @throws AssertionError if the authentication or octaneHttpClient is null
-         */
-        public Builder(Authentication authentication, OctaneHttpClient octaneHttpClient) {
-            assert authentication != null;
-            assert octaneHttpClient != null;
-            this.authentication = authentication;
-            this.octaneHttpClient = octaneHttpClient;
+        public Builder(final OctaneWrapper.OctaneInternalConfiguration octaneInternalConfiguration, final String urlDomain) {
+            this.octaneInternalConfiguration = octaneInternalConfiguration;
+            this.urlDomain = urlDomain;
         }
 
         /**
@@ -282,98 +258,20 @@ public class Octane {
         }
 
         /**
-         * Sets the domain and the port.  The domain should include the full http scheme (http/https)
-         * <br>
-         * eg {@code http://octane.server.com}
-         *
-         * @param domain - domain name including http scheme
-         * @param port   - port number
-         * @return this object
-         * @throws NullPointerException if the domain is null
-         */
-        public Builder Server(String domain, int port) {
-
-            urlDomain = domain + ":" + port;
-
-            return this;
-        }
-
-        /**
-         * Sets the domain and the port.  The domain should include the full http scheme (http/https)
-         * <br>
-         * eg {@code http://octane.server.com}
-         *
-         * @param domain - domain name including http scheme
-         * @return this object
-         * @throws NullPointerException if the domain is null
-         */
-        public Builder Server(String domain) {
-
-            urlDomain = domain;
-
-            return this;
-        }
-
-        /**
-         * Sets the OctaneClassFactoryName.
-         * See {@link OctaneClassFactory} for more details
-         *
-         * @param octaneClassFactoryClassName The name of the {@link OctaneClassFactory} to use
-         * @return An instance of this builder object
-         */
-        public Builder OctaneClassFactoryClassName(String octaneClassFactoryClassName) {
-            this.octaneClassFactoryClassName = octaneClassFactoryClassName;
-
-            return this;
-        }
-
-        /**
-         * Sets the {@link OctaneHttpClient} instance.
-         *
-         * @param octaneHttpClient The instance to use
-         * @return An instance of this builder object
-         */
-        public Builder OctaneHttpClient(OctaneHttpClient octaneHttpClient) {
-            this.octaneHttpClient = octaneHttpClient;
-
-            return this;
-        }
-
-        /**
-         * Configure a settings provider with custom settings like: readTimeout
-         * @param settings - a plain java object with timeout settings(for now)
-         * @return An instance of this builder object
-         */
-        public Builder settings(OctaneCustomSettings settings) {
-
-            customSettings = settings;
-
-            return this;
-        }
-
-        /**
          * The main build procedure which creates the {@link Octane} object and authenticates against the server
          *
          * @return a new Octane instance which has the set context and is correctly authenticated
          */
         public Octane build() {
 
-            Octane objOctane = null;
+            Octane objOctane;
 
             logger.info("Building Octane context using {}", this);
 
-            final OctaneInternalConfiguration octaneInternalConfiguration = new OctaneInternalConfiguration();
-            // Init default http client if it wasn't specified
-            OctaneCustomSettings settings = customSettings != null ? customSettings : defaultOctaneSettings;
-            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, authentication, settings) : this.octaneHttpClient;
-            octaneInternalConfiguration.octaneClassFactoryClassName = this.octaneClassFactoryClassName;
-
-            if (octaneInternalConfiguration.octaneHttpClient.authenticate()) {
-                if (idsharedSpaceId == null) {
-                    objOctane = new Octane(octaneInternalConfiguration, urlDomain);
-                } else {
-                    objOctane = new Octane(octaneInternalConfiguration, urlDomain, idsharedSpaceId, workSpaceId);
-                }
+            if (idsharedSpaceId == null) {
+                objOctane = new Octane(octaneInternalConfiguration, urlDomain);
+            } else {
+                objOctane = new Octane(octaneInternalConfiguration, urlDomain, idsharedSpaceId, workSpaceId);
             }
 
             return objOctane;
@@ -385,60 +283,5 @@ public class Octane {
         }
     }
 
-    /**
-     * Used to aggregate internal configurations that need to be passed around
-     */
-    public static final class OctaneInternalConfiguration {
-        private OctaneHttpClient octaneHttpClient;
-        private String octaneClassFactoryClassName;
 
-        /**
-         * Returns the instance of the {@link OctaneHttpClient}
-         *
-         * @return instance
-         */
-        public OctaneHttpClient getOctaneHttpClient() {
-            return octaneHttpClient;
-        }
-
-        /**
-         * Returns the class string of the {@link OctaneClassFactory}
-         *
-         * @return class string
-         */
-        public String getOctaneClassFactoryClassName() {
-            return octaneClassFactoryClassName;
-        }
-    }
-
-    /**
-     * Octane settings holder containing lower level configurations
-     */
-    public static class OctaneCustomSettings {
-
-        public enum Setting {
-            READ_TIMEOUT,
-            CONNECTION_TIMEOUT,
-            TRUST_ALL_CERTS,
-            SHARED_HTTP_TRANSPORT
-        }
-
-        private final Map<Setting, Object> settings = new HashMap<>();
-
-        // Initialize defaults
-        {
-            settings.put(Setting.READ_TIMEOUT, 60000);
-            settings.put(Setting.CONNECTION_TIMEOUT, 10000);
-            settings.put(Setting.TRUST_ALL_CERTS, false);
-            settings.put(Setting.SHARED_HTTP_TRANSPORT, null);
-        }
-
-        public void set(Setting setting, Object value) {
-            settings.put(setting, value);
-        }
-
-        public Object get(Setting setting) {
-            return settings.get(setting);
-        }
-    }
 }

@@ -16,7 +16,9 @@ package com.hpe.adm.nga.sdk.network;
 import com.hpe.adm.nga.sdk.APIMode;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * HTTP request.
@@ -39,6 +41,7 @@ public abstract class OctaneHttpRequest {
     private final String requestUrl;
     private final OctaneRequestMethod octaneRequestMethod;
     private Set<APIMode> httpHeaders = new HashSet<>();
+    private boolean isSensitive = false;
 
     private OctaneHttpRequest(String requestUrl, OctaneRequestMethod octaneRequestMethod) {
         this.requestUrl = requestUrl;
@@ -61,9 +64,17 @@ public abstract class OctaneHttpRequest {
         return octaneRequestMethod;
     }
 
+    public boolean isSensitive() {
+        return isSensitive;
+    }
+
+    public void setSensitive(boolean sensitive) {
+        isSensitive = sensitive;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof OctaneHttpRequest)) return false;
+        if (!(obj instanceof OctaneHttpRequest)) return false;
         final OctaneHttpRequest that = (OctaneHttpRequest) obj;
         return octaneRequestMethod == that.octaneRequestMethod && requestUrl.equals(that.requestUrl);
     }

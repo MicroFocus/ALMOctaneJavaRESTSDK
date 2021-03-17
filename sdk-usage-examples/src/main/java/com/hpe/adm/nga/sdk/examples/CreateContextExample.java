@@ -14,7 +14,7 @@
 package com.hpe.adm.nga.sdk.examples;
 
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.OctaneWrapper;
 import com.hpe.adm.nga.sdk.authentication.SimpleClientAuthentication;
 
 /**
@@ -31,16 +31,20 @@ public class CreateContextExample {
     public void createContext() {
         // two types of authentication
         // 1) API Key
-        Authentication clientAuthentication = new SimpleClientAuthentication("clientId", "clientSecret");
+        SimpleClientAuthentication clientAuthentication = new SimpleClientAuthentication("clientId", "clientSecret");
 
         // 2) User/pass
         //Authentication userPassAuthentication = new SimpleUserAuthentication("user", "password");
 
-        // get instance of Octane Builder
-        final Octane.Builder octaneBuilder = new Octane.Builder(clientAuthentication);
+        // get instance of OctaneWrapper Builder
+        final OctaneWrapper.Builder octaneWrapperBuilder = new OctaneWrapper.Builder();
+        // add authentication and get instance of the correct wrapper
+        final OctaneWrapper.ExplicitAuthenticationOctaneWrapperBuilder explicitAuthenticationOctaneWrapperBuilder = octaneWrapperBuilder.authentication(clientAuthentication);
 
         // now we can add the server
-        octaneBuilder.Server("http://myd-vm10632.hpeswlab.net:8081");
+        explicitAuthenticationOctaneWrapperBuilder.Server("http://myd-vm10632.hpeswlab.net:8081");
+        // now we can the instance of Octane builder
+        final Octane.Builder octaneBuilder = explicitAuthenticationOctaneWrapperBuilder.build().octane();
         // the sharedspace
         octaneBuilder.sharedSpace(1001);
         // the workspace
@@ -50,7 +54,7 @@ public class CreateContextExample {
 
         Octane octane = octaneBuilder.build();
 
-       // octane.entityList("defects").get().limit(2).execute();
+        // octane.entityList("defects").get().limit(2).execute();
         octane.entityList("defects").get().execute();
     }
 

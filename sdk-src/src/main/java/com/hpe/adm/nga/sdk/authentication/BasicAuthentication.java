@@ -18,7 +18,7 @@ import com.hpe.adm.nga.sdk.APIMode;
 /**
  * Represents basic authentication
  */
-public abstract class BasicAuthentication extends Authentication {
+public abstract class BasicAuthentication extends AuthenticationWithAPIMode {
 
     /**
      * Represents basic authentication
@@ -26,7 +26,7 @@ public abstract class BasicAuthentication extends Authentication {
      * @param apiMode The mode to use if necessary
      */
     BasicAuthentication(final APIMode apiMode) {
-        super(apiMode, true);
+        super(apiMode);
     }
 
     /**
