@@ -15,7 +15,6 @@ package com.hpe.adm.nga.sdk.entities.update;
 
 import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
-import com.hpe.adm.nga.sdk.entities.get.GetEntities;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -81,11 +80,17 @@ public class UpdateEntities {
 
     /**
      * Append a new path element, for special cases
+     *
      * @param path The new path section to be added
      * @return this
      */
     public UpdateEntities addPath(String path) {
         octaneRequest.getOctaneUrl().getPaths().add(path);
+        return this;
+    }
+
+    public final UpdateEntities apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
         return this;
     }
 }

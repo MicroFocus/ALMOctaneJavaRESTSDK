@@ -14,7 +14,6 @@
 package com.hpe.adm.nga.sdk.entities.delete;
 
 import com.hpe.adm.nga.sdk.APIMode;
-import com.hpe.adm.nga.sdk.entities.get.GetEntity;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -51,11 +50,17 @@ public class DeleteEntity {
 
     /**
      * Append a new path element, for special cases
+     *
      * @param path The new path section to be added
      * @return this
      */
     public DeleteEntity addPath(String path) {
         octaneRequest.getOctaneUrl().getPaths().add(path);
+        return this;
+    }
+
+    public final DeleteEntity apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
         return this;
     }
 }

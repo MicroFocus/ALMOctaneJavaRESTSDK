@@ -25,7 +25,7 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
  * @param <T> The type of the entity model
  * @see DeleteEntity for the non typed version
  */
-public abstract class DeleteTypedEntity<T extends TypedEntityModel> extends TypedEntityList.TypedEntityRequest<T> {
+public abstract class DeleteTypedEntity<T extends TypedEntityModel, E extends DeleteTypedEntity> extends TypedEntityList.TypedEntityRequest<T> {
     private final OctaneRequest octaneRequest;
 
     protected DeleteTypedEntity(final Class<T> typedEntityModelClass, final OctaneHttpClient octaneHttpClient, final String urlDomain, final String entityId) {
@@ -48,10 +48,16 @@ public abstract class DeleteTypedEntity<T extends TypedEntityModel> extends Type
      *
      * @return The entity
      */
-    public final T execute(APIMode header)  {
+    public final T execute(APIMode header) {
         octaneRequest.addHeader(header);
         T result = execute();
         octaneRequest.removeHeader(header);
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public final E apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
+        return (E) this;
     }
 }

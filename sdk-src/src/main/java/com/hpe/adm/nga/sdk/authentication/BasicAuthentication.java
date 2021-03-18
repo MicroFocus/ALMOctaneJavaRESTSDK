@@ -13,21 +13,10 @@
  */
 package com.hpe.adm.nga.sdk.authentication;
 
-import com.hpe.adm.nga.sdk.APIMode;
-
 /**
  * Represents basic authentication
  */
-public abstract class BasicAuthentication extends AuthenticationWithAPIMode {
-
-    /**
-     * Represents basic authentication
-     *
-     * @param apiMode The mode to use if necessary
-     */
-    BasicAuthentication(final APIMode apiMode) {
-        super(apiMode);
-    }
+public abstract class BasicAuthentication {
 
     /**
      * The id that is used for the authentication

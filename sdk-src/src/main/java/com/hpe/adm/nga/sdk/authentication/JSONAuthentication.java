@@ -14,19 +14,13 @@
 
 package com.hpe.adm.nga.sdk.authentication;
 
-import com.hpe.adm.nga.sdk.APIMode;
-
 /**
  * An abstract class to use the authentication with a mode set for implementing JSON Authentication
  * This can be overidden if the authentication details are kept obtained in a different manner
  */
-abstract class JSONAuthentication extends AuthenticationWithAPIMode implements ExplicitAuthentication {
+abstract class JSONAuthentication implements ExplicitAuthentication {
 
     private static final String JSON_STRING = "{\"%s\":\"%s\",\"%s\":\"%s\"}";
-
-    JSONAuthentication(final APIMode apiMode) {
-        super(apiMode);
-    }
 
     /**
      * Returns the authentication string for most authentication purposes.

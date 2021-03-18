@@ -128,4 +128,10 @@ public abstract class GetTypedEntities<T extends TypedEntityModel, E extends Get
         octaneRequest.getOctaneUrl().setDqlQueryParam(query);
         return (E) this;
     }
+
+    @SuppressWarnings("unchecked")
+    public final E apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
+        return (E) this;
+    }
 }

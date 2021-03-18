@@ -70,12 +70,19 @@ public abstract class CreateTypedEntities<T extends TypedEntityModel, E extends 
 
     /**
      * Adds the entities to be sent to the server to be created
+     *
      * @param entities A collection of entities
      * @return this instance
      */
     @SuppressWarnings("unchecked")
     public final E entities(Collection<T> entities) {
         entityModels = entities;
+        return (E) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public final E apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
         return (E) this;
     }
 }

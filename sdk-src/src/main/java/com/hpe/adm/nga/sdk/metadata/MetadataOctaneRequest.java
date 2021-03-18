@@ -13,6 +13,7 @@
  */
 package com.hpe.adm.nga.sdk.metadata;
 
+import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import com.hpe.adm.nga.sdk.query.Query;
@@ -48,6 +49,11 @@ abstract class MetadataOctaneRequest {
             octaneRequest.getOctaneUrl().setDqlQueryParam(builder.build());
             return this;
         }
+    }
+
+    final MetadataOctaneRequest apiMode(final APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
+        return this;
     }
 
 }

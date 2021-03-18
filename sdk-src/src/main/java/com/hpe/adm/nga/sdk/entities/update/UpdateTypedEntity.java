@@ -70,4 +70,10 @@ public abstract class UpdateTypedEntity<T extends TypedEntityModel, E extends Up
         this.entityModel = entityModel;
         return (E) this;
     }
+
+    @SuppressWarnings("unchecked")
+    public final E apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
+        return (E) this;
+    }
 }

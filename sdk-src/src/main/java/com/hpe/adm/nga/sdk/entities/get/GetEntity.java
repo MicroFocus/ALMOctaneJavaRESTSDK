@@ -63,11 +63,17 @@ public class GetEntity {
 
     /**
      * Append a new path element, for special cases
+     *
      * @param path The new path section to be added
      * @return this
      */
     public GetEntity addPath(String path) {
         octaneRequest.getOctaneUrl().getPaths().add(path);
+        return this;
+    }
+
+    public GetEntity apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
         return this;
     }
 }

@@ -15,7 +15,6 @@ package com.hpe.adm.nga.sdk.entities.get;
 
 import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.entities.TypedEntityList;
-import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.TypedEntityModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneRequest;
@@ -68,6 +67,12 @@ public abstract class GetTypedEntity<T extends TypedEntityModel, E extends GetTy
     @SuppressWarnings("unchecked")
     public final E addFields(final F... fields) {
         GetTypedHelper.addFields(octaneRequest, fields);
+        return (E) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public final E apiMode(APIMode apiMode) {
+        octaneRequest.addHeader(apiMode);
         return (E) this;
     }
 }
