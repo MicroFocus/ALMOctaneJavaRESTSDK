@@ -237,6 +237,7 @@ public class GenerateModels {
             phaseValueSet.add(new String[]{phase.getId(), ((StringFieldModel) phase.getValue("name")).getValue()
                     .replaceAll(" ", "_")
                     .replaceAll("&", "N")
+                    .replaceAll("/", "_")
                     .toUpperCase()});
             phaseMap.merge(GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(), true), phaseValueSet, (existingValues, newValues) -> {
                 existingValues.addAll(newValues);
