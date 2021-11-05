@@ -26,12 +26,6 @@ import java.util.List;
  */
 public final class UpdateTestScriptModel extends TypedEntityModel {
 
-    @Nullable
-    @Override
-    public String getId() {
-        return null;
-    }
-
     /**
      * Represents the revision type (see Octane test script documentation)
      */

@@ -49,11 +49,22 @@ public abstract class TypedEntityModel implements Entity {
     }
 
     /**
+     * Returns the id of this entity
+     * @return The entity id
+     */
+    @Override
+    public final String getId() {
+        FieldModel<?> id = wrappedEntityModel.getValue("id");
+        return id == null ? null : id.getValue().toString();
+    }
+
+    /**
      * Returns the type of this entity
      * @return The entity type
      */
     @Override
     public final String getType() {
-        return ((StringFieldModel) wrappedEntityModel.getValue("type")).getValue();
+        FieldModel<?> id = wrappedEntityModel.getValue("type");
+        return id == null ? null : id.getValue().toString();
     }
 }
