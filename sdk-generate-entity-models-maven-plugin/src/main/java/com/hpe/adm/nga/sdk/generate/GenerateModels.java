@@ -266,7 +266,11 @@ public class GenerateModels {
                     } else if (fieldMetadata1.getFieldType() == FieldMetadata.FieldType.Reference) {
                         if ((!entityMetadatum.getName().equals("list_node")) && (fieldMetadata1.getFieldTypedata().getTargets()[0].getType().equals("list_node"))) {
                             final String listName = logicalNameToListsMap.get(fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName());
-                            references.add(listName);
+                            if (fieldMetadata1.getFieldTypedata().isMultiple()) {
+                                references.add("java.util.Collection<" + listName + ">");
+                            } else {
+                                references.add(listName);
+                            }
                         } else {
                             final GeneratorHelper.ReferenceMetadata referenceMetadata = GeneratorHelper.getAllowedSuperTypesForReference(fieldMetadata1, entityMetadata);
                             if (fieldMetadata1.getFieldTypedata().isMultiple()) {
