@@ -28,6 +28,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by dherasymchuk on 12/29/2016.
@@ -96,8 +97,9 @@ public class TestLogicalOperators extends TestBase {
         Collection<EntityModel> generatedEntity2 = DataGenerator.generateEntityModel(octane, "defects", fields);
         Collection<EntityModel> createdEntities2 = DataGenerator.getAllDataForEntities(octane.entityList("defects").create().entities(generatedEntity2).execute(), octane, "defects");
         createdEntities.addAll(createdEntities2);
+        createdEntities = octane.entityList("defects").get().addFields("name").query(Query.statement("id", QueryMethod.In,
+                createdEntities.stream().map(EntityModel::getId).toArray()).build()).execute();
         defectIds.addAll(CommonUtils.getIdFromEntityModelCollection(createdEntities));
-        createdEntities = octane.entityList("defects").get().addFields("name").query(Query.statement("id", QueryMethod.In, defectIds.toArray()).build()).execute();
         defectNames.addAll(CommonUtils.getValuesFromEntityModelCollection(createdEntities, "name"));
     }
 
