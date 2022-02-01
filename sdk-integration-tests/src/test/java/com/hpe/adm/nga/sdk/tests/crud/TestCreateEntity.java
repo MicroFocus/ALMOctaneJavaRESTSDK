@@ -42,7 +42,7 @@ public class TestCreateEntity extends TestBase {
         EntityModel entityModel = entityModels.iterator().next();
         String entityId = CommonUtils.getIdFromEntityModel(entityModel);
 
-        EntityModel getEntity = entityList.at(entityId).get().execute();
+        EntityModel getEntity = entityList.at(entityId).get().addFields("parent", "name").execute();
 
         Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
     }
@@ -54,7 +54,7 @@ public class TestCreateEntity extends TestBase {
         List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
         Query query = QueryUtils.getQueryForIds(entityIds);
 
-        Collection<EntityModel> getEntity = entityList.get().query(query).execute();
+        Collection<EntityModel> getEntity = entityList.get().addFields("parent", "name").query(query).execute();
 
         Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(generatedEntity, getEntity));
     }

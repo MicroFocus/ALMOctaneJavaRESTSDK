@@ -54,7 +54,7 @@ public class TestUpdateEntity extends TestBase {
 
         entityList.at(entityId).update().entity(updatedEntity).execute();
 
-        EntityModel getEntity = entityList.at(entityId).get().execute();
+        EntityModel getEntity = entityList.at(entityId).get().addFields("name").execute();
 
         Assert.assertTrue(CommonUtils.isEntityAInEntityB(updatedEntity, getEntity));
     }
@@ -82,7 +82,7 @@ public class TestUpdateEntity extends TestBase {
 
         entityList.update().entities(updatedEntityCollection).execute();
 
-        Collection<EntityModel> getEntity = entityList.get().query(query).execute();
+        Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query).execute();
 
         Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
 
@@ -112,7 +112,7 @@ public class TestUpdateEntity extends TestBase {
 
         octane.entityList(entityName).update().entities(updatedEntityCollection).query(query).execute();
 
-        Collection<EntityModel> getEntity = octane.entityList(entityName).get().query(query).execute();
+        Collection<EntityModel> getEntity = octane.entityList(entityName).get().addFields("end_date").query(query).execute();
 
         Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
     }
