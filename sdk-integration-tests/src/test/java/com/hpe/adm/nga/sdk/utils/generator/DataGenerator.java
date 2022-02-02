@@ -87,7 +87,7 @@ public class DataGenerator {
 
 
     private static EntityModel generatePA(Octane octane, Set<FieldModel> fields) {
-        Collection<EntityModel> pas = octane.entityList("product_areas").get().execute();
+        Collection<EntityModel> pas = octane.entityList("product_areas").get().addFields("parent").execute();
         EntityModel parentEntity = CommonUtils.getEntityWithStringValue(pas, "parent", null);
         String parentId = CommonUtils.getIdFromEntityModel(parentEntity);
         FieldModel<String> name = new StringFieldModel("name", "sdk_pa_" + UUID.randomUUID());

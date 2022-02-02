@@ -66,14 +66,16 @@ public class TestSupportFiltering extends TestBase {
         Set<FieldModel> fields = new HashSet<>();
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName, fields);
         Collection<EntityModel> entityModels = DataGenerator.getAllDataForEntities(entityList.create().entities(generatedEntity).execute(),octane,entityName);
+        entityModels = octane.entityList(entityName).get().addFields("name")
+                .query(Query.statement("id", QueryMethod.In, entityModels.stream().map(EntityModel::getId).toArray()).build()).execute();
         EntityModel entityModel = entityModels.iterator().next();
         String entityName = CommonUtils.getValueFromEntityModel(entityModel, "name");
 
         Query query = getQuery(entityName, logicalOperation);
 
-        Collection<EntityModel> getEntity = entityList.get().query(query).execute();
+        Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query).execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(generatedEntity, getEntity));
+        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModels, getEntity));
     }
 
     private Query getQuery(String entityName, String logicalOperation) {

@@ -49,7 +49,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByOneFieldAscending() throws Exception {
 
-        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("name", true).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name").query(idQuery).addOrderBy("name", true).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
@@ -59,7 +59,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByOneFieldDescending() throws Exception {
 
-        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("name", false).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name").query(idQuery).addOrderBy("name", false).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
@@ -69,7 +69,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByTwoFieldAscending() throws Exception {
 
-        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("end_date,name", true).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name", "end_date").query(idQuery).addOrderBy("end_date,name", true).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
@@ -79,7 +79,7 @@ public class TestOrderBy extends TestBase {
     @Test
     public void orderByTwoFieldDescending() throws Exception {
 
-        Collection<EntityModel> entityModels = octane.entityList("releases").get().query(idQuery).addOrderBy("end_date", true).addOrderBy("name", false).execute();
+        Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name", "end_date").query(idQuery).addOrderBy("end_date", true).addOrderBy("name", false).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
