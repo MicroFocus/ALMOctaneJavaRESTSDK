@@ -46,7 +46,7 @@ public interface APIMode {
 
         @Override
         public String getHeaderKey() {
-            return "ALM_OCTANE_TECH_PREVIEW";
+            return "ALM-OCTANE-TECH-PREVIEW";
         }
     };
 
