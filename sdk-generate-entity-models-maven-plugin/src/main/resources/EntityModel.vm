@@ -68,10 +68,10 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
 
 #macro (getPhase)
 public com.hpe.adm.nga.sdk.enums.Phases.${className}Phase getPhase() {
-    final ReferenceFieldModel phase = (ReferenceFieldModel) wrappedEntityModel.getValue("phase");
-    if (phase == null) {
+    if (wrappedEntityModel.getValue("phase") instanceof EmptyFieldModel) {
         return null;
     }
+    final ReferenceFieldModel phase = (ReferenceFieldModel) wrappedEntityModel.getValue("phase");
     final EntityModel referenceFieldModel = phase.getValue();
     return com.hpe.adm.nga.sdk.enums.Phases.${className}Phase.getFromEntityModel(referenceFieldModel);
 }
@@ -92,10 +92,11 @@ public com.hpe.adm.nga.sdk.enums.Phases.${className}Phase getPhase() {
 
 #macro (getSingleListNode $field $listName)
 public ${listName} get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
-    final ReferenceFieldModel ${GeneratorHelper.getSanitisedFieldName(${field.name})} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
-    if (${GeneratorHelper.getSanitisedFieldName(${field.name})} == null) {
+    if (wrappedEntityModel.getValue("${field.name}") instanceof EmptyFieldModel) {
         return null;
     }
+
+    final ReferenceFieldModel ${GeneratorHelper.getSanitisedFieldName(${field.name})} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
     final EntityModel referenceFieldModel = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
     return ${listName}.getFromEntityModel(referenceFieldModel);
 
@@ -124,14 +125,14 @@ public ${GeneratorHelper.getFieldTypeAsJava(${field.getFieldType()})} get${Gener
 #macro (getSingleReference $field $referenceMetadata)
 #multipleReferenceAnnotations (${referenceMetadata})
 public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper.camelCaseFieldName(${field.name})}(){
+    if (wrappedEntityModel.getValue("${field.name}") instanceof EmptyFieldModel) {
+        return null;
+    }
     final ReferenceFieldModel ${GeneratorHelper.getSanitisedFieldName(${field.name})} = (ReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
-		if (${GeneratorHelper.getSanitisedFieldName(${field.name})} == null) {
-            return null;
-		}
-		final EntityModel referenceFieldModel = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
-        #if (${referenceMetadata.hasTypedReturn()} && ${referenceMetadata.getReferenceTypes().size()} > 1)
-final StringFieldModel type = (StringFieldModel) referenceFieldModel.getValue("type");
-		final String referenceType = type.getValue();
+	final EntityModel referenceFieldModel = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
+    #if (${referenceMetadata.hasTypedReturn()} && ${referenceMetadata.getReferenceTypes().size()} > 1)
+    final StringFieldModel type = (StringFieldModel) referenceFieldModel.getValue("type");
+	final String referenceType = type.getValue();
             #foreach($type in ${referenceMetadata.getReferenceTypes()})
 #if($foreach.count > 1)else #{end}if (referenceType.equals("${type}")) {
 			    return (T) new ${GeneratorHelper.camelCaseFieldName(${type})}EntityModel(referenceFieldModel);
