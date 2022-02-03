@@ -62,7 +62,7 @@ public class OctanePartialException extends RuntimeException{
 		return errors.stream()
 				.map(errorModel -> {
 					if (errorModel == null) {
-						return "No error.";
+						return "Unknown error.";
 					}
 					return errorModel.toString();
 				}).collect(Collectors.joining(".\n", "Errors:\n", "."));

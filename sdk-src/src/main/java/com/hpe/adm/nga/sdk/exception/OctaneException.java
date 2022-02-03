@@ -46,7 +46,7 @@ public class OctaneException extends RuntimeException {
 	@Override
 	public String getMessage() {
 		if (errorModel == null) {
-			return "No error.";
+			return "Unknown error.";
 		}
 		return errorModel.toString();
 	}
