@@ -17,6 +17,7 @@ import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.ErrorModel;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -26,22 +27,20 @@ import java.util.Collection;
  */
 public class OctanePartialException extends RuntimeException{
 
-	private Collection<EntityModel> entities = null;
-	private Collection<ErrorModel> errors = null;
-	
+	private final Collection<EntityModel> entities;
+	private final Collection<ErrorModel> errors;
+
 	/**
 	 * Creates a new OctanePartialException object based on errors and entities models
-	 * 
+	 *
 	 * @param errorModels - error models
-	 * @param entities - entities models  
+	 * @param entities - entities models
 	 */
 	public OctanePartialException(Collection<ErrorModel> errorModels, Collection<EntityModel> entities){
-		
-		setEntitiesModels(entities);
-		setErrorModels(errorModels);
-		
+		this.errors = errorModels;
+		this.entities = entities;
 	}
-	
+
 	/**
 	 * getter of collection of entities models
 	 * @return collection of entities models
@@ -49,15 +48,7 @@ public class OctanePartialException extends RuntimeException{
 	public Collection<EntityModel> getEntitiesModels(){
 		return entities;
 	}
-	
-	/**
-	 * setter of collection of entities models
-	 *
-	 */
-	private void setEntitiesModels(Collection<EntityModel> entCollection){
-		entities = entCollection;
-	}
-	
+
 	/**
 	 * getter of collection of error models
 	 * @return the error models
@@ -65,14 +56,16 @@ public class OctanePartialException extends RuntimeException{
 	public Collection<ErrorModel> getErrorModels(){
 		return errors;
 	}
-	
-	/**
-	 * setter of collection of error models
-	 *
-	 */
-	private void setErrorModels(Collection<ErrorModel> errorModels){
-		errors = errorModels;
+
+	@Override
+	public String getMessage() {
+		return errors.stream()
+				.map(errorModel -> {
+					if (errorModel == null) {
+						return "No error.";
+					}
+					return errorModel.toString();
+				}).collect(Collectors.joining(".\n", "Errors:\n", "."));
 	}
-		
-		
+
 }
