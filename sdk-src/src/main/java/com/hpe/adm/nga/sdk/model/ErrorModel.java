@@ -25,6 +25,7 @@ import java.util.Set;
 public class ErrorModel extends EntityModel{
 
 	public static final String HTTP_STATUS_CODE_PROPERTY_NAME = "http_status_code";
+	public static final String STACK_TRACE_PROPERTY_NAME = "stack_trace";
 
 	/**
 	 * Creates a new ErrorModel object with given field models
@@ -39,6 +40,7 @@ public class ErrorModel extends EntityModel{
 	@Override
 	public String toString() {
 		JSONObject jsonObject = ModelParser.getInstance().getEntityJSONObject(this);
+		jsonObject.remove(STACK_TRACE_PROPERTY_NAME);
 		return jsonObject.toString();
 	}
 
