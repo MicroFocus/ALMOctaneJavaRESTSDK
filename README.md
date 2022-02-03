@@ -189,6 +189,10 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* 16.0.300
+  * Fixed ClassCastException on EmptyFieldModel [Issue 133](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/133)
+  * Replaced `/` with `_` in list name generation [Issue 124](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/124)
+  * Added OctanePartialException message [Issue 132](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/132)
 * 15.1.60
   * Added support for [Basic Authentication](https://admhelp.microfocus.com/octane/en/15.1.60/Online/Content/API/Authenticate.htm#mt-item-2).
     If the Octane space parameter `SUPPORTS_BASIC_AUTHENTICATION` is set to true,  
