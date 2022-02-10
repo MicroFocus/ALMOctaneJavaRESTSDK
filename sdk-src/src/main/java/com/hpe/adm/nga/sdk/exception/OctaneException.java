@@ -23,8 +23,7 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
  */
 public class OctaneException extends RuntimeException {
 
-		
-	private ErrorModel errorModel = null;
+	private final ErrorModel errorModel;
 	
 	/**
 	 * Creates a new OctaneException object based on error model
@@ -33,7 +32,7 @@ public class OctaneException extends RuntimeException {
 	 *   
 	 */
 	public OctaneException(ErrorModel  error){
-		setError(error);
+		this.errorModel = error;
 	}
 	
 	/**
@@ -43,17 +42,12 @@ public class OctaneException extends RuntimeException {
 	public ErrorModel getError(){
 		return errorModel;
 	}
-	
-	/**
-	 * set a new error model
-	 * @param error - error model
-	 */
-	private void setError(ErrorModel error){
-		errorModel = error;
-	}
 
 	@Override
 	public String getMessage() {
+		if (errorModel == null) {
+			return "Unknown error.";
+		}
 		return errorModel.toString();
 	}
 }

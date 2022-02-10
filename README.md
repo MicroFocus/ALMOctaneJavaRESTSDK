@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>15.1.60</version>
+    <version>16.0.300</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '15.1.60'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '16.0.300'
 ```
 
 ## Introduction
@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this, add the following to your project's POM file (assuming 15.1.60 being the SDK version):
+To enable this, add the following to your project's POM file (assuming 16.0.300-SNAPSHOT being the SDK version):
 
 ```xml
  <build>
@@ -59,7 +59,7 @@ To enable this, add the following to your project's POM file (assuming 15.1.60 b
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>15.1.60</version>
+                <version>16.0.300</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -171,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>15.1.60</version>
+            <version>16.0.300</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,6 +189,10 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* 16.0.300
+  * Fixed ClassCastException on EmptyFieldModel [Issue 133](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/133)
+  * Replaced `/` with `_` in list name generation [Issue 124](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/124)
+  * Added OctanePartialException message [Issue 132](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/132)
 * 15.1.60
   * Added support for [Basic Authentication](https://admhelp.microfocus.com/octane/en/15.1.60/Online/Content/API/Authenticate.htm#mt-item-2).
     If the Octane space parameter `SUPPORTS_BASIC_AUTHENTICATION` is set to true,  

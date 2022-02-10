@@ -123,15 +123,6 @@ public class GenerateModels {
      */
     private boolean entityShouldNotBeGenerated(String name) {
         /*
-         * @Since 15.0.20
-         * The run_history's id is integer even though it should be string.  It would be extremely complicated to make a special case for run_history id as long
-         * Therefore until this is fixed in Octane - the entity will be ignored
-         */
-        if (name.equals("run_history")) {
-            return true;
-        }
-
-        /*
          * @Since 15.1.20
          * field_metadata is a special case in that it is used when defining UDFs.  It causes problems in the entity generation due to the list node
          * not having a reference.  It is unlikely that this would be used by the SDK so is ignored for now.  If this does cause an issue we could
@@ -141,21 +132,7 @@ public class GenerateModels {
             return true;
         }
 
-        /*
-         * @Since 15.1.20
-         * log entities have the ID marked as an integer and not as a string.  This causes issues with creating the entity.
-         * A defect has been raised in Octane to fix this
-         */
-        if (name.startsWith("log")) {
-            return true;
-        }
-
-        /*
-         * @Since 15.1.20
-         * This entity "overrides" the type field for its own use which causes issues.
-         * A defect has been raised in Octane to fix this
-         */
-        return name.equals("ci_parameter");
+        return false;
     }
 
     private Map<String, String> generateLists(Octane octane) throws IOException {
@@ -237,6 +214,7 @@ public class GenerateModels {
             phaseValueSet.add(new String[]{phase.getId(), ((StringFieldModel) phase.getValue("name")).getValue()
                     .replaceAll(" ", "_")
                     .replaceAll("&", "N")
+                    .replaceAll("/", "_")
                     .toUpperCase()});
             phaseMap.merge(GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(), true), phaseValueSet, (existingValues, newValues) -> {
                 existingValues.addAll(newValues);
@@ -266,7 +244,11 @@ public class GenerateModels {
                     } else if (fieldMetadata1.getFieldType() == FieldMetadata.FieldType.Reference) {
                         if ((!entityMetadatum.getName().equals("list_node")) && (fieldMetadata1.getFieldTypedata().getTargets()[0].getType().equals("list_node"))) {
                             final String listName = logicalNameToListsMap.get(fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName());
-                            references.add(listName);
+                            if (fieldMetadata1.getFieldTypedata().isMultiple()) {
+                                references.add("java.util.Collection<" + listName + ">");
+                            } else {
+                                references.add(listName);
+                            }
                         } else {
                             final GeneratorHelper.ReferenceMetadata referenceMetadata = GeneratorHelper.getAllowedSuperTypesForReference(fieldMetadata1, entityMetadata);
                             if (fieldMetadata1.getFieldTypedata().isMultiple()) {
@@ -319,8 +301,14 @@ public class GenerateModels {
 
     private Collection<FieldMetadata> sanitiseMetaData(Collection<FieldMetadata> fieldMetadataCollection) {
         return fieldMetadataCollection.stream()
-                // filter out entities that have references without a target - like public to protected
+                // filter out fields that have references without a target - like public to protected
                 .filter(fieldMetadata -> fieldMetadata.getFieldType() != FieldMetadata.FieldType.Reference || fieldMetadata.getFieldTypedata().getTargets() != null)
+                // filter out fields that have references to field_metadata
+                .filter(fieldMetadata -> fieldMetadata.getFieldType() != FieldMetadata.FieldType.Reference || !fieldMetadata.getFieldTypedata().getTargets()[0].getType().startsWith("field_metadata"))
+                // filter out the id field, it is created automatically in the TypedEntityModel
+                .filter(fieldMetadata -> !fieldMetadata.getName().equals("id"))
+                // filter out the type field, it is created automatically in the TypedEntityModel, ci_parameter has a field called type that overrides id
+                .filter(fieldMetadata -> !fieldMetadata.getName().equals("type"))
                 .collect(Collectors.toList());
     }
 

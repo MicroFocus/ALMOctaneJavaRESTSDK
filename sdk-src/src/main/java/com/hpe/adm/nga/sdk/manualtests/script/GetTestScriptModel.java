@@ -38,12 +38,6 @@ public class GetTestScriptModel extends TypedEntityModel {
         super(wrappedEntityModel);
     }
 
-    @Nullable
-    @Override
-    public String getId() {
-        return null;
-    }
-
     /**
      * Label: Creation Time
      * Description: The date and time the script was created, according to the ISO-8601 date format.

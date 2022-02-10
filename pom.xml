@@ -19,7 +19,7 @@
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-root</artifactId>
     <packaging>pom</packaging>
-    <version>15.1.40-SNAPSHOT</version>
+    <version>16.0.300-SNAPSHOT</version>
 
     <name>ALM Octane REST API SDK</name>
     <description>The Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP
@@ -66,14 +66,14 @@
         <java.version>1.8</java.version>
 
         <slf4j.version>1.7.25</slf4j.version>
-        <logback.version>1.1.3</logback.version>
+        <logback.version>1.2.0</logback.version>
 
-        <google-api-client.version>1.30.2</google-api-client.version>
+        <google-api-client.version>1.31.1</google-api-client.version>
         <org-json.version>20160212</org-json.version>
 
         <commons-configuration.version>2.0</commons-configuration.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
-        <commons-io.version>2.6</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
 
         <maven-release.version>2.5.3</maven-release.version>
         <maven-surefire.version>2.19.1</maven-surefire.version>

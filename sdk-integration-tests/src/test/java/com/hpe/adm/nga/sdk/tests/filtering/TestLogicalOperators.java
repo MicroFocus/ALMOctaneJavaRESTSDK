@@ -24,10 +24,13 @@ import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by dherasymchuk on 12/29/2016.
@@ -56,7 +59,7 @@ public class TestLogicalOperators extends TestBase {
     @Test
     public void testQueryWithAnd() {
         Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).build();
-        Collection<EntityModel> getEntity = entityList.get().query(query).execute();
+        Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query).execute();
         Assert.assertEquals("Wrong amount of defects in response", 1, getEntity.size());
         Assert.assertEquals("Wrong defect id in response", defectIds.get(0), CommonUtils.getIdFromEntityModelCollection(getEntity).get(0));
     }
@@ -64,7 +67,7 @@ public class TestLogicalOperators extends TestBase {
     @Test
     public void testQueryWithAndPlusOr() {
         Query query1 = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).or("id", QueryMethod.EqualTo, defectIds.get(1)).and("name", QueryMethod.EqualTo, defectNames.get(1)).build();
-        Collection<EntityModel> getEntity = entityList.get().query(query1).execute();
+        Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query1).execute();
         Assert.assertEquals("Wrong amount of defects in response", 2, getEntity.size());
         Assert.assertTrue("Wrong defect id in response", defectIds.containsAll(CommonUtils.getIdFromEntityModelCollection(getEntity)));
     }
@@ -96,6 +99,8 @@ public class TestLogicalOperators extends TestBase {
         Collection<EntityModel> generatedEntity2 = DataGenerator.generateEntityModel(octane, "defects", fields);
         Collection<EntityModel> createdEntities2 = DataGenerator.getAllDataForEntities(octane.entityList("defects").create().entities(generatedEntity2).execute(), octane, "defects");
         createdEntities.addAll(createdEntities2);
+        createdEntities = octane.entityList("defects").get().addFields("name").query(Query.statement("id", QueryMethod.In,
+                createdEntities.stream().map(EntityModel::getId).toArray()).build()).execute();
         defectIds.addAll(CommonUtils.getIdFromEntityModelCollection(createdEntities));
         defectNames.addAll(CommonUtils.getValuesFromEntityModelCollection(createdEntities, "name"));
     }
