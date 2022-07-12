@@ -13,7 +13,21 @@
  */
 package com.hpe.adm.nga.sdk.network.google;
 
-import com.google.api.client.http.*;
+import com.google.api.client.http.ByteArrayContent;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpContent;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpMediaType;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
+import com.google.api.client.http.HttpStatusCodes;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.InputStreamContent;
+import com.google.api.client.http.MultipartContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
@@ -21,7 +35,11 @@ import com.hpe.adm.nga.sdk.authentication.BasicAuthentication;
 import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
-import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
+import com.hpe.adm.nga.sdk.model.ModelParser;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
@@ -37,7 +55,20 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -74,35 +105,47 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
     private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
 
+    private boolean mustReAuthenticate = false;
+    private List<String> newCookie = new ArrayList<>();
+    private final AtomicInteger runningRequestsCount = new AtomicInteger(0);
+    private boolean isBlockedToRequest = false; // Should be used inside disallowedToRequestLock lock
+    private final ReentrantLock disallowedToRequestLock = new ReentrantLock();
+    private final Condition allowedToRequestCond = disallowedToRequestLock.newCondition();
+    private final Condition noRunningRequestsCond = disallowedToRequestLock.newCondition();
+    private final ReentrantLock isAuthenticatingLock = new ReentrantLock();
+
+    /*
+     * synchronized (this) - for get/set variable(s) with authentication data
+     * synchronized (isAuthenticatingLock) - authentication process in progress
+     * disallowedToRequestLock - TODO Add Description
+     * */
+
     // identity operation by default. do nothing
     private Consumer<HttpRequest> customRequestInitializer = request -> {
     };
 
     private final Consumer<HttpRequest> defaultRequestInitializer = request -> {
-        request.setResponseInterceptor(response -> {
-            // retrieve new LWSSO in response if any
-            HttpHeaders responseHeaders = response.getHeaders();
-            updateLWSSOCookieValue(responseHeaders);
-        });
 
         request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
 
-        final StringBuilder cookieBuilder = new StringBuilder();
-        if (lwssoValue != null && !lwssoValue.isEmpty()) {
-            cookieBuilder.append(LWSSO_COOKIE_KEY).append("=").append(lwssoValue);
-        }
-        if (octaneUserValue != null && !octaneUserValue.isEmpty()) {
-            cookieBuilder.append(";").append(OCTANE_USER_COOKIE_KEY).append("=").append(octaneUserValue);
-        }
-
-        request.getHeaders().setCookie(cookieBuilder.toString());
-
-        if (lastUsedAuthentication != null) {
-            if (lastUsedAuthentication.isBasicAuthentication()) {
-                final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
-                request.getHeaders().setBasicAuthentication(basicAuthentication.getAuthenticationId(), basicAuthentication.getAuthenticationSecret());
+        synchronized (this) {
+            final StringBuilder cookieBuilder = new StringBuilder();
+            if (lwssoValue != null && !lwssoValue.isEmpty()) {
+                cookieBuilder.append(LWSSO_COOKIE_KEY).append("=").append(lwssoValue);
             }
-            lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
+            if (octaneUserValue != null && !octaneUserValue.isEmpty()) {
+                cookieBuilder.append(";").append(OCTANE_USER_COOKIE_KEY).append("=").append(octaneUserValue);
+            }
+
+            request.getHeaders().setCookie(cookieBuilder.toString());
+
+            if (lastUsedAuthentication != null) {
+                if (lastUsedAuthentication.isBasicAuthentication()) {
+                    final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
+                    request.getHeaders().setBasicAuthentication(basicAuthentication.getAuthenticationId(), basicAuthentication.getAuthenticationSecret());
+                }
+                lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
+            }
         }
         request.setReadTimeout(60000);
     };
@@ -146,6 +189,76 @@ public class GoogleHttpClient implements OctaneHttpClient {
         }
     }
 
+    private boolean getIsBlockedToRequest() {
+        return isBlockedToRequest;
+    }
+
+    private void setIsBlockedToRequest(boolean value) {
+        isBlockedToRequest = value;
+    }
+
+    private synchronized boolean getMustReAuthenticate() {
+        return mustReAuthenticate;
+    }
+
+    private synchronized void setMustReAuthenticate(boolean value) {
+        mustReAuthenticate = value;
+        if (value) {
+            newCookie = new ArrayList<>();
+            isBlockedToRequest = true;
+        }
+    }
+
+    private synchronized boolean isReAuthenticated(Date requestDate) {
+        return lastSuccessfulAuthTimestamp.getTime() >= requestDate.getTime();
+    }
+
+    private synchronized List<String> getNewCookie() {
+        return newCookie;
+    }
+
+    private synchronized void setNewCookie(List<String> value) {
+        newCookie = value;
+    }
+
+    private void waitCondition(Lock lock, Condition condition) {
+        lock.lock();
+        try {
+            condition.await();
+        } catch (InterruptedException ignored) {
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void gotNewCookie(List<String> newCookie) {
+        if (!getMustReAuthenticate()) {
+            boolean cookieWasEmpty;
+            synchronized (this) {
+                cookieWasEmpty = getNewCookie().isEmpty();
+                setNewCookie(newCookie);
+            }
+            if (cookieWasEmpty) {
+                disallowedToRequestLock.lock();
+                setIsBlockedToRequest(true);
+                try {
+                    if (runningRequestsCount.get() > 0) {
+                        waitCondition(disallowedToRequestLock, noRunningRequestsCond);
+                    }
+                    List<String> cookie = getNewCookie();
+                    updateLWSSOCookieValue(cookie);
+                    setNewCookie(new ArrayList<>());
+
+                    setIsBlockedToRequest(false);
+                    allowedToRequestCond.signalAll();
+
+                } finally {
+                    disallowedToRequestLock.unlock();
+                }
+            }
+        }
+    }
+
     /**
      * Builds a HttpRequestFactory that accepts self-signed certificates
      *
@@ -186,36 +299,37 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @return - Returns true if the authentication succeeded, false otherwise.
      */
     public synchronized boolean authenticate() {
-        if (lastUsedAuthentication == null) {
-            return false;
-        }
-        if (lastUsedAuthentication.isBasicAuthentication()) {
-            return true;
-        }
-        //reset so it's not sent to auth request, server might return 304
-        lwssoValue = null;
-        octaneUserValue = null;
-        try {
-            final ByteArrayContent content = ByteArrayContent.fromString("application/json", ((JSONAuthentication) lastUsedAuthentication).getAuthenticationString());
-            HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
-
-            // Authenticate request should never set the api mode header.
-            // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
-            // Using this kind of header for future requests will still work.
-            lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
-                    httpRequest.getHeaders().remove(apiMode.getHeaderKey())
-            );
-
-            HttpResponse response = executeRequest(httpRequest);
-
-            if (response.isSuccessStatusCode()) {
-                lastSuccessfulAuthTimestamp = new Date();
-                return true;
-            } else {
+        synchronized (isAuthenticatingLock) {
+            if (lastUsedAuthentication == null) {
                 return false;
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (lastUsedAuthentication.isBasicAuthentication()) {
+                return true;
+            }
+            //reset so it's not sent to auth request, server might return 304
+            lwssoValue = null;
+            octaneUserValue = null;
+            try {
+                final ByteArrayContent content = ByteArrayContent.fromString("application/json", ((JSONAuthentication) lastUsedAuthentication).getAuthenticationString());
+                HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
+
+                // Authenticate request should never set the api mode header.
+                // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
+                // Using this kind of header for future requests will still work.
+                lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
+                        httpRequest.getHeaders().remove(apiMode.getHeaderKey())
+                );
+
+                HttpResponse response = executeRequest(httpRequest);
+                if (response.isSuccessStatusCode()) {
+                    lastSuccessfulAuthTimestamp = new Date();
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -228,7 +342,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
             if (response.isSuccessStatusCode()) {
                 HttpHeaders hdr1 = response.getHeaders();
-                updateLWSSOCookieValue(hdr1);
+                updateLWSSOCookieValue(hdr1.getHeaderStringValues(SET_COOKIE));
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {
@@ -328,12 +442,37 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @return OctaneHttpResponse
      */
     private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, int retryCount) {
+        disallowedToRequestLock.lock();
+        try {
+            if (getIsBlockedToRequest()) {
+                waitCondition(disallowedToRequestLock, allowedToRequestCond);
+            }
+        } finally {
+            disallowedToRequestLock.unlock();
+        }
 
         final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
         final HttpResponse httpResponse;
-
+        Date requestDate = new Date();
         try {
-            httpResponse = executeRequest(httpRequest);
+            try {
+                runningRequestsCount.incrementAndGet();
+                httpResponse = executeRequest(httpRequest);
+            } finally {
+                int isRunningCount = runningRequestsCount.decrementAndGet();
+                if (isRunningCount == 0) {
+                    disallowedToRequestLock.lock();
+                    try {
+                        logger.debug("Signal: no running requests");
+                        noRunningRequestsCond.signalAll();
+                    } finally {
+                        disallowedToRequestLock.unlock();
+                    }
+                }
+            }
+            if (httpResponse.getHeaders().containsKey(SET_COOKIE)) {
+                gotNewCookie(httpResponse.getHeaders().getHeaderStringValues(SET_COOKIE));
+            }
 
             final OctaneHttpResponse octaneHttpResponse = convertHttpResponseToOctaneHttpResponse(httpResponse);
             final String eTag = httpResponse.getHeaders().getETag();
@@ -365,27 +504,28 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 if (errorCodeFieldModel != null && httpStatusCode.getValue() == 401 &&
                         (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())) &&
                         lastUsedAuthentication != null) {
-
-                    Date currentTimestamp = new Date();
-
-                    // The same http client should not attempt re-auth from multiple threads
-                    synchronized (this) {
-
-                        // If another thread already handled session timeout, skip the re-auth and just retry the request
-                        if (lastSuccessfulAuthTimestamp.getTime() < currentTimestamp.getTime()) {
-                            logger.debug("Auth token expired, trying to re-authenticate");
+                    synchronized (isAuthenticatingLock) {
+                        if (!isReAuthenticated(requestDate)) {
+                            setMustReAuthenticate(true);
                             try {
+                                if (runningRequestsCount.get() > 0) {
+                                    waitCondition(disallowedToRequestLock, noRunningRequestsCond);
+                                }
                                 authenticate();
-                            } catch (OctaneException ex) {
-                                logger.debug("Exception while retrying authentication: {}", ex.getMessage());
+                            } finally {
+                                setMustReAuthenticate(false);
+                                disallowedToRequestLock.lock();
+                                try {
+                                    setIsBlockedToRequest(false);
+                                    allowedToRequestCond.signalAll();
+                                } finally {
+                                    disallowedToRequestLock.unlock();
+                                }
                             }
-                        } else {
-                            logger.debug("Auth token expired, but re-authentication was handled by another thread, will not re-authenticate");
                         }
-
-                        logger.debug("Retrying request, retries left: {}", retryCount);
-                        return execute(octaneHttpRequest, --retryCount);
                     }
+                    logger.debug("Retrying request, retries left: {}", retryCount);
+                    return execute(octaneHttpRequest, --retryCount);
                 }
             }
 
@@ -406,6 +546,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
         HttpResponse response;
         try {
             response = httpRequest.execute();
+            if (httpRequest.getUrl().toString().contains(OAUTH_AUTH_URL) ||
+                    httpRequest.getUrl().toString().contains(OAUTH_SIGNOUT_URL)) {
+                updateLWSSOCookieValue(response.getHeaders().getHeaderStringValues(SET_COOKIE));
+            }
         } catch (Exception e) {
             throw wrapException(e, httpRequest);
         }
@@ -541,15 +685,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * Retrieve new cookie from set-cookie header
      *
-     * @param headers The headers containing the cookie
+     * @param cookieHeaderValue The list of the cookie to be set
      * @return true if LWSSO cookie is renewed
      */
-    private boolean updateLWSSOCookieValue(HttpHeaders headers) {
+    private synchronized boolean updateLWSSOCookieValue(List<String> cookieHeaderValue) {
         boolean renewed = false;
-        List<String> cookieHeaderValue = headers.getHeaderStringValues(SET_COOKIE);
-        if (cookieHeaderValue.isEmpty()) {
-            return false;
-        }
 
         /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
         String strCookies = cookieHeaderValue.toString();
@@ -568,6 +708,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             if (lwssoCookie.isPresent()) {
                 lwssoValue = lwssoCookie.get().getValue();
                 renewed = true;
+                logger.debug("The new lwsso cookie was set: {}", lwssoValue.substring(0, 15));
             } else {
                 cookies.stream().filter(cookie -> cookie.getName().equals(OCTANE_USER_COOKIE_KEY)).findAny().ifPresent(cookie -> octaneUserValue = cookie.getValue());
             }
