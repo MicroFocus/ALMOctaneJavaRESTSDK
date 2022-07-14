@@ -117,7 +117,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /*
      * synchronized (this) - for get/set variable(s) with authentication data
      * synchronized (isAuthenticatingLock) - authentication process in progress
-     * disallowedToRequestLock - TODO Add Description
+     * disallowedToRequestLock - setting/getting isBlockedToRequest, related conditions
      * */
 
     // identity operation by default. do nothing
@@ -128,23 +128,25 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
 
-        synchronized (this) {
-            final StringBuilder cookieBuilder = new StringBuilder();
-            if (lwssoValue != null && !lwssoValue.isEmpty()) {
-                cookieBuilder.append(LWSSO_COOKIE_KEY).append("=").append(lwssoValue);
-            }
-            if (octaneUserValue != null && !octaneUserValue.isEmpty()) {
-                cookieBuilder.append(";").append(OCTANE_USER_COOKIE_KEY).append("=").append(octaneUserValue);
-            }
-
-            request.getHeaders().setCookie(cookieBuilder.toString());
-
-            if (lastUsedAuthentication != null) {
-                if (lastUsedAuthentication.isBasicAuthentication()) {
-                    final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
-                    request.getHeaders().setBasicAuthentication(basicAuthentication.getAuthenticationId(), basicAuthentication.getAuthenticationSecret());
+        synchronized (isAuthenticatingLock) {
+            synchronized (this) {
+                final StringBuilder cookieBuilder = new StringBuilder();
+                if (lwssoValue != null && !lwssoValue.isEmpty()) {
+                    cookieBuilder.append(LWSSO_COOKIE_KEY).append("=").append(lwssoValue);
                 }
-                lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
+                if (octaneUserValue != null && !octaneUserValue.isEmpty()) {
+                    cookieBuilder.append(";").append(OCTANE_USER_COOKIE_KEY).append("=").append(octaneUserValue);
+                }
+
+                request.getHeaders().setCookie(cookieBuilder.toString());
+
+                if (lastUsedAuthentication != null) {
+                    if (lastUsedAuthentication.isBasicAuthentication()) {
+                        final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
+                        request.getHeaders().setBasicAuthentication(basicAuthentication.getAuthenticationId(), basicAuthentication.getAuthenticationSecret());
+                    }
+                    lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().set(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
+                }
             }
         }
         request.setReadTimeout(60000);
@@ -445,6 +447,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         disallowedToRequestLock.lock();
         try {
             if (getIsBlockedToRequest()) {
+                logger.debug("Waiting while will be allowed to request");
                 waitCondition(disallowedToRequestLock, allowedToRequestCond);
             }
         } finally {
@@ -463,7 +466,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 if (isRunningCount == 0) {
                     disallowedToRequestLock.lock();
                     try {
-                        logger.debug("Signal: no running requests");
+                        logger.debug("Signal to all 'no running requests'");
                         noRunningRequestsCond.signalAll();
                     } finally {
                         disallowedToRequestLock.unlock();
@@ -708,7 +711,15 @@ public class GoogleHttpClient implements OctaneHttpClient {
             if (lwssoCookie.isPresent()) {
                 lwssoValue = lwssoCookie.get().getValue();
                 renewed = true;
-                logger.debug("The new lwsso cookie was set: {}", lwssoValue.substring(0, 15));
+                if (logger.isDebugEnabled()) {
+                    String cookieSub;
+                    if (lwssoValue.length() > 20) {
+                        cookieSub = lwssoValue.substring(0, 20) + "...";
+                    } else {
+                        cookieSub = lwssoValue;
+                    }
+                    logger.debug("The new lwsso cookie was set: {}", cookieSub);
+                }
             } else {
                 cookies.stream().filter(cookie -> cookie.getName().equals(OCTANE_USER_COOKIE_KEY)).findAny().ifPresent(cookie -> octaneUserValue = cookie.getValue());
             }
