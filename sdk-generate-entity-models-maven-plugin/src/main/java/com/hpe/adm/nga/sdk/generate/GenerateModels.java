@@ -15,6 +15,7 @@ package com.hpe.adm.nga.sdk.generate;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -137,15 +138,16 @@ public class GenerateModels {
 
     private Map<String, String> generateLists(Octane octane) throws IOException {
         final Collection<EntityModel> listNodes = new ArrayList<>();
+        GetEntities getListNodes =
+                octane.entityList("list_nodes").get().addFields("name", "list_root", "id", "logical_name").limit(1000);
 
         int offset = 0;
-        Collection<EntityModel> fetchedListNodes =
-                octane.entityList("list_nodes").get().addFields("name", "list_root", "id", "logical_name").limit(1000).offset(offset).execute();
+        Collection<EntityModel> fetchedListNodes = getListNodes.offset(offset).execute();
 
         while (fetchedListNodes.size() > 0) {
             listNodes.addAll(fetchedListNodes);
             offset += fetchedListNodes.size();
-            fetchedListNodes = octane.entityList("list_nodes").get().addFields("name", "list_root", "id", "logical_name").limit(1000).offset(offset).execute();
+            fetchedListNodes = getListNodes.offset(offset).execute();
         }
 
         final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
