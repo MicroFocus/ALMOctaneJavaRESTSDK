@@ -25,11 +25,13 @@ import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpCookie;
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -266,6 +268,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 }
                 case POST_BINARY: {
                     httpRequest = buildBinaryPostRequest((OctaneHttpRequest.PostBinaryOctaneHttpRequest) octaneHttpRequest);
+                    break;
+                }
+                case POST_BINARY_MULTIPART: {
+                    OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest postBinaryBulkOctaneHttpRequest = (OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest) octaneHttpRequest;
+                    GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
+                    httpRequest = requestFactory.buildPostRequest(domain, generateBinaryBulkPostRequest(postBinaryBulkOctaneHttpRequest));
+                    httpRequest.getHeaders().setAccept(postBinaryBulkOctaneHttpRequest.getAcceptType());
                     break;
                 }
                 case PUT: {
@@ -509,6 +518,17 @@ public class GoogleHttpClient implements OctaneHttpClient {
         return httpRequest;
     }
 
+    private MultipartContent generateBinaryBulkPostRequest(OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest postBinaryBulkOctaneHttpRequest) {
+        MultipartContent content = new MultipartContent()
+                .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
+                        .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
+
+        for (Triple<String, InputStream, String> binaryFile : postBinaryBulkOctaneHttpRequest.getBinaryFileInfo()) {
+            addBinaryFileToMultiPart(content, postBinaryBulkOctaneHttpRequest.getBinaryContentType(), binaryFile);
+        }
+        return content;
+    }
+
     /**
      * Generates HTTP content based on input parameters and stream.
      *
@@ -521,7 +541,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
                         .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
 
-        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", octaneHttpRequest.getContent().getBytes(StandardCharsets.UTF_8));
+        return addBinaryFileToMultiPart(content, octaneHttpRequest.getBinaryContentType(), Triple.of(octaneHttpRequest.getContent(), octaneHttpRequest.getBinaryInputStream(), octaneHttpRequest.getBinaryContentName()));
+    }
+
+    private MultipartContent addBinaryFileToMultiPart(MultipartContent content, String contentType, Triple<String, InputStream, String> binaryContent) {
+        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", binaryContent.getLeft().getBytes(StandardCharsets.UTF_8));
         MultipartContent.Part part1 = new MultipartContent.Part(byteArrayContent);
         String contentDisposition = String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT, HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE);
         HttpHeaders httpHeaders = new HttpHeaders()
@@ -531,9 +555,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
         content.addPart(part1);
 
         // Add Stream
-        InputStreamContent inputStreamContent = new InputStreamContent(octaneHttpRequest.getBinaryContentType(), octaneHttpRequest.getBinaryInputStream());
+        InputStreamContent inputStreamContent = new InputStreamContent(contentType, binaryContent.getMiddle());
         MultipartContent.Part part2 = new MultipartContent.Part(inputStreamContent);
-        part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, octaneHttpRequest.getBinaryContentName())));
+        part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, binaryContent.getRight())));
         content.addPart(part2);
         return content;
     }
