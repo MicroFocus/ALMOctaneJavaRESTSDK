@@ -523,9 +523,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
                         .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
 
-        for (Triple<String, InputStream, String> binaryFile : postBinaryBulkOctaneHttpRequest.getBinaryFileInfo()) {
-            addBinaryFileToMultiPart(content, postBinaryBulkOctaneHttpRequest.getBinaryContentType(), binaryFile);
-        }
+        postBinaryBulkOctaneHttpRequest.getBinaryFileInfo()
+                .forEach(binaryFile -> addBinaryFileToMultiPart(content, postBinaryBulkOctaneHttpRequest.getBinaryContentType(), binaryFile));
         return content;
     }
 
