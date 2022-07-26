@@ -5,7 +5,7 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>16.0.300</version>
+    <version>16.0.400</version>
 </dependency>
 ```
 #### Gradle
