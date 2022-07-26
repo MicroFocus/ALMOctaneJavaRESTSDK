@@ -189,6 +189,10 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* 16.0.400
+  * Fixed list entity bug related to pagination
+  * Updated google client version to 1.42.0
+  * Support multiple attachments in single requests
 * 16.0.300
   * Fixed ClassCastException on EmptyFieldModel [Issue 133](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/133)
   * Replaced `/` with `_` in list name generation [Issue 124](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/issues/124)
