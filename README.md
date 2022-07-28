@@ -10,7 +10,7 @@
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '16.0.300'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '16.0.400'
 ```
 
 ## Introduction
@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this, add the following to your project's POM file (assuming 16.0.300-SNAPSHOT being the SDK version):
+To enable this, add the following to your project's POM file (assuming 16.0.400 being the SDK version):
 
 ```xml
  <build>
@@ -59,7 +59,7 @@ To enable this, add the following to your project's POM file (assuming 16.0.300-
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>16.0.300</version>
+                <version>16.0.400</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -171,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>16.0.300</version>
+            <version>16.0.400</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
