@@ -51,7 +51,7 @@ This plugin connects to your ALM Octane server using the given authentication cr
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
-To enable this, add the following to your project's POM file (assuming 16.0.400-SNAPSHOT being the SDK version):
+To enable this, add the following to your project's POM file (assuming 16.0.400 being the SDK version):
 
 ```xml
  <build>
