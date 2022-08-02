@@ -85,7 +85,9 @@ public class TestGoogleHttpClient {
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
         doReturn(true).when(googleHttpClientSpy, "authenticate");
         Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
-        Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", new Date(0));
+        long currentTimeMs = System.currentTimeMillis();
+        Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", currentTimeMs);
+        Whitebox.setInternalState(googleHttpClientSpy, "requestStartTime", ThreadLocal.withInitial(() -> currentTimeMs + 1));
 
         //Create timeout exception, the same way octane does
         ErrorModel errorModel = new ErrorModel(new HashSet<>());
@@ -262,12 +264,12 @@ public class TestGoogleHttpClient {
 
         public synchronized void setNewUsingCookie(String name) {
             usingCookie = new Cookie(LWSSO_COOKIE_KEY, name);
-            cookieExpiredAt = new Date().getTime() + 1000;
-            cookieShouldBeUpdatedAt = new Date().getTime() + 500;
+            cookieExpiredAt = System.currentTimeMillis() + 1000;
+            cookieShouldBeUpdatedAt = System.currentTimeMillis() + 500;
             logger.debug("Using new cookie: {}={}", usingCookie.getName(), usingCookie.getValue());
         }
         public boolean isCookieShouldBeUpdated() {
-            return cookieShouldBeUpdatedAt != null && cookieShouldBeUpdatedAt <= new Date().getTime();
+            return cookieShouldBeUpdatedAt != null && cookieShouldBeUpdatedAt <= System.currentTimeMillis();
         }
         public static Delay getServerDelay() {
             int max = 50;
@@ -284,7 +286,7 @@ public class TestGoogleHttpClient {
                     authRequestsCount++;
                 } else {
                     if (cookieExpiredAt != null) {
-                        Long currentTime = new Date().getTime();
+                        Long currentTime = System.currentTimeMillis();
                         if (cookieExpiredAt <= currentTime) {
                             logger.debug("NULL the cookie");
                             usingCookie = null;
