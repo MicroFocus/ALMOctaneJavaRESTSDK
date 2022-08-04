@@ -416,10 +416,6 @@ public class GoogleHttpClient implements OctaneHttpClient {
         requestPhaser.register();
     }
 
-    private void setReceiveNewCookies() {
-        areNewCookiesReceived = true;
-    }
-
     private HttpResponse executeRequest(final HttpRequest httpRequest) {
         logger.debug(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(), httpRequest.getHeaders().toString());
 
@@ -597,7 +593,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         String url = response.getRequest().getUrl().getRawPath();
         // if not auth and SET_COOKIE is received then stop all new requests until started requests are finished
         if (!url.contains(OAUTH_AUTH_URL)) {
-            setReceiveNewCookies();
+            areNewCookiesReceived = true;
         }
 
         /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
