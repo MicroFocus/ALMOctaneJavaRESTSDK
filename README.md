@@ -190,6 +190,8 @@ Currently the admin sections are not available using generated entities - but th
 
 ## What's New
 * 16.0.400.1
+  * Fixed bug related to session cookie collision on parallel requests
+* 16.0.400
   * Fixed list entity bug related to pagination
   * Updated google client version to 1.42.0
   * Support multiple attachments in single requests
