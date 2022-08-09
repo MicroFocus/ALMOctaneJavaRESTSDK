@@ -40,6 +40,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.concurrent.Phaser;
 import java.util.function.Consumer;
 
 /**
@@ -72,9 +73,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
     protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
-    protected Date lastSuccessfulAuthTimestamp;
+    protected Long lastSuccessfulAuthTimestamp;
     private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
     private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
+
+    private final ThreadLocal<Long> requestStartTime = new ThreadLocal<>();
+    private final Phaser requestPhaser = new Phaser(1);
+    private boolean areNewCookiesReceived;
 
     // identity operation by default. do nothing
     private Consumer<HttpRequest> customRequestInitializer = request -> {
@@ -83,8 +88,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final Consumer<HttpRequest> defaultRequestInitializer = request -> {
         request.setResponseInterceptor(response -> {
             // retrieve new LWSSO in response if any
-            HttpHeaders responseHeaders = response.getHeaders();
-            updateLWSSOCookieValue(responseHeaders);
+            updateLWSSOCookieValue(response);
         });
 
         request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
@@ -211,7 +215,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             HttpResponse response = executeRequest(httpRequest);
 
             if (response.isSuccessStatusCode()) {
-                lastSuccessfulAuthTimestamp = new Date();
+                lastSuccessfulAuthTimestamp = System.currentTimeMillis();
                 return true;
             } else {
                 return false;
@@ -229,8 +233,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             HttpResponse response = executeRequest(httpRequest);
 
             if (response.isSuccessStatusCode()) {
-                HttpHeaders hdr1 = response.getHeaders();
-                updateLWSSOCookieValue(hdr1);
+                updateLWSSOCookieValue(response);
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {
@@ -338,12 +341,17 @@ public class GoogleHttpClient implements OctaneHttpClient {
      */
     private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, int retryCount) {
 
-        final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
-        final HttpResponse httpResponse;
-
         try {
-            httpResponse = executeRequest(httpRequest);
-
+            final HttpResponse httpResponse;
+            try {
+                // wait auth or set cookies and register new request
+                registerNewRequest();
+                final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
+                httpResponse = executeRequest(httpRequest);
+            } finally {
+                // unregister current request
+                requestPhaser.arriveAndDeregister();
+            }
             final OctaneHttpResponse octaneHttpResponse = convertHttpResponseToOctaneHttpResponse(httpResponse);
             final String eTag = httpResponse.getHeaders().getETag();
             if (eTag != null) {
@@ -375,13 +383,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())) &&
                         lastUsedAuthentication != null) {
 
-                    Date currentTimestamp = new Date();
-
                     // The same http client should not attempt re-auth from multiple threads
                     synchronized (this) {
-
                         // If another thread already handled session timeout, skip the re-auth and just retry the request
-                        if (lastSuccessfulAuthTimestamp.getTime() < currentTimestamp.getTime()) {
+                        if (lastSuccessfulAuthTimestamp < requestStartTime.get()) {
+                            // wait until all current requests are finished before authenticate
+                            requestPhaser.arriveAndAwaitAdvance();
                             logger.debug("Auth token expired, trying to re-authenticate");
                             try {
                                 authenticate();
@@ -391,15 +398,22 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         } else {
                             logger.debug("Auth token expired, but re-authentication was handled by another thread, will not re-authenticate");
                         }
-
                         logger.debug("Retrying request, retries left: {}", retryCount);
-                        return execute(octaneHttpRequest, --retryCount);
                     }
+                    return execute(octaneHttpRequest, --retryCount);
                 }
             }
 
             throw exception;
         }
+    }
+
+    private synchronized void registerNewRequest() {
+        if (areNewCookiesReceived) {
+            requestPhaser.arriveAndAwaitAdvance();
+            areNewCookiesReceived = false;
+        }
+        requestPhaser.register();
     }
 
     private HttpResponse executeRequest(final HttpRequest httpRequest) {
@@ -414,6 +428,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         HttpResponse response;
         try {
+            requestStartTime.set(System.currentTimeMillis());
             response = httpRequest.execute();
         } catch (Exception e) {
             throw wrapException(e, httpRequest);
@@ -564,14 +579,21 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * Retrieve new cookie from set-cookie header
      *
-     * @param headers The headers containing the cookie
+     * @param response The response containing the set-cookie header or not
      * @return true if LWSSO cookie is renewed
      */
-    private boolean updateLWSSOCookieValue(HttpHeaders headers) {
+    private boolean updateLWSSOCookieValue(HttpResponse response) {
+        HttpHeaders headers = response.getHeaders();
         boolean renewed = false;
         List<String> cookieHeaderValue = headers.getHeaderStringValues(SET_COOKIE);
         if (cookieHeaderValue.isEmpty()) {
             return false;
+        }
+
+        String url = response.getRequest().getUrl().getRawPath();
+        // if not auth and SET_COOKIE is received then stop all new requests until started requests are finished
+        if (!url.contains(OAUTH_AUTH_URL)) {
+            areNewCookiesReceived = true;
         }
 
         /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
