@@ -23,6 +23,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -139,7 +141,7 @@ public class TestModel {
     }
 
     @Test
-    public void testEntityModelWithDateField() {
+    public void testEntityModelWithDateField_fromModelToJsonObject() {
         ZonedDateTime now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Z"));
         expectedResult = "{\"field\":\"" + now.toString() + "\"}";
         set.add(new DateFieldModel("field", now));
@@ -150,6 +152,26 @@ public class TestModel {
         } catch (Exception ex) {
             fail("Failed with exception: " + ex);
         }
+    }
+
+    @Test
+    public void testEntityModelWithDateField_fromJsonObjectToModel_dateWithMillis() {
+        JSONObject jsonObject = new JSONObject("{\"creation_time\":\"2022-09-07T14:26:44.143Z\"}");
+
+        EntityModel entityModel = ModelParser.getInstance().getEntityModel(jsonObject);
+        FieldModel dateField = entityModel.getValue("creation_time");
+
+        assertThat(dateField.getValue(), instanceOf(ZonedDateTime.class));
+    }
+
+    @Test
+    public void testEntityModelWithDateField_fromJsonObjectToModel_dateWithoutMillis() {
+        JSONObject jsonObject = new JSONObject("{\"creation_time\":\"2022-09-07T14:26:44Z\"}");
+
+        EntityModel entityModel = ModelParser.getInstance().getEntityModel(jsonObject);
+        FieldModel dateField = entityModel.getValue("creation_time");
+
+        assertThat(dateField.getValue(), instanceOf(ZonedDateTime.class));
     }
 
     @Test
