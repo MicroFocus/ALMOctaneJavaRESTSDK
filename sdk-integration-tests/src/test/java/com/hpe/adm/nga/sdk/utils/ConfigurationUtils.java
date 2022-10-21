@@ -17,29 +17,29 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- *
  * Created by brucesp on 06/06/2016.
  */
 public class ConfigurationUtils {
-	private static final ConfigurationUtils INSTANCE = new ConfigurationUtils();
+    private static final ConfigurationUtils INSTANCE = new ConfigurationUtils();
 
-	final Properties combinedConfiguration;
+    final Properties combinedConfiguration = new Properties();
 
-	private ConfigurationUtils() {
-		try {
-			combinedConfiguration = System.getProperties();
-			combinedConfiguration.load(Thread.currentThread().getContextClassLoader()
-					.getResourceAsStream("configuration.properties"));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private ConfigurationUtils() {
+        try {
+            combinedConfiguration.load(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("configuration.properties"));
+            System.getProperties()
+                    .forEach((key, value) -> combinedConfiguration.setProperty(key.toString(), value.toString()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public static final ConfigurationUtils getInstance() {
-		return INSTANCE;
-	}
+    public static final ConfigurationUtils getInstance() {
+        return INSTANCE;
+    }
 
-	public final String getString(final String property) {
-		return combinedConfiguration.getProperty(property);
-	}
+    public final String getString(final String property) {
+        return combinedConfiguration.getProperty(property);
+    }
 }
