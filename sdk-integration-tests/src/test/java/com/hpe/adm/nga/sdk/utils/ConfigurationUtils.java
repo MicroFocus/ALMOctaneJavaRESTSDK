@@ -13,10 +13,8 @@
  */
 package com.hpe.adm.nga.sdk.utils;
 
-import org.apache.commons.configuration2.CombinedConfiguration;
-import org.apache.commons.configuration2.SystemConfiguration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  *
@@ -25,15 +23,14 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class ConfigurationUtils {
 	private static final ConfigurationUtils INSTANCE = new ConfigurationUtils();
 
-	final CombinedConfiguration combinedConfiguration;
+	final Properties combinedConfiguration;
 
 	private ConfigurationUtils() {
-		final Configurations configurations = new Configurations();
-		combinedConfiguration = new CombinedConfiguration();
 		try {
-			combinedConfiguration.addConfiguration(new SystemConfiguration());
-			combinedConfiguration.addConfiguration(configurations.properties("configuration.properties"));
-		} catch (ConfigurationException e) {
+			combinedConfiguration = System.getProperties();
+			combinedConfiguration.load(Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream("configuration.properties"));
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -43,6 +40,6 @@ public class ConfigurationUtils {
 	}
 
 	public final String getString(final String property) {
-		return combinedConfiguration.getString(property);
+		return combinedConfiguration.getProperty(property);
 	}
 }
