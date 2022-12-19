@@ -34,7 +34,6 @@ import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.http.HttpClientTransportOverHTTP;
 import org.eclipse.jetty.client.util.ByteBufferContentProvider;
 import org.eclipse.jetty.client.util.FutureResponseListener;
-import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.client.util.MultiPartContentProvider;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpHeader;
@@ -101,7 +100,7 @@ public class JettyHttpClient implements OctaneHttpClient {
         logSystemProperties();
         org.eclipse.jetty.util.log.Log.setLog(new StdErrLog());
 
-        HttpClient client = new HttpClient(new HttpClientTransportOverHTTP(), new SslContextFactory.Client());
+        HttpClient client = new HttpClient(new HttpClientTransportOverHTTP2(new HTTP2Client()), new SslContextFactory.Client());
 
         addAuthentication(client);
         client.setIdleTimeout(6000);
@@ -128,7 +127,7 @@ public class JettyHttpClient implements OctaneHttpClient {
         boolean trustAllCerts = (boolean) settings.get(Octane.OctaneCustomSettings.Setting.TRUST_ALL_CERTS);
         HttpClient client = httpTransport != null ?
                 new HttpClient(httpTransport, new SslContextFactory.Client(trustAllCerts)) :
-                new HttpClient(new HttpClientTransportOverHTTP(), new SslContextFactory.Client(trustAllCerts));
+                new HttpClient(new HttpClientTransportOverHTTP2(new HTTP2Client()), new SslContextFactory.Client(trustAllCerts));
 
         addAuthentication(client);
         client.setConnectTimeout((int) settings.get(Octane.OctaneCustomSettings.Setting.CONNECTION_TIMEOUT));
