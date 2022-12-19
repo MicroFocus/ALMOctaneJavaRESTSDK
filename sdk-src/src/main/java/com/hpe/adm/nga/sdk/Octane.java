@@ -21,6 +21,7 @@ import com.hpe.adm.nga.sdk.entities.TypedEntityList;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
+import com.hpe.adm.nga.sdk.network.jetty.JettyHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,9 @@ public class Octane {
     public static final String NO_ENTITY = "";
     private static final long ONLY_SHAREDSPACE_WORKSPACE_ID = 0L;
 
+
     //private members
+    private boolean isHttp2;
     private final String urlDomain;
     private final String idsharedSpaceId;
     private final long workSpaceId;
@@ -88,6 +91,7 @@ public class Octane {
         urlDomain = domain;
         idsharedSpaceId = sharedSpaceId;
         workSpaceId = workId;
+        isHttp2=false;
         logger.info("Setting context to: domain=" + urlDomain + "; spaceid=" + idsharedSpaceId + "; workspaceid=" + workSpaceId);
     }
 
@@ -98,6 +102,7 @@ public class Octane {
     private Octane(OctaneInternalConfiguration octaneInternalConfiguration, String domain) {
         this(octaneInternalConfiguration, domain, null);
     }
+
 
     /**
      * <p>
@@ -206,6 +211,7 @@ public class Octane {
         private String urlDomain = "";
         private String idsharedSpaceId = null;
         private long workSpaceId = 0;
+        private boolean isHttp2 = false;
         private OctaneHttpClient octaneHttpClient;
         private final Authentication authentication;
         private String octaneClassFactoryClassName;
@@ -236,6 +242,12 @@ public class Octane {
             assert octaneHttpClient != null;
             this.authentication = authentication;
             this.octaneHttpClient = octaneHttpClient;
+        }
+
+        public Builder isHttp2(boolean http2) {
+
+            isHttp2 = http2;
+            return this;
         }
 
         /**
@@ -365,7 +377,8 @@ public class Octane {
             final OctaneInternalConfiguration octaneInternalConfiguration = new OctaneInternalConfiguration();
             // Init default http client if it wasn't specified
             OctaneCustomSettings settings = customSettings != null ? customSettings : defaultOctaneSettings;
-            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, authentication, settings) : this.octaneHttpClient;
+            OctaneHttpClient client = isHttp2 ? new JettyHttpClient(urlDomain,authentication,settings) : new GoogleHttpClient(urlDomain, authentication, settings);
+            octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? client : this.octaneHttpClient;
             octaneInternalConfiguration.octaneClassFactoryClassName = this.octaneClassFactoryClassName;
 
             if (octaneInternalConfiguration.octaneHttpClient.authenticate()) {
