@@ -189,7 +189,7 @@ public class JettyHttpClient implements OctaneHttpClient {
     }
 
     @Override
-    public void signOut() {
+    public synchronized void signOut() {
         Request httpRequest = null;
         try {
             httpRequest = requestFactory.buildPostRequest(URI.create(urlDomain + OAUTH_SIGNOUT_URL), null);
