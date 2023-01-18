@@ -20,18 +20,25 @@ import com.hpe.adm.nga.sdk.authentication.BasicAuthentication;
 import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
-import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ErrorModel;
+import com.hpe.adm.nga.sdk.model.LongFieldModel;
+import com.hpe.adm.nga.sdk.model.ModelParser;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Triple;
-import org.eclipse.jetty.client.*;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.HttpClientTransport;
+import org.eclipse.jetty.client.HttpContent;
+import org.eclipse.jetty.client.HttpContentResponse;
+import org.eclipse.jetty.client.HttpResponseException;
 import org.eclipse.jetty.client.api.ContentProvider;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
-import org.eclipse.jetty.client.http.HttpClientTransportOverHTTP;
 import org.eclipse.jetty.client.util.ByteBufferContentProvider;
 import org.eclipse.jetty.client.util.FutureResponseListener;
 import org.eclipse.jetty.client.util.MultiPartContentProvider;
@@ -57,7 +64,15 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -93,7 +108,7 @@ public class JettyHttpClient implements OctaneHttpClient {
     private final Phaser requestPhaser = new Phaser(1);
 
 
-    public JettyHttpClient(final String urlDomain, final Authentication authentication){
+    public JettyHttpClient(final String urlDomain, final Authentication authentication) {
         this.urlDomain = urlDomain;
         this.lastUsedAuthentication = authentication;
 
@@ -107,13 +122,12 @@ public class JettyHttpClient implements OctaneHttpClient {
 
         try {
             client.start();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
-        requestFactory = new RequestFactory(this,client);
+        requestFactory = new RequestFactory(this, client);
 
     }
 
@@ -136,16 +150,15 @@ public class JettyHttpClient implements OctaneHttpClient {
 
         try {
             client.start();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
-        requestFactory = new RequestFactory(this,client);
+        requestFactory = new RequestFactory(this, client);
     }
 
-    private void addAuthentication(HttpClient client){
+    private void addAuthentication(HttpClient client) {
 
         if (lastUsedAuthentication != null) {
             if (lastUsedAuthentication.isBasicAuthentication()) {
@@ -220,7 +233,7 @@ public class JettyHttpClient implements OctaneHttpClient {
                 case GET: {
                     GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
                     httpRequest = requestFactory.buildGetRequest(domain.toURI());
-                    if(((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType()!=null)
+                    if (((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType() != null)
                         httpRequest.getHeaders().add(HttpHeader.ACCEPT, ((OctaneHttpRequest.GetOctaneHttpRequest) octaneHttpRequest).getAcceptType());
                     final String eTagHeader = requestToEtagMap.get(octaneHttpRequest);
                     if (eTagHeader != null) {
@@ -234,7 +247,7 @@ public class JettyHttpClient implements OctaneHttpClient {
                     httpRequest = requestFactory.buildPostRequest(domain.toURI(),
                             new ByteBufferContentProvider(postOctaneHttpRequest.getContentType(),
                                     ByteBuffer.wrap(postOctaneHttpRequest.getContent().getBytes(StandardCharsets.UTF_8))));
-                    if(postOctaneHttpRequest.getAcceptType()!=null)
+                    if (postOctaneHttpRequest.getAcceptType() != null)
                         httpRequest.getHeaders().add(HttpHeader.ACCEPT, postOctaneHttpRequest.getAcceptType());
                     break;
                 }
@@ -247,7 +260,7 @@ public class JettyHttpClient implements OctaneHttpClient {
                     OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest postBinaryBulkOctaneHttpRequest = (OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest) octaneHttpRequest;
                     httpRequest = requestFactory.buildPostRequest(domain.toURI(),
                             generateBinaryBulkPostRequest(postBinaryBulkOctaneHttpRequest));
-                    if(postBinaryBulkOctaneHttpRequest.getAcceptType()!=null)
+                    if (postBinaryBulkOctaneHttpRequest.getAcceptType() != null)
                         httpRequest.getHeaders().add(HttpHeader.ACCEPT, postBinaryBulkOctaneHttpRequest.getAcceptType());
                     break;
                 }
@@ -257,7 +270,7 @@ public class JettyHttpClient implements OctaneHttpClient {
                     httpRequest = requestFactory.buildPutRequest(domain.toURI(),
                             new ByteBufferContentProvider(putHttpOctaneHttpRequest.getContentType(),
                                     ByteBuffer.wrap(putHttpOctaneHttpRequest.getContent().getBytes(StandardCharsets.UTF_8))));
-                    if(putHttpOctaneHttpRequest.getAcceptType()!=null)
+                    if (putHttpOctaneHttpRequest.getAcceptType() != null)
                         httpRequest.getHeaders().add(HttpHeader.ACCEPT, putHttpOctaneHttpRequest.getAcceptType());
                     break;
                 }
@@ -275,7 +288,7 @@ public class JettyHttpClient implements OctaneHttpClient {
             octaneHttpRequest.getHeaders()
                     .forEach(header -> httpRequest.getHeaders().add(header.getHeaderKey(), header.getHeaderValue()));
 
-        } catch (IOException e ) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return httpRequest;
@@ -393,15 +406,14 @@ public class JettyHttpClient implements OctaneHttpClient {
         ContentResponse response;
         try {
             requestStartTime.set(System.currentTimeMillis());
-            if(httpRequest.getPath().contains("metadata")){
+            if (httpRequest.getPath().contains("metadata")) {
                 FutureResponseListener listener = new FutureResponseListener(httpRequest, 10 * 1024 * 1024);
                 httpRequest.send(listener);
                 response = listener.get(2, TimeUnit.SECONDS);
-            }
-            else {
+            } else {
                 response = httpRequest.send();
             }
-            if(response.getStatus()/10 == 40)
+            if (response.getStatus() / 10 == 40)
                 throw new Exception(response.getReason(), new HttpResponseException(response.getReason(), response));
         } catch (Exception e) {
             throw wrapException(e, httpRequest);
@@ -425,20 +437,20 @@ public class JettyHttpClient implements OctaneHttpClient {
         private HttpClient client;
         private JettyHttpClient jetty;
 
-        public RequestFactory(JettyHttpClient jetty,HttpClient client) {
+        public RequestFactory(JettyHttpClient jetty, HttpClient client) {
             this.client = client;
-            this.jetty=jetty;
+            this.jetty = jetty;
         }
 
         public Request buildRequest(Request request, ContentProvider contentProvider) {
 
-            request.onResponseSuccess(response->jetty.updateLWSSOCookieValue(response));
+            request.onResponseSuccess(response -> jetty.updateLWSSOCookieValue(response));
 
 
-            if(jetty.lwssoValue != null && !jetty.lwssoValue.isEmpty())
-                request.cookie(new HttpCookie(jetty.LWSSO_COOKIE_KEY,jetty.lwssoValue));
+            if (jetty.lwssoValue != null && !jetty.lwssoValue.isEmpty())
+                request.cookie(new HttpCookie(jetty.LWSSO_COOKIE_KEY, jetty.lwssoValue));
             if (jetty.octaneUserValue != null && !jetty.octaneUserValue.isEmpty()) {
-                request.cookie(new HttpCookie(jetty.OCTANE_USER_COOKIE_KEY,jetty.octaneUserValue));
+                request.cookie(new HttpCookie(jetty.OCTANE_USER_COOKIE_KEY, jetty.octaneUserValue));
             }
             if (jetty.lastUsedAuthentication != null) {
                 lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().add(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
@@ -481,7 +493,7 @@ public class JettyHttpClient implements OctaneHttpClient {
         GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
         final Request httpRequest = requestFactory.buildPostRequest(domain.toURI(),
                 generateMultiPartContent(octaneHttpRequest));
-        if(octaneHttpRequest.getAcceptType()!=null)
+        if (octaneHttpRequest.getAcceptType() != null)
             httpRequest.getHeaders().add(HttpHeader.ACCEPT, octaneHttpRequest.getAcceptType());
 
         return httpRequest;
@@ -510,15 +522,15 @@ public class JettyHttpClient implements OctaneHttpClient {
     private MultiPartContentProvider addBinaryFileToMultiPart(MultiPartContentProvider content, String contentType, Triple<String, InputStream, String> binaryContent) {
         ByteBufferContentProvider byteArrayContent = new ByteBufferContentProvider("application/json", ByteBuffer.wrap(binaryContent.getLeft().getBytes(StandardCharsets.UTF_8)));
         HttpFields httpHeaders = new HttpFields();
-        httpHeaders.add(HttpHeader.ACCEPT_ENCODING,"gzip");
+        httpHeaders.add(HttpHeader.ACCEPT_ENCODING, "gzip");
 
-        content.addFilePart(HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE, "blob",byteArrayContent, httpHeaders);
+        content.addFilePart(HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE, "blob", byteArrayContent, httpHeaders);
         // Add Stream
         try {
             byteArrayContent = new ByteBufferContentProvider(contentType, ByteBuffer.wrap(IOUtils.toByteArray(binaryContent.getMiddle())));
             HttpFields httpHeaders1 = new HttpFields();
-            httpHeaders1.add(HttpHeader.ACCEPT_ENCODING,"gzip");
-            content.addFilePart("content",binaryContent.getRight(),byteArrayContent, null);
+            httpHeaders1.add(HttpHeader.ACCEPT_ENCODING, "gzip");
+            content.addFilePart("content", binaryContent.getRight(), byteArrayContent, null);
             return content;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -546,10 +558,6 @@ public class JettyHttpClient implements OctaneHttpClient {
             areNewCookiesReceived = true;
         }
 
-        /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965
-        String strCookies = cookieHeaderValue.toString();
-        List<HttpCookie> Cookies = java.net.HttpCookie.parse(strCookies.substring(1, strCookies.length()-1));
-        lwssoValue = Cookies.stream().filter(a -> a.getName().equals(LWSSO_COOKIE_KEY)).findFirst().get().getValue();*/
         for (String strCookie : cookieHeaderValue) {
             List<java.net.HttpCookie> cookies;
             try {
@@ -648,7 +656,6 @@ public class JettyHttpClient implements OctaneHttpClient {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             content.advance();
             byteArrayOutputStream.write(content.getContent().array());
-            //logger.debug("Content:{}", byteArrayOutputStream.toString().replace('\n',';'));
         } catch (IOException ex) {
             logger.error("Failed to log content of {} {}", content, ex);
         }
