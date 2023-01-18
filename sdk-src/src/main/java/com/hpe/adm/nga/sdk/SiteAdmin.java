@@ -62,7 +62,7 @@ public class SiteAdmin {
         protected String urlDomain = "";
         protected OctaneHttpClient octaneHttpClient;
         private final Authentication authentication;
-        private boolean isHttp2=false;
+        private boolean isHttp2 = false;
 
         //Functions
 
@@ -143,7 +143,7 @@ public class SiteAdmin {
             logger.info("Building SiteAdmin Octane context using {}", this);
 
             // Init default http client if it wasn't specified
-            OctaneHttpClient client = isHttp2 ? new JettyHttpClient(urlDomain,authentication) : new GoogleHttpClient(urlDomain,authentication);
+            OctaneHttpClient client = isHttp2 ? new JettyHttpClient(urlDomain, authentication) : new GoogleHttpClient(urlDomain, authentication);
             this.octaneHttpClient = this.octaneHttpClient == null ? client : this.octaneHttpClient;
 
             if (octaneHttpClient.authenticate()) {

@@ -91,7 +91,7 @@ public class Octane {
         urlDomain = domain;
         idsharedSpaceId = sharedSpaceId;
         workSpaceId = workId;
-        isHttp2=false;
+        isHttp2 = false;
         logger.info("Setting context to: domain=" + urlDomain + "; spaceid=" + idsharedSpaceId + "; workspaceid=" + workSpaceId);
     }
 
@@ -353,6 +353,7 @@ public class Octane {
 
         /**
          * Configure a settings provider with custom settings like: readTimeout
+         *
          * @param settings - a plain java object with timeout settings(for now)
          * @return An instance of this builder object
          */
@@ -377,7 +378,7 @@ public class Octane {
             final OctaneInternalConfiguration octaneInternalConfiguration = new OctaneInternalConfiguration();
             // Init default http client if it wasn't specified
             OctaneCustomSettings settings = customSettings != null ? customSettings : defaultOctaneSettings;
-            OctaneHttpClient client = isHttp2 ? new JettyHttpClient(urlDomain,authentication,settings) : new GoogleHttpClient(urlDomain, authentication, settings);
+            OctaneHttpClient client = isHttp2 ? new JettyHttpClient(urlDomain, authentication, settings) : new GoogleHttpClient(urlDomain, authentication, settings);
             octaneInternalConfiguration.octaneHttpClient = this.octaneHttpClient == null ? client : this.octaneHttpClient;
             octaneInternalConfiguration.octaneClassFactoryClassName = this.octaneClassFactoryClassName;
 
