@@ -110,6 +110,7 @@ public class JettyHttpClient implements OctaneHttpClient {
         }
         catch (Exception e){
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         requestFactory = new RequestFactory(this,client);
@@ -138,6 +139,7 @@ public class JettyHttpClient implements OctaneHttpClient {
         }
         catch (Exception e){
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         requestFactory = new RequestFactory(this,client);
