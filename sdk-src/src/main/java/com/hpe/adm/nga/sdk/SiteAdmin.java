@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2021 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2023 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@ package com.hpe.adm.nga.sdk;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
+import com.hpe.adm.nga.sdk.network.jetty.JettyHttpClient;
 import com.hpe.adm.nga.sdk.siteadmin.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,7 @@ public class SiteAdmin {
         protected String urlDomain = "";
         protected OctaneHttpClient octaneHttpClient;
         private final Authentication authentication;
+        private boolean isHttp2 = false;
 
         //Functions
 
@@ -88,6 +90,13 @@ public class SiteAdmin {
             this.authentication = authentication;
             this.octaneHttpClient = octaneHttpClient;
         }
+
+        public Builder isHttp2(boolean http2) {
+
+            isHttp2 = http2;
+            return this;
+        }
+
 
         /**
          * Sets the domain and the port.  The domain should include the full http scheme (http/https)
@@ -134,7 +143,8 @@ public class SiteAdmin {
             logger.info("Building SiteAdmin Octane context using {}", this);
 
             // Init default http client if it wasn't specified
-            this.octaneHttpClient = this.octaneHttpClient == null ? new GoogleHttpClient(urlDomain, authentication) : this.octaneHttpClient;
+            OctaneHttpClient client = isHttp2 ? new JettyHttpClient(urlDomain, authentication) : new GoogleHttpClient(urlDomain, authentication);
+            this.octaneHttpClient = this.octaneHttpClient == null ? client : this.octaneHttpClient;
 
             if (octaneHttpClient.authenticate()) {
                 objOctane = getSiteAdmin();

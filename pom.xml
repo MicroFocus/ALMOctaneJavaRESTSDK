@@ -19,7 +19,7 @@
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-root</artifactId>
     <packaging>pom</packaging>
-    <version>16.1.100-SNAPSHOT</version>
+    <version>16.1.100.1-SNAPSHOT</version>
 
     <name>ALM Octane REST API SDK</name>
     <description>The Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP
@@ -93,6 +93,8 @@
         <powermock.version>1.6.1</powermock.version>
         <mockito.version>1.9.5</mockito.version>
         <cobertura.version>2.7</cobertura.version>
+
+        <jetty.version>9.4.49.v20220914</jetty.version>
     </properties>
 
     <dependencies>
