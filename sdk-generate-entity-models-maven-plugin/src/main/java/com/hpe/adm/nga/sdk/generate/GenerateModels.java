@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2021 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2023 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@ package com.hpe.adm.nga.sdk.generate;
 
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.entities.get.GetEntities;
 import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
@@ -136,7 +137,19 @@ public class GenerateModels {
     }
 
     private Map<String, String> generateLists(Octane octane) throws IOException {
-        final Collection<EntityModel> listNodes = octane.entityList("list_nodes").get().addFields("name", "list_root", "id", "logical_name").execute();
+        final Collection<EntityModel> listNodes = new ArrayList<>();
+        GetEntities getListNodes =
+                octane.entityList("list_nodes").get().addFields("name", "list_root", "id", "logical_name").limit(1000);
+
+        int offset = 0;
+        Collection<EntityModel> fetchedListNodes = getListNodes.offset(offset).execute();
+
+        while (fetchedListNodes.size() > 0) {
+            listNodes.addAll(fetchedListNodes);
+            offset += fetchedListNodes.size();
+            fetchedListNodes = getListNodes.offset(offset).execute();
+        }
+
         final Map<String, List<String[]>> mappedListNodes = new HashMap<>();
         final Map<String, String> logicalNameToNameMap = new HashMap<>();
         listNodes.forEach(listNode -> {
@@ -215,6 +228,7 @@ public class GenerateModels {
                     .replaceAll(" ", "_")
                     .replaceAll("&", "N")
                     .replaceAll("/", "_")
+                    .replaceAll("-", "_")
                     .toUpperCase()});
             phaseMap.merge(GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(), true), phaseValueSet, (existingValues, newValues) -> {
                 existingValues.addAll(newValues);

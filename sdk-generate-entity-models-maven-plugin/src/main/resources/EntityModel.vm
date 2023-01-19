@@ -48,7 +48,7 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
 }
 
 #macro (fieldMetadaAnnotations $field)
-@FieldMetadata(filterable = ${field.isFilterable()}, sortable = ${field.isSortable()}, required = ${field.isRequired()}#if(${field.getFieldType()} == "String"), maxLength = ${field.getMaxLength()}L#elseif((${field.getFieldType()} == "Integer") || (${field.getFieldType()} == "Float")), minValue = ${field.getMinValue()}L, maxValue = ${field.getMaxValue()}L#end)
+@FieldMetadata(filterable = ${field.isFilterable()}, sortable = ${field.isSortable()}, required = ${field.isRequired()}#if(${field.getFieldType()} == "String"), maxLength = ${field.getMaxLength()}L#end)
 #end
 
 #macro (multipleReferenceAnnotations $referenceMetadata)

@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2021 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2023 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package com.hpe.adm.nga.sdk.network;
 
 import com.hpe.adm.nga.sdk.APIMode;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.InputStream;
 import java.util.*;
@@ -30,7 +31,8 @@ public abstract class OctaneHttpRequest {
         POST,
         PUT,
         DELETE,
-        POST_BINARY
+        POST_BINARY,
+        POST_BINARY_MULTIPART
     }
 
     public static final String JSON_CONTENT_TYPE = "application/json";
@@ -157,6 +159,27 @@ public abstract class OctaneHttpRequest {
 
         public String getBinaryContentName() {
             return binaryContentName;
+        }
+
+        public String getBinaryContentType() {
+            return binaryContentType;
+        }
+    }
+
+    public static class PostBinaryBulkOctaneHttpRequest extends HasContentOctaneHttpRequest<PostBinaryBulkOctaneHttpRequest> {
+
+        // content, binaryInputStream, binaryContentName
+        List<Triple<String, InputStream, String>> binaryFileInfo;
+        private String binaryContentType;
+
+        public PostBinaryBulkOctaneHttpRequest(final String url, List<Triple<String, InputStream, String>> binaryFileInfo, String binaryContentType) {
+            super(url, OctaneRequestMethod.POST_BINARY_MULTIPART, OCTET_STREAM_CONTENT_TYPE, null);
+            this.binaryFileInfo = binaryFileInfo;
+            this.binaryContentType = binaryContentType;
+        }
+
+        public List<Triple<String, InputStream, String>> getBinaryFileInfo() {
+            return binaryFileInfo;
         }
 
         public String getBinaryContentType() {

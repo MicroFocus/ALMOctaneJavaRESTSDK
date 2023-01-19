@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2021 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2023 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,11 +25,13 @@ import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpCookie;
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -38,6 +40,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.concurrent.Phaser;
 import java.util.function.Consumer;
 
 /**
@@ -70,9 +73,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
     protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
-    protected Date lastSuccessfulAuthTimestamp;
+    protected Long lastSuccessfulAuthTimestamp;
     private final Map<OctaneHttpRequest, OctaneHttpResponse> cachedRequestToResponse = new HashMap<>();
     private final Map<OctaneHttpRequest, String> requestToEtagMap = new HashMap<>();
+
+    private final ThreadLocal<Long> requestStartTime = new ThreadLocal<>();
+    private final Phaser requestPhaser = new Phaser(1);
+    private boolean areNewCookiesReceived;
 
     // identity operation by default. do nothing
     private Consumer<HttpRequest> customRequestInitializer = request -> {
@@ -81,8 +88,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     private final Consumer<HttpRequest> defaultRequestInitializer = request -> {
         request.setResponseInterceptor(response -> {
             // retrieve new LWSSO in response if any
-            HttpHeaders responseHeaders = response.getHeaders();
-            updateLWSSOCookieValue(responseHeaders);
+            updateLWSSOCookieValue(response);
         });
 
         request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
@@ -209,7 +215,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             HttpResponse response = executeRequest(httpRequest);
 
             if (response.isSuccessStatusCode()) {
-                lastSuccessfulAuthTimestamp = new Date();
+                lastSuccessfulAuthTimestamp = System.currentTimeMillis();
                 return true;
             } else {
                 return false;
@@ -227,8 +233,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             HttpResponse response = executeRequest(httpRequest);
 
             if (response.isSuccessStatusCode()) {
-                HttpHeaders hdr1 = response.getHeaders();
-                updateLWSSOCookieValue(hdr1);
+                updateLWSSOCookieValue(response);
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {
@@ -266,6 +271,13 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 }
                 case POST_BINARY: {
                     httpRequest = buildBinaryPostRequest((OctaneHttpRequest.PostBinaryOctaneHttpRequest) octaneHttpRequest);
+                    break;
+                }
+                case POST_BINARY_MULTIPART: {
+                    OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest postBinaryBulkOctaneHttpRequest = (OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest) octaneHttpRequest;
+                    GenericUrl domain = new GenericUrl(octaneHttpRequest.getRequestUrl());
+                    httpRequest = requestFactory.buildPostRequest(domain, generateBinaryBulkPostRequest(postBinaryBulkOctaneHttpRequest));
+                    httpRequest.getHeaders().setAccept(postBinaryBulkOctaneHttpRequest.getAcceptType());
                     break;
                 }
                 case PUT: {
@@ -329,12 +341,17 @@ public class GoogleHttpClient implements OctaneHttpClient {
      */
     private OctaneHttpResponse execute(OctaneHttpRequest octaneHttpRequest, int retryCount) {
 
-        final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
-        final HttpResponse httpResponse;
-
         try {
-            httpResponse = executeRequest(httpRequest);
-
+            final HttpResponse httpResponse;
+            try {
+                // wait auth or set cookies and register new request
+                registerNewRequest();
+                final HttpRequest httpRequest = convertOctaneRequestToGoogleHttpRequest(octaneHttpRequest);
+                httpResponse = executeRequest(httpRequest);
+            } finally {
+                // unregister current request
+                requestPhaser.arriveAndDeregister();
+            }
             final OctaneHttpResponse octaneHttpResponse = convertHttpResponseToOctaneHttpResponse(httpResponse);
             final String eTag = httpResponse.getHeaders().getETag();
             if (eTag != null) {
@@ -366,13 +383,12 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         (ERROR_CODE_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue()) || ERROR_CODE_GLOBAL_TOKEN_EXPIRED.equals(errorCodeFieldModel.getValue())) &&
                         lastUsedAuthentication != null) {
 
-                    Date currentTimestamp = new Date();
-
                     // The same http client should not attempt re-auth from multiple threads
                     synchronized (this) {
-
                         // If another thread already handled session timeout, skip the re-auth and just retry the request
-                        if (lastSuccessfulAuthTimestamp.getTime() < currentTimestamp.getTime()) {
+                        if (lastSuccessfulAuthTimestamp < requestStartTime.get()) {
+                            // wait until all current requests are finished before authenticate
+                            requestPhaser.arriveAndAwaitAdvance();
                             logger.debug("Auth token expired, trying to re-authenticate");
                             try {
                                 authenticate();
@@ -382,15 +398,22 @@ public class GoogleHttpClient implements OctaneHttpClient {
                         } else {
                             logger.debug("Auth token expired, but re-authentication was handled by another thread, will not re-authenticate");
                         }
-
                         logger.debug("Retrying request, retries left: {}", retryCount);
-                        return execute(octaneHttpRequest, --retryCount);
                     }
+                    return execute(octaneHttpRequest, --retryCount);
                 }
             }
 
             throw exception;
         }
+    }
+
+    private synchronized void registerNewRequest() {
+        if (areNewCookiesReceived) {
+            requestPhaser.arriveAndAwaitAdvance();
+            areNewCookiesReceived = false;
+        }
+        requestPhaser.register();
     }
 
     private HttpResponse executeRequest(final HttpRequest httpRequest) {
@@ -405,6 +428,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
         HttpResponse response;
         try {
+            requestStartTime.set(System.currentTimeMillis());
             response = httpRequest.execute();
         } catch (Exception e) {
             throw wrapException(e, httpRequest);
@@ -509,6 +533,16 @@ public class GoogleHttpClient implements OctaneHttpClient {
         return httpRequest;
     }
 
+    private MultipartContent generateBinaryBulkPostRequest(OctaneHttpRequest.PostBinaryBulkOctaneHttpRequest postBinaryBulkOctaneHttpRequest) {
+        MultipartContent content = new MultipartContent()
+                .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
+                        .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
+
+        postBinaryBulkOctaneHttpRequest.getBinaryFileInfo()
+                .forEach(binaryFile -> addBinaryFileToMultiPart(content, postBinaryBulkOctaneHttpRequest.getBinaryContentType(), binaryFile));
+        return content;
+    }
+
     /**
      * Generates HTTP content based on input parameters and stream.
      *
@@ -521,7 +555,11 @@ public class GoogleHttpClient implements OctaneHttpClient {
                 .setMediaType(new HttpMediaType(HTTP_MEDIA_TYPE_MULTIPART_NAME)
                         .setParameter(HTTP_MULTIPART_BOUNDARY_NAME, HTTP_MULTIPART_BOUNDARY_VALUE));
 
-        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", octaneHttpRequest.getContent().getBytes(StandardCharsets.UTF_8));
+        return addBinaryFileToMultiPart(content, octaneHttpRequest.getBinaryContentType(), Triple.of(octaneHttpRequest.getContent(), octaneHttpRequest.getBinaryInputStream(), octaneHttpRequest.getBinaryContentName()));
+    }
+
+    private MultipartContent addBinaryFileToMultiPart(MultipartContent content, String contentType, Triple<String, InputStream, String> binaryContent) {
+        ByteArrayContent byteArrayContent = new ByteArrayContent("application/json", binaryContent.getLeft().getBytes(StandardCharsets.UTF_8));
         MultipartContent.Part part1 = new MultipartContent.Part(byteArrayContent);
         String contentDisposition = String.format(HTTP_MULTIPART_PART1_DISPOSITION_FORMAT, HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE);
         HttpHeaders httpHeaders = new HttpHeaders()
@@ -531,9 +569,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
         content.addPart(part1);
 
         // Add Stream
-        InputStreamContent inputStreamContent = new InputStreamContent(octaneHttpRequest.getBinaryContentType(), octaneHttpRequest.getBinaryInputStream());
+        InputStreamContent inputStreamContent = new InputStreamContent(contentType, binaryContent.getMiddle());
         MultipartContent.Part part2 = new MultipartContent.Part(inputStreamContent);
-        part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, octaneHttpRequest.getBinaryContentName())));
+        part2.setHeaders(new HttpHeaders().set(HTTP_MULTIPART_PART_DISPOSITION_NAME, String.format(HTTP_MULTIPART_PART2_DISPOSITION_FORMAT, binaryContent.getRight())));
         content.addPart(part2);
         return content;
     }
@@ -541,14 +579,21 @@ public class GoogleHttpClient implements OctaneHttpClient {
     /**
      * Retrieve new cookie from set-cookie header
      *
-     * @param headers The headers containing the cookie
+     * @param response The response containing the set-cookie header or not
      * @return true if LWSSO cookie is renewed
      */
-    private boolean updateLWSSOCookieValue(HttpHeaders headers) {
+    private boolean updateLWSSOCookieValue(HttpResponse response) {
+        HttpHeaders headers = response.getHeaders();
         boolean renewed = false;
         List<String> cookieHeaderValue = headers.getHeaderStringValues(SET_COOKIE);
         if (cookieHeaderValue.isEmpty()) {
             return false;
+        }
+
+        String url = response.getRequest().getUrl().getRawPath();
+        // if not auth and SET_COOKIE is received then stop all new requests until started requests are finished
+        if (!url.contains(OAUTH_AUTH_URL)) {
+            areNewCookiesReceived = true;
         }
 
         /* Following code failed to parse set-cookie to get LWSSO cookie due to cookie version, check RFC 2965

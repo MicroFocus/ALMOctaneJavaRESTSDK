@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2021 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2023 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,36 +13,33 @@
  */
 package com.hpe.adm.nga.sdk.utils;
 
-import org.apache.commons.configuration2.CombinedConfiguration;
-import org.apache.commons.configuration2.SystemConfiguration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
- *
  * Created by brucesp on 06/06/2016.
  */
 public class ConfigurationUtils {
-	private static final ConfigurationUtils INSTANCE = new ConfigurationUtils();
+    private static final ConfigurationUtils INSTANCE = new ConfigurationUtils();
 
-	final CombinedConfiguration combinedConfiguration;
+    final Properties combinedConfiguration = new Properties();
 
-	private ConfigurationUtils() {
-		final Configurations configurations = new Configurations();
-		combinedConfiguration = new CombinedConfiguration();
-		try {
-			combinedConfiguration.addConfiguration(new SystemConfiguration());
-			combinedConfiguration.addConfiguration(configurations.properties("configuration.properties"));
-		} catch (ConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private ConfigurationUtils() {
+        try {
+            combinedConfiguration.load(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("configuration.properties"));
+            System.getProperties()
+                    .forEach((key, value) -> combinedConfiguration.setProperty(key.toString(), value.toString()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public static final ConfigurationUtils getInstance() {
-		return INSTANCE;
-	}
+    public static final ConfigurationUtils getInstance() {
+        return INSTANCE;
+    }
 
-	public final String getString(final String property) {
-		return combinedConfiguration.getString(property);
-	}
+    public final String getString(final String property) {
+        return combinedConfiguration.getProperty(property);
+    }
 }

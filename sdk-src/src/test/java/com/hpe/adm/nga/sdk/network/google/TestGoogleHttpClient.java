@@ -1,5 +1,5 @@
 /*
- * © Copyright 2016-2021 Micro Focus or one of its affiliates.
+ * © Copyright 2016-2023 Micro Focus or one of its affiliates.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,39 +28,53 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.mockserver.configuration.ConfigurationProperties;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.TimeToLive;
 import org.mockserver.matchers.Times;
+import org.mockserver.mock.action.ExpectationResponseCallback;
 import org.mockserver.model.Cookie;
 import org.mockserver.model.Delay;
+import org.mockserver.model.HttpResponse;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpClassCallback.callback;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.doThrow;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(GoogleHttpClient.class)
 public class TestGoogleHttpClient {
+    public static final String OAUTH_AUTH_URL = "/authentication/sign_in";
+    public static final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
+
+    private static final Logger logger = LoggerFactory.getLogger(TestGoogleHttpClient.class);
 
     @Test
     public void testRequestRetry() throws Exception {
@@ -71,7 +85,9 @@ public class TestGoogleHttpClient {
         doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
         doReturn(true).when(googleHttpClientSpy, "authenticate");
         Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
-        Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", new Date(0));
+        long currentTimeMs = System.currentTimeMillis();
+        Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", currentTimeMs);
+        Whitebox.setInternalState(googleHttpClientSpy, "requestStartTime", ThreadLocal.withInitial(() -> currentTimeMs + 1));
 
         //Create timeout exception, the same way octane does
         ErrorModel errorModel = new ErrorModel(new HashSet<>());
@@ -104,8 +120,8 @@ public class TestGoogleHttpClient {
         int connTimeout = 2345;
 
         Octane.OctaneCustomSettings settings = new Octane.OctaneCustomSettings() {{
-                set(Setting.READ_TIMEOUT,55000);
-                set(Setting.CONNECTION_TIMEOUT,2345);
+            set(Setting.READ_TIMEOUT, 55000);
+            set(Setting.CONNECTION_TIMEOUT, 2345);
         }};
 
         GoogleHttpClient client = new GoogleHttpClient("http://google.com:8090", null, settings);
@@ -205,5 +221,112 @@ public class TestGoogleHttpClient {
                                 .withBody("{\"errorCode\":\"VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT\"," +
                                         "\"accumulatedMessage\":\"Previous validation errors " +
                                         "(non mandatory validators): \"}"));
+    }
+
+    @Test
+    public void testCookieCollision() {
+        try (ClientAndServer clientAndServer = startClientAndServer()) {
+
+            int nrCores = Math.max(Runtime.getRuntime().availableProcessors(), 4);
+            TestOctaneResponseCallback.cores = nrCores;
+
+            clientAndServer
+                    .when(request())
+                    .respond(
+                            callback().withCallbackClass(
+                                    TestOctaneResponseCallback.class
+                            )
+                    );
+
+            Authentication authentication = new SimpleUserAuthentication("", "");
+            String url = "http://localhost:" + clientAndServer.getLocalPort();
+            GoogleHttpClient googleHttpClient = new GoogleHttpClient(url, authentication);
+
+            googleHttpClient.authenticate();
+            Octane octane = new Octane.Builder(authentication, googleHttpClient)
+                    .Server(url).workSpace(1002).sharedSpace(1001).build();
+
+            IntStream.rangeClosed(1, nrCores).parallel().forEach((nr) -> runGetRequests(octane, 5000));
+
+        } catch (Exception e) {
+            fail("Error: " + e.getMessage());
+        }
+    }
+
+    public static class TestOctaneResponseCallback implements ExpectationResponseCallback {
+        public static int cores = 4;
+        private static int regularRequestsCount = 0;
+        private static int authRequestsCount = 0;
+        private static Cookie usingCookie = null;
+        private static Long cookieExpiredAt = null;
+        private static Long cookieShouldBeUpdatedAt = null;
+        private final static Random random = new Random();
+
+        public synchronized void setNewUsingCookie(String name) {
+            usingCookie = new Cookie(LWSSO_COOKIE_KEY, name);
+            cookieExpiredAt = System.currentTimeMillis() + 1000;
+            cookieShouldBeUpdatedAt = System.currentTimeMillis() + 500;
+            logger.debug("Using new cookie: {}={}", usingCookie.getName(), usingCookie.getValue());
+        }
+        public boolean isCookieShouldBeUpdated() {
+            return cookieShouldBeUpdatedAt != null && cookieShouldBeUpdatedAt <= System.currentTimeMillis();
+        }
+        public static Delay getServerDelay() {
+            int max = 50;
+            int min = 10;
+            return Delay.milliseconds(random.nextInt(max - min + 1) + min);
+        }
+        @Override
+        public HttpResponse handle(org.mockserver.model.HttpRequest httpRequest) throws Exception {
+            String howToHandle = "empty";
+            boolean isAuthRequest = httpRequest.getPath().getValue().endsWith(OAUTH_AUTH_URL);
+            synchronized (TestOctaneResponseCallback.class) {
+                if (isAuthRequest) {
+                    howToHandle = "auth";
+                    authRequestsCount++;
+                } else {
+                    if (cookieExpiredAt != null) {
+                        Long currentTime = System.currentTimeMillis();
+                        if (cookieExpiredAt <= currentTime) {
+                            logger.debug("NULL the cookie");
+                            usingCookie = null;
+                        }
+                    }
+                    if (usingCookie != null && httpRequest.getCookies() != null) {
+                        List<Cookie> cookies = httpRequest.getCookies().getEntries();
+                        for (Cookie cookie : cookies) {
+                            if (cookie.equals(usingCookie)) {
+                                howToHandle = "regular";
+                                break;
+                            }
+                        }
+                    }
+                    regularRequestsCount++;
+                }
+            }
+            switch (howToHandle) {
+                case "auth":
+                    synchronized (TestOctaneResponseCallback.class) {
+                        setNewUsingCookie("auth-lwsso-" + authRequestsCount);
+                        return response()
+                                .withStatusCode(200)
+                                .withCookie(usingCookie.getName(), usingCookie.getValue());
+                    }
+                case "regular":
+                    synchronized (TestOctaneResponseCallback.class) {
+                        if (isCookieShouldBeUpdated()) {
+                            setNewUsingCookie("regular-lwsso-" + regularRequestsCount);
+                            return response().withStatusCode(200)
+                                    .withCookie(usingCookie.getName(), usingCookie.getValue());
+                        }
+                    }
+                    return response().withStatusCode(200).withDelay(getServerDelay());
+                default:
+                    return response().withStatusCode(401).withDelay(getServerDelay())
+                            .withBody("{\"errorCode\":\"VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT\"," +
+                                    "\"accumulatedMessage\":\"Previous validation errors " +
+                                    "(non mandatory validators): \"}");
+            }
+        }
     }
 }
