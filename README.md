@@ -5,7 +5,7 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>16.1.100.1</version>
+    <version>16.1.100.2</version>
 </dependency>
 ```
 #### Gradle
@@ -171,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>16.1.100.1</version>
+            <version>16.1.100.2</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,6 +189,8 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* 16.1.100.2
+  * Added Query.NULL and Query.NULL_REFERENCE values for filtering not populated fields
 * 16.1.100.1
   * Added a new OctaneHttpClient using Jetty, for HTTP/2 support 
 * 16.1.100
