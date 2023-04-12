@@ -59,7 +59,7 @@ To enable this, add the following to your project's POM file (assuming 16.1.100 
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>16.1.100.1</version>
+                <version>16.1.100.2</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
