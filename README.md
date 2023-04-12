@@ -10,7 +10,7 @@
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '16.1.100.1'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '16.1.100.2'
 ```
 
 ## Introduction
