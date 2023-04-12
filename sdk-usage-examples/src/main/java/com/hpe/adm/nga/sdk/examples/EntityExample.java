@@ -75,7 +75,8 @@ public class EntityExample {
 
     /**
      * All the dates that are returned by the SDK are in Zulu time (UTC)
-     * Because the SDK uses the java 1.8 time library there is an easy way to convert the time into whatever time zone you want
+     * Because the SDK uses the java 1.8 time library there is an easy way to convert the time into whatever time
+     * zone you want
      * This method show an example on how you can do that for the creation time of an entity.
      */
     public void convertServerZuluTimeToLocalTime() {
@@ -162,6 +163,19 @@ public class EntityExample {
         get.query(statement.build()).execute();
     }
 
+    public void getDefectsWithPopulatedFields() {
+        // the context is for all entities
+        final GetEntities get = entityList.get();
+
+        // to verify that a field is populated we make sure that it is not equal to null
+        // for value fields use Query.NULL and for reference fields Query.NULL_REFERENCE should be used
+        Query.QueryBuilder statement = Query.not("closed_on", QueryMethod.EqualTo, Query.NULL)
+                .and(Query.not("owner", QueryMethod.EqualTo, Query.NULL_REFERENCE));
+
+        // finally build the query object and execute it
+        get.query(statement.build()).execute();
+    }
+
     /**
      * Cross filter query
      * <p>
@@ -207,7 +221,8 @@ public class EntityExample {
                         ))));
 
         // create the fields
-        final Set<FieldModel> entityFields = new HashSet<>(Arrays.asList(nameField, investedHoursField, parentField, phaseField));
+        final Set<FieldModel> entityFields =
+                new HashSet<>(Arrays.asList(nameField, investedHoursField, parentField, phaseField));
 
         final EntityModel entityModel = new EntityModel(entityFields);
 
