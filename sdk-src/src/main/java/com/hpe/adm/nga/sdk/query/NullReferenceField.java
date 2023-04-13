@@ -14,4 +14,7 @@
 package com.hpe.adm.nga.sdk.query;
 
 public class NullReferenceField {
+    public String toString() {
+        return "{null}";
+    }
 }
