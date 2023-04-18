@@ -45,6 +45,8 @@ public class CreateContextExample {
         octaneBuilder.sharedSpace(1001);
         // the workspace
         octaneBuilder.workSpace(1002);
+        //sets the client to HTTP2 client, by default is set to HTTP1.1
+        //octaneBuilder.isHttp2(true);
 
         // finally we build the context and get an Octane instance:
 
