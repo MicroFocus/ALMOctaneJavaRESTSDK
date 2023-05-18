@@ -65,7 +65,10 @@ public final class ModelParser {
 
         Collection<FieldModel> fieldModels = onlyDirty ? entityModel.getDirtyValues() : entityModel.getValues();
         JSONObject objField = new JSONObject();
-        fieldModels.forEach((i) -> objField.put(i.getName(), getFieldValue(i)));
+        fieldModels.forEach((i) -> {
+            Object value = getFieldValue(i);
+            objField.put(i.getName(), Objects.isNull(value) ? JSONObject.NULL : value);
+        });
 
         return objField;
     }
