@@ -43,7 +43,7 @@ public class ${className}EntityModel extends TypedEntityModel implements ${inter
 
 #foreach(${field} in ${fieldMetadata})
     #getter ($field)
-    #if($field.isEditable())#setter ($field)#end
+    #if($field.isEditable())#setter ($field)#clearValue ($field)#end
 #end
 }
 
@@ -170,6 +170,14 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
         #else
         return value;
         #end
+#end
+
+#macro (clearValue $field)
+    #fieldMetadaAnnotations($field)
+    public ${className}EntityModel clear${GeneratorHelper.camelCaseFieldName(${field.name})}() {
+        wrappedEntityModel.setValue(new ${GeneratorHelper.getFieldModel(${field})}("${field.name}", null));
+        return this;
+    }
 #end
 
 #macro (setter $field)
