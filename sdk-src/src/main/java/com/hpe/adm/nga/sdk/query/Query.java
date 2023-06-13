@@ -47,6 +47,8 @@ package com.hpe.adm.nga.sdk.query;
  */
 public class Query {
 
+    public static NullField NULL = new NullField();
+    public static NullReferenceField NULL_REFERENCE = new NullReferenceField();
     protected String queryString = "";
 
     protected Query() {}

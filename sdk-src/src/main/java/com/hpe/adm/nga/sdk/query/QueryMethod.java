@@ -153,8 +153,10 @@ public enum QueryMethod {
      * @return string representation
      */
     private static String toString(Object value) {
-        if (value == null) {
-            return "{null}";
+        if (value == null || value == Query.NULL_REFERENCE) {
+            return Query.NULL_REFERENCE.toString();
+        } else if (value.getClass() == NullField.class) {
+            return Query.NULL.toString();
         } else if (value.getClass() == ZonedDateTime.class) {
             ZonedDateTime zonedDateTime = ((ZonedDateTime) value).withZoneSameInstant(ZoneId.of("Z"));
             return "'" + zonedDateTime + "'";
