@@ -22,20 +22,32 @@ import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.metadata.features.Feature;
 import com.hpe.adm.nga.sdk.metadata.features.RestFeature;
 import com.hpe.adm.nga.sdk.metadata.features.SubTypesOfFeature;
-import com.hpe.adm.nga.sdk.model.*;
+import com.hpe.adm.nga.sdk.model.EmptyFieldModel;
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.FieldModel;
+import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
+import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import static org.eclipse.jetty.util.log.Log.getLog;
 
 /**
  * <p>The class that generates entities based on the metadata from the given ALM Octane server
