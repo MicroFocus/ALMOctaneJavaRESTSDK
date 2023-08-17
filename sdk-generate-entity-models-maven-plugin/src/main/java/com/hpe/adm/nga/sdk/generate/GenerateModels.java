@@ -27,13 +27,15 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.eclipse.jetty.util.log.Log.getLog;
 
 /**
  * <p>The class that generates entities based on the metadata from the given ALM Octane server
@@ -191,7 +193,7 @@ public class GenerateModels {
             velocityContext.put("listItemsSet", entry);
             velocityContext.put("className", className);
             velocityContext.put("packageName", getPackageForList(rootId));
-            final FileWriter fileWriter = new FileWriter(listFile);
+            final OutputStreamWriter fileWriter = new OutputStreamWriter(Files.newOutputStream(listFile.toPath()), StandardCharsets.UTF_8);
             listsTemplate.merge(velocityContext, fileWriter);
             fileWriter.close();
         }
@@ -238,7 +240,7 @@ public class GenerateModels {
 
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("phaseMap", phaseMap);
-        final FileWriter fileWriter = new FileWriter(new File(enumsDirectory, "Phases.java"));
+        final OutputStreamWriter fileWriter = new OutputStreamWriter(Files.newOutputStream(new File(enumsDirectory, "Phases.java").toPath()), StandardCharsets.UTF_8);
         phasesTemplate.merge(velocityContext, fileWriter);
         fileWriter.close();
 
@@ -306,7 +308,7 @@ public class GenerateModels {
         velocityContext.put("availablePhases", availablePhases);
         velocityContext.put("requiredFields", requiredFields);
 
-        final FileWriter fileWriter = new FileWriter(new File(modelDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityModel.java"));
+        final OutputStreamWriter fileWriter = new OutputStreamWriter(Files.newOutputStream(new File(modelDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityModel.java").toPath()), StandardCharsets.UTF_8);
         template.merge(velocityContext, fileWriter);
 
         fileWriter.close();
@@ -353,7 +355,7 @@ public class GenerateModels {
         interfaceVelocityContext.put("superInterfaceName",
                 (subTypeOfFeature.map(feature -> GeneratorHelper.camelCaseFieldName(((SubTypesOfFeature) feature).getType())).orElse("")) + "Entity");
 
-        final FileWriter interfaceFileWriter = new FileWriter(new File(modelDirectory, GeneratorHelper.camelCaseFieldName(name) + "Entity.java"));
+        final OutputStreamWriter interfaceFileWriter = new OutputStreamWriter(Files.newOutputStream(new File(modelDirectory, GeneratorHelper.camelCaseFieldName(name) + "Entity.java").toPath()), StandardCharsets.UTF_8);
         interfaceTemplate.merge(interfaceVelocityContext, interfaceFileWriter);
 
         interfaceFileWriter.close();
@@ -398,7 +400,7 @@ public class GenerateModels {
                 entityListVelocityContext.put("hasTestScript", true);
             }
 
-            final FileWriter entityListFileWriter = new FileWriter(new File(entitiesDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityList.java"));
+            final OutputStreamWriter entityListFileWriter = new OutputStreamWriter(Files.newOutputStream(new File(entitiesDirectory, GeneratorHelper.camelCaseFieldName(name) + "EntityList.java").toPath()), StandardCharsets.UTF_8);
             entityListTemplate.merge(entityListVelocityContext, entityListFileWriter);
 
             entityListFileWriter.close();
