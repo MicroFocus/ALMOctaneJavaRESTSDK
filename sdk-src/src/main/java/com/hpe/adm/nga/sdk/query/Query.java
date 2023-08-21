@@ -101,11 +101,7 @@ public class Query {
      * @return query string
      */
     public String getQueryString() {
-        try {
-            return URLEncoder.encode(queryString, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return queryString;
     }
 
     /**

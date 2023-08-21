@@ -192,6 +192,7 @@ Currently the admin sections are not available using generated entities - but th
 * 23.3.0
   * Query is now sent as an encoded string so that special characters are now supported for api data filtering
   * Fixed bug related to code generation based on ALM Octane entities containing special characters
+  * Updated org.json to version 20230227
 * 16.1.100.3
   * Added new clearField method on generated models which sets the field value to null instead of removing it
 * 16.1.100.2
