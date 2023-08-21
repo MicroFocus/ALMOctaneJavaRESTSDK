@@ -5,12 +5,20 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
+<<<<<<< HEAD
     <version>16.1.100.4</version>
+=======
+    <version>23.3.0</version>
+>>>>>>> master
 </dependency>
 ```
 #### Gradle
 ```groovy
+<<<<<<< HEAD
 compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '16.1.100.4'
+=======
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '23.3.0'
+>>>>>>> master
 ```
 
 ## Introduction
@@ -59,7 +67,11 @@ To enable this, add the following to your project's POM file (assuming 16.1.100 
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
+<<<<<<< HEAD
                 <version>16.1.100.4</version>
+=======
+                <version>23.3.0</version>
+>>>>>>> master
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -171,7 +183,11 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
+<<<<<<< HEAD
             <version>16.1.100.4</version>
+=======
+            <version>23.3.0</version>
+>>>>>>> master
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,8 +205,14 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+<<<<<<< HEAD
 * 16.1.100.4
   * Fixed vulnerability by increasing dependency version to 20230227 for org.json
+=======
+* 23.3.0
+  * Query is now sent as an encoded string so that special characters are now supported for api data filtering
+  * Fixed bug related to code generation based on ALM Octane entities containing special characters
+  * Updated org.json to version 20230227
 * 16.1.100.3
   * Added new clearField method on generated models which sets the field value to null instead of removing it
 * 16.1.100.2
