@@ -16,6 +16,9 @@ package com.hpe.adm.nga.sdk.network;
 
 import com.hpe.adm.nga.sdk.query.Query;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -136,7 +139,11 @@ public final class OctaneUrl {
      * @param query {@link Query} object, build by {@link com.hpe.adm.nga.sdk.query.Query.QueryBuilder}
      */
     public void setDqlQueryParam(Query query) {
-        setParam(OctaneUrl.QUERY_PARAM_NAME, '"' + query.getQueryString() + '"');
+        try {
+            setParam(OctaneUrl.QUERY_PARAM_NAME, '"' + URLEncoder.encode(query.getQueryString(), StandardCharsets.UTF_8.name()) + '"');
+        } catch (UnsupportedEncodingException e) {
+            setParam(OctaneUrl.QUERY_PARAM_NAME, '"' + query.getQueryString() + '"');
+        }
     }
 
     /**
