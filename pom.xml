@@ -55,15 +55,20 @@ limitations under the License.
     </scm>
 
     <organization>
-        <name>Micro Focus</name>
-        <url>http://www.microfocus.com</url>
+        <name>Open Text</name>
+        <url>https://www.opentext.com/</url>
     </organization>
 
     <developers>
         <developer>
             <name>Spencer Bruce</name>
-            <email>spencerbruce@microfocus.com</email>
-            <organization>Micro Focus</organization>
+            <email>sbruce@opentext.com</email>
+            <organization>Open Text</organization>
+        </developer>
+        <developer>
+            <name>Silviu Anton</name>
+            <email>santon@opentext.com</email>
+            <organization>Open Text</organization>
         </developer>
     </developers>
 
