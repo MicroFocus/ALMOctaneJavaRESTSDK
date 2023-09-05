@@ -77,7 +77,7 @@ public class DateFieldModel implements FieldModel<ZonedDateTime> {
 		public void setValue(String newName,ZonedDateTime newValue){
 			
 			name = newName;
-			value = newValue.withZoneSameInstant(ZoneId.of("Z"));
+			value = newValue == null ? null : newValue.withZoneSameInstant(ZoneId.of("Z"));
 		}
 
 
