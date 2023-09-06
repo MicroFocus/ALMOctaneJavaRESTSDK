@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>23.3.0</version>
+    <version>23.3.1</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '23.3.0'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '23.3.1'
 ```
 
 ## Introduction
@@ -59,7 +59,7 @@ To enable this, add the following to your project's POM file (assuming 16.1.100 
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>23.3.0</version>
+                <version>23.3.1</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -171,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>23.3.0</version>
+            <version>23.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,6 +189,10 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* 23.3.1
+  * Fixed bug related to JSON Array response parsing
+  * Fixed DateFieldModel bug related to the clear method
+  * Updated licenses
 * 23.3.0
   * Query is now sent as an encoded string so that special characters are now supported for api data filtering
   * Fixed bug related to code generation based on ALM Octane entities containing special characters
@@ -277,5 +281,4 @@ Currently the admin sections are not available using generated entities - but th
   See the ALM Octane documentation for more information
   
 ## Disclaimer
-  
-Certain versions of software accessible here may contain branding from Hewlett-Packard Company (now HP Inc.) and Hewlett Packard Enterprise Company.  As of September 1, 2017, the software is now offered by Micro Focus, a separately owned and operated company.  Any reference to the HP and Hewlett Packard Enterprise/HPE marks is historical in nature, and the HP and Hewlett Packard Enterprise/HPE marks are the property of their respective owners. 
+Certain versions of software accessible here may contain branding from Hewlett-Packard Company (now HP Inc.) and Hewlett Packard Enterprise Company. This software was acquired by Micro Focus on September 1, 2017, and is now offered by OpenText. Any reference to the HP and Hewlett Packard Enterprise/HPE marks is historical in nature, and the HP and Hewlett Packard Enterprise/HPE marks are the property of their respective owners.
