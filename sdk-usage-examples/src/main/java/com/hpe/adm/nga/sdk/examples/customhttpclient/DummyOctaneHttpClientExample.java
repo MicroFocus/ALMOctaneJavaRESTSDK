@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016-2023 Open Text.
  *
  * The only warranties for products and services of Open Text and
