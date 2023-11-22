@@ -2,9 +2,7 @@ package com.hpe.adm.nga.sdk.model;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -56,6 +54,21 @@ public class Fact {
         });
 
         return facts;
+    }
+
+    public boolean replaceIdAfterPathSequence(String pathSequence, String initialId, String newId) {
+        List<String> pathSequenceList = Arrays.asList(pathSequence.split("/"));
+        int startIndex = Collections.indexOfSubList(pathElements, pathSequenceList);
+        if (startIndex >= 0) {
+            int idPosition = startIndex + pathSequenceList.size();
+            if (pathElements.get(idPosition).equals(initialId)) {
+                pathElements.set(idPosition, newId);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String getType() {
