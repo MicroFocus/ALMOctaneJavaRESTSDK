@@ -117,6 +117,13 @@ public final class ModelParser {
         return objBase;
     }
 
+    public final JSONArray getEntitiesJSONArray(Collection<EntityModel> entitiesModels, boolean onlyDirty) {
+        JSONArray objEntities = new JSONArray();
+        entitiesModels.forEach((i) -> objEntities.put(getEntityJSONObject(i, onlyDirty)));
+
+        return objEntities;
+    }
+
     /**
      * GetEntities an object that represent a field value based on the Field Model
      *
@@ -137,10 +144,13 @@ public final class ModelParser {
             }
 
         } else if (fieldModel.getClass() == MultiReferenceFieldModel.class) {
-
             Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
             fieldValue = getEntitiesJSONObject(entities, false);
-
+        } else if (fieldModel.getClass() == ArrayFieldModel.class) {
+            Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
+            fieldValue = getEntitiesJSONArray(entities, false);
+        } else if (fieldModel.getClass() == FactFieldModel.class) {
+            fieldValue = fieldModel.toString();
         } else {
 
             fieldValue = fieldModel.getValue();
@@ -176,20 +186,18 @@ public final class ModelParser {
             } else if (aObj instanceof Boolean) {
                 fldModel = new BooleanFieldModel(strKey, Boolean.parseBoolean(aObj.toString()));
             } else if (aObj instanceof JSONArray) {
-                fldModel = new ObjectFieldModel(strKey, aObj.toString());
+                fldModel = new ArrayFieldModel(strKey, getEntitiesFromArray((JSONArray) aObj));
             } else if (aObj instanceof JSONObject) {
 
                 JSONObject fieldObject = jsonEntityObj.getJSONObject(strKey);
 
-                if (!fieldObject.isNull(JSON_DATA_NAME)) {
+                if (!fieldObject.isNull(JSON_DATA_NAME) && fieldObject.get(JSON_DATA_NAME) instanceof JSONArray) {
 
                     Collection<EntityModel> entities = getEntities(aObj.toString());
                     fldModel = new MultiReferenceFieldModel(strKey, entities);
-                } else if (!fieldObject.isNull("type") && !fieldObject.isNull("id")) {
+                } else {
                     EntityModel ref = getEntityModel(jsonEntityObj.getJSONObject(strKey));
                     fldModel = new ReferenceFieldModel(strKey, ref);
-                } else {
-                    fldModel = new ObjectFieldModel(strKey, aObj.toString());
                 }
 
             } else if (aObj instanceof String) {
@@ -202,6 +210,13 @@ public final class ModelParser {
 
                 } else {
                     fldModel = new StringFieldModel(strKey, aObj.toString());
+
+                    if (strKey.equals("fact")) {
+                        Fact fact = Fact.getFact(aObj.toString());
+                        if (fact != null) {
+                            fldModel = new FactFieldModel(strKey, fact);
+                        }
+                    }
                 }
             } else {
                 logger.debug(LOGGER_INVALID_FIELD_SCHEME_FORMAT, strKey);
@@ -235,6 +250,13 @@ public final class ModelParser {
             entityModels = new OctaneCollectionImpl<>();
         }
         IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
+
+        return entityModels;
+    }
+
+    private Collection<EntityModel> getEntitiesFromArray(JSONArray jsonArray) {
+        Collection<EntityModel> entityModels = new ArrayList<>();
+        IntStream.range(0, jsonArray.length()).forEach((i) -> entityModels.add(getEntityModel(jsonArray.getJSONObject(i))));
 
         return entityModels;
     }
