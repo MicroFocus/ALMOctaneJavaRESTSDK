@@ -14,18 +14,18 @@ public class BusinessRulesCRUDExample {
     public static void main(String[] args) {
 
         BusinessRulesService sourceService = new BusinessRulesService.Builder()
-                .username("sa@nga")
-                .password("Welcome1")
-                .url("http://localhost:8080")
-                .sharedSpaceId(1001)
-                .workspaceId(11001).build();
+                .username("")
+                .password("")
+                .url("")
+                .sharedSpaceId(0)
+                .workspaceId(0).build();
 
         BusinessRulesService targetService = new BusinessRulesService.Builder()
-                .username("mqm_rnd@hpe.com")
-                .password("Password1")
-                .url("https://pmo8.almoctane.com")
-                .sharedSpaceId(1001)
-                .workspaceId(16001).build();
+                .username("")
+                .password("")
+                .url("")
+                .sharedSpaceId(0)
+                .workspaceId(0).build();
 
         // fetch rules from the source workspace
         OctaneCollection<EntityModel> sourceTeamRules = sourceService.getBusinessRulesForEntityType("team");
