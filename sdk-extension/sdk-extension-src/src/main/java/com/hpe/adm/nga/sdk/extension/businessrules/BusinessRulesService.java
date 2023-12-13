@@ -26,12 +26,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hpe.adm.nga.sdk.businessrules;
+package com.hpe.adm.nga.sdk.extension.businessrules;
 
 import com.hpe.adm.nga.sdk.APIMode;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
-import com.hpe.adm.nga.sdk.entities.OctaneCollection;
 import com.hpe.adm.nga.sdk.entities.get.GetEntities;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.query.Query;
@@ -39,8 +38,6 @@ import com.hpe.adm.nga.sdk.query.QueryMethod;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class BusinessRulesService {
@@ -56,17 +53,17 @@ public class BusinessRulesService {
         this.onSharedSpace = onMasterWorkspace;
     }
 
-    public OctaneCollection<EntityModel> getBusinessRules() {
+    public Collection<BusinessRuleEntityModel> getBusinessRules() {
         GetEntities request = octane.entityList(ENTITY_NAME).get();
 
         if (!onSharedSpace) {
             request = request.query(Query.not("workspace_id", QueryMethod.EqualTo, Long.toString(MASTER_WORKSPACE_ID)).build());
         }
 
-        return request.execute();
+        return request.execute().stream().map(BusinessRuleEntityModel::new).collect(Collectors.toList());
     }
 
-    public OctaneCollection<EntityModel> getBusinessRulesForEntityType(String entityType) {
+    public Collection<BusinessRuleEntityModel> getBusinessRulesForEntityType(String entityType) {
         GetEntities request = octane.entityList(ENTITY_NAME).get();
 
         if (entityType == null) {
@@ -80,7 +77,7 @@ public class BusinessRulesService {
             request = request.query(Query.statement("category", QueryMethod.EqualTo, entityType).build());
         }
 
-        return request.execute();
+        return request.execute().stream().map(BusinessRuleEntityModel::new).collect(Collectors.toList());
     }
 
     public int clearBusinessRules() {
@@ -91,38 +88,50 @@ public class BusinessRulesService {
         return deleteBusinessRules(getBusinessRulesForEntityType(entityType));
     }
 
-    public OctaneCollection<EntityModel> createBusinessRules(OctaneCollection<EntityModel> rules) {
-        rules.forEach(BusinessRulesService::removeNonEditableFields);
+    public Collection<BusinessRuleEntityModel> createBusinessRules(Collection<BusinessRuleEntityModel> rules) {
+        rules.forEach(this::removeNonEditableFields);
 
         return octane.entityList(ENTITY_NAME).create()
-                .entities(rules)
-                .execute();
+                .entities(new ArrayList<>(rules))
+                .execute()
+                .stream()
+                .map(BusinessRuleEntityModel::new)
+                .collect(Collectors.toList());
     }
 
-    public OctaneCollection<EntityModel> updateBusinessRules(OctaneCollection<EntityModel> rules) {
-        rules.forEach(BusinessRulesService::removeNonEditableFields);
+    public Collection<BusinessRuleEntityModel> updateBusinessRules(Collection<BusinessRuleEntityModel> rules) {
+        rules.forEach(this::removeNonEditableFields);
 
         return octane.entityList(ENTITY_NAME).update()
-                .entities(rules)
-                .execute();
+                .entities(new ArrayList<>(rules))
+                .execute()
+                .stream()
+                .map(BusinessRuleEntityModel::new)
+                .collect(Collectors.toList());
     }
 
-    public OctaneCollection<EntityModel> deleteBusinessRulesByIds(Collection<String> businessRulesIds) {
+    public Collection<BusinessRuleEntityModel> deleteBusinessRulesByIds(Collection<String> businessRulesIds) {
         return octane.entityList(ENTITY_NAME)
                 .delete()
                 .query(Query.statement("id", QueryMethod.In, businessRulesIds.toArray()).build())
-                .execute();
+                .execute()
+                .stream()
+                .map(BusinessRuleEntityModel::new)
+                .collect(Collectors.toList());
     }
 
-    private static void removeNonEditableFields(EntityModel rule) {
+    private void removeNonEditableFields(EntityModel rule) {
         rule.removeValue("workspace_id");
         rule.removeValue("logical_name");
         rule.removeValue("index");
         rule.removeValue("last_modified");
         rule.removeValue("version_stamp");
+
+        rule.removeValue("shared");
+        rule.removeValue("is_system");
     }
 
-    public int deleteBusinessRules(OctaneCollection<EntityModel> rules) {
+    public int deleteBusinessRules(Collection<BusinessRuleEntityModel> rules) {
         Collection<String> rulesIds = rules.stream()
                 .map(rule -> ((StringFieldModel) rule.getValue("id")).getValue())
                 .collect(Collectors.toList());

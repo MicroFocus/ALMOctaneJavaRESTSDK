@@ -81,7 +81,7 @@ public final class ModelParser {
         Collection<FieldModel> fieldModels = onlyDirty ? entityModel.getDirtyValues() : entityModel.getValues();
         JSONObject objField = new JSONObject();
         fieldModels.forEach((i) -> {
-            Object value = getFieldValue(i);
+            Object value = i.getJSONValue();
             objField.put(i.getName(), Objects.isNull(value) ? JSONObject.NULL : value);
         });
 
@@ -117,48 +117,6 @@ public final class ModelParser {
         return objBase;
     }
 
-    public final JSONArray getEntitiesJSONArray(Collection<EntityModel> entitiesModels, boolean onlyDirty) {
-        JSONArray objEntities = new JSONArray();
-        entitiesModels.forEach((i) -> objEntities.put(getEntityJSONObject(i, onlyDirty)));
-
-        return objEntities;
-    }
-
-    /**
-     * GetEntities an object that represent a field value based on the Field Model
-     *
-     * @param fieldModel the source fieldModel
-     * @return field value
-     */
-    @SuppressWarnings("rawtypes")
-    private Object getFieldValue(FieldModel fieldModel) {
-
-        Object fieldValue;
-
-        if (fieldModel.getClass() == ReferenceFieldModel.class) {
-            EntityModel fieldEntityModel = ((ReferenceFieldModel) fieldModel).getValue();
-            fieldValue = JSONObject.NULL;
-
-            if (fieldEntityModel != null) {
-                fieldValue = getEntityJSONObject(fieldEntityModel, false);
-            }
-
-        } else if (fieldModel.getClass() == MultiReferenceFieldModel.class) {
-            Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
-            fieldValue = getEntitiesJSONObject(entities, false);
-        } else if (fieldModel.getClass() == ArrayFieldModel.class) {
-            Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
-            fieldValue = getEntitiesJSONArray(entities, false);
-        } else if (fieldModel.getClass() == FactFieldModel.class) {
-            fieldValue = fieldModel.toString();
-        } else {
-
-            fieldValue = fieldModel.getValue();
-        }
-
-        return fieldValue;
-    }
-
     /**
      * get a new EntityModel object based on json object
      *
@@ -186,7 +144,7 @@ public final class ModelParser {
             } else if (aObj instanceof Boolean) {
                 fldModel = new BooleanFieldModel(strKey, Boolean.parseBoolean(aObj.toString()));
             } else if (aObj instanceof JSONArray) {
-                fldModel = new ArrayFieldModel(strKey, getEntitiesFromArray((JSONArray) aObj));
+                fldModel = new ObjectFieldModel(strKey, aObj.toString());
             } else if (aObj instanceof JSONObject) {
 
                 JSONObject fieldObject = jsonEntityObj.getJSONObject(strKey);
@@ -195,9 +153,11 @@ public final class ModelParser {
 
                     Collection<EntityModel> entities = getEntities(aObj.toString());
                     fldModel = new MultiReferenceFieldModel(strKey, entities);
-                } else {
+                } else if (!fieldObject.isNull("type") && !fieldObject.isNull("id")) {
                     EntityModel ref = getEntityModel(jsonEntityObj.getJSONObject(strKey));
                     fldModel = new ReferenceFieldModel(strKey, ref);
+                } else {
+                    fldModel = new ObjectFieldModel(strKey, aObj.toString());
                 }
 
             } else if (aObj instanceof String) {
@@ -210,13 +170,6 @@ public final class ModelParser {
 
                 } else {
                     fldModel = new StringFieldModel(strKey, aObj.toString());
-
-                    if (strKey.equals("fact")) {
-                        Fact fact = Fact.getFact(aObj.toString());
-                        if (fact != null) {
-                            fldModel = new FactFieldModel(strKey, fact);
-                        }
-                    }
                 }
             } else {
                 logger.debug(LOGGER_INVALID_FIELD_SCHEME_FORMAT, strKey);
@@ -250,13 +203,6 @@ public final class ModelParser {
             entityModels = new OctaneCollectionImpl<>();
         }
         IntStream.range(0, jsonDataArr.length()).forEach((i) -> entityModels.add(getEntityModel(jsonDataArr.getJSONObject(i))));
-
-        return entityModels;
-    }
-
-    private Collection<EntityModel> getEntitiesFromArray(JSONArray jsonArray) {
-        Collection<EntityModel> entityModels = new ArrayList<>();
-        IntStream.range(0, jsonArray.length()).forEach((i) -> entityModels.add(getEntityModel(jsonArray.getJSONObject(i))));
 
         return entityModels;
     }

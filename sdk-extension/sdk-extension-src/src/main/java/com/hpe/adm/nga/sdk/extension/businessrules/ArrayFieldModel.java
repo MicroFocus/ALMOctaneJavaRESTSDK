@@ -26,59 +26,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hpe.adm.nga.sdk.model;
+package com.hpe.adm.nga.sdk.extension.businessrules;
 
+import com.hpe.adm.nga.sdk.model.EntityModel;
+import com.hpe.adm.nga.sdk.model.ModelParser;
+import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
+import org.json.JSONArray;
 
-import org.json.JSONObject;
+import java.util.Collection;
 
-/**
- *
- * This class hold the ReferenceFieldModel objects and serve as a ReferenceField type FieldModel data holder
- *
- *
- */
-public class ReferenceFieldModel implements FieldModel<EntityModel> {
+public class ArrayFieldModel extends MultiReferenceFieldModel {
 
-	//Private
-	private EntityModel refValue;
-	private String refName;
+    /**
+     * Creates a new MultiReferenceFieldModel object
+     *
+     * @param newName - Field name
+     * @param value   - Field Value
+     */
+    public ArrayFieldModel(String newName, Collection<EntityModel> value) {
+        super(newName, value);
+    }
 
-	/**
-	 * Creates a new ReferenceFieldModel object
-	 *
-	 * @param name - Field name
-	 * @param value - Field Value
-	 */
-	public ReferenceFieldModel(String name,EntityModel value){
+    @Override
+    public Object getJSONValue() {
+        JSONArray objEntities = new JSONArray();
+        getValue().forEach((i) -> objEntities.put(ModelParser.getInstance().getEntityJSONObject(i)));
 
-		setValue( name, value);
-	}
-
-	/**
-	 * GetEntities Value
-	 */
-	public EntityModel getValue(){
-		return refValue ;
-	}
-
-	/**
-	 * GetEntities name
-	 */
-	public String getName(){
-		return refName;
-	}
-
-	/**
-	 * Set name/value
-	 */
-	public void setValue(String name,EntityModel value){
-
-		refValue = value;
-		refName = name;
-	}
-
-	@Override
-	public Object getJSONValue() {
-		return refValue != null ? ModelParser.getInstance().getEntityJSONObject(refValue) : JSONObject.NULL;
-	}
+        return objEntities;
+    }
 }

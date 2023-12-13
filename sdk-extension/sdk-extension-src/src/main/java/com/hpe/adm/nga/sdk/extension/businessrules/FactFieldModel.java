@@ -26,59 +26,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hpe.adm.nga.sdk.model;
+package com.hpe.adm.nga.sdk.extension.businessrules;
 
+import com.hpe.adm.nga.sdk.model.FieldModel;
 
-import org.json.JSONObject;
+public class FactFieldModel implements FieldModel<Fact> {
 
-/**
- *
- * This class hold the ReferenceFieldModel objects and serve as a ReferenceField type FieldModel data holder
- *
- *
- */
-public class ReferenceFieldModel implements FieldModel<EntityModel> {
+    private String name = "";
+    private Fact value = null;
 
-	//Private
-	private EntityModel refValue;
-	private String refName;
+    public FactFieldModel(String name, Fact value) {
+        setValue(name, value);
+    }
 
-	/**
-	 * Creates a new ReferenceFieldModel object
-	 *
-	 * @param name - Field name
-	 * @param value - Field Value
-	 */
-	public ReferenceFieldModel(String name,EntityModel value){
+    @Override
+    public Fact getValue() {
+        return value;
+    }
 
-		setValue( name, value);
-	}
+    @Override
+    public void setValue(String name, Fact value) {
+        this.name = name;
+        this.value = value;
+    }
 
-	/**
-	 * GetEntities Value
-	 */
-	public EntityModel getValue(){
-		return refValue ;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * GetEntities name
-	 */
-	public String getName(){
-		return refName;
-	}
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 
-	/**
-	 * Set name/value
-	 */
-	public void setValue(String name,EntityModel value){
-
-		refValue = value;
-		refName = name;
-	}
-
-	@Override
-	public Object getJSONValue() {
-		return refValue != null ? ModelParser.getInstance().getEntityJSONObject(refValue) : JSONObject.NULL;
-	}
+    @Override
+    public Object getJSONValue() {
+        return value.toString();
+    }
 }

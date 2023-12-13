@@ -28,6 +28,9 @@
  */
 package com.hpe.adm.nga.sdk.model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.Collection;
 
 
@@ -89,5 +92,15 @@ public class MultiReferenceFieldModel implements FieldModel<Collection<EntityMod
 			data = value;
 		}
 
+		@Override
+		public Object getJSONValue() {
+			JSONObject objBase = new JSONObject();
+			JSONArray objEntities = new JSONArray();
+			objBase.put("data", objEntities);
+			objBase.put("total_count", data.size());
+			objBase.put("exceeds_total_count", false);
+			data.forEach(i -> objEntities.put(ModelParser.getInstance().getEntityJSONObject(i)));
 
+			return objBase;
+		}
 }
