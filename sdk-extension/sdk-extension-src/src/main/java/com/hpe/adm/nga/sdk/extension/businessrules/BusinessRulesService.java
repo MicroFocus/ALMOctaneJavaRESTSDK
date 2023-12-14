@@ -80,6 +80,21 @@ public class BusinessRulesService {
         return request.execute().stream().map(BusinessRuleEntityModel::new).collect(Collectors.toList());
     }
 
+    public Collection<BusinessRuleEntityModel> getBusinessRulesByIds(Collection<String> businessRulesIds) {
+
+        Query query = onSharedSpace ? Query.statement("id", QueryMethod.In, businessRulesIds.toArray()).build() :
+                Query.statement("id", QueryMethod.In, businessRulesIds.toArray())
+                        .and(Query.not("workspace_id", QueryMethod.EqualTo, Long.toString(MASTER_WORKSPACE_ID))).build();
+
+        return octane.entityList(ENTITY_NAME)
+                .get()
+                .query(query)
+                .execute()
+                .stream()
+                .map(BusinessRuleEntityModel::new)
+                .collect(Collectors.toList());
+    }
+
     public int clearBusinessRules() {
         return deleteBusinessRules(getBusinessRules());
     }

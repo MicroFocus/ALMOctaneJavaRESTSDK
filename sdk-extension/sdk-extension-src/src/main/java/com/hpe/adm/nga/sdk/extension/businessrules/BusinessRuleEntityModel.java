@@ -57,12 +57,8 @@ public class BusinessRuleEntityModel extends EntityModel {
                             return new ArrayFieldModel(fieldModel.getName(),
                                     getEntitiesFromArray(new JSONArray(objectFieldModel.getValue())));
                         } catch (Exception e1) {
-                            try {
-                                return new ReferenceFieldModel(fieldModel.getName(),
-                                        convert(ModelParser.getInstance().getEntityModel(new JSONObject(objectFieldModel.getValue()))));
-                            } catch (Exception e2) {
-                                System.out.println(e2.toString());
-                            }
+                            return new ReferenceFieldModel(fieldModel.getName(),
+                                    convert(ModelParser.getInstance().getEntityModel(new JSONObject(objectFieldModel.getValue()))));
                         }
                     } else if (fieldModel instanceof StringFieldModel) {
                         StringFieldModel stringFieldModel = (StringFieldModel) fieldModel;
