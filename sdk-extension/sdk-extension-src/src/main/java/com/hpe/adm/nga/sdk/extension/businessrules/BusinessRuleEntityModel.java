@@ -40,11 +40,13 @@ import java.util.stream.IntStream;
 
 public class BusinessRuleEntityModel extends EntityModel {
 
-    private Collection<Fact> facts = new ArrayList<>();
-
     public BusinessRuleEntityModel(EntityModel entityModel) {
-        super(new HashSet<>(), EntityState.DIRTY);
-        this.setValues(convert(entityModel).getValues());
+        this(entityModel, true);
+    }
+
+    private BusinessRuleEntityModel(EntityModel entityModel, boolean convert) {
+        super(new HashSet<>());
+        this.setValues(convert ? convert(entityModel).getValues() : entityModel.getValues());
     }
 
     private EntityModel convert(EntityModel entityModel) {
@@ -56,7 +58,7 @@ public class BusinessRuleEntityModel extends EntityModel {
                         try {
                             return new ArrayFieldModel(fieldModel.getName(),
                                     getEntitiesFromArray(new JSONArray(objectFieldModel.getValue())));
-                        } catch (Exception e1) {
+                        } catch (Exception e) {
                             return new ReferenceFieldModel(fieldModel.getName(),
                                     convert(ModelParser.getInstance().getEntityModel(new JSONObject(objectFieldModel.getValue()))));
                         }
@@ -66,8 +68,6 @@ public class BusinessRuleEntityModel extends EntityModel {
                         if (stringFieldModel.getName().equals("fact")) {
                             Fact fact = Fact.getFact(stringFieldModel.getValue());
                             if (fact != null) {
-                                facts.add(fact);
-
                                 return new FactFieldModel(stringFieldModel.getName(), fact);
                             }
                         }
@@ -100,10 +100,20 @@ public class BusinessRuleEntityModel extends EntityModel {
     }
 
     public Collection<Fact> getFacts() {
-        return facts;
-    }
+        Collection<Fact> facts = new ArrayList<>();
 
-    public void setFacts(Collection<Fact> facts) {
-        this.facts = facts;
+        this.getValues().forEach(fieldModel -> {
+            if (fieldModel instanceof FactFieldModel) {
+                facts.add(((FactFieldModel) fieldModel).getValue());
+            } else if (fieldModel instanceof MultiReferenceFieldModel) {
+                MultiReferenceFieldModel multiRefFieldModel = (MultiReferenceFieldModel) fieldModel;
+                multiRefFieldModel.getValue().forEach(em -> facts.addAll(new BusinessRuleEntityModel(em, false).getFacts()));
+            } else if (fieldModel instanceof ReferenceFieldModel) {
+                ReferenceFieldModel refFieldModel = (ReferenceFieldModel) fieldModel;
+                facts.addAll(new BusinessRuleEntityModel(refFieldModel.getValue(), false).getFacts());
+            }
+        });
+
+        return facts;
     }
 }
