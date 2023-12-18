@@ -2,4 +2,4 @@
 Extension of ALMOctaneJavaRESTSDK
 - provides http client with support for request/response hooks/interceptors
 - provides option to build a com.hpe.adm.nga.sdk.query.Query directly from a java.lang.String
-
+- provides support for create, retrieve, update and delete operations on business rules using [BusinessRulesService](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/blob/master/sdk-extension/sdk-extension-src/src/main/java/com/hpe/adm/nga/sdk/extension/businessrules/BusinessRulesService.java). It also allows accessing the facts within business rules and makes it possible to change the references inside the facts (see [BusinessRulesCRUDExample](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/blob/master/sdk-extension/sdk-extension-usage-examples/src/main/java/com/hpe/adm/nga/sdk/extension/BusinessRulesCRUDExample.java))
