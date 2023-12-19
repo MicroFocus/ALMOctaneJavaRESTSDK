@@ -42,4 +42,7 @@ public interface FieldModel<T> {
 	default boolean hasValue() {
 		return true;
 	}
+	default Object getJSONValue() {
+		return getValue();
+	}
 }

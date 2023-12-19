@@ -189,6 +189,8 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* CE 23.4
+  * Added support for operating with business rules (see [README](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/blob/master/sdk-extension/README.md))
 * 23.3.1
   * Fixed bug related to JSON Array response parsing
   * Fixed DateFieldModel bug related to the clear method

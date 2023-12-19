@@ -81,7 +81,7 @@ public final class ModelParser {
         Collection<FieldModel> fieldModels = onlyDirty ? entityModel.getDirtyValues() : entityModel.getValues();
         JSONObject objField = new JSONObject();
         fieldModels.forEach((i) -> {
-            Object value = getFieldValue(i);
+            Object value = i.getJSONValue();
             objField.put(i.getName(), Objects.isNull(value) ? JSONObject.NULL : value);
         });
 
@@ -118,38 +118,6 @@ public final class ModelParser {
     }
 
     /**
-     * GetEntities an object that represent a field value based on the Field Model
-     *
-     * @param fieldModel the source fieldModel
-     * @return field value
-     */
-    @SuppressWarnings("rawtypes")
-    private Object getFieldValue(FieldModel fieldModel) {
-
-        Object fieldValue;
-
-        if (fieldModel.getClass() == ReferenceFieldModel.class) {
-            EntityModel fieldEntityModel = ((ReferenceFieldModel) fieldModel).getValue();
-            fieldValue = JSONObject.NULL;
-
-            if (fieldEntityModel != null) {
-                fieldValue = getEntityJSONObject(fieldEntityModel, false);
-            }
-
-        } else if (fieldModel.getClass() == MultiReferenceFieldModel.class) {
-
-            Collection<EntityModel> entities = ((MultiReferenceFieldModel) fieldModel).getValue();
-            fieldValue = getEntitiesJSONObject(entities, false);
-
-        } else {
-
-            fieldValue = fieldModel.getValue();
-        }
-
-        return fieldValue;
-    }
-
-    /**
      * get a new EntityModel object based on json object
      *
      * @param jsonEntityObj - json object
@@ -181,7 +149,7 @@ public final class ModelParser {
 
                 JSONObject fieldObject = jsonEntityObj.getJSONObject(strKey);
 
-                if (!fieldObject.isNull(JSON_DATA_NAME)) {
+                if (!fieldObject.isNull(JSON_DATA_NAME) && fieldObject.get(JSON_DATA_NAME) instanceof JSONArray) {
 
                     Collection<EntityModel> entities = getEntities(aObj.toString());
                     fldModel = new MultiReferenceFieldModel(strKey, entities);
