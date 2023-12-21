@@ -94,6 +94,7 @@ public class TestSharedSpaceAdmin {
         userEntityModel.setValue(new StringFieldModel("first_name", "Tester"+uuid));
         userEntityModel.setValue(new StringFieldModel("last_name", "McTestface"));
         userEntityModel.setValue(new StringFieldModel("password", "Welcome1"));
+        userEntityModel.setValue(new StringFieldModel("phone1", "123456"));
 
         final CreateEntities createUsers = octane.entityList("users").create();
         createUsers.entities(Collections.singleton(userEntityModel));
