@@ -65,11 +65,9 @@ public class BusinessRuleEntityModel extends EntityModel {
                     } else if (fieldModel instanceof StringFieldModel) {
                         StringFieldModel stringFieldModel = (StringFieldModel) fieldModel;
 
-                        if (stringFieldModel.getName().equals("fact")) {
-                            Fact fact = Fact.getFact(stringFieldModel.getValue());
-                            if (fact != null) {
-                                return new FactFieldModel(stringFieldModel.getName(), fact);
-                            }
+                        Fact fact = Fact.getFact(stringFieldModel.getValue());
+                        if (fact != null) {
+                            return new FactFieldModel(stringFieldModel.getName(), fact);
                         }
                     } else if (fieldModel instanceof ReferenceFieldModel) {
                         ReferenceFieldModel refFieldModel = (ReferenceFieldModel) fieldModel;
