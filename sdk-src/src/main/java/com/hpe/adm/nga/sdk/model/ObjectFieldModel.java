@@ -28,11 +28,18 @@
  */
 package com.hpe.adm.nga.sdk.model;
 
+import org.json.JSONObject;
+
 /**
  * This class hold the ObjectFieldModel objects. These are normally arbitrary JSON objects.  In this case the JSON is
  * represented as a string
  */
 public class ObjectFieldModel extends StringFieldModel implements FieldModel<String> {
+
+    @Override
+    public Object getJSONValue() {
+        return new JSONObject(getValue());
+    }
 
     /**
      * Creates a new StringFieldModel object
