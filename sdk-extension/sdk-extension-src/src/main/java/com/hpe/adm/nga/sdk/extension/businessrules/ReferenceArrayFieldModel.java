@@ -35,15 +35,19 @@ import org.json.JSONArray;
 
 import java.util.Collection;
 
-public class ArrayFieldModel extends MultiReferenceFieldModel {
+/**
+ * This class hold the ReferenceArrayFieldModel objects. These are normally arbitrary JSON arrays of entity models.  In this case the JSON is
+ * represented as a Collection<EntityModel>
+ */
+public class ReferenceArrayFieldModel extends MultiReferenceFieldModel {
 
     /**
-     * Creates a new MultiReferenceFieldModel object
+     * Creates a new ReferenceArrayFieldModel object
      *
      * @param newName - Field name
      * @param value   - Field Value
      */
-    public ArrayFieldModel(String newName, Collection<EntityModel> value) {
+    public ReferenceArrayFieldModel(String newName, Collection<EntityModel> value) {
         super(newName, value);
     }
 

@@ -144,7 +144,7 @@ public final class ModelParser {
             } else if (aObj instanceof Boolean) {
                 fldModel = new BooleanFieldModel(strKey, Boolean.parseBoolean(aObj.toString()));
             } else if (aObj instanceof JSONArray) {
-                fldModel = new ObjectFieldModel(strKey, aObj.toString());
+                fldModel = new ArrayFieldModel(strKey, aObj.toString());
             } else if (aObj instanceof JSONObject) {
 
                 JSONObject fieldObject = jsonEntityObj.getJSONObject(strKey);
