@@ -52,11 +52,11 @@ public class BusinessRuleEntityModel extends EntityModel {
     private EntityModel convert(EntityModel entityModel) {
         entityModel.setValues(entityModel.getValues().stream()
                 .map(fieldModel -> {
-                    if (fieldModel instanceof ObjectFieldModel) {
-                        ObjectFieldModel objectFieldModel = (ObjectFieldModel) fieldModel;
+                    if (fieldModel instanceof ArrayFieldModel) {
+                        ArrayFieldModel objectFieldModel = (ArrayFieldModel) fieldModel;
 
                         try {
-                            return new ArrayFieldModel(fieldModel.getName(),
+                            return new ReferenceArrayFieldModel(fieldModel.getName(),
                                     getEntitiesFromArray(new JSONArray(objectFieldModel.getValue())));
                         } catch (Exception e) {
                             return new ReferenceFieldModel(fieldModel.getName(),
