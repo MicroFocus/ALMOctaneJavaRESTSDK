@@ -37,7 +37,7 @@ import java.util.Collection;
 
 /**
  * This class hold the ReferenceArrayFieldModel objects. These are normally arbitrary JSON arrays of entity models.  In this case the JSON is
- * represented as a Collection<EntityModel>
+ * represented as a Collection of EntityModel
  */
 public class ReferenceArrayFieldModel extends MultiReferenceFieldModel {
 
