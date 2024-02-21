@@ -45,7 +45,7 @@ public class BusinessRuleEntityModel extends EntityModel {
         this(entityModel, true);
     }
 
-    private BusinessRuleEntityModel(EntityModel entityModel, boolean convert) {
+    public BusinessRuleEntityModel(EntityModel entityModel, boolean convert) {
         super(new HashSet<>());
         this.setValues(convert ? convert(entityModel).getValues() : entityModel.getValues());
     }
