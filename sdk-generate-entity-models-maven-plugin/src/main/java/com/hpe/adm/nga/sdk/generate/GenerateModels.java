@@ -253,12 +253,8 @@ public class GenerateModels {
         final Collection<EntityModel> phases = octane.entityList("phases").get().addFields("id", "name", "entity").execute();
         phases.forEach(phase -> {
             final Set<String[]> phaseValueSet = new HashSet<>();
-            phaseValueSet.add(new String[]{phase.getId(), ((StringFieldModel) phase.getValue("name")).getValue()
-                    .replaceAll(" ", "_")
-                    .replaceAll("&", "N")
-                    .replaceAll("/", "_")
-                    .replaceAll("-", "_")
-                    .toUpperCase()});
+
+            phaseValueSet.add(new String[]{phase.getId(), createIdentifier(((StringFieldModel) phase.getValue("name")).getValue())});
             phaseMap.merge(GeneratorHelper.camelCaseFieldName(((StringFieldModel) phase.getValue("entity")).getValue(), true), phaseValueSet, (existingValues, newValues) -> {
                 existingValues.addAll(newValues);
                 return existingValues;
@@ -432,5 +428,24 @@ public class GenerateModels {
 
             entityListFileWriter.close();
         }
+    }
+
+    private String createIdentifier(final String phaseValue) {
+        if (phaseValue == null || phaseValue.length() == 0) {
+            return "_";
+        }
+
+        final char[] c = phaseValue.toCharArray();
+        if (!Character.isJavaIdentifierStart(c[0])) {
+            c[0] = '_';
+        }
+
+        for (int i = 1; i < c.length; i++) {
+            if (!Character.isJavaIdentifierPart(c[i])) {
+                c[i] = '_';
+            }
+        }
+
+        return new String(c).toUpperCase();
     }
 }
