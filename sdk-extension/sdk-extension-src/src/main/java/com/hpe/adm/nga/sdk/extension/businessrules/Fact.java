@@ -48,9 +48,9 @@ public class Fact {
 
     public static Fact getFact(String factString) {
         int paranthesisIndex = factString.indexOf("(");
-        if (paranthesisIndex > 0) {
-            Pattern pathElementPattern = Pattern.compile("\\(\"(?<element>.+?)\"\\)");
-            Matcher matcher = pathElementPattern.matcher(factString.substring(paranthesisIndex, factString.length()));
+        if (paranthesisIndex > 0 && !factString.substring(0, paranthesisIndex).matches(".*\\s.*")) {
+            Pattern pathElementPattern = Pattern.compile("\\(\"(?<element>[^\"]+?)\"\\)");
+            Matcher matcher = pathElementPattern.matcher(factString.substring(paranthesisIndex));
             List<String> pathElements = new ArrayList<>();
 
             while (matcher.find()) {

@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class BusinessRuleEntityModel extends EntityModel {
 
@@ -53,21 +54,23 @@ public class BusinessRuleEntityModel extends EntityModel {
         entityModel.setValues(entityModel.getValues().stream()
                 .map(fieldModel -> {
                     if (fieldModel instanceof ArrayFieldModel) {
-                        ArrayFieldModel objectFieldModel = (ArrayFieldModel) fieldModel;
+                        ArrayFieldModel arrayFieldModel = (ArrayFieldModel) fieldModel;
 
-                        try {
-                            return new ReferenceArrayFieldModel(fieldModel.getName(),
-                                    getEntitiesFromArray(new JSONArray(objectFieldModel.getValue())));
-                        } catch (Exception e) {
-                            return new ReferenceFieldModel(fieldModel.getName(),
-                                    convert(ModelParser.getInstance().getEntityModel(new JSONObject(objectFieldModel.getValue()))));
-                        }
+                        return new ReferenceArrayFieldModel(fieldModel.getName(),
+                                getEntitiesFromArray(new JSONArray(arrayFieldModel.getValue())));
+                    } else if (fieldModel instanceof ObjectFieldModel) {
+                        ObjectFieldModel objectFieldModel = (ObjectFieldModel) fieldModel;
+
+                        return new ReferenceFieldModel(fieldModel.getName(),
+                                convert(ModelParser.getInstance().getEntityModel(new JSONObject(objectFieldModel.getValue()))));
                     } else if (fieldModel instanceof StringFieldModel) {
                         StringFieldModel stringFieldModel = (StringFieldModel) fieldModel;
 
-                        Fact fact = Fact.getFact(stringFieldModel.getValue());
-                        if (fact != null) {
-                            return new FactFieldModel(stringFieldModel.getName(), fact);
+                        if (!Stream.of("comment", "value").collect(Collectors.toSet()).contains(fieldModel.getName())) {
+                            Fact fact = Fact.getFact(stringFieldModel.getValue());
+                            if (fact != null) {
+                                return new FactFieldModel(stringFieldModel.getName(), fact);
+                            }
                         }
                     } else if (fieldModel instanceof ReferenceFieldModel) {
                         ReferenceFieldModel refFieldModel = (ReferenceFieldModel) fieldModel;
