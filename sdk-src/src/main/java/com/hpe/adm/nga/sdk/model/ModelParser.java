@@ -29,6 +29,7 @@
 package com.hpe.adm.nga.sdk.model;
 
 import com.hpe.adm.nga.sdk.entities.OctaneCollection;
+import java.time.format.DateTimeParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -44,7 +45,6 @@ public final class ModelParser {
     private static final String JSON_ERRORS_NAME = "errors";
     private static final String JSON_TOTAL_COUNT_NAME = "total_count";
     private static final String JSON_EXCEEDS_TOTAL_COUNT_NAME = "exceeds_total_count";
-    private static final String REGEX_DATE_FORMAT = "\\d{4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z";
     private static final String LOGGER_INVALID_FIELD_SCHEME_FORMAT = "{} field scheme is invalid";
 
     private final Logger logger = LoggerFactory.getLogger(ModelParser.class.getName());
@@ -162,15 +162,13 @@ public final class ModelParser {
 
             } else if (aObj instanceof String) {
 
-                boolean isMatch = aObj.toString().matches(REGEX_DATE_FORMAT);
-                if (isMatch) {
-
-                    final ZonedDateTime zonedDateTime = ZonedDateTime.parse(aObj.toString());
+                try {
+                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(aObj.toString());
                     fldModel = new DateFieldModel(strKey, zonedDateTime);
-
-                } else {
+                } catch (DateTimeParseException e) {
                     fldModel = new StringFieldModel(strKey, aObj.toString());
                 }
+
             } else {
                 logger.debug(LOGGER_INVALID_FIELD_SCHEME_FORMAT, strKey);
                 continue; //do not put it inside the model object to avoid a null pointer exception
