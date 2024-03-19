@@ -34,6 +34,7 @@ import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.BasicAuthentication;
 import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
+import com.hpe.adm.nga.sdk.authentication.SessionIdAuthentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.*;
@@ -211,6 +212,10 @@ public class GoogleHttpClient implements OctaneHttpClient {
             return false;
         }
         if (lastUsedAuthentication.isBasicAuthentication()) {
+            return true;
+        }
+        if (lastUsedAuthentication.isSessionIdAuthentication()) {
+            lwssoValue = ((SessionIdAuthentication) lastUsedAuthentication).getSessionID();
             return true;
         }
         //reset so it's not sent to auth request, server might return 304

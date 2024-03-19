@@ -41,7 +41,7 @@ public abstract class BasicAuthentication extends Authentication {
      * @param apiMode The mode to use if necessary
      */
     BasicAuthentication(final APIMode apiMode) {
-        super(apiMode, true);
+        super(apiMode, true, false);
     }
 
     /**
