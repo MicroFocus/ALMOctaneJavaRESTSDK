@@ -43,7 +43,7 @@ public class SessionIdAuthentication extends Authentication {
      * @param sessionID             The session ID
      * @param apiMode               The mode
      */
-    SessionIdAuthentication(String sessionID, APIMode apiMode) {
+    public SessionIdAuthentication(String sessionID, APIMode apiMode) {
         super(apiMode, false, true);
         this.sessionID = sessionID;
     }
