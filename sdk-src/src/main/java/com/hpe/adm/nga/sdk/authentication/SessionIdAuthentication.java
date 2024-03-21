@@ -31,30 +31,24 @@ package com.hpe.adm.nga.sdk.authentication;
 import com.hpe.adm.nga.sdk.APIMode;
 
 /**
- * Represents basic authentication
+ * Authentication using the LWSSO cookie directly
  */
-public abstract class BasicAuthentication extends Authentication {
+public class SessionIdAuthentication extends Authentication {
+
+    private final String sessionID;
 
     /**
-     * Represents basic authentication
+     * The mode to use or null if none is needed
      *
-     * @param apiMode The mode to use if necessary
+     * @param sessionID             The session ID
+     * @param apiMode               The mode
      */
-    BasicAuthentication(final APIMode apiMode) {
-        super(apiMode, true, false);
+    public SessionIdAuthentication(String sessionID, APIMode apiMode) {
+        super(apiMode, false, true);
+        this.sessionID = sessionID;
     }
 
-    /**
-     * The id that is used for the authentication
-     *
-     * @return client id or username
-     */
-    abstract public String getAuthenticationId();
-
-    /**
-     * The secret that is used for the authentication
-     *
-     * @return client secret or password
-     */
-    abstract public String getAuthenticationSecret();
+    public String getSessionID() {
+        return sessionID;
+    }
 }

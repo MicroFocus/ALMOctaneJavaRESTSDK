@@ -42,15 +42,17 @@ public abstract class Authentication {
 
     private final APIMode apiMode;
     private final boolean isBasicAuthentication;
+    private final boolean isSessionIdAuthentication;
 
     /**
      * The mode to use or null if none is needed
      *
      * @param apiMode The mode
      */
-    Authentication(final APIMode apiMode, final boolean isBasicAuthentication) {
+    Authentication(final APIMode apiMode, final boolean isBasicAuthentication, final boolean isSessionIdAuthentication) {
         this.apiMode = apiMode;
         this.isBasicAuthentication = isBasicAuthentication;
+        this.isSessionIdAuthentication = isSessionIdAuthentication;
     }
 
     /**
@@ -72,6 +74,15 @@ public abstract class Authentication {
      */
     public final boolean isBasicAuthentication() {
         return isBasicAuthentication;
+    }
+
+    /**
+     * Returns whether this authentication type is based on provided LWSSOCOOKIE
+     *
+     * @return is based on LWSSO
+     */
+    public final boolean isSessionIdAuthentication() {
+        return isSessionIdAuthentication;
     }
 }
 
