@@ -40,7 +40,7 @@ abstract public class JSONAuthentication extends Authentication {
     private static final String JSON_STRING = "{\"%s\":\"%s\",\"%s\":\"%s\"}";
 
     JSONAuthentication(final APIMode apiMode) {
-        super(apiMode, false);
+        super(apiMode, false, false);
     }
 
     /**
