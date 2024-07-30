@@ -5,7 +5,7 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>24.1.5</version>
+    <version>24.3.0</version>
 </dependency>
 ```
 #### Gradle
@@ -59,7 +59,7 @@ To enable this, add the following to your project's POM file (assuming 16.1.100 
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>24.1.5</version>
+                <version>24.3.0</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -171,7 +171,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>24.1.5</version>
+            <version>24.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,6 +189,8 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* CE 24.3.0
+  * Generate entities plugin now supports fields that point to generic lists (e.g. EntityIconEntityModel.conditionFieldValue)
 * CE 24.1.5
   * Fixed vulnerabilities from jetty
 * CE 24.1.4

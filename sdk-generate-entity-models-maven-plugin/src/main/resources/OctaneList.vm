@@ -1,0 +1,9 @@
+package com.hpe.adm.nga.sdk.enums;
+
+import com.hpe.adm.nga.sdk.model.EntityModel;
+
+public interface OctaneList {
+
+    public String getId();
+    public EntityModel getAsEntityModel();
+}
