@@ -34,7 +34,7 @@
 	<parent>
         <groupId>com.microfocus.adm.almoctane.sdk.extension</groupId>
         <artifactId>sdk-extension-root</artifactId>
-        <version>24.1.4-SNAPSHOT</version>
+        <version>24.1.5-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
