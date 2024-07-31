@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
@@ -82,7 +83,7 @@ import java.util.stream.Collectors;
  */
 public class GenerateModels {
 
-    private final Template template, interfaceTemplate, entityListTemplate, phasesTemplate, listsTemplate;
+    private final Template template, interfaceTemplate, entityListTemplate, phasesTemplate, listsTemplate, listInterfaceTemplate;
     private final File modelDirectory, entitiesDirectory, enumsDirectory;
 
     /**
@@ -114,6 +115,7 @@ public class GenerateModels {
         entityListTemplate = velocityEngine.getTemplate("/TypedEntityList.vm");
         phasesTemplate = velocityEngine.getTemplate("/Phases.vm");
         listsTemplate = velocityEngine.getTemplate("/Lists.vm");
+        listInterfaceTemplate = velocityEngine.getTemplate("/OctaneList.vm");
     }
 
     /**
@@ -126,6 +128,7 @@ public class GenerateModels {
      * @throws IOException A problem with the generation of the entities
      */
     public void generate(Authentication authentication, String server, long sharedSpace, long workSpace) throws IOException {
+        generateListInterface();
         final Octane octane = new Octane.Builder(authentication).sharedSpace(sharedSpace).workSpace(workSpace).Server(server).build();
         final Metadata metadata = octane.metadata();
         final Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
@@ -142,6 +145,13 @@ public class GenerateModels {
             generateInterface(entityMetadatum, name, interfaceName);
             generateEntityList(entityMetadatum, name, fieldMetadata);
         }
+    }
+
+    private void generateListInterface() throws IOException {
+        final VelocityContext velocityContext = new VelocityContext();
+        final OutputStreamWriter fileWriter = new OutputStreamWriter(Files.newOutputStream(new File(enumsDirectory, "OctaneList.java").toPath()), StandardCharsets.UTF_8);
+        listInterfaceTemplate.merge(velocityContext, fileWriter);
+        fileWriter.close();
     }
 
     /**
@@ -282,7 +292,7 @@ public class GenerateModels {
                         references.add("com.hpe.adm.nga.sdk.enums.Phases." + className + "Phase");
                     } else if (fieldMetadata1.getFieldType() == FieldMetadata.FieldType.Reference) {
                         if ((!entityMetadatum.getName().equals("list_node")) && (fieldMetadata1.getFieldTypedata().getTargets()[0].getType().equals("list_node"))) {
-                            final String listName = logicalNameToListsMap.get(fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName());
+                            final String listName = logicalNameToListsMap.getOrDefault(fieldMetadata1.getFieldTypedata().getTargets()[0].logicalName(), "OctaneList");
                             if (fieldMetadata1.getFieldTypedata().isMultiple()) {
                                 references.add("java.util.Collection<" + listName + ">");
                             } else {

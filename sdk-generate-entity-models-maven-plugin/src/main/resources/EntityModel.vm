@@ -2,6 +2,10 @@
 #set ($subTypeOf = ${GeneratorHelper.getSubTypeOf(${entityMetadata})})
 package com.hpe.adm.nga.sdk.model;
 
+import com.hpe.adm.nga.sdk.enums.OctaneList;
+
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * <p>Entity Name: ${entityMetadata.name}</p>
  * <p>Label: ${entityMetadata.getLabel()}</p>
@@ -86,7 +90,7 @@ public com.hpe.adm.nga.sdk.enums.Phases.${className}Phase getPhase() {
 #end
 
 #macro (getListNode $field)
-#set ($listName = ${logicalNameToListsMap.get(${field.getFieldTypedata().getTargets()[0].logicalName()})})
+#set ($listName = ${logicalNameToListsMap.getOrDefault(${field.getFieldTypedata().getTargets()[0].logicalName()}, "OctaneList")})
 #if (${field.getFieldTypedata().isMultiple()})#getMultiListNode($field $listName)#else#getSingleListNode($field $listName)#end
 #end
 
@@ -103,14 +107,20 @@ public ${listName} get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
 #end
 
 #macro (getMultiListNode $field $listName)
-public java.util.Collection<${listName}> get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
+public#if ($listName == "OctaneList") <T extends OctaneList>#end java.util.Collection<#if($listName == "OctaneList")T#{else}${listName}#end> get${GeneratorHelper.camelCaseFieldName(${field.name})}(#if($listName == "OctaneList")Class<T> listType#end) {
     final MultiReferenceFieldModel ${GeneratorHelper.getSanitisedFieldName(${field.name})} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
     if (${GeneratorHelper.getSanitisedFieldName(${field.name})} == null) {
 return new java.util.ArrayList();
 }
 final java.util.Collection
 <EntityModel> value = ${GeneratorHelper.getSanitisedFieldName(${field.name})}.getValue();
-	return value.stream().map(${listName}::getFromEntityModel)
+	return value.stream().map(#if ($listName == "OctaneList")val -> {
+        try {
+            return (T) listType.getClass().getMethod("getFromEntityModel").invoke(val);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }#{else}$listName::getFromEntityModel#end)
 	    .collect(java.util.stream.Collectors.toList());
 
 #end
@@ -216,7 +226,7 @@ public ${referenceMetadata.getReferenceClassForSignature()} get${GeneratorHelper
 
 #macro (setMultiListNode $field $listName)
     #fieldMetadaAnnotations($field)
-	public ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final java.util.Collection<${listName}> ${GeneratorHelper.getSanitisedFieldName(${field.name})}) {
+	public#if($listName == "OctaneList") <T extends OctaneList>#end ${className}EntityModel set${GeneratorHelper.camelCaseFieldName(${field.name})}(final java.util.Collection<#if($listName == "OctaneList")T#{else}$listName#end> ${GeneratorHelper.getSanitisedFieldName(${field.name})}) {
         if (${GeneratorHelper.getSanitisedFieldName(${field.name})} == null) {
             wrappedEntityModel.removeValue("${field.name}");
             return this;

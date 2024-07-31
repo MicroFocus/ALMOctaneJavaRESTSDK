@@ -4,10 +4,12 @@ import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import java.util.Arrays;
 
+import com.hpe.adm.nga.sdk.enums.OctaneList;
+
 /**
  * Generated class - do not edit!
  */
-public enum $className {
+public enum $className implements OctaneList {
 
 #set($listItems = $listItemsSet.getValue())
 #set($rootModel = $listItems.get(0))
