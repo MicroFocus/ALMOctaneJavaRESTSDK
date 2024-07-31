@@ -107,7 +107,7 @@ public ${listName} get${GeneratorHelper.camelCaseFieldName(${field.name})}() {
 #end
 
 #macro (getMultiListNode $field $listName)
-public#if ($listName == "OctaneList") <T extends OctaneList>#end java.util.Collection<#if($listName == "OctaneList")T#{else}${listName}#end> get${GeneratorHelper.camelCaseFieldName(${field.name})}(#if($listName == "OctaneList")T listType#end) {
+public#if ($listName == "OctaneList") <T extends OctaneList>#end java.util.Collection<#if($listName == "OctaneList")T#{else}${listName}#end> get${GeneratorHelper.camelCaseFieldName(${field.name})}(#if($listName == "OctaneList")Class<T> listType#end) {
     final MultiReferenceFieldModel ${GeneratorHelper.getSanitisedFieldName(${field.name})} = (MultiReferenceFieldModel) wrappedEntityModel.getValue("${field.name}");
     if (${GeneratorHelper.getSanitisedFieldName(${field.name})} == null) {
 return new java.util.ArrayList();
