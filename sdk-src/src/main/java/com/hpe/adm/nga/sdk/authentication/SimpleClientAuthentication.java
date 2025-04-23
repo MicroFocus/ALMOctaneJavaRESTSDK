@@ -29,6 +29,7 @@
 package com.hpe.adm.nga.sdk.authentication;
 
 import com.hpe.adm.nga.sdk.APIMode;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Default class to enable api key authentications
@@ -46,7 +47,7 @@ public class SimpleClientAuthentication extends ClientAuthentication {
      */
     public SimpleClientAuthentication(final String clientId, final String clientSecret, final APIMode apiMode) {
         super(apiMode);
-        this.clientId = clientId;
+        this.clientId = StringEscapeUtils.escapeJava(clientId);
         this.clientSecret = clientSecret;
     }
 

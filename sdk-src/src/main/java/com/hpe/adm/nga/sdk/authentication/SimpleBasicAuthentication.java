@@ -29,6 +29,7 @@
 package com.hpe.adm.nga.sdk.authentication;
 
 import com.hpe.adm.nga.sdk.APIMode;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /***
  * Basic implementation for using basic authentication with Octane.  This stores the user and password in memory
@@ -44,7 +45,7 @@ public class SimpleBasicAuthentication extends BasicAuthentication {
      */
     public SimpleBasicAuthentication(final String userName, final String password, final APIMode apiMode) {
         super(apiMode);
-        this.userName = userName;
+        this.userName = StringEscapeUtils.escapeJava(userName);
         this.password = password;
     }
 

@@ -29,6 +29,7 @@
 package com.hpe.adm.nga.sdk.authentication;
 
 import com.hpe.adm.nga.sdk.APIMode;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Default class to enable user authentications
@@ -47,7 +48,7 @@ public class SimpleUserAuthentication extends UserAuthentication {
      */
     public SimpleUserAuthentication(final String userName, final String password, final APIMode apiMode) {
         super(apiMode);
-        this.userName = userName;
+        this.userName = StringEscapeUtils.escapeJava(userName);
         this.password = password;
     }
 
