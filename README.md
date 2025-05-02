@@ -189,6 +189,10 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* CE 25.2
+  * Handling special characters with API client\secret authentication
+  * Copyright update
+  * Unauthorized requests throw OctaneException instead of RuntimeException
 * CE 24.3
   * Generate entities plugin now supports fields that point to generic lists (e.g. EntityIconEntityModel.conditionFieldValue)
 * CE 24.1.5
