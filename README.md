@@ -1,4 +1,4 @@
-# ALM Octane REST API Java SDK
+# Open Text Core Software Delivery Platform and Software Delivery Management REST API Java SDK
 
 #### Maven
 ```xml
@@ -15,15 +15,16 @@ compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '25
 
 ## Introduction
 
-A Java SDK that can be used to connect to ALM Octane's REST API.  See the Javadoc for more information of how to use the SDK.
-See also the REST API documentation for more details about Octane's API.
+A Java SDK that can be used to connect to Open Text Core Software Delivery Platform and Software Delivery Management REST API.
+This SDK is designed to work seamlessly with either Open Text Core Software Delivery Platform (SDP) and Software Delivery Management. For simplicity, these products will be referred to as SDP in the sections below.
+See the Javadoc for more information of how to use the SDK. See also the [REST API documentation](https://admhelp.microfocus.com/octane/en/25.1/Online/Content/API/articles_API2.htm) for more details about the SDP API.
 
 This has multiple sub-projects:
 
 1. sdk-src which is the main source of the Java SDK
-2. sdk-integration-tests which can be run to test the SDK against your Octane server
+2. sdk-integration-tests which can be run to test the SDK against your SDP server
 3. sdk-usage-examples which contain some simple examples as to how to use the SDK
-4. sdk-generate-entity-models-maven-plugin which contains a maven plugin that generates POJO's for your servers Octane entities [see "Entity Generation"](#entity-generation)
+4. sdk-generate-entity-models-maven-plugin which contains a maven plugin that generates POJO's for your servers SDP entities [see "Entity Generation"](#entity-generation)
 5. sdk-extension which provides some tools to access more of the sdk-src's underlying implementation 
 
 The easiest way to compile the project is to use [maven](https://maven.apache.org/) and run the command:
@@ -47,7 +48,7 @@ This will create a javadoc site in the `sdk-src/target/site/apidocs` directory
 ## Entity Generation
 
 You can generate entities based on your server's metadata using the `sdk-generate-entity-models-maven-plugin` plugin.
-This plugin connects to your ALM Octane server using the given authentication credentials, shared space and work space
+This plugin connects to your SDP server using the given authentication credentials, shared space and work space
 and generates strongly typed entities that can be used instead of the generic out of the box entity that comes
 with the SDK.
 
@@ -157,7 +158,7 @@ See the following example for how to use the generated code:
         defectEntityList.update().entities(Collections.singleton(defect)).execute();
 ```
 
-Please note that due to the way that the Octane REST API works only a limited number of fields will be automatically retrieved from the server.  Due to this the `addFields` method
+Please note that due to the way that the SDP REST API works only a limited number of fields will be automatically retrieved from the server.  Due to this the `addFields` method
 should be used to explicitly state which fields should be retrieved.  You can see more information [here](https://admhelp.microfocus.com/octane/en/latest/Online/Content/API/fields_clause.htm)
 
 ## Logging
