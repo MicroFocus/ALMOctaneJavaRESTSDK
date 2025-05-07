@@ -1,4 +1,4 @@
-# Open Text Core Software Delivery Platform and Software Delivery Management REST API Java SDK
+# OpenText Core Software Delivery Platform and Software Delivery Management REST API Java SDK
 
 #### Maven
 ```xml
@@ -15,8 +15,8 @@ compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '25
 
 ## Introduction
 
-A Java SDK that can be used to connect to Open Text Core Software Delivery Platform and Software Delivery Management REST API.
-This SDK is designed to work seamlessly with either Open Text Core Software Delivery Platform (SDP) and Software Delivery Management. For simplicity, these products will be referred to as SDP in the sections below.
+A Java SDK that can be used to connect to OpenText Core Software Delivery Platform and Software Delivery Management REST API.
+This SDK is designed to work seamlessly with either OpenText Core Software Delivery Platform (SDP) and Software Delivery Management. For simplicity, these products will be referred to as SDP in the sections below.
 See the Javadoc for more information of how to use the SDK. See also the [REST API documentation](https://admhelp.microfocus.com/octane/en/25.1/Online/Content/API/articles_API2.htm) for more details about the SDP API.
 
 This has multiple sub-projects:
