@@ -92,7 +92,7 @@
         <org-json.version>20240303</org-json.version>
         <json-path.version>2.9.0</json-path.version>
 
-        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <commons-io.version>2.19.0</commons-io.version>
         <commons-lang3>3.12.0</commons-lang3>
 
