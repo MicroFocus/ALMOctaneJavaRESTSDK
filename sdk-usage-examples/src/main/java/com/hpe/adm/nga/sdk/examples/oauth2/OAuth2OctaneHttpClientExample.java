@@ -50,11 +50,15 @@ public class OAuth2OctaneHttpClientExample {
 
     // Configuration constants (replace with your environment values)
 
+    // These are the ID and the secret of the client that exists in the IDP.
+    // Please make sure there is a federated API Access in Octane with the same client ID.
     private static final String IDP_CLIENT_ID = "";
     private static final String IDP_CLIENT_SECRET = "";
-
     private static final String IDP_TOKEN_ENDPOINT = "";
 
+    // These are the client ID and secret of the client that will be used to access the
+    // token exchange endpoint in Octane. These should be configured in Octane's sso.conf
+    // file, under the token-exchange section.
     private static final String OCTANE_TOKEN_EXCHANGE_CLIENT_ID = "";
     private static final String OCTANE_TOKEN_EXCHANGE_CLIENT_SECRET = "";
 
