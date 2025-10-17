@@ -41,8 +41,16 @@ public interface OctaneHttpClient {
     //Constants
     String OAUTH_AUTH_URL = "/authentication/sign_in";
     String OAUTH_SIGNOUT_URL = "/authentication/sign_out";
+    String EXCHANGE_TOKEN_URL = "/osp/a/au/auth/oauth2/token";
     String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
+    String ACCESS_TOKEN_COOKIE_KEY = "access_token";
     String OCTANE_USER_COOKIE_KEY = "OCTANE_USER";
+
+    String TOKEN_EXCHANGE_GRANT_TYPE_KEY = "grant_type";
+    String TOKEN_EXCHANGE_SUBJECT_TOKEN_TYPE_KEY = "subject_token_type";
+    String TOKEN_EXCHANGE_SUBJECT_TOKEN_KEY = "subject_token";
+    String TOKEN_EXCHANGE_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:token-exchange";
+    String TOKEN_EXCHANGE_SUBJECT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:access_token";
 
     /**
      * Authenticate with the Octane server using an implementation of the {@link JSONAuthentication} class.

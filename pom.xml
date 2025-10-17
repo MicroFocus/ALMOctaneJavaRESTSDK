@@ -34,7 +34,7 @@
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-root</artifactId>
     <packaging>pom</packaging>
-    <version>25.2-SNAPSHOT</version>
+    <version>25.4-SNAPSHOT</version>
     <name>ALM Octane REST API SDK</name>
     <description>The Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP
     </description>

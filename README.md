@@ -5,12 +5,12 @@
 <dependency>
     <groupId>com.microfocus.adm.almoctane.sdk</groupId>
     <artifactId>sdk-src</artifactId>
-    <version>25.2</version>
+    <version>25.4</version>
 </dependency>
 ```
 #### Gradle
 ```groovy
-compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '25.2'
+compile group: 'com.microfocus.adm.almoctane.sdk', name: 'sdk-src', version: '25.4'
 ```
 
 ## Introduction
@@ -55,12 +55,12 @@ with the SDK.
 To enable this, add the following to your project's POM file (assuming 16.1.100 being the SDK version):
 
 ```xml
- <build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>com.microfocus.adm.almoctane.sdk</groupId>
                 <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
-                <version>25.2</version>
+                <version>25.4</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -172,7 +172,7 @@ The easiest way is to add a maven dependency to such an implementation (slf4j-si
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>
-            <version>25.2</version>
+            <version>25.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -190,6 +190,8 @@ spaces can be accessed.  See the `TestSharedSpaceAdmin` and `TestWorkSpaceAdmin`
 Currently the admin sections are not available using generated entities - but the CRUD functions are available
 
 ## What's New
+* CE 25.4
+    * OAuth2's token exchange mechanism is now supported. (see an example [here](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/blob/master/sdk-usage-examples/src/main/java/com/hpe/adm/nga/sdk/examples/oauth2/OAuth2OctaneHttpClientExample.java))
 * CE 25.2
   * Handling special characters with API client\secret authentication
   * Copyright update

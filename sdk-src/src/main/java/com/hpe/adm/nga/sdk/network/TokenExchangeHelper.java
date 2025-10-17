@@ -26,35 +26,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hpe.adm.nga.sdk.authentication;
-
-import com.hpe.adm.nga.sdk.APIMode;
+package com.hpe.adm.nga.sdk.network;
 
 /**
- * Represents basic authentication
+ * Helper class to perform token exchange operations.
  */
-public abstract class BasicAuthentication extends Authentication {
+public final class TokenExchangeHelper {
+    private TokenExchangeHelper() {};
 
     /**
-     * Represents basic authentication
-     *
-     * @param apiMode The mode to use if necessary
+     * Minimal helper to extract "access_token" from JSON string
+     * Works without external JSON libraries.
      */
-    BasicAuthentication(final APIMode apiMode) {
-        super(apiMode, AuthenticationType.BASIC);
+    public static String extractAccessToken(String json) {
+        // Look for "access_token":"<token>"
+        String key = "\"access_token\"";
+        int keyIndex = json.indexOf(key);
+        if (keyIndex == -1) return null;
+
+        int colonIndex = json.indexOf(':', keyIndex);
+        if (colonIndex == -1) return null;
+
+        int firstQuote = json.indexOf('"', colonIndex + 1);
+        int secondQuote = json.indexOf('"', firstQuote + 1);
+        if (firstQuote == -1 || secondQuote == -1) return null;
+
+        return json.substring(firstQuote + 1, secondQuote);
     }
-
-    /**
-     * The id that is used for the authentication
-     *
-     * @return client id or username
-     */
-    abstract public String getAuthenticationId();
-
-    /**
-     * The secret that is used for the authentication
-     *
-     * @return client secret or password
-     */
-    abstract public String getAuthenticationSecret();
 }
