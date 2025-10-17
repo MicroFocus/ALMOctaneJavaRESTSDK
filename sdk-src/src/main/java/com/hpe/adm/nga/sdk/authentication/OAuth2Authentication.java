@@ -46,8 +46,8 @@ public class OAuth2Authentication extends Authentication {
      * @param clientId     the client id for performing the token exchange operation in Octane
      * @param clientSecret the client secret for performing the token exchange operation in Octane
      */
-    public OAuth2Authentication(final APIMode apiMode, final String accessToken, final String clientId,
-                                final String clientSecret) {
+    public OAuth2Authentication(final String accessToken, final String clientId, final String clientSecret,
+                                final APIMode apiMode) {
         super(apiMode, AuthenticationType.OAUTH2);
         this.accessToken = accessToken;
         this.clientId = clientId;
@@ -61,7 +61,7 @@ public class OAuth2Authentication extends Authentication {
      * @param clientSecret the client secret for performing the token exchange operation in Octane
      */
     public OAuth2Authentication(final String accessToken, final String clientId, final String clientSecret) {
-        this(null, accessToken, clientId, clientSecret);
+        this(accessToken, clientId, clientSecret, null);
     }
 
     /**
