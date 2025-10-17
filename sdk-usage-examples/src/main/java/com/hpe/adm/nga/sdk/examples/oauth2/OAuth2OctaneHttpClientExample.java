@@ -50,10 +50,13 @@ public class OAuth2OctaneHttpClientExample {
 
     // Configuration constants (replace with your environment values)
 
+    private static final String IDP_CLIENT_ID = "";
+    private static final String IDP_CLIENT_SECRET = "";
+
     private static final String IDP_TOKEN_ENDPOINT = "";
 
-    private static final String CLIENT_ID = "";
-    private static final String CLIENT_SECRET = "";
+    private static final String OCTANE_TOKEN_EXCHANGE_CLIENT_ID = "";
+    private static final String OCTANE_TOKEN_EXCHANGE_CLIENT_SECRET = "";
 
     private static final String OCTANE_SERVER = "";
 
@@ -62,10 +65,46 @@ public class OAuth2OctaneHttpClientExample {
 
     private static final HttpTransport TRANSPORT = new NetHttpTransport();
 
+    public static void main(String[] args) {
+        // configureSSLToTrustAll(); // for dev only
+        executeRequestsAndDisplayResults();
+    }
+
+    private static void executeRequestsAndDisplayResults() {
+        String idpAccessToken;
+        try {
+            // Get IDP token using constants above
+            idpAccessToken = requestClientCredentialsAccessToken(IDP_TOKEN_ENDPOINT, IDP_CLIENT_ID, IDP_CLIENT_SECRET);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (idpAccessToken == null) {
+            System.out.println("Failed to get access token from IDP");
+            return;
+        }
+
+        // Build Octane client using obtained token
+        Authentication clientAuthentication = new OAuth2Authentication(idpAccessToken, OCTANE_TOKEN_EXCHANGE_CLIENT_ID,
+                OCTANE_TOKEN_EXCHANGE_CLIENT_SECRET);
+        final Octane.Builder octaneBuilder = new Octane.Builder(clientAuthentication);
+
+        octaneBuilder.Server(OCTANE_SERVER);
+        octaneBuilder.sharedSpace(SHARED_SPACE_ID);
+        octaneBuilder.workSpace(WORKSPACE_ID);
+        octaneBuilder.isHttp2(true);
+
+        Octane octane = octaneBuilder.build();
+
+        // Fetch and print some entities
+        octane.entityList("defects").get().addFields("name").execute().forEach(System.out::println);
+        octane.entityList("features").get().addFields("name").execute().forEach(System.out::println);
+    }
+
     /**
      * Calls the token endpoint with client_credentials using form-encoded body and Basic Auth.
      */
-    public static String requestClientCredentialsResponse(
+    private static String requestClientCredentialsResponse(
             String tokenEndpoint,
             String clientId,
             String clientSecret
@@ -101,7 +140,7 @@ public class OAuth2OctaneHttpClientExample {
     }
 
     /** Returns only the access_token extracted from JSON body. */
-    public static String requestClientCredentialsAccessToken(
+    private static String requestClientCredentialsAccessToken(
             String tokenEndpoint,
             String clientId,
             String clientSecret
@@ -111,45 +150,10 @@ public class OAuth2OctaneHttpClientExample {
     }
 
     /** Regex extractor for "access_token":"...". */
-    public static String extractAccessToken(String jsonBody) {
+    private static String extractAccessToken(String jsonBody) {
         Pattern p = Pattern.compile("\"access_token\"\\s*:\\s*\"([^\"]+)\"");
         Matcher m = p.matcher(jsonBody);
         return m.find() ? m.group(1) : null;
-    }
-
-    public static void main(String[] args) {
-        // configureSSLToTrustAll(); // for dev only
-        new OAuth2OctaneHttpClientExample().createContext();
-    }
-
-    public void createContext() {
-        String idpAccessToken;
-        try {
-            // Get IDP token using constants above
-            idpAccessToken = requestClientCredentialsAccessToken(IDP_TOKEN_ENDPOINT, CLIENT_ID, CLIENT_SECRET);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (idpAccessToken == null) {
-            System.out.println("Failed to get access token from IDP");
-            return;
-        }
-
-        // Build Octane client using obtained token
-        Authentication clientAuthentication = new OAuth2Authentication(idpAccessToken, "tx", "txpass");
-        final Octane.Builder octaneBuilder = new Octane.Builder(clientAuthentication);
-
-        octaneBuilder.Server(OCTANE_SERVER);
-        octaneBuilder.sharedSpace(SHARED_SPACE_ID);
-        octaneBuilder.workSpace(WORKSPACE_ID);
-        octaneBuilder.isHttp2(true);
-
-        Octane octane = octaneBuilder.build();
-
-        // Fetch and print some entities
-        octane.entityList("defects").get().addFields("name").execute().forEach(System.out::println);
-        octane.entityList("features").get().addFields("name").execute().forEach(System.out::println);
     }
 
     /**
