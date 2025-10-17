@@ -41,10 +41,10 @@ public class OAuth2Authentication extends Authentication {
     private boolean isAuthenticated;
 
     /**
-     * @param apiMode      the mode to use or null if none is needed
      * @param accessToken  the access token from the IDP
      * @param clientId     the client id for performing the token exchange operation in Octane
      * @param clientSecret the client secret for performing the token exchange operation in Octane
+     * @param apiMode      the mode to use or null if none is needed
      */
     public OAuth2Authentication(final String accessToken, final String clientId, final String clientSecret,
                                 final APIMode apiMode) {
