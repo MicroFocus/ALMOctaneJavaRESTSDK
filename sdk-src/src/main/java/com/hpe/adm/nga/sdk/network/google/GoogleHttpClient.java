@@ -31,16 +31,15 @@ package com.hpe.adm.nga.sdk.network.google;
 import com.google.api.client.http.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
+import com.hpe.adm.nga.sdk.authentication.*;
 import com.hpe.adm.nga.sdk.authentication.BasicAuthentication;
-import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
-import com.hpe.adm.nga.sdk.authentication.SessionIdAuthentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.*;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
+import com.hpe.adm.nga.sdk.network.TokenExchangeHelper;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +85,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     protected HttpRequestFactory requestFactory;
     protected String lwssoValue = "";
+    protected String accessTokenValue = "";
     protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
@@ -102,16 +102,17 @@ public class GoogleHttpClient implements OctaneHttpClient {
     };
 
     private final Consumer<HttpRequest> defaultRequestInitializer = request -> {
-        request.setResponseInterceptor(response -> {
-            // retrieve new LWSSO in response if any
-            updateLWSSOCookieValue(response);
-        });
-
+        // retrieve new LWSSO in response if any
+        if (!AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
+            request.setResponseInterceptor(this::updateLWSSOCookieValue);
+        }
         request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
 
         final StringBuilder cookieBuilder = new StringBuilder();
         if (lwssoValue != null && !lwssoValue.isEmpty()) {
             cookieBuilder.append(LWSSO_COOKIE_KEY).append("=").append(lwssoValue);
+        } else if (accessTokenValue != null && !accessTokenValue.isEmpty()) {
+            cookieBuilder.append(ACCESS_TOKEN_COOKIE_KEY).append("=").append(accessTokenValue);
         }
         if (octaneUserValue != null && !octaneUserValue.isEmpty()) {
             cookieBuilder.append(";").append(OCTANE_USER_COOKIE_KEY).append("=").append(octaneUserValue);
@@ -120,7 +121,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         request.getHeaders().setCookie(cookieBuilder.toString());
 
         if (lastUsedAuthentication != null) {
-            if (lastUsedAuthentication.isBasicAuthentication()) {
+            if (AuthenticationType.BASIC.equals(lastUsedAuthentication.getAuthenticationType())) {
                 final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
                 request.getHeaders().setBasicAuthentication(basicAuthentication.getAuthenticationId(), basicAuthentication.getAuthenticationSecret());
             }
@@ -211,37 +212,105 @@ public class GoogleHttpClient implements OctaneHttpClient {
         if (lastUsedAuthentication == null) {
             return false;
         }
-        if (lastUsedAuthentication.isBasicAuthentication()) {
-            return true;
-        }
-        if (lastUsedAuthentication.isSessionIdAuthentication()) {
-            lwssoValue = ((SessionIdAuthentication) lastUsedAuthentication).getSessionID();
-            return true;
-        }
-        //reset so it's not sent to auth request, server might return 304
-        lwssoValue = null;
-        octaneUserValue = null;
-        try {
-            final ByteArrayContent content = ByteArrayContent.fromString("application/json", ((JSONAuthentication) lastUsedAuthentication).getAuthenticationString());
-            HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
 
-            // Authenticate request should never set the api mode header.
-            // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
-            // Using this kind of header for future requests will still work.
-            lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
-                    httpRequest.getHeaders().remove(apiMode.getHeaderKey())
-            );
-
-            HttpResponse response = executeRequest(httpRequest);
-
-            if (response.isSuccessStatusCode()) {
-                lastSuccessfulAuthTimestamp = System.currentTimeMillis();
+        AuthenticationType authenticationType = lastUsedAuthentication.getAuthenticationType();
+        switch (authenticationType) {
+            case BASIC: {
                 return true;
-            } else {
+            }
+            case SESSION_ID: {
+                lwssoValue = ((SessionIdAuthentication) lastUsedAuthentication).getSessionID();
+                return true;
+            }
+            case JSON: {
+                //reset so it's not sent to auth request, server might return 304
+                lwssoValue = null;
+                accessTokenValue = null;
+                octaneUserValue = null;
+
+                try {
+                    final ByteArrayContent content = ByteArrayContent.fromString("application/json", ((JSONAuthentication) lastUsedAuthentication).getAuthenticationString());
+                    HttpRequest httpRequest = requestFactory.buildPostRequest(new GenericUrl(urlDomain + OAUTH_AUTH_URL), content);
+
+                    // Authenticate request should never set the api mode header.
+                    // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
+                    // Using this kind of header for future requests will still work.
+                    lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
+                            httpRequest.getHeaders().remove(apiMode.getHeaderKey())
+                    );
+
+                    HttpResponse response = executeRequest(httpRequest);
+
+                    if (response.isSuccessStatusCode()) {
+                        lastSuccessfulAuthTimestamp = System.currentTimeMillis();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case OAUTH2: {
+                OAuth2Authentication authentication = (OAuth2Authentication) lastUsedAuthentication;
+                if (authentication.isAuthenticated()) {
+                    accessTokenValue = authentication.getAccessToken();
+                    return true;
+                }
+
+                //reset so it's not sent to auth request, server might return 304
+                lwssoValue = null;
+                accessTokenValue = null;
+                octaneUserValue = null;
+
+                try {
+                    GenericUrl url = new GenericUrl(urlDomain + EXCHANGE_TOKEN_URL);
+
+                    Map<String, String> data = new HashMap<>();
+                    data.put(TOKEN_EXCHANGE_GRANT_TYPE_KEY, TOKEN_EXCHANGE_GRANT_TYPE);
+                    data.put(TOKEN_EXCHANGE_SUBJECT_TOKEN_TYPE_KEY, TOKEN_EXCHANGE_SUBJECT_TOKEN_TYPE);
+                    data.put(TOKEN_EXCHANGE_SUBJECT_TOKEN_KEY, authentication.getAccessToken());
+
+                    HttpContent content = new UrlEncodedContent(data);
+
+                    HttpRequest httpRequest = requestFactory.buildPostRequest(url, content);
+                    httpRequest.getHeaders().setContentType("application/x-www-form-urlencoded");
+
+                    String clientId = authentication.getClientId();
+                    String clientSecret = authentication.getClientSecret();
+                    String basicAuth = Base64.getEncoder()
+                            .encodeToString((clientId + ":" + clientSecret).getBytes(StandardCharsets.UTF_8));
+                    httpRequest.getHeaders().setAuthorization("Basic " + basicAuth);
+
+                    // Authenticate request should never set the api mode header.
+                    // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
+                    // Using this kind of header for future requests will still work.
+                    authentication.getAPIMode().ifPresent(apiMode ->
+                            httpRequest.getHeaders().remove(apiMode.getHeaderKey())
+                    );
+
+                    HttpResponse response = executeRequest(httpRequest);
+
+                    if (response.isSuccessStatusCode()) {
+                        String body = response.parseAsString();
+                        accessTokenValue = TokenExchangeHelper.extractAccessToken(body);
+
+                        if (accessTokenValue != null && !accessTokenValue.isEmpty()) {
+                            authentication.exchangeAccessToken(accessTokenValue);
+                        }
+
+                        lastSuccessfulAuthTimestamp = System.currentTimeMillis();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            default: {
                 return false;
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -253,7 +322,9 @@ public class GoogleHttpClient implements OctaneHttpClient {
             HttpResponse response = executeRequest(httpRequest);
 
             if (response.isSuccessStatusCode()) {
-                updateLWSSOCookieValue(response);
+                if (!AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
+                    updateLWSSOCookieValue(response);
+                }
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {

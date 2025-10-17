@@ -33,26 +33,22 @@ import com.hpe.adm.nga.sdk.APIMode;
 import java.util.Optional;
 
 /**
- * Interface of Authentication , hold contract functions. <br>
+ * Interface of Authentication, hold contract functions. <br>
  * Provided implementations: {@link SimpleUserAuthentication}, {@link SimpleClientAuthentication},
  * {@link SimpleBasicAuthentication} <br>
  * Note that the default implementations keep the credentials in memory. <br>
  */
 public abstract class Authentication {
-
     private final APIMode apiMode;
-    private final boolean isBasicAuthentication;
-    private final boolean isSessionIdAuthentication;
+    private final AuthenticationType authenticationType;
 
     /**
-     * The mode to use or null if none is needed
-     *
-     * @param apiMode The mode
+     * @param apiMode            The mode to use or null if none is needed
+     * @param authenticationType The type of authentication
      */
-    Authentication(final APIMode apiMode, final boolean isBasicAuthentication, final boolean isSessionIdAuthentication) {
+    Authentication(final APIMode apiMode, final AuthenticationType authenticationType) {
         this.apiMode = apiMode;
-        this.isBasicAuthentication = isBasicAuthentication;
-        this.isSessionIdAuthentication = isSessionIdAuthentication;
+        this.authenticationType = authenticationType;
     }
 
     /**
@@ -68,21 +64,12 @@ public abstract class Authentication {
     }
 
     /**
-     * Returns whether this authentication type supports basic authentication
+     * Returns the type of authentication that is used.
      *
      * @return Supports basic authentication
      */
-    public final boolean isBasicAuthentication() {
-        return isBasicAuthentication;
-    }
-
-    /**
-     * Returns whether this authentication type is based on provided LWSSOCOOKIE
-     *
-     * @return is based on LWSSO
-     */
-    public final boolean isSessionIdAuthentication() {
-        return isSessionIdAuthentication;
+    public final AuthenticationType getAuthenticationType() {
+        return authenticationType;
     }
 }
 
