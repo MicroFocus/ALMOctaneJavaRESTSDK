@@ -276,7 +276,7 @@ public class JettyHttpClient implements OctaneHttpClient {
             httpRequest = requestFactory.buildPostRequest(URI.create(urlDomain + OAUTH_SIGNOUT_URL), null);
             ContentResponse response = executeRequest(httpRequest);
 
-            if (HttpStatus.isSuccess(response.getStatus())) {
+            if (HttpStatus.isSuccess(response.getStatus()) && lastUsedAuthentication != null) {
                 if (!AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
                     updateLWSSOCookieValue(response);
                 }
@@ -509,7 +509,7 @@ public class JettyHttpClient implements OctaneHttpClient {
         }
 
         public Request buildRequest(Request request, ContentProvider contentProvider) {
-            if (!AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
+            if (lastUsedAuthentication != null && !AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
                 request.onResponseSuccess(jetty::updateLWSSOCookieValue);
             }
 
