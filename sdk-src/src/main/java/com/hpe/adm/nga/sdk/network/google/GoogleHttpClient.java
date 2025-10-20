@@ -103,7 +103,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
 
     private final Consumer<HttpRequest> defaultRequestInitializer = request -> {
         // retrieve new LWSSO in response if any
-        if (!AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
+        if (lastUsedAuthentication != null && !AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
             request.setResponseInterceptor(this::updateLWSSOCookieValue);
         }
         request.setUnsuccessfulResponseHandler((httpRequest, httpResponse, b) -> false);
@@ -321,7 +321,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             httpRequest = requestFactory.buildPostRequest(genericUrl, null);
             HttpResponse response = executeRequest(httpRequest);
 
-            if (response.isSuccessStatusCode()) {
+            if (response.isSuccessStatusCode() && lastUsedAuthentication != null) {
                 if (!AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
                     updateLWSSOCookieValue(response);
                 }
