@@ -37,6 +37,12 @@
         <version>25.4-SNAPSHOT</version>
     </parent>
 
+    <name>ALM Octane REST API SDK Extension</name>
+    <description>
+        Extension of ALM Octane Java REST SDK, can be used for more advanced use cases.
+    </description>
+    <url>https://github.com/MicroFocus/ALMOctaneJavaRESTSDK</url>
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>sdk-extension-src</artifactId>
 

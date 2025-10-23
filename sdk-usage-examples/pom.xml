@@ -37,6 +37,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <name>ALM Octane REST API SDK Examples</name>
+    <description>Examples for the Java SDK that can be used to access Octane's REST API without worrying about REST or HTTP</description>
+
     <artifactId>sdk-usage-examples</artifactId>
     <dependencies>
         <dependency>
