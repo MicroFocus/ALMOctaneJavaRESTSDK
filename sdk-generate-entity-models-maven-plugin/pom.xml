@@ -39,6 +39,12 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>maven-plugin</packaging>
 
+    <name>ALM Octane REST API SDK Entity Models Maven Plugin</name>
+    <description>
+        Maven plugin for generating entity models for ALM Octane.
+    </description>
+    <url>https://github.com/MicroFocus/ALMOctaneJavaRESTSDK</url>
+
     <artifactId>sdk-generate-entity-models-maven-plugin</artifactId>
 
     <build>

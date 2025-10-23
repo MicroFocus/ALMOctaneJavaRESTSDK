@@ -37,6 +37,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <name>ALM Octane REST API SDK Integration Tests</name>
+    <description>
+        Integration tests for the ALM Octane REST API SDK.
+    </description>
+    <url>https://github.com/MicroFocus/ALMOctaneJavaRESTSDK</url>
+
     <artifactId>sdk-integration-tests</artifactId>
     <properties>
         <skip-integration-tests>true</skip-integration-tests>
