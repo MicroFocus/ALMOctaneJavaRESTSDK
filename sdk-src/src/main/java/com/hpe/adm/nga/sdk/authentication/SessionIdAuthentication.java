@@ -44,7 +44,7 @@ public class SessionIdAuthentication extends Authentication {
      * @param apiMode               The mode
      */
     public SessionIdAuthentication(String sessionID, APIMode apiMode) {
-        super(apiMode, false, true);
+        super(apiMode, AuthenticationType.SESSION_ID);
         this.sessionID = sessionID;
     }
 

@@ -33,7 +33,7 @@
     <parent>
         <artifactId>sdk-root</artifactId>
         <groupId>com.microfocus.adm.almoctane.sdk</groupId>
-        <version>25.2-SNAPSHOT</version>
+        <version>25.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

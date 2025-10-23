@@ -28,33 +28,9 @@
  */
 package com.hpe.adm.nga.sdk.authentication;
 
-import com.hpe.adm.nga.sdk.APIMode;
-
-/**
- * Represents basic authentication
- */
-public abstract class BasicAuthentication extends Authentication {
-
-    /**
-     * Represents basic authentication
-     *
-     * @param apiMode The mode to use if necessary
-     */
-    BasicAuthentication(final APIMode apiMode) {
-        super(apiMode, AuthenticationType.BASIC);
-    }
-
-    /**
-     * The id that is used for the authentication
-     *
-     * @return client id or username
-     */
-    abstract public String getAuthenticationId();
-
-    /**
-     * The secret that is used for the authentication
-     *
-     * @return client secret or password
-     */
-    abstract public String getAuthenticationSecret();
+public enum AuthenticationType {
+    BASIC,
+    SESSION_ID,
+    OAUTH2,
+    JSON
 }

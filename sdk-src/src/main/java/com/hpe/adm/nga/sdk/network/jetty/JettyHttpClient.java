@@ -30,10 +30,7 @@ package com.hpe.adm.nga.sdk.network.jetty;
 
 import com.google.api.client.http.GenericUrl;
 import com.hpe.adm.nga.sdk.Octane;
-import com.hpe.adm.nga.sdk.authentication.Authentication;
-import com.hpe.adm.nga.sdk.authentication.BasicAuthentication;
-import com.hpe.adm.nga.sdk.authentication.JSONAuthentication;
-import com.hpe.adm.nga.sdk.authentication.SessionIdAuthentication;
+import com.hpe.adm.nga.sdk.authentication.*;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -44,6 +41,7 @@ import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
+import com.hpe.adm.nga.sdk.network.TokenExchangeHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.eclipse.jetty.client.HttpClient;
@@ -56,6 +54,7 @@ import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.ByteBufferContentProvider;
+import org.eclipse.jetty.client.util.FormContentProvider;
 import org.eclipse.jetty.client.util.FutureResponseListener;
 import org.eclipse.jetty.client.util.MultiPartContentProvider;
 import org.eclipse.jetty.http.HttpFields;
@@ -64,6 +63,7 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http2.client.HTTP2Client;
 import org.eclipse.jetty.http2.client.http.HttpClientTransportOverHTTP2;
+import org.eclipse.jetty.util.Fields;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
@@ -80,15 +80,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -109,10 +101,10 @@ public class JettyHttpClient implements OctaneHttpClient {
 
     private static final int HTTP_REQUEST_RETRY_COUNT = 1;
 
-
     private boolean areNewCookiesReceived;
     protected RequestFactory requestFactory;
     protected String lwssoValue = "";
+    protected String accessTokenValue = "";
     protected String octaneUserValue;
     protected final String urlDomain;
     protected Authentication lastUsedAuthentication;
@@ -175,9 +167,8 @@ public class JettyHttpClient implements OctaneHttpClient {
     }
 
     private void addAuthentication(HttpClient client) {
-
         if (lastUsedAuthentication != null) {
-            if (lastUsedAuthentication.isBasicAuthentication()) {
+            if (AuthenticationType.BASIC.equals(lastUsedAuthentication.getAuthenticationType())) {
                 final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
                 client.getAuthenticationStore().addAuthentication(new org.eclipse.jetty.client.util.BasicAuthentication(URI.create(urlDomain),
                         org.eclipse.jetty.client.api.Authentication.ANY_REALM,
@@ -192,35 +183,90 @@ public class JettyHttpClient implements OctaneHttpClient {
         if (lastUsedAuthentication == null) {
             return false;
         }
-        if (lastUsedAuthentication.isBasicAuthentication()) {
-            return true;
-        }
-        if (lastUsedAuthentication.isSessionIdAuthentication()) {
-            lwssoValue = ((SessionIdAuthentication) lastUsedAuthentication).getSessionID();
-            return true;
-        }
-        //reset so it's not sent to auth request, server might return 304
-        lwssoValue = null;
-        octaneUserValue = null;
 
-        final ByteBufferContentProvider content = new ByteBufferContentProvider("application/json",
-                ByteBuffer.wrap(((JSONAuthentication) lastUsedAuthentication).getAuthenticationString().getBytes(StandardCharsets.UTF_8)));
-        Request httpRequest = requestFactory.buildPostRequest(URI.create(urlDomain + OAUTH_AUTH_URL), content);
+        AuthenticationType authenticationType = lastUsedAuthentication.getAuthenticationType();
+        switch (authenticationType) {
+            case BASIC: {
+                return true;
+            }
+            case SESSION_ID: {
+                lwssoValue = ((SessionIdAuthentication) lastUsedAuthentication).getSessionID();
+                return true;
+            }
+            case JSON: {
+                //reset so it's not sent to auth request, server might return 304
+                lwssoValue = null;
+                accessTokenValue = null;
+                octaneUserValue = null;
 
-        // Authenticate request should never set the api mode header.
-        // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
-        // Using this kind of header for future requests will still work.
-        lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
-                httpRequest.getHeaders().remove(apiMode.getHeaderKey())
-        );
-        ContentResponse response = executeRequest(httpRequest);
-        if (HttpStatus.isSuccess(response.getStatus())) {
-            lastSuccessfulAuthTimestamp = System.currentTimeMillis();
-            return true;
-        } else {
-            return false;
+                final ByteBufferContentProvider content = new ByteBufferContentProvider("application/json",
+                        ByteBuffer.wrap(((JSONAuthentication) lastUsedAuthentication).getAuthenticationString().getBytes(StandardCharsets.UTF_8)));
+                Request httpRequest = requestFactory.buildPostRequest(URI.create(urlDomain + OAUTH_AUTH_URL), content);
+
+                // Authenticate request should never set the api mode header.
+                // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
+                // Using this kind of header for future requests will still work.
+                lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
+                        httpRequest.getHeaders().remove(apiMode.getHeaderKey())
+                );
+                ContentResponse response = executeRequest(httpRequest);
+                if (HttpStatus.isSuccess(response.getStatus())) {
+                    lastSuccessfulAuthTimestamp = System.currentTimeMillis();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            case OAUTH2: {
+                OAuth2Authentication authentication = (OAuth2Authentication) lastUsedAuthentication;
+                if (authentication.isAuthenticated()) {
+                    accessTokenValue = authentication.getAccessToken();
+                    return true;
+                }
+
+                lwssoValue = null;
+                accessTokenValue = null;
+                octaneUserValue = null;
+
+                Fields form = new Fields();
+                form.add(TOKEN_EXCHANGE_GRANT_TYPE_KEY, TOKEN_EXCHANGE_GRANT_TYPE);
+                form.add(TOKEN_EXCHANGE_SUBJECT_TOKEN_TYPE_KEY, TOKEN_EXCHANGE_SUBJECT_TOKEN_TYPE);
+                form.add(TOKEN_EXCHANGE_SUBJECT_TOKEN_KEY, ((OAuth2Authentication) lastUsedAuthentication).getAccessToken());
+
+                Request httpRequest = requestFactory.buildPostRequest(URI.create(urlDomain + EXCHANGE_TOKEN_URL),
+                        new FormContentProvider(form));
+
+                String clientId = authentication.getClientId();
+                String clientSecret = authentication.getClientSecret();
+                String basicAuth = Base64.getEncoder()
+                        .encodeToString((clientId + ":" + clientSecret).getBytes(StandardCharsets.UTF_8));
+                httpRequest.getHeaders().add(HttpHeader.AUTHORIZATION, "Basic " + basicAuth);
+
+                // Authenticate request should never set the api mode header.
+                // Newer versions of the Octane server will not accept a private access level HPE_CLIENT_TYPE on the authentication request.
+                // Using this kind of header for future requests will still work.
+                lastUsedAuthentication.getAPIMode().ifPresent(apiMode ->
+                        httpRequest.getHeaders().remove(apiMode.getHeaderKey())
+                );
+
+                ContentResponse response = executeRequest(httpRequest);
+                String body = response.getContentAsString();
+
+                if (HttpStatus.isSuccess(response.getStatus()) && !body.isEmpty()) {
+                    accessTokenValue = TokenExchangeHelper.extractAccessToken(body);
+                    if (accessTokenValue != null && !accessTokenValue.isEmpty()) {
+                        authentication.exchangeAccessToken(accessTokenValue);
+                        lastSuccessfulAuthTimestamp = System.currentTimeMillis();
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            default: {
+                return false;
+            }
         }
-
     }
 
     @Override
@@ -230,8 +276,10 @@ public class JettyHttpClient implements OctaneHttpClient {
             httpRequest = requestFactory.buildPostRequest(URI.create(urlDomain + OAUTH_SIGNOUT_URL), null);
             ContentResponse response = executeRequest(httpRequest);
 
-            if (HttpStatus.isSuccess(response.getStatus())) {
-                updateLWSSOCookieValue(response);
+            if (HttpStatus.isSuccess(response.getStatus()) && lastUsedAuthentication != null) {
+                if (!AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
+                    updateLWSSOCookieValue(response);
+                }
                 lastUsedAuthentication = null;
             }
         } catch (Exception e) {
@@ -452,10 +500,8 @@ public class JettyHttpClient implements OctaneHttpClient {
     }
 
     private class RequestFactory {
-
-        private boolean hasCustom = false;
-        private HttpClient client;
-        private JettyHttpClient jetty;
+        private final HttpClient client;
+        private final JettyHttpClient jetty;
 
         public RequestFactory(JettyHttpClient jetty, HttpClient client) {
             this.client = client;
@@ -463,14 +509,17 @@ public class JettyHttpClient implements OctaneHttpClient {
         }
 
         public Request buildRequest(Request request, ContentProvider contentProvider) {
+            if (lastUsedAuthentication != null && !AuthenticationType.OAUTH2.equals(lastUsedAuthentication.getAuthenticationType())) {
+                request.onResponseSuccess(jetty::updateLWSSOCookieValue);
+            }
 
-            request.onResponseSuccess(response -> jetty.updateLWSSOCookieValue(response));
-
-
-            if (jetty.lwssoValue != null && !jetty.lwssoValue.isEmpty())
-                request.cookie(new HttpCookie(jetty.LWSSO_COOKIE_KEY, jetty.lwssoValue));
+            if (jetty.lwssoValue != null && !jetty.lwssoValue.isEmpty()) {
+                request.cookie(new HttpCookie(OctaneHttpClient.LWSSO_COOKIE_KEY, jetty.lwssoValue));
+            } else if (jetty.accessTokenValue != null && !jetty.accessTokenValue.isEmpty()) {
+                request.cookie(new HttpCookie(OctaneHttpClient.ACCESS_TOKEN_COOKIE_KEY, jetty.accessTokenValue));
+            }
             if (jetty.octaneUserValue != null && !jetty.octaneUserValue.isEmpty()) {
-                request.cookie(new HttpCookie(jetty.OCTANE_USER_COOKIE_KEY, jetty.octaneUserValue));
+                request.cookie(new HttpCookie(OctaneHttpClient.OCTANE_USER_COOKIE_KEY, jetty.octaneUserValue));
             }
             if (jetty.lastUsedAuthentication != null) {
                 lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.getHeaders().add(apiMode.getHeaderKey(), apiMode.getHeaderValue()));
@@ -506,7 +555,6 @@ public class JettyHttpClient implements OctaneHttpClient {
         }
 
     }
-
 
     private Request buildBinaryPostRequest(OctaneHttpRequest.PostBinaryOctaneHttpRequest octaneHttpRequest) throws IOException {
 
