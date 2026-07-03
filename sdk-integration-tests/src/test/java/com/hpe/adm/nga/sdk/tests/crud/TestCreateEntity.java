@@ -34,11 +34,12 @@ import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -51,7 +52,7 @@ public class TestCreateEntity extends TestBase {
     }
 
     @Test
-    public void testCreateEntity() throws Exception {
+    void createEntity() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
@@ -59,11 +60,11 @@ public class TestCreateEntity extends TestBase {
 
         EntityModel getEntity = entityList.at(entityId).get().addFields("parent", "name").execute();
 
-        Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
+        assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
     }
 
     @Test
-    public void testCreateEntityCollection() throws Exception {
+    void createEntityCollection() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
@@ -71,7 +72,7 @@ public class TestCreateEntity extends TestBase {
 
         Collection<EntityModel> getEntity = entityList.get().addFields("parent", "name").query(query).execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(generatedEntity, getEntity));
+        assertTrue(CommonUtils.isCollectionAInCollectionB(generatedEntity, getEntity));
     }
 
 

@@ -34,13 +34,14 @@ import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -52,7 +53,7 @@ public class TestComments extends TestBase {
     }
 
     @Test
-    public void testCreateCommentForDefect() throws Exception {
+    void createCommentForDefect() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, "defects");
         Collection<EntityModel> entityModels = octane.entityList("defects").create().entities(generatedEntity).execute();
 
@@ -60,7 +61,7 @@ public class TestComments extends TestBase {
 
         Collection<EntityModel> actualComments = octane.entityList("comments").get().execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(expectedComments, actualComments));
+        assertTrue(CommonUtils.isCollectionAInCollectionB(expectedComments, actualComments));
     }
 
     private Collection<EntityModel> createComments(String fieldEntityType, Collection<EntityModel> entityModels) throws Exception {

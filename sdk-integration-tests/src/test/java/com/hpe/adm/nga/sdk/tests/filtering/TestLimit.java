@@ -31,10 +31,11 @@ package com.hpe.adm.nga.sdk.tests.filtering;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -47,7 +48,7 @@ public class TestLimit extends TestBase {
     }
 
     @Test
-    public void testLimit() throws Exception {
+    void limit() throws Exception {
 
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         entityList.create().entities(generatedEntity).execute();
@@ -60,7 +61,7 @@ public class TestLimit extends TestBase {
             Collection<EntityModel> getLimitEntities = entityList.get().limit(totalCount - 1).execute();
             int limit = getLimitEntities.size();
 
-            Assert.assertTrue(limit + 1 == totalCount);
+            assertEquals(limit + 1, totalCount);
         }
 
     }

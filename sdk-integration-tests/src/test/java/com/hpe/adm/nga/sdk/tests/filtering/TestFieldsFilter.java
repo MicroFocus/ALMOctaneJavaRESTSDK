@@ -33,10 +33,11 @@ import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -48,7 +49,7 @@ public class TestFieldsFilter extends TestBase {
     }
 
     @Test
-    public void testFieldsFilterWithIdOneField() throws Exception {
+    void fieldsFilterWithIdOneField() throws Exception {
 
         List<String> filterFields = Arrays.asList("attachments");
         Set<FieldModel> fields = new HashSet<>();
@@ -59,11 +60,11 @@ public class TestFieldsFilter extends TestBase {
 
         EntityModel getEntity = entityList.at(entityId).get().addFields("attachments").execute();
 
-        Assert.assertTrue(isOnlyRequestedFieldsExistInEntity(getEntity, filterFields));
+        assertTrue(isOnlyRequestedFieldsExistInEntity(getEntity, filterFields));
     }
 
     @Test
-    public void testFieldsFilterWithIdMultipleFields() throws Exception {
+    void fieldsFilterWithIdMultipleFields() throws Exception {
 
         List<String> filterFields = Arrays.asList("attachments", "creation_time", "has_attachments");
         Set<FieldModel> fields = new HashSet<>();
@@ -74,11 +75,11 @@ public class TestFieldsFilter extends TestBase {
 
         EntityModel getEntity = entityList.at(entityId).get().addFields("attachments", "creation_time", "has_attachments").execute();
 
-        Assert.assertTrue(isOnlyRequestedFieldsExistInEntity(getEntity, filterFields));
+        assertTrue(isOnlyRequestedFieldsExistInEntity(getEntity, filterFields));
     }
 
     @Test
-    public void testFieldsFilterMultipleFields() throws Exception {
+    void fieldsFilterMultipleFields() throws Exception {
 
         List<String> filterFields = Arrays.asList("done_work", "description", "expected_velocity");
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
@@ -86,7 +87,7 @@ public class TestFieldsFilter extends TestBase {
 
         Collection<EntityModel> getEntity = entityList.get().addFields("done_work", "description", "expected_velocity").execute();
 
-        Assert.assertTrue(getIdFromEntityModelCollection(getEntity, filterFields));
+        assertTrue(getIdFromEntityModelCollection(getEntity, filterFields));
     }
 
     public static boolean isOnlyRequestedFieldsExistInEntity(EntityModel entityModel, List<String> fields) {

@@ -38,15 +38,17 @@ import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-public class TestGherkinScript extends TestBase {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class TestGherkinScript extends TestBase {
 
     @Test
-    public void testTestStepCreation() {
+    void testStepCreation() {
         final String createdTestId = createTest();
         // this will fail if incorrect
         final EntityList.TestEntities test_manual = (EntityList.TestEntities) octane.entityList("gherkin_tests").at(createdTestId);
@@ -55,20 +57,20 @@ public class TestGherkinScript extends TestBase {
 
         final GetTestScriptModel getTestScriptModel = testSteps.get().execute();
         final String asString = getTestScriptModel.getTestStepsAsString();
-        Assert.assertTrue("Returned test script is not correct!", asString.startsWith("#Auto generated Octane revision tag\n@TID")
-                && asString.endsWith("\nFeature:\n"));
+        assertTrue(asString.startsWith("#Auto generated Octane revision tag\n@TID")
+                && asString.endsWith("\nFeature:\n"), "Returned test script is not correct!");
     }
 
     private void updateTestSteps(TestStepList testSteps) {
         final UpdateTestSteps update = testSteps.update();
         // check test steps are created
-        Assert.assertTrue("Script not created correctly!", update.testSteps(new UpdateTestScriptModel().setTestSteps("#Auto generated Octane revision tag\n@TID2010REV0.2.0\nFeature:\n")).execute());
+        assertTrue(update.testSteps(new UpdateTestScriptModel().setTestSteps("#Auto generated Octane revision tag\n@TID2010REV0.2.0\nFeature:\n")).execute(), "Script not created correctly!");
     }
 
     @Test
-    public void testIncorrectNonTypedTestStepCreation() {
+    void incorrectNonTypedTestStepCreation() {
         final EntityList.Entities not_test_manual = octane.entityList("not_gherkin").at("1001");
-        Assert.assertFalse("Entities is not the right type!", not_test_manual instanceof EntityList.TestEntities);
+        assertFalse(not_test_manual instanceof EntityList.TestEntities, "Entities is not the right type!");
     }
 
     private String createTest() {

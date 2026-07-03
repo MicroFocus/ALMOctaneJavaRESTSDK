@@ -41,8 +41,8 @@ import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.tools.*;
 import java.io.File;
@@ -50,13 +50,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
-public class TestGenerateModels {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
+class TestGenerateModels {
 
     private static final String TEST_NAME = "testName";
     private static final String TEST_DESCRIPTION = "testDescription";
 
     @Test
-    public void testGenerateModels() throws Exception {
+    void generateModels() throws Exception {
         final File generatedSourcesDirectory = new File("target/test-test-sources");
         FileUtils.deleteDirectory(generatedSourcesDirectory);
         //noinspection ResultOfMethodCallIgnored
@@ -100,7 +105,7 @@ public class TestGenerateModels {
         }
 
         if (hasError) {
-            Assert.fail(stringBuilder.toString());
+            fail(stringBuilder.toString());
         }
     }
 
@@ -111,11 +116,9 @@ public class TestGenerateModels {
         final String sharedSpaceId = configuration.getString("sdk.sharedSpaceId");
         final String workspaceId = configuration.getString("sdk.workspaceId");
 
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             new GenerateModels(generatedDirectory).generate(authentication, url, Long.parseLong(sharedSpaceId), Long.parseLong(workspaceId));
-        } catch (Exception e) {
-            Assert.fail("Test failed whilst building test sources; " + e.getMessage());
-        }
+        }, "Test failed whilst building test sources; ");
     }
 
     private void testGeneratedClass(File generatedDirectory) throws Exception {
@@ -153,8 +156,8 @@ public class TestGenerateModels {
         final String getDescription = (String) defectTypedEntityModel.getClass().getMethod("getDescription").invoke(defectTypedEntityModel);
         final Object getAuthor = defectTypedEntityModel.getClass().getMethod("getAuthor").invoke(defectTypedEntityModel);
 
-        Assert.assertEquals(entityName, getName);
-        Assert.assertNull(getDescription);
-        Assert.assertNotNull(getAuthor);
+        assertEquals(entityName, getName);
+        assertNull(getDescription);
+        assertNotNull(getAuthor);
     }
 }

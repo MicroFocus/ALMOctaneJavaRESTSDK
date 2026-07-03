@@ -42,15 +42,19 @@ import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-public class TestTestSteps extends TestBase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class TestTestSteps extends TestBase {
 
     @Test
-    public void testTestStepCreation() {
+    void testStepCreation() {
         final String createdTestId = createTest();
         // this will fail if incorrect
         final EntityList.TestEntities test_manual = (EntityList.TestEntities) octane.entityList("manual_tests").at(createdTestId);
@@ -59,21 +63,21 @@ public class TestTestSteps extends TestBase {
 
         final GetTestScriptModel getTestScriptModel = testSteps.get().execute();
         final String asString = getTestScriptModel.getTestStepsAsString();
-        Assert.assertEquals("Returned test script is not correct!", "- Step 1\n- ?Validating Step 1\n- @2002 link to test\n", asString);
+        assertEquals("- Step 1\n- ?Validating Step 1\n- @2002 link to test\n", asString, "Returned test script is not correct!");
 
         final List<AbstractTestStep> testStepsAsObjects = getTestScriptModel.getTestStepsAsObjects();
-        Assert.assertNotNull("test script as objects is null", testStepsAsObjects);
-        Assert.assertEquals("test script as objects is not length 3", 3, testStepsAsObjects.size());
+        assertNotNull(testStepsAsObjects, "test script as objects is null");
+        assertEquals(3, testStepsAsObjects.size(), "test script as objects is not length 3");
 
         final TestStep testStep = (TestStep) testStepsAsObjects.getFirst();
-        Assert.assertEquals("TestStep object string is incorrect", "Step 1", testStep.getTestStep());
+        assertEquals("Step 1", testStep.getTestStep(), "TestStep object string is incorrect");
 
         final ValidationTestStep validationTestStep = (ValidationTestStep) testStepsAsObjects.get(1);
-        Assert.assertEquals("ValidationTestStep object string is incorrect", "Validating Step 1", validationTestStep.getTestStep());
+        assertEquals("Validating Step 1", validationTestStep.getTestStep(), "ValidationTestStep object string is incorrect");
 
         final CallTestStep callTestStep = (CallTestStep) testStepsAsObjects.get(2);
-        Assert.assertEquals("CallTestStep object string is incorrect", "link to test", callTestStep.getCallStepString());
-        Assert.assertEquals("CallTestStep object test id is incorrect", "2002", callTestStep.getTestId());
+        assertEquals("link to test", callTestStep.getCallStepString(), "CallTestStep object string is incorrect");
+        assertEquals("2002", callTestStep.getTestId(), "CallTestStep object test id is incorrect");
     }
 
     private void updateTestSteps(TestStepList testSteps) {
@@ -85,13 +89,13 @@ public class TestTestSteps extends TestBase {
         testStepList.add(new CallTestStep("2002", "link to test"));
 
         // check test steps are created
-        Assert.assertTrue("Script not created correctly!", update.testSteps(new UpdateTestScriptModel().setTestSteps(testStepList)).execute());
+        assertTrue(update.testSteps(new UpdateTestScriptModel().setTestSteps(testStepList)).execute(), "Script not created correctly!");
     }
 
     @Test
-    public void testIncorrectNonTypedTestStepCreation() {
+    void incorrectNonTypedTestStepCreation() {
         final EntityList.Entities not_test_manual = octane.entityList("not_test_manual").at("1001");
-        Assert.assertFalse("Entities is not the right type!", not_test_manual instanceof EntityList.TestEntities);
+        assertFalse(not_test_manual instanceof EntityList.TestEntities, "Entities is not the right type!");
     }
 
     private String createTest() {

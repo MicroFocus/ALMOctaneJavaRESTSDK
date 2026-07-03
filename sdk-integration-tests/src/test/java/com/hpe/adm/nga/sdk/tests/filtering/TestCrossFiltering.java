@@ -36,14 +36,16 @@ import com.hpe.adm.nga.sdk.query.QueryMethod;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  *
@@ -59,18 +61,18 @@ public class TestCrossFiltering extends TestBase {
     }
 
     @Test
-    public void simpleCrossFilter() throws Exception {
+    void simpleCrossFilter() throws Exception {
         Query query = Query.statement("release", QueryMethod.EqualTo,
                 (Query.statement("id",QueryMethod.EqualTo, releaseId))
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
         String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
-        Assert.assertEquals("More defects than expected in response", 1, defects.size());
-        Assert.assertEquals("Wrong defect id in response", defectId, newDefectId);
+        assertEquals(1, defects.size(), "More defects than expected in response");
+        assertEquals(defectId, newDefectId, "Wrong defect id in response");
     }
 
     @Test
-    public void simpleCrossFilterReverse() throws Exception {
+    void simpleCrossFilterReverse() throws Exception {
         Query query = Query.statement("release", QueryMethod.EqualTo,
                 Query.not("id", QueryMethod.EqualTo, releaseId)
         ).build();
@@ -78,13 +80,13 @@ public class TestCrossFiltering extends TestBase {
         // it could be that there are no other defects.  So if defects is empty that's also good
         if (defects != null && defects.size() > 0) {
             String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
-            Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
+            assertNotEquals(defectId, newDefectId, "Wrong defect id in response");
         }
     }
 
-    @Ignore
+    @Disabled
     @Test
-    public void crossFilterTwoHopes() throws Exception {
+    void crossFilterTwoHopes() throws Exception {
         Query query = Query.statement("id", QueryMethod.EqualTo,
                             Query.statement("release", QueryMethod.EqualTo,
                                 Query.statement("id", QueryMethod.EqualTo, releaseId)
@@ -92,13 +94,13 @@ public class TestCrossFiltering extends TestBase {
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
         String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
-        Assert.assertEquals("More defects than expected in response", 1, defects.size());
-        Assert.assertEquals("Wrong defect id in response", defectId, newDefectId);
+        assertEquals(1, defects.size(), "More defects than expected in response");
+        assertEquals(defectId, newDefectId, "Wrong defect id in response");
     }
 
-    @Ignore
+    @Disabled
     @Test
-    public void crossFilterTwoHopesReverse() throws Exception {
+    void crossFilterTwoHopesReverse() throws Exception {
         Query query = Query.statement("id", QueryMethod.EqualTo,
                 Query.not("release", QueryMethod.EqualTo,
                         Query.statement("id", QueryMethod.EqualTo, releaseId)
@@ -106,11 +108,11 @@ public class TestCrossFiltering extends TestBase {
                         ).build();
         Collection<EntityModel> defects = octane.entityList("defects").get().query(query).execute();
         String newDefectId = CommonUtils.getIdFromEntityModel(defects.iterator().next());
-        Assert.assertNotEquals("Wrong defect id in response", defectId, newDefectId);
+        assertNotEquals(defectId, newDefectId, "Wrong defect id in response");
     }
 
-    @BeforeClass
-    public static void initTests() throws Exception {
+    @BeforeAll
+    static void initTests() throws Exception {
         Set<FieldModel> fields = new HashSet<>();
         Collection<EntityModel> releaseEntity = DataGenerator.generateEntityModel(octane, "releases", fields);
         Collection<EntityModel> releases = octane.entityList("releases").create().entities(releaseEntity).execute();

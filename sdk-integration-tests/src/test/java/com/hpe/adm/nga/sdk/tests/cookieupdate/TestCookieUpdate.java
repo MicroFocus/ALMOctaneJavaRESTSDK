@@ -32,17 +32,18 @@ import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
  * Created by Dmitry Zavyalov on 08/05/2016.
  */
-@Ignore // before to execute this test change mockssso.xml on server -> tokenIdleTimeout="1"
+@Disabled // before to execute this test change mockssso.xml on server -> tokenIdleTimeout="1"
 public class TestCookieUpdate extends TestBase {
 
     public TestCookieUpdate() {
@@ -50,7 +51,7 @@ public class TestCookieUpdate extends TestBase {
     }
 
     @Test
-    public void testCookieUpdate() throws Exception {
+    void cookieUpdate() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         EntityModel entityModel = entityModels.iterator().next();
@@ -60,7 +61,7 @@ public class TestCookieUpdate extends TestBase {
         while (counter < 2) {
             sleepTime(70);
             EntityModel getEntity = entityList.at(entityId).get().execute();
-            Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
+            assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity.iterator().next(), getEntity));
             counter++;
         }
     }
@@ -74,7 +75,7 @@ public class TestCookieUpdate extends TestBase {
     }
 
     @Test
-    public void testCookieUpdateForPost() throws Exception {
+    void cookieUpdateForPost() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         int counter = 0;
         while (counter < 2) {

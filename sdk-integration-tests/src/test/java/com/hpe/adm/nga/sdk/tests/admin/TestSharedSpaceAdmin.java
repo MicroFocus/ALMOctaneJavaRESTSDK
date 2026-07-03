@@ -38,14 +38,16 @@ import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.UUID;
 
-public class TestSharedSpaceAdmin {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class TestSharedSpaceAdmin {
     static {
         // for local execution
         if (System.getProperty("should.set.proxy") == null) {
@@ -57,8 +59,8 @@ public class TestSharedSpaceAdmin {
     private static Authentication authentication;
     private static String sharedSpaceId;
 
-    @BeforeClass
-    public static void init() {
+    @BeforeAll
+    static void init() {
         HttpUtils.SetSystemKeepAlive(false);
         HttpUtils.SetSystemProxy();
 
@@ -69,23 +71,23 @@ public class TestSharedSpaceAdmin {
     }
 
     @Test
-    public void testGetSharedSpaceAdmin() {
+    void getSharedSpaceAdmin() {
         Octane octane = ContextUtils.getContextSharedSpace(url, authentication, null);
         final OctaneCollection<EntityModel> entityModels = octane.entityList(Octane.NO_ENTITY).get().execute();
-        Assert.assertTrue(entityModels.size() > 0);
-        Assert.assertEquals("shared_space", entityModels.iterator().next().getValue("type").getValue());
+        assertTrue(entityModels.size() > 0);
+        assertEquals("shared_space", entityModels.iterator().next().getValue("type").getValue());
     }
 
     @Test
-    public void testGetSharedSpaceUsers() {
+    void getSharedSpaceUsers() {
         Octane octane = ContextUtils.getContextSharedSpace(url, authentication, sharedSpaceId);
         final OctaneCollection<EntityModel> entityModels = octane.entityList("users").get().execute();
-        Assert.assertTrue(entityModels.size() > 0);
-        Assert.assertEquals("sharedspace_user", entityModels.iterator().next().getValue("type").getValue());
+        assertTrue(entityModels.size() > 0);
+        assertEquals("sharedspace_user", entityModels.iterator().next().getValue("type").getValue());
     }
 
     @Test
-    public void testCreateSharedSpaceUser() {
+    void createSharedSpaceUser() {
         Octane octane = ContextUtils.getContextSharedSpace(url, authentication, sharedSpaceId);
 
         final EntityModel userEntityModel = new EntityModel();
@@ -100,6 +102,6 @@ public class TestSharedSpaceAdmin {
         createUsers.entities(Collections.singleton(userEntityModel));
         final OctaneCollection<EntityModel> octaneCollection = createUsers.execute();
 
-        Assert.assertEquals(1, octaneCollection.size());
+        assertEquals(1, octaneCollection.size());
     }
 }

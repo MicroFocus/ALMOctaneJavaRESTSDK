@@ -39,22 +39,23 @@ import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
  * Created by Dmitry Zavyalov on 09/05/2016.
  */
 
-@Ignore //Before remove ignore, please support username = "rest2@hpe.com" with password = "Welcome2"
-public class TestParallelExecution extends TestBase {
+//Before remove ignore, please support username = "rest2@hpe.com" with password = "Welcome2"
+@Disabled class TestParallelExecution extends TestBase {
 
     @Test
-    public void testParallelExecution_two_clients() throws Exception {
+    void parallelExecutionTwoClients() throws Exception {
         String entityName1 = "product_areas";
         String entityName2 = "defects";
 
@@ -77,10 +78,10 @@ public class TestParallelExecution extends TestBase {
         int counter = 0;
         do {
             EntityModel getEntity1 = entityList1.at(entityId1).get().execute();
-            Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity1.iterator().next(), getEntity1));
+            assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity1.iterator().next(), getEntity1));
             sleepTime(5);
             EntityModel getEntity2 = entityList2.at(entityId2).get().execute();
-            Assert.assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity2.iterator().next(), getEntity2));
+            assertTrue(CommonUtils.isEntityAInEntityB(generatedEntity2.iterator().next(), getEntity2));
             sleepTime(5);
             counter++;
         } while (counter < 5);

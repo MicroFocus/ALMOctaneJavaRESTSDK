@@ -35,12 +35,13 @@ import com.hpe.adm.nga.sdk.query.QueryMethod;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -53,27 +54,27 @@ public class TestSupportFiltering extends TestBase {
     }
 
     @Test
-    public void supportEqual() throws Exception {
+    void supportEqual() throws Exception {
         testFiltering("EQ");
     }
 
     @Test
-    public void supportLessThan() throws Exception {
+    void supportLessThan() throws Exception {
         testFiltering("LT");
     }
 
     @Test
-    public void supportGreaterThan() throws Exception {
+    void supportGreaterThan() throws Exception {
         testFiltering("GT");
     }
 
     @Test
-    public void supportLessEqual() throws Exception {
+    void supportLessEqual() throws Exception {
         testFiltering("LE");
     }
 
     @Test
-    public void supportGreaterEqual() throws Exception {
+    void supportGreaterEqual() throws Exception {
         testFiltering("GE");
     }
 
@@ -90,7 +91,7 @@ public class TestSupportFiltering extends TestBase {
 
         Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query).execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModels, getEntity));
+        assertTrue(CommonUtils.isCollectionAInCollectionB(entityModels, getEntity));
     }
 
     private Query getQuery(String entityName, String logicalOperation) {

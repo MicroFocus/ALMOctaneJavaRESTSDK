@@ -28,48 +28,48 @@
  */
 package com.hpe.adm.nga.sdk.query;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.hpe.adm.nga.sdk.query.QueryMethod.COMPARISON_OPERATOR_BETWEEN;
 import static com.hpe.adm.nga.sdk.query.QueryMethod.COMPARISON_OPERATOR_IN;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestQueryMethod {
+class TestQueryMethod {
 
     @Test
-    public void testInString() {
+    void inString() {
         final String queryResult = QueryMethod.In.getAction().apply("testField", new String[]{"1", "2", "3"});
-        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_IN + " '1','2','3')", queryResult);
+        assertEquals("(testField " + COMPARISON_OPERATOR_IN + " '1','2','3')", queryResult);
     }
 
     @Test
-    public void testInNumber() {
+    void inNumber() {
         final String queryResult = QueryMethod.In.getAction().apply("testField", new Long[]{1L, 2L, 3L});
-        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_IN + " 1,2,3)", queryResult);
+        assertEquals("(testField " + COMPARISON_OPERATOR_IN + " 1,2,3)", queryResult);
     }
 
     @Test
-    public void testInNull() {
+    void inNull() {
         final String queryResult = QueryMethod.In.getAction().apply("testField", null);
-        Assert.assertEquals("", queryResult);
+        assertEquals("", queryResult);
     }
 
     @Test
-    public void testInEmpty() {
+    void inEmpty() {
         final String queryResult = QueryMethod.In.getAction().apply("testField", new String[]{""});
-        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_IN + " '')", queryResult);
+        assertEquals("(testField " + COMPARISON_OPERATOR_IN + " '')", queryResult);
     }
 
     @Test
-    public void testBetweenNumber() {
+    void betweenNumber() {
         final String queryResult = QueryMethod.Between.getAction().apply("testField", new QueryMethod.Between("1000", "1020"));
-        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000' ...'1020')", queryResult);
+        assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000' ...'1020')", queryResult);
     }
 
     @Test
-    public void testBetweenDate() {
+    void betweenDate() {
         final String queryResult = QueryMethod.Between.getAction().apply("testField", new QueryMethod.Between("1000", "1020"));
-        Assert.assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000' ...'1020')", queryResult);
+        assertEquals("(testField " + COMPARISON_OPERATOR_BETWEEN + " '1000' ...'1020')", queryResult);
     }
 
 }

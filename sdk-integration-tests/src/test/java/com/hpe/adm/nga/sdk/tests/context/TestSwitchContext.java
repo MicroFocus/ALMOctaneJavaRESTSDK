@@ -38,7 +38,7 @@ import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
@@ -58,7 +58,7 @@ public class TestSwitchContext {
     }
 
     @Test
-    public void contextSharedSpace() {
+    void contextSharedSpace() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
         Authentication authentication = AuthenticationUtils.getAuthentication();
@@ -72,7 +72,7 @@ public class TestSwitchContext {
     }
 
     @Test
-    public void contextWorkspace() {
+    void contextWorkspace() {
         final ConfigurationUtils configuration = ConfigurationUtils.getInstance();
         String url = configuration.getString("sdk.url");
         Authentication authentication = AuthenticationUtils.getAuthentication();

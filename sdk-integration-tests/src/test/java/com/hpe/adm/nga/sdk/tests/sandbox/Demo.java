@@ -31,7 +31,7 @@ package com.hpe.adm.nga.sdk.tests.sandbox;
 import com.hpe.adm.nga.sdk.model.EntityModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
@@ -46,7 +46,7 @@ public class Demo extends TestBase {
     }
 
     @Test
-    public void demoTest() throws Exception {
+    void demoTest() throws Exception {
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
 
     }

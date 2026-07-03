@@ -35,40 +35,38 @@ import com.hpe.adm.nga.sdk.model.ModelParser;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestUpdateEntities {
+class TestUpdateEntities {
 	private static Octane octane;
 	private static EntityList defects;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+    @BeforeAll
+    static void setUpBeforeClass() throws Exception {
 		octane = CommonMethods.getOctaneForTest();
 		defects = octane.entityList("defects");
 	}
 
-	@Test
-	public void testUpdateEntity() {
+    @Test
+    void updateEntity() {
 		final String jsonUpdateString = "{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"name\"}";
 		UpdateEntity spiedUpdateEntity = Mockito.spy(defects.at("1002").update());
 
-		try {
-			JSONObject inJsonEntity = new JSONObject(jsonUpdateString);
-			EntityModel entityModelIn = ModelParser.getInstance().getEntityModel(inJsonEntity);
+        Assertions.assertDoesNotThrow(() -> {
+            JSONObject inJsonEntity = new JSONObject(jsonUpdateString);
+            EntityModel entityModelIn = ModelParser.getInstance().getEntityModel(inJsonEntity);
 
-			spiedUpdateEntity.entity(entityModelIn);
-			EntityModel entityModelOut = (EntityModel) FieldUtils.readField(spiedUpdateEntity, "entityModel", true);
+            spiedUpdateEntity.entity(entityModelIn);
+            EntityModel entityModelOut = (EntityModel) FieldUtils.readField(spiedUpdateEntity, "entityModel", true);
 
-			Assert.assertTrue(CommonUtils.isEntityAInEntityB(entityModelIn, entityModelOut));
-		} catch (Exception ex) {
-			fail("Failed with exception: " + ex);
-		}
+            assertTrue(CommonUtils.isEntityAInEntityB(entityModelIn, entityModelOut));
+        }, "Failed with exception: ");
 
 	}
 }

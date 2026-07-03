@@ -45,9 +45,9 @@ import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.Times;
@@ -61,51 +61,49 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-public class TestCreateEntities {
+class TestCreateEntities {
 
 	private final static String JSON_DATA_NAME = "data";
 
 	private static Octane octane;
 
-	@BeforeClass
-	public static void setUpBeforeClass() {
+    @BeforeAll
+    static void setUpBeforeClass() {
 		octane = CommonMethods.getOctaneForTest();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testCreateEntity() {
+    @SuppressWarnings("unchecked")
+    @Test
+    void createEntity() {
 		final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"moris2\"}],\"total_count\":1}";
 
 		EntityList defects = octane.entityList("defects");
 		// No spy needed — we only read internal state, we don't stub any behaviour
 		CreateEntities createEntity = defects.create();
 
-		try {
-			Collection<EntityModel> entityModelsIn = testGetEntityModels(jsonCreateString);
+        Assertions.assertDoesNotThrow(() -> {
+            Collection<EntityModel> entityModelsIn = testGetEntityModels(jsonCreateString);
 
-			createEntity.entities(entityModelsIn);
+            createEntity.entities(entityModelsIn);
 
-			Collection<EntityModel> internalModels = (Collection<EntityModel>) FieldUtils.readField(createEntity, "entityModels", true);
-			JSONObject jsonEntity = ModelParser.getInstance().getEntitiesJSONObject(internalModels);
+            Collection<EntityModel> internalModels = (Collection<EntityModel>) FieldUtils.readField(createEntity, "entityModels", true);
+            JSONObject jsonEntity = ModelParser.getInstance().getEntitiesJSONObject(internalModels);
 
-			Collection<EntityModel> entityModelsOut = testGetEntityModels(jsonEntity.toString());
-			Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(entityModelsIn, entityModelsOut));
-		} catch (Exception ex) {
-			fail("Failed with exception: " + ex);
-		}
+            Collection<EntityModel> entityModelsOut = testGetEntityModels(jsonEntity.toString());
+            assertTrue(CommonUtils.isCollectionAInCollectionB(entityModelsIn, entityModelsOut));
+        }, "Failed with exception: ");
 	}
 
-	@Test
-	public void testCustomPath() throws Exception {
+    @Test
+    void customPath() throws Exception {
 		EntityList defects = octane.entityList("defects");
 		// Spy is required here: execute() is stubbed to avoid making a real HTTP call
 		GetEntities get = spy(defects.get());
@@ -117,11 +115,11 @@ public class TestCreateEntities {
 		get.addPath("custom").addPath("path").execute();
 
 		OctaneRequest reqAfter = (OctaneRequest) FieldUtils.readField(get, "octaneRequest", true);
-		Assert.assertEquals("Url's don't match", expectedUrl, reqAfter.getOctaneUrl().toString());
+		assertEquals(expectedUrl, reqAfter.getOctaneUrl().toString(), "Url's don't match");
 	}
 
-	@Test
-	public void testEntitiesCustomApiMode() throws Exception {
+    @Test
+    void entitiesCustomApiMode() throws Exception {
 
 		ClientAndServer clientAndServer = startClientAndServer();
 		Cookie firstCookie = new Cookie("LWSSO_COOKIE_KEY", "one");

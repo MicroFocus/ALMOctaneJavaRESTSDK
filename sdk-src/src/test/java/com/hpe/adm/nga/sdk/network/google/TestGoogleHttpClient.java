@@ -36,9 +36,8 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.TimeToLive;
@@ -60,7 +59,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doReturn;
@@ -78,7 +79,7 @@ public class TestGoogleHttpClient {
     private static final Logger logger = LoggerFactory.getLogger(TestGoogleHttpClient.class);
 
     @Test
-    public void testRequestRetry() throws Exception {
+    void requestRetry() throws Exception {
 
         Authentication authentication = new SimpleUserAuthentication("", "");
         GoogleHttpClient googleHttpClientSpy = Mockito.spy(new GoogleHttpClient("http://url.com", authentication));
@@ -126,7 +127,7 @@ public class TestGoogleHttpClient {
     }
 
     @Test
-    public void testCustomSettings() {
+    void customSettings() {
         Octane.OctaneCustomSettings settings = new Octane.OctaneCustomSettings() {{
             set(Setting.READ_TIMEOUT, 55000);
             set(Setting.CONNECTION_TIMEOUT, 2345);
@@ -141,16 +142,16 @@ public class TestGoogleHttpClient {
         } catch (Exception e) {
             long end = System.currentTimeMillis();
 
-            Assert.assertTrue(e.getCause() instanceof SocketTimeoutException);
+            assertInstanceOf(SocketTimeoutException.class, e.getCause());
             long duration = end - start;
-            Assert.assertTrue(duration < 3000 && duration > 2000);
+            assertTrue(duration < 3000 && duration > 2000);
         }
 
     }
 
     @Test
-    @Ignore
-    public void testParallelRequestRetry() {
+    @Disabled
+    void parallelRequestRetry() {
         ClientAndServer clientAndServer = startClientAndServer();
         Octane octane;
         long totalExecutionTime = 500;
@@ -232,7 +233,7 @@ public class TestGoogleHttpClient {
     }
 
     @Test
-    public void testCookieCollision() {
+    void cookieCollision() {
         try (ClientAndServer clientAndServer = startClientAndServer()) {
 
             int nrCores = Math.max(Runtime.getRuntime().availableProcessors(), 4);

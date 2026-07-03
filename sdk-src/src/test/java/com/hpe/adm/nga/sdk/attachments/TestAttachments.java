@@ -31,24 +31,23 @@ package com.hpe.adm.nga.sdk.attachments;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.Assert.assertEquals;
-
-public class TestAttachments {
+class TestAttachments {
 	private static Octane octane;
 	private static AttachmentList attachments;
 
-	@BeforeClass
-	public static void setUpBeforeClass() {
+    @BeforeAll
+    static void setUpBeforeClass() {
 		octane = CommonMethods.getOctaneForTest();
 		attachments = octane.attachmentList();
 	}
 
-	@Test
-	public void testCorrectUrl() throws Exception {
+    @Test
+    void correctUrl() throws Exception {
 		String expectedResult = CommonMethods.getDomain() + "/api/shared_spaces/" + CommonMethods.getSharedSpace() + "/workspaces/" + CommonMethods.getWorkSpace() + "/attachments";
 		String internalUrl = (String) FieldUtils.readField(attachments, "attachmentListDomain", true);
 		assertEquals(expectedResult, internalUrl);
