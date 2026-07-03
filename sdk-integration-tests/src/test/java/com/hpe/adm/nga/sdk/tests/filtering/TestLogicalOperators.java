@@ -64,7 +64,7 @@ public class TestLogicalOperators extends TestBase {
 
     @Test
     public void testQueryWithOr() {
-        Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).or("id", QueryMethod.EqualTo, defectIds.get(1)).build();
+        Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.getFirst()).or("id", QueryMethod.EqualTo, defectIds.get(1)).build();
         Collection<EntityModel> getEntity = entityList.get().query(query).execute();
         Assert.assertEquals("Wrong amount of defects in response", 2, getEntity.size());
         Assert.assertTrue("Wrong defect id in response", defectIds.containsAll(CommonUtils.getIdFromEntityModelCollection(getEntity)));
@@ -73,15 +73,15 @@ public class TestLogicalOperators extends TestBase {
 
     @Test
     public void testQueryWithAnd() {
-        Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).build();
+        Query query = Query.statement("id", QueryMethod.EqualTo, defectIds.getFirst()).and("name", QueryMethod.EqualTo, defectNames.getFirst()).build();
         Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query).execute();
         Assert.assertEquals("Wrong amount of defects in response", 1, getEntity.size());
-        Assert.assertEquals("Wrong defect id in response", defectIds.get(0), CommonUtils.getIdFromEntityModelCollection(getEntity).get(0));
+        Assert.assertEquals("Wrong defect id in response", defectIds.getFirst(), CommonUtils.getIdFromEntityModelCollection(getEntity).getFirst());
     }
 
     @Test
     public void testQueryWithAndPlusOr() {
-        Query query1 = Query.statement("id", QueryMethod.EqualTo, defectIds.get(0)).and("name", QueryMethod.EqualTo, defectNames.get(0)).or("id", QueryMethod.EqualTo, defectIds.get(1)).and("name", QueryMethod.EqualTo, defectNames.get(1)).build();
+        Query query1 = Query.statement("id", QueryMethod.EqualTo, defectIds.getFirst()).and("name", QueryMethod.EqualTo, defectNames.getFirst()).or("id", QueryMethod.EqualTo, defectIds.get(1)).and("name", QueryMethod.EqualTo, defectNames.get(1)).build();
         Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query1).execute();
         Assert.assertEquals("Wrong amount of defects in response", 2, getEntity.size());
         Assert.assertTrue("Wrong defect id in response", defectIds.containsAll(CommonUtils.getIdFromEntityModelCollection(getEntity)));

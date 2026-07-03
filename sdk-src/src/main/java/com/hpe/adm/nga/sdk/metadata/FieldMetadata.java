@@ -67,7 +67,7 @@ public class FieldMetadata {
 		@SerializedName("PRIVATE")
 		Private,
 		@SerializedName("PUBLIC_TECH_PREVIEW")
-		TechPreview;
+		TechPreview
 	}
 
 	// Private

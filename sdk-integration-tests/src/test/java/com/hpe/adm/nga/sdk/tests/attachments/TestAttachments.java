@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Integration tests for {@link com.hpe.adm.nga.sdk.attachments.AttachmentList}
@@ -356,9 +357,9 @@ public class TestAttachments extends TestBase {
      * @return random rgb represented as an int
      */
     private static int getRandomRgb() {
-        int r = (int) (Math.random() * 256); //red
-        int g = (int) (Math.random() * 256); //green
-        int b = (int) (Math.random() * 256); //blue
+        int r = (int) (ThreadLocalRandom.current().nextDouble() * 256); //red
+        int g = (int) (ThreadLocalRandom.current().nextDouble() * 256); //green
+        int b = (int) (ThreadLocalRandom.current().nextDouble() * 256); //blue
         return (255 << 24) | (r << 16) | (g << 8) | b;
     }
 

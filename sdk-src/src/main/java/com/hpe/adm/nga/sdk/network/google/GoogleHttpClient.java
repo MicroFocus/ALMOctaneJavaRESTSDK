@@ -463,8 +463,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
             }
 
             //Handle session timeout exception
-            if (retryCount > 0 && exception instanceof OctaneException) {
-                OctaneException octaneException = (OctaneException) exception;
+            if (retryCount > 0 && exception instanceof OctaneException octaneException) {
                 StringFieldModel errorCodeFieldModel = (StringFieldModel) octaneException.getError().getValue("errorCode");
                 LongFieldModel httpStatusCode = (LongFieldModel) octaneException.getError().getValue(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME);
 
@@ -507,7 +506,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
         requestPhaser.register();
     }
 
-    private HttpResponse executeRequest(final HttpRequest httpRequest) {
+    protected HttpResponse executeRequest(final HttpRequest httpRequest) {
         logger.debug(LOGGER_REQUEST_FORMAT, httpRequest.getRequestMethod(), httpRequest.getUrl().toString(), httpRequest.getHeaders().toString());
 
         final HttpContent content = httpRequest.getContent();
@@ -530,9 +529,7 @@ public class GoogleHttpClient implements OctaneHttpClient {
     }
 
     private static RuntimeException wrapException(Exception exception, HttpRequest httpRequest) {
-        if (exception instanceof HttpResponseException) {
-
-            HttpResponseException httpResponseException = (HttpResponseException) exception;
+        if (exception instanceof HttpResponseException httpResponseException) {
             logger.debug(LOGGER_RESPONSE_FORMAT, httpResponseException.getStatusCode(), httpResponseException.getStatusMessage(), httpResponseException.getHeaders().toString());
 
             // It seems that Octane returns a message in 401 but this is swallowed by the HttpConnection as expected by the HTTP spec
@@ -594,8 +591,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
      * @param content {@link HttpContent}
      */
     private static void logHttpContent(HttpContent content) {
-        if (content instanceof MultipartContent) {
-            MultipartContent multipartContent = ((MultipartContent) content);
+        if (content instanceof MultipartContent multipartContent1) {
+            MultipartContent multipartContent = multipartContent1;
             logger.debug("MultipartContent: {}", content.getType());
             multipartContent.getParts().forEach(part -> {
                 logger.debug("Part: encoding: {}, headers: {}", part.getEncoding(), part.getHeaders());
@@ -603,8 +600,8 @@ public class GoogleHttpClient implements OctaneHttpClient {
             });
         } else if (content instanceof InputStreamContent) {
             logger.debug("InputStreamContent: type: {}", content.getType());
-        } else if (content instanceof FileContent) {
-            logger.debug("FileContent: type: {}, filepath: {}", content.getType(), ((FileContent) content).getFile().getAbsolutePath());
+        } else if (content instanceof FileContent fileContent) {
+            logger.debug("FileContent: type: {}, filepath: {}", content.getType(), fileContent.getFile().getAbsolutePath());
         } else {
             try {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

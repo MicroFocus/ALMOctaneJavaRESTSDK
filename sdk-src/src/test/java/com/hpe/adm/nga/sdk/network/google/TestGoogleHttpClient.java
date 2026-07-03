@@ -28,7 +28,6 @@
  */
 package com.hpe.adm.nga.sdk.network.google;
 
-import com.google.api.client.http.HttpRequest;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.Authentication;
 import com.hpe.adm.nga.sdk.authentication.SimpleUserAuthentication;
@@ -40,8 +39,6 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.TimeToLive;
@@ -50,18 +47,13 @@ import org.mockserver.mock.action.ExpectationResponseCallback;
 import org.mockserver.model.Cookie;
 import org.mockserver.model.Delay;
 import org.mockserver.model.HttpResponse;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -69,22 +61,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpClassCallback.callback;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.doThrow;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.verifyPrivate;
 
-@PowerMockIgnore("javax.management.*")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(GoogleHttpClient.class)
 public class TestGoogleHttpClient {
     public static final String OAUTH_AUTH_URL = "/authentication/sign_in";
     public static final String LWSSO_COOKIE_KEY = "LWSSO_COOKIE_KEY";
@@ -95,45 +81,52 @@ public class TestGoogleHttpClient {
     public void testRequestRetry() throws Exception {
 
         Authentication authentication = new SimpleUserAuthentication("", "");
-        GoogleHttpClient googleHttpClientSpy = spy(new GoogleHttpClient("http://url.com", authentication));
+        GoogleHttpClient googleHttpClientSpy = Mockito.spy(new GoogleHttpClient("http://url.com", authentication));
 
-        doReturn(null).when(googleHttpClientSpy, "convertOctaneRequestToGoogleHttpRequest", any(OctaneHttpRequest.class));
-        doReturn(true).when(googleHttpClientSpy, "authenticate");
-        Whitebox.setInternalState(googleHttpClientSpy, "lastUsedAuthentication", PowerMockito.mock(Authentication.class));
+        // Stub protected and public methods directly via Mockito — no PowerMock needed
+        doReturn(null).when(googleHttpClientSpy).convertOctaneRequestToGoogleHttpRequest(any(OctaneHttpRequest.class));
+        doReturn(true).when(googleHttpClientSpy).authenticate();
+
+        // Protected fields are accessible from the same package (com.hpe.adm.nga.sdk.network.google)
+        googleHttpClientSpy.lastUsedAuthentication = Mockito.mock(Authentication.class);
         long currentTimeMs = System.currentTimeMillis();
-        Whitebox.setInternalState(googleHttpClientSpy, "lastSuccessfulAuthTimestamp", currentTimeMs);
-        Whitebox.setInternalState(googleHttpClientSpy, "requestStartTime", ThreadLocal.withInitial(() -> currentTimeMs + 1));
+        googleHttpClientSpy.lastSuccessfulAuthTimestamp = currentTimeMs;
 
-        //Create timeout exception, the same way octane does
+        // requestStartTime is a private final ThreadLocal — we cannot replace the field,
+        // but we CAN set the value for the current thread.  setAccessible works here because
+        // GoogleHttpClient is in the unnamed module (classpath), same as this test.
+        Field requestStartTimeField = GoogleHttpClient.class.getDeclaredField("requestStartTime");
+        requestStartTimeField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        ThreadLocal<Long> requestStartTime = (ThreadLocal<Long>) requestStartTimeField.get(googleHttpClientSpy);
+        requestStartTime.set(currentTimeMs + 1);  // ensures lastSuccessfulAuthTimestamp < requestStartTime
+
+        // Create a token-expired exception, the same way the real server returns one
         ErrorModel errorModel = new ErrorModel(new HashSet<>());
         errorModel.setValue(new StringFieldModel("errorCode", "VALIDATION_TOKEN_EXPIRED_IDLE_TIME_OUT"));
         errorModel.setValue(new LongFieldModel(ErrorModel.HTTP_STATUS_CODE_PROPERTY_NAME, 401L));
         OctaneException octaneException = new OctaneException(errorModel);
 
-        doThrow(octaneException)
-                .when(googleHttpClientSpy, "executeRequest", Matchers.any(HttpRequest.class));
+        // executeRequest is now protected, so Mockito spy can stub it directly.
+        // Use any() (not any(HttpRequest.class)) so it also matches null — convertOctaneRequestToGoogleHttpRequest
+        // is stubbed to return null, so executeRequest receives null here.
+        doThrow(octaneException).when(googleHttpClientSpy).executeRequest(any());
 
         OctaneHttpRequest request = new OctaneHttpRequest.GetOctaneHttpRequest("http://url.com");
 
         try {
             googleHttpClientSpy.execute(request);
         } catch (Exception ex) {
-            //this is supposed to fail, eventually
+            // expected to fail eventually after all retries are exhausted
         }
 
-        /*
-          Check if the method retried the right amount of times
-         */
-        verifyPrivate(
-                googleHttpClientSpy,
-                times(GoogleHttpClient.getHttpRequestRetryCount() + 1))
-                .invoke("execute", any(), anyInt());
+        // Verify executeRequest was called once per attempt: initial + retries
+        Mockito.verify(googleHttpClientSpy, times(GoogleHttpClient.getHttpRequestRetryCount() + 1))
+                .executeRequest(any());
     }
 
     @Test
     public void testCustomSettings() {
-        int connTimeout = 2345;
-
         Octane.OctaneCustomSettings settings = new Octane.OctaneCustomSettings() {{
             set(Setting.READ_TIMEOUT, 55000);
             set(Setting.CONNECTION_TIMEOUT, 2345);
@@ -166,7 +159,7 @@ public class TestGoogleHttpClient {
         initServerResponse(clientAndServer, cookieExpirationTime);
         Authentication authentication = new SimpleUserAuthentication("", "");
         String url = "http://localhost:" + clientAndServer.getLocalPort();
-        GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, authentication));
+        GoogleHttpClient spyGoogleHttpClient = Mockito.spy(new GoogleHttpClient(url, authentication));
         octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 
         int nrCores = Math.max(Runtime.getRuntime().availableProcessors(),2);

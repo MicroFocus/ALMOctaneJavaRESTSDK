@@ -94,19 +94,13 @@ public class TestSupportFiltering extends TestBase {
     }
 
     private Query getQuery(String entityName, String logicalOperation) {
-        switch (logicalOperation) {
-            case "EQ":
-                return Query.statement("name", QueryMethod.EqualTo, entityName).build();
-            case "LT":
-                return Query.statement("name", QueryMethod.LessThan, "z_" + entityName).build();
-            case "GT":
-                return Query.statement("name", QueryMethod.GreaterThan, "a_" + entityName).build();
-            case "LE":
-                return Query.statement("name", QueryMethod.LessThanOrEqualTo, entityName).build();
-            case "GE":
-                return Query.statement("name", QueryMethod.GreaterThanOrEqualTo, entityName).build();
-            default:
-                return null;
-        }
+        return switch (logicalOperation) {
+            case "EQ" -> Query.statement("name", QueryMethod.EqualTo, entityName).build();
+            case "LT" -> Query.statement("name", QueryMethod.LessThan, "z_" + entityName).build();
+            case "GT" -> Query.statement("name", QueryMethod.GreaterThan, "a_" + entityName).build();
+            case "LE" -> Query.statement("name", QueryMethod.LessThanOrEqualTo, entityName).build();
+            case "GE" -> Query.statement("name", QueryMethod.GreaterThanOrEqualTo, entityName).build();
+            default -> null;
+        };
     }
 }

@@ -52,7 +52,7 @@ public class TestOctaneExceptions {
 	public static void beforeClass(){
 		stringField = new StringFieldModel("stringField", "value");
 		booleanField = new BooleanFieldModel("booleanField", true);
-		longField = new LongFieldModel("longField", new Long(5));
+		longField = new LongFieldModel("longField", Long.valueOf(5));
 		set = new HashSet<FieldModel>();
 		set.add(stringField);
 		set.add(booleanField);

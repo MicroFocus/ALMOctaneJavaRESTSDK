@@ -42,20 +42,17 @@ import com.hpe.adm.nga.sdk.network.OctaneRequest;
 import com.hpe.adm.nga.sdk.network.google.GoogleHttpClient;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonMethods;
 import com.hpe.adm.nga.sdk.unit_tests.common.CommonUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.internal.util.reflection.Whitebox;
+import org.mockito.Mockito;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.Times;
 import org.mockserver.model.Cookie;
 import org.mockserver.model.Header;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -66,13 +63,12 @@ import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
-import static org.powermock.api.mockito.PowerMockito.spy;
 
-@PowerMockIgnore("javax.management.*")
-@RunWith(PowerMockRunner.class)
 public class TestCreateEntities {
 
 	private final static String JSON_DATA_NAME = "data";
@@ -82,7 +78,6 @@ public class TestCreateEntities {
 	@BeforeClass
 	public static void setUpBeforeClass() {
 		octane = CommonMethods.getOctaneForTest();
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -91,14 +86,15 @@ public class TestCreateEntities {
 		final String jsonCreateString = "{\"data\":[{\"parent\":{\"id\":1002,\"type\":\"feature\"},\"phase\":{\"id\":1007,\"type\":\"phase\"},\"severity\":{\"id\":1004,\"type\":\"list_node\"},\"id\":1,\"name\":\"moris2\"}],\"total_count\":1}";
 
 		EntityList defects = octane.entityList("defects");
-		CreateEntities spiedCreateEntity = PowerMockito.spy(defects.create());
+		// No spy needed — we only read internal state, we don't stub any behaviour
+		CreateEntities createEntity = defects.create();
 
 		try {
 			Collection<EntityModel> entityModelsIn = testGetEntityModels(jsonCreateString);
 
-			spiedCreateEntity.entities(entityModelsIn);
+			createEntity.entities(entityModelsIn);
 
-			Collection<EntityModel> internalModels = (Collection<EntityModel>) Whitebox.getInternalState(spiedCreateEntity, "entityModels");
+			Collection<EntityModel> internalModels = (Collection<EntityModel>) FieldUtils.readField(createEntity, "entityModels", true);
 			JSONObject jsonEntity = ModelParser.getInstance().getEntitiesJSONObject(internalModels);
 
 			Collection<EntityModel> entityModelsOut = testGetEntityModels(jsonEntity.toString());
@@ -106,23 +102,21 @@ public class TestCreateEntities {
 		} catch (Exception ex) {
 			fail("Failed with exception: " + ex);
 		}
-
 	}
 
 	@Test
-	public void testCustomPath(){
+	public void testCustomPath() throws Exception {
 		EntityList defects = octane.entityList("defects");
+		// Spy is required here: execute() is stubbed to avoid making a real HTTP call
+		GetEntities get = spy(defects.get());
+		doReturn(ModelParser.getInstance().getEntities("{data:[]}")).when(get).execute();
 
-		GetEntities get = PowerMockito.spy(defects.get());
-
-		PowerMockito.doReturn(ModelParser.getInstance().getEntities("{data:[]}")).when(get).execute();
-
-		OctaneRequest reqBefore = (OctaneRequest)Whitebox.getInternalState(get, "octaneRequest");
+		OctaneRequest reqBefore = (OctaneRequest) FieldUtils.readField(get, "octaneRequest", true);
 		String expectedUrl = reqBefore.getOctaneUrl().toString() + "/custom/path";
 
 		get.addPath("custom").addPath("path").execute();
 
-		OctaneRequest reqAfter = (OctaneRequest)Whitebox.getInternalState(get, "octaneRequest");
+		OctaneRequest reqAfter = (OctaneRequest) FieldUtils.readField(get, "octaneRequest", true);
 		Assert.assertEquals("Url's don't match", expectedUrl, reqAfter.getOctaneUrl().toString());
 	}
 
@@ -143,14 +137,16 @@ public class TestCreateEntities {
 		try {
 			Authentication authentication = new SimpleUserAuthentication("", "");
 			String url = "http://localhost:" + clientAndServer.getLocalPort();
-			GoogleHttpClient spyGoogleHttpClient = spy(new GoogleHttpClient(url, authentication));
+			// Plain Mockito spy — no PowerMock, no bytecode manipulation
+			GoogleHttpClient spyGoogleHttpClient = Mockito.spy(new GoogleHttpClient(url, authentication));
 
 			Octane octane = new Octane.Builder(authentication, spyGoogleHttpClient).Server(url).workSpace(1002).sharedSpace(1001).build();
 			EntityList defects = octane.entityList("defects");
-			GetEntities get = PowerMockito.spy(defects.get());
-			DeleteEntities delete = PowerMockito.spy(defects.delete());
-			CreateEntities create = PowerMockito.spy(defects.create());
-			UpdateEntities update = PowerMockito.spy(defects.update());
+			// No stubbing needed on these objects — MockServer handles the HTTP responses
+			GetEntities get = defects.get();
+			DeleteEntities delete = defects.delete();
+			CreateEntities create = defects.create();
+			UpdateEntities update = defects.update();
 
 			Collection<EntityModel> models = new ArrayList<>();
 			create.entities(models);
@@ -164,7 +160,6 @@ public class TestCreateEntities {
 
 			clientAndServer
 					.when(request()
-						//.withMethod("GET")
 						.withPath("/api/shared_spaces/1001/workspaces/1002/defects")
 						.withHeaders(Header.header("testHeader","testHeaderValue")))
 					.respond(response()
@@ -212,9 +207,6 @@ public class TestCreateEntities {
 		JSONArray jasoDataArr = jasonObj.getJSONArray(JSON_DATA_NAME);
 		Collection<EntityModel> entityModels = new ArrayList<>();
 		IntStream.range(0, jasoDataArr.length()).forEach((i) -> entityModels.add(ModelParser.getInstance().getEntityModel(jasoDataArr.getJSONObject(i))));
-
 		return entityModels;
 	}
-
-
 }

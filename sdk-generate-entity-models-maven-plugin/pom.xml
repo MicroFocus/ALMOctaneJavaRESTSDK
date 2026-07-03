@@ -103,7 +103,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
+            <artifactId>velocity-engine-core</artifactId>
             <version>${org.apache.velocity.version}</version>
         </dependency>
         <dependency>

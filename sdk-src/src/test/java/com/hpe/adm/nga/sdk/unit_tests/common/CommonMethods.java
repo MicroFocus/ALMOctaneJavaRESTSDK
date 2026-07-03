@@ -35,7 +35,7 @@ import com.hpe.adm.nga.sdk.model.FieldModel;
 import com.hpe.adm.nga.sdk.model.MultiReferenceFieldModel;
 import com.hpe.adm.nga.sdk.model.ReferenceFieldModel;
 import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
-import org.powermock.api.mockito.PowerMockito;
+import org.mockito.Mockito;
 
 import java.util.Collection;
 import java.util.Set;
@@ -47,8 +47,8 @@ public class CommonMethods {
     private final static int workSpace = 1002;
 
     public static Octane getOctaneForTest() {
-        final OctaneHttpClient octaneHttpClient = PowerMockito.mock(OctaneHttpClient.class);
-        PowerMockito.when(octaneHttpClient.authenticate()).thenReturn(true);
+        final OctaneHttpClient octaneHttpClient = Mockito.mock(OctaneHttpClient.class);
+        Mockito.when(octaneHttpClient.authenticate()).thenReturn(true);
 
         return new Octane.Builder(new SimpleUserAuthentication("user", "password"), octaneHttpClient)
                 .Server(getDomain())

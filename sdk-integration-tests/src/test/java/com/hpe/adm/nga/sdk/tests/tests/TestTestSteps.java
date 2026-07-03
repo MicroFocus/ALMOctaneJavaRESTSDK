@@ -65,7 +65,7 @@ public class TestTestSteps extends TestBase {
         Assert.assertNotNull("test script as objects is null", testStepsAsObjects);
         Assert.assertEquals("test script as objects is not length 3", 3, testStepsAsObjects.size());
 
-        final TestStep testStep = (TestStep) testStepsAsObjects.get(0);
+        final TestStep testStep = (TestStep) testStepsAsObjects.getFirst();
         Assert.assertEquals("TestStep object string is incorrect", "Step 1", testStep.getTestStep());
 
         final ValidationTestStep validationTestStep = (ValidationTestStep) testStepsAsObjects.get(1);

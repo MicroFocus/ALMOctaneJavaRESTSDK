@@ -82,40 +82,38 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <java.version>1.8</java.version>
+        <java.version>21</java.version>
 
-        <slf4j.version>1.7.25</slf4j.version>
-        <logback.version>1.5.18</logback.version>
+        <slf4j.version>2.0.18</slf4j.version>
+        <logback.version>1.5.34</logback.version>
 
-        <google-api-client.version>1.44.1</google-api-client.version>
-        <guava.version>33.0.0-jre</guava.version>
-        <org-json.version>20240303</org-json.version>
-        <json-path.version>2.9.0</json-path.version>
+        <google-api-client.version>2.1.0</google-api-client.version>
+        <guava.version>33.6.0-jre</guava.version>
+        <org-json.version>20260522</org-json.version>
+        <json-path.version>3.0.0</json-path.version>
 
-        <commons-beanutils.version>1.9.4</commons-beanutils.version>
-        <commons-io.version>2.19.0</commons-io.version>
-        <commons-lang3>3.12.0</commons-lang3>
+        <commons-beanutils.version>1.11.0</commons-beanutils.version>
+        <commons-io.version>2.22.0</commons-io.version>
+        <commons-lang3>3.20.0</commons-lang3>
 
         <maven-release.version>2.5.3</maven-release.version>
-        <maven-surefire.version>2.19.1</maven-surefire.version>
-        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
-        <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
-        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
-        <maven-compiler.version>3.5.1</maven-compiler.version>
-        <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
-        <maven-plugin-api.version>3.6.0</maven-plugin-api.version>
-        <maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
-        <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
+        <maven-surefire.version>3.5.6</maven-surefire.version>
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+        <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+        <maven-compiler.version>3.15.0</maven-compiler.version>
+        <maven-plugin-plugin.version>3.15.2</maven-plugin-plugin.version>
+        <maven-plugin-api.version>3.9.16</maven-plugin-api.version>
+        <maven-plugin-annotations.version>3.15.2</maven-plugin-annotations.version>
+        <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
 
-        <org.javassist.version>3.20.0-GA</org.javassist.version>
-        <org.apache.velocity.version>1.7</org.apache.velocity.version>
+        <org.apache.velocity.version>2.4.1</org.apache.velocity.version>
 
-        <junit.version>4.13.1</junit.version>
-        <powermock.version>1.6.1</powermock.version>
-        <mockito.version>1.9.5</mockito.version>
-        <cobertura.version>2.7</cobertura.version>
+        <junit.version>4.13.2</junit.version>
+        <mockito.version>5.23.0</mockito.version>
 
-        <jetty.version>9.4.54.v20240208</jetty.version>
+        <jetty.version>11.0.26</jetty.version>
+        <http2-client.version>11.0.26</http2-client.version>
     </properties>
 
     <dependencies>
@@ -132,13 +130,12 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>16.3.0</version>
+                <version>26.84.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -175,33 +172,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-module-junit4</artifactId>
-                <version>${powermock.version}</version>
-                <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.javassist</groupId>
-                        <artifactId>javassist</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-mockito</artifactId>
-                <version>${powermock.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>${org.javassist.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -222,7 +195,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>3.0</version>
+                <version>5.0.0</version>
                 <configuration>
                     <!-- Update this file accordingly to change the license everywhere -->
                     <header>LICENSE.txt</header>
@@ -263,14 +236,16 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler.version}</version>
                     <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
+                        <release>${java.version}</release>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire.version}</version>
+                    <configuration>
+                        <argLine>--add-opens java.base/java.nio.charset=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -287,20 +262,17 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>cobertura-maven-plugin</artifactId>
-                            <version>${cobertura.version}</version>
-                            <configuration>
-                                <formats>
-                                    <format>xml</format>
-                                </formats>
-                            </configuration>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>jacoco-maven-plugin</artifactId>
+                            <version>0.8.15</version>
                             <executions>
                                 <execution>
-                                    <goals>
-                                        <goal>clean</goal>
-                                        <goal>check</goal>
-                                    </goals>
+                                    <goals><goal>prepare-agent</goal></goals>
+                                </execution>
+                                <execution>
+                                    <id>report</id>
+                                    <phase>test</phase>
+                                    <goals><goal>report</goal></goals>
                                 </execution>
                             </executions>
                         </plugin>

@@ -314,7 +314,7 @@ public final class GeneratorHelper {
     public static EntityMetadataWrapper entityMetadataWrapper(final EntityMetadata entityMetadata) {
         final EntityMetadataWrapper entityMetadataWrapper = new EntityMetadataWrapper();
         final Optional<Feature> restFeatureOptional = entityMetadata.features().stream().filter(feature -> feature instanceof RestFeature).findAny();
-        if (!restFeatureOptional.isPresent()) {
+        if (restFeatureOptional.isEmpty()) {
             return entityMetadataWrapper;
         }
 
