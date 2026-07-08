@@ -42,26 +42,24 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpClient;
 import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import com.hpe.adm.nga.sdk.network.TokenExchangeHelper;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Triple;
+import org.eclipse.jetty.client.BasicAuthentication;
+import org.eclipse.jetty.client.BytesRequestContent;
+import org.eclipse.jetty.client.CompletableResponseListener;
+import org.eclipse.jetty.client.ContentResponse;
+import org.eclipse.jetty.client.FormRequestContent;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpClientTransport;
-import org.eclipse.jetty.client.HttpContentResponse;
 import org.eclipse.jetty.client.HttpResponseException;
-import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.client.api.Request;
-import org.eclipse.jetty.client.api.Response;
-import org.eclipse.jetty.client.util.BytesRequestContent;
-import org.eclipse.jetty.client.util.FormRequestContent;
-import org.eclipse.jetty.client.util.FutureResponseListener;
-import org.eclipse.jetty.client.util.MultiPartRequestContent;
+import org.eclipse.jetty.client.MultiPartRequestContent;
+import org.eclipse.jetty.client.Request;
+import org.eclipse.jetty.client.Response;
 import org.eclipse.jetty.http.HttpFields;
+import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.MultiPart;
 import org.eclipse.jetty.http.HttpStatus;
-import org.eclipse.jetty.http2.client.HTTP2Client;
-import org.eclipse.jetty.http2.client.http.HttpClientTransportOverHTTP2;
-import org.eclipse.jetty.io.ClientConnector;
 import org.eclipse.jetty.util.Fields;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
@@ -70,11 +68,9 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpCookie;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -118,7 +114,7 @@ public class JettyHttpClient implements OctaneHttpClient {
         this.lastUsedAuthentication = authentication;
 
         logSystemProperties();
-        HttpClient client = new HttpClient(new HttpClientTransportOverHTTP2(new HTTP2Client()));
+        HttpClient client = new HttpClient();
 
         addAuthentication(client);
         client.setIdleTimeout(6000);
@@ -147,10 +143,8 @@ public class JettyHttpClient implements OctaneHttpClient {
         } else {
             SslContextFactory.Client sslContextFactory = new SslContextFactory.Client();
             sslContextFactory.setTrustAll(trustAllCerts);
-            ClientConnector connector = new ClientConnector();
-            connector.setSslContextFactory(sslContextFactory);
-            HTTP2Client http2Client = new HTTP2Client(connector);
-            client = new HttpClient(new HttpClientTransportOverHTTP2(http2Client));
+            client = new HttpClient();
+            client.setSslContextFactory(sslContextFactory);
         }
 
         addAuthentication(client);
@@ -170,9 +164,9 @@ public class JettyHttpClient implements OctaneHttpClient {
     private void addAuthentication(HttpClient client) {
         if (lastUsedAuthentication != null) {
             if (AuthenticationType.BASIC.equals(lastUsedAuthentication.getAuthenticationType())) {
-                final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
-                client.getAuthenticationStore().addAuthentication(new org.eclipse.jetty.client.util.BasicAuthentication(URI.create(urlDomain),
-                        org.eclipse.jetty.client.api.Authentication.ANY_REALM,
+                final com.hpe.adm.nga.sdk.authentication.BasicAuthentication basicAuthentication = (com.hpe.adm.nga.sdk.authentication.BasicAuthentication) lastUsedAuthentication;
+                client.getAuthenticationStore().addAuthentication(new BasicAuthentication(URI.create(urlDomain),
+                        org.eclipse.jetty.client.Authentication.ANY_REALM,
                         basicAuthentication.getAuthenticationId(),
                         basicAuthentication.getAuthenticationSecret()));
             }
@@ -470,9 +464,8 @@ public class JettyHttpClient implements OctaneHttpClient {
         try {
             requestStartTime.set(System.currentTimeMillis());
             if (httpRequest.getPath().contains("metadata")) {
-                FutureResponseListener listener = new FutureResponseListener(httpRequest, 10 * 1024 * 1024);
-                httpRequest.send(listener);
-                response = listener.get(2, TimeUnit.SECONDS);
+                CompletableResponseListener listener = new CompletableResponseListener(httpRequest, 10 * 1024 * 1024);
+                response = listener.send().get(2, TimeUnit.SECONDS);
             } else {
                 response = httpRequest.send();
             }
@@ -509,12 +502,12 @@ public class JettyHttpClient implements OctaneHttpClient {
             }
 
             if (jetty.lwssoValue != null && !jetty.lwssoValue.isEmpty()) {
-                request.cookie(new HttpCookie(OctaneHttpClient.LWSSO_COOKIE_KEY, jetty.lwssoValue));
+                request.cookie(HttpCookie.from(OctaneHttpClient.LWSSO_COOKIE_KEY, jetty.lwssoValue));
             } else if (jetty.accessTokenValue != null && !jetty.accessTokenValue.isEmpty()) {
-                request.cookie(new HttpCookie(OctaneHttpClient.ACCESS_TOKEN_COOKIE_KEY, jetty.accessTokenValue));
+                request.cookie(HttpCookie.from(OctaneHttpClient.ACCESS_TOKEN_COOKIE_KEY, jetty.accessTokenValue));
             }
             if (jetty.octaneUserValue != null && !jetty.octaneUserValue.isEmpty()) {
-                request.cookie(new HttpCookie(OctaneHttpClient.OCTANE_USER_COOKIE_KEY, jetty.octaneUserValue));
+                request.cookie(HttpCookie.from(OctaneHttpClient.OCTANE_USER_COOKIE_KEY, jetty.octaneUserValue));
             }
             if (jetty.lastUsedAuthentication != null) {
                 jetty.lastUsedAuthentication.getAPIMode().ifPresent(apiMode -> request.headers(fields -> fields.put(apiMode.getHeaderKey(), apiMode.getHeaderValue())));
@@ -590,12 +583,12 @@ public class JettyHttpClient implements OctaneHttpClient {
         HttpFields.Mutable httpHeaders = HttpFields.build();
         httpHeaders.add(HttpHeader.ACCEPT_ENCODING, "gzip");
 
-        content.addFieldPart(HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE, byteArrayContent, httpHeaders);
+        content.addPart(new MultiPart.ContentSourcePart(HTTP_MULTIPART_PART1_DISPOSITION_ENTITY_VALUE, null, httpHeaders, byteArrayContent));
         // Add Stream
         try {
-            byte[] fileBytes = IOUtils.toByteArray(binaryContent.getMiddle());
-            byteArrayContent = new BytesRequestContent(contentType, fileBytes);
-            content.addFilePart("content", binaryContent.getRight(), byteArrayContent, null);
+            byte[] fileBytes = binaryContent.getMiddle().readAllBytes();
+            BytesRequestContent fileContent = new BytesRequestContent(contentType, fileBytes);
+            content.addPart(new MultiPart.ContentSourcePart("content", binaryContent.getRight(), null, fileContent));
             return content;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -656,8 +649,8 @@ public class JettyHttpClient implements OctaneHttpClient {
             if (httpResponseException.getResponse().getStatus() == 401) {
                 try {
                     final String cookie = httpRequest.getCookies().stream()
+                            .map(HttpCookie::asJavaNetHttpCookie)
                             .map(java.net.HttpCookie::toString)
-                            .map(Object::toString)
                             .collect(Collectors.joining(";"));
                     for (String splitCookie : cookie.split(";")) {
                         if (splitCookie.startsWith(LWSSO_COOKIE_KEY)) {
@@ -674,9 +667,11 @@ public class JettyHttpClient implements OctaneHttpClient {
             }
 
             List<String> exceptionContentList = new ArrayList<>();
-            HttpContentResponse response = (HttpContentResponse) httpResponseException.getResponse();
+            Response response = httpResponseException.getResponse();
             exceptionContentList.add(response.getReason());
-            exceptionContentList.add(response.getContentAsString());
+            if (response instanceof ContentResponse contentResponse) {
+                exceptionContentList.add(contentResponse.getContentAsString());
+            }
 
 
             for (String exceptionContent : exceptionContentList) {

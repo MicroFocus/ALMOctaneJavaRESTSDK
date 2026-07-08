@@ -150,7 +150,6 @@ public class TestGoogleHttpClient {
     }
 
     @Test
-    @Disabled
     void parallelRequestRetry() {
         ClientAndServer clientAndServer = startClientAndServer();
         Octane octane;
