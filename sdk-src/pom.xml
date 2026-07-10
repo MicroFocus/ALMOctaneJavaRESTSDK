@@ -81,13 +81,13 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>3.0.0</version>
+            <version>${jakarta.annotation-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>6.1.0</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -101,13 +101,13 @@
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-netty</artifactId>
-            <version>7.1.0</version>
+            <version>${mockserver.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-core</artifactId>
-            <version>7.1.0</version>
+            <version>${mockserver.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

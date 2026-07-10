@@ -31,6 +31,7 @@ package com.hpe.adm.nga.sdk.network.jetty;
 import com.google.api.client.http.GenericUrl;
 import com.hpe.adm.nga.sdk.Octane;
 import com.hpe.adm.nga.sdk.authentication.*;
+import com.hpe.adm.nga.sdk.authentication.BasicAuthentication;
 import com.hpe.adm.nga.sdk.exception.OctaneException;
 import com.hpe.adm.nga.sdk.exception.OctanePartialException;
 import com.hpe.adm.nga.sdk.model.EntityModel;
@@ -43,7 +44,6 @@ import com.hpe.adm.nga.sdk.network.OctaneHttpRequest;
 import com.hpe.adm.nga.sdk.network.OctaneHttpResponse;
 import com.hpe.adm.nga.sdk.network.TokenExchangeHelper;
 import org.apache.commons.lang3.tuple.Triple;
-import org.eclipse.jetty.client.BasicAuthentication;
 import org.eclipse.jetty.client.BytesRequestContent;
 import org.eclipse.jetty.client.CompletableResponseListener;
 import org.eclipse.jetty.client.ContentResponse;
@@ -164,8 +164,8 @@ public class JettyHttpClient implements OctaneHttpClient {
     private void addAuthentication(HttpClient client) {
         if (lastUsedAuthentication != null) {
             if (AuthenticationType.BASIC.equals(lastUsedAuthentication.getAuthenticationType())) {
-                final com.hpe.adm.nga.sdk.authentication.BasicAuthentication basicAuthentication = (com.hpe.adm.nga.sdk.authentication.BasicAuthentication) lastUsedAuthentication;
-                client.getAuthenticationStore().addAuthentication(new BasicAuthentication(URI.create(urlDomain),
+                final BasicAuthentication basicAuthentication = (BasicAuthentication) lastUsedAuthentication;
+                client.getAuthenticationStore().addAuthentication(new org.eclipse.jetty.client.BasicAuthentication(URI.create(urlDomain),
                         org.eclipse.jetty.client.Authentication.ANY_REALM,
                         basicAuthentication.getAuthenticationId(),
                         basicAuthentication.getAuthenticationSecret()));

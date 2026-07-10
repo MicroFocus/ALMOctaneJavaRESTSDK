@@ -106,6 +106,7 @@
         <maven-plugin-api.version>3.9.16</maven-plugin-api.version>
         <maven-plugin-annotations.version>3.15.2</maven-plugin-annotations.version>
         <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
+        <junit-jupiter.version>6.1.0</junit-jupiter.version>
 
         <org.apache.velocity.version>2.4.1</org.apache.velocity.version>
 
@@ -113,6 +114,12 @@
         <mockito.version>5.23.0</mockito.version>
 
         <jetty.version>12.1.10</jetty.version>
+        <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
+        <mockserver.version>7.1.0</mockserver.version>
+
+        <google-libraries-bom.version>26.84.0</google-libraries-bom.version>
+        <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+        <license-maven-plugin.version>5.0.0</license-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -134,7 +141,7 @@
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.84.0</version>
+                <version>${google-libraries-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -188,7 +195,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>5.0.0</version>
+                <version>${license-maven-plugin.version}</version>
                 <configuration>
                     <!-- Update this file accordingly to change the license everywhere -->
                     <header>LICENSE.txt</header>
@@ -257,7 +264,7 @@
                         <plugin>
                             <groupId>org.jacoco</groupId>
                             <artifactId>jacoco-maven-plugin</artifactId>
-                            <version>0.8.15</version>
+                            <version>${jacoco-maven-plugin.version}</version>
                             <executions>
                                 <execution>
                                     <goals><goal>prepare-agent</goal></goals>
