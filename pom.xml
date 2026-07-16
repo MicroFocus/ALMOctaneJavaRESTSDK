@@ -358,12 +358,12 @@
     <distributionManagement>
         <repository>
             <id>release-repository</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
             <id>snapshot-repository</id>
             <name>Maven2 Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://central.sonatype.com/repository/maven-snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
