@@ -29,74 +29,70 @@
 package com.hpe.adm.nga.sdk.model;
 
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestModel {
+class TestModel {
 
     private static Set<FieldModel> set;
     private EntityModel model;
     private String expectedResult;
     private String gotResult;
 
-    @BeforeClass
-    public static void initializeOnCreate() {
+    @BeforeAll
+    static void initializeOnCreate() {
         set = new HashSet<>();
     }
 
-    @Before
-    public void beforeEachMethod() {
+    @BeforeEach
+    void beforeEachMethod() {
         set.clear();
     }
 
-    @After
-    public void afterEachMethod() {
+    @AfterEach
+    void afterEachMethod() {
         assertEquals(expectedResult, gotResult);
     }
 
     @Test
-    public void testEntityModelWithBooleanField() {
+    void entityModelWithBooleanField() {
         expectedResult = "{\"falseValue\":false,\"trueValue\":true}";
         set.add(new BooleanFieldModel("trueValue", true));
         set.add(new BooleanFieldModel("falseValue", false));
         model = new EntityModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
 
     }
 
     @Test
-    public void testEntityModelWithStringField() {
+    void entityModelWithStringField() {
         expectedResult = "{\"firstValue\":\"first\",\"secondValue\":\"second\",\"thirdValue\":\"third\"}";
         set.add(new StringFieldModel("firstValue", "first"));
         set.add(new StringFieldModel("secondValue", "second"));
         set.add(new StringFieldModel("thirdValue", "third"));
         model = new EntityModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testEntityModelWithReferenceField() {
+    void entityModelWithReferenceField() {
         expectedResult = "{\"firstRef\":{\"falseValue\":false,\"trueValue\":true},\"secondRef\":{\"falseValue\":false,\"trueValue\":true}}";
         Set<FieldModel> refSet = new HashSet<>();
         refSet.add(new BooleanFieldModel("trueValue", true));
@@ -106,16 +102,14 @@ public class TestModel {
         set.add(new ReferenceFieldModel("firstRef", refModel));
         set.add(new ReferenceFieldModel("secondRef", refModel));
         model = new EntityModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testEntityModelWithMultiReferenceField() {
+    void entityModelWithMultiReferenceField() {
         expectedResult = "{\"field\":{\"exceeds_total_count\":false,\"data\":[{\"falseValue\":false,\"trueValue\":true},{\"falseValue\":false,\"trueValue\":true}],\"total_count\":2}}";
         Set<FieldModel> firstSet = new HashSet<>();
         firstSet.add(new BooleanFieldModel("trueValue", true));
@@ -133,44 +127,38 @@ public class TestModel {
         set.add(new MultiReferenceFieldModel("field", entityCol));
 
         model = new EntityModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testEntityModelWithLongField() {
+    void entityModelWithLongField() {
         expectedResult = "{\"secondField\":200,\"firstField\":-200}";
         set.add(new LongFieldModel("firstField", -200L));
         set.add(new LongFieldModel("secondField", 200L));
         model = new EntityModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testEntityModelWithDateField_fromModelToJsonObject() {
+    void entityModelWithDateFieldFromModelToJsonObject() {
         ZonedDateTime now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Z"));
         expectedResult = "{\"field\":\"" + now.toString() + "\"}";
         set.add(new DateFieldModel("field", now));
         model = new EntityModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testEntityModelWithDateField_fromJsonObjectToModel_dateWithMillis() {
+    void entityModelWithDateFieldFromJsonObjectToModelDateWithMillis() {
         JSONObject jsonObject = new JSONObject("{\"creation_time\":\"2022-09-07T14:26:44.143Z\"}");
 
         EntityModel entityModel = ModelParser.getInstance().getEntityModel(jsonObject);
@@ -180,7 +168,7 @@ public class TestModel {
     }
 
     @Test
-    public void testEntityModelWithDateField_fromJsonObjectToModel_dateWithoutMillis() {
+    void entityModelWithDateFieldFromJsonObjectToModelDateWithoutMillis() {
         JSONObject jsonObject = new JSONObject("{\"creation_time\":\"2022-09-07T14:26:44Z\"}");
 
         EntityModel entityModel = ModelParser.getInstance().getEntityModel(jsonObject);
@@ -190,21 +178,19 @@ public class TestModel {
     }
 
     @Test
-    public void testErrorModel() {
+    void errorModel() {
         expectedResult = "{\"secondField\":651651651,\"firstField\":0}";
         set.add(new LongFieldModel("firstField", 0L));
         set.add(new LongFieldModel("secondField", 651651651L));
         ErrorModel model = new ErrorModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testComplexEntityModel() {
+    void complexEntityModel() {
         ZonedDateTime now = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("Z"));
         expectedResult = "{\"longField\":200,\"RefField\":{\"falseValue\":false,\"trueValue\":true},\"dateField\":\"" + now.toString() + "\",\"stringField\":\"first\",\"multiRefField\":{\"exceeds_total_count\":false,\"data\":[{\"falseValue\":false,\"trueValue\":true},{\"falseValue\":false,\"trueValue\":true}],\"total_count\":2},\"boolField\":true}";
 
@@ -233,46 +219,40 @@ public class TestModel {
         set.add(new StringFieldModel("stringField", "first"));
         set.add(new BooleanFieldModel("boolField", true));
         model = new EntityModel(set);
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
             assertEquals(expectedResult, gotResult);
             assertEquals(expectedResult, model.toString());
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testAddSingleValue() {
+    void addSingleValue() {
         expectedResult = "{\"trueValue\":true}";
         model = new EntityModel();
         model.setValue(new BooleanFieldModel("trueValue", true));
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testUpdateSingleValue() {
+    void updateSingleValue() {
         expectedResult = "{\"trueValue\":true}";
         Set<FieldModel> fieldSet = new HashSet<>();
         fieldSet.add(new BooleanFieldModel("trueValue", false));
         model = new EntityModel(fieldSet);
         model.setValue(new BooleanFieldModel("trueValue", true));
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             JSONObject outJsonEntity = ModelParser.getInstance().getEntityJSONObject(model);
             gotResult = outJsonEntity.toString();
-        } catch (Exception ex) {
-            fail("Failed with exception: " + ex);
-        }
+        }, "Failed with exception: ");
     }
 
     @Test
-    public void testDirtyEntity() {
+    void dirtyEntity() {
         // all fields should be dirty
         model = new EntityModel();
         model.setValue(new StringFieldModel("testKey", "testValue"));
@@ -282,7 +262,7 @@ public class TestModel {
     }
 
     @Test
-    public void testNonDirtyEntity() {
+    void nonDirtyEntity() {
         // all fields should be dirty
         model = new EntityModel(Collections.singleton(new StringFieldModel("testKey", "testValue")), EntityModel.EntityState.CLEAN);
         final Set<FieldModel> values = model.getValues();
@@ -291,7 +271,7 @@ public class TestModel {
     }
 
     @Test
-    public void testNonDirtyEntityWithAddition() {
+    void nonDirtyEntityWithAddition() {
         // all fields should be dirty
         model = new EntityModel(Collections.singleton(new StringFieldModel("testKey", "testValue")), EntityModel.EntityState.CLEAN);
         model.setValue(new StringFieldModel("testKey2", "testValue2"));
@@ -303,7 +283,7 @@ public class TestModel {
     }
 
     @Test
-    public void testCleanEntityWithId() {
+    void cleanEntityWithId() {
         // all fields should be dirty
         model = new EntityModel(Collections.singleton(new StringFieldModel("id", "idValue")), EntityModel.EntityState.CLEAN);
         final Set<FieldModel> values = model.getValues();

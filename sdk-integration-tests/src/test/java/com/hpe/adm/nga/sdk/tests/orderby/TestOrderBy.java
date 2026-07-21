@@ -34,24 +34,25 @@ import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  *
  * Created by Guy Guetta on 03/05/2016.
  */
-public class TestOrderBy extends TestBase {
+class TestOrderBy extends TestBase {
 
     private static Query idQuery;
 
-    @BeforeClass
-    public static void initTest() throws Exception {
+    @BeforeAll
+    static void initTest() throws Exception {
         Collection<EntityModel> generatedEntity = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             generatedEntity.addAll(DataGenerator.generateEntityModel(octane, "releases"));
@@ -62,43 +63,43 @@ public class TestOrderBy extends TestBase {
     }
 
     @Test
-    public void orderByOneFieldAscending() throws Exception {
+    void orderByOneFieldAscending() throws Exception {
 
         Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name").query(idQuery).addOrderBy("name", true).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
-        Assert.assertTrue("Names are not sorted ascending", isSortedAsc(names));
+        assertTrue(isSortedAsc(names), "Names are not sorted ascending");
     }
 
     @Test
-    public void orderByOneFieldDescending() throws Exception {
+    void orderByOneFieldDescending() throws Exception {
 
         Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name").query(idQuery).addOrderBy("name", false).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
-        Assert.assertTrue("Names are not sorted descending", isSortedDes(names));
+        assertTrue(isSortedDes(names), "Names are not sorted descending");
     }
 
     @Test
-    public void orderByTwoFieldAscending() throws Exception {
+    void orderByTwoFieldAscending() throws Exception {
 
         Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name", "end_date").query(idQuery).addOrderBy("end_date,name", true).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
-        Assert.assertTrue("Names are not sorted ascending", isSortedAsc(names));
+        assertTrue(isSortedAsc(names), "Names are not sorted ascending");
     }
 
     @Test
-    public void orderByTwoFieldDescending() throws Exception {
+    void orderByTwoFieldDescending() throws Exception {
 
         Collection<EntityModel> entityModels = octane.entityList("releases").get().addFields("name", "end_date").query(idQuery).addOrderBy("end_date", true).addOrderBy("name", false).execute();
 
         List<String> names = CommonUtils.getValuesFromEntityModelCollection(entityModels, "name");
 
-        Assert.assertTrue("Names are not sorted descending", isSortedDes(names));
+        assertTrue(isSortedDes(names), "Names are not sorted descending");
     }
 
     private boolean isSortedAsc(List<String> list) {

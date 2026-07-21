@@ -37,8 +37,8 @@ import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  *
@@ -59,8 +59,8 @@ public class TestBase {
         }
     }
 
-    @BeforeClass
-    public static void init() {
+    @BeforeAll
+    static void init() {
         HttpUtils.SetSystemKeepAlive(false);
         HttpUtils.SetSystemProxy();
 
@@ -75,8 +75,8 @@ public class TestBase {
         metadata = octane.metadata();
     }
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         if (!entityName.equals(entityTypeOld)) {
             entityList = octane.entityList(entityName);
             entityTypeOld = entityName;

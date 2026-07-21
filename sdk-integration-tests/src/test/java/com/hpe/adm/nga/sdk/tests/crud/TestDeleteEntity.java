@@ -34,11 +34,13 @@ import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -50,7 +52,7 @@ public class TestDeleteEntity extends TestBase {
     }
 
     @Test
-    public void testDeleteEntityById() throws Exception{
+    void deleteEntityById() throws Exception{
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModel(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
 
@@ -63,11 +65,11 @@ public class TestDeleteEntity extends TestBase {
 
         List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(getEntity);
 
-        Assert.assertFalse(entityIds.contains(entityId));
+        assertFalse(entityIds.contains(entityId));
     }
 
     @Test
-    public void testDeleteEntitiesByQuery() throws Exception{
+    void deleteEntitiesByQuery() throws Exception{
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
         Collection<EntityModel> entityModels = entityList.create().entities(generatedEntity).execute();
         List<String> entityIds = CommonUtils.getIdFromEntityModelCollection(entityModels);
@@ -83,6 +85,6 @@ public class TestDeleteEntity extends TestBase {
         //check there are no common ids
         actualEntityIds.retainAll(entityIds);
 
-        Assert.assertTrue(actualEntityIds.isEmpty());
+        assertTrue(actualEntityIds.isEmpty());
     }
 }

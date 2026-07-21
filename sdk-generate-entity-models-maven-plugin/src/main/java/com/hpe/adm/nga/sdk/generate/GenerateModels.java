@@ -52,7 +52,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -103,10 +102,10 @@ public class GenerateModels {
         enumsDirectory.mkdirs();
 
         final VelocityEngine velocityEngine = new VelocityEngine();
-        velocityEngine.setProperty("resource.loader", "class");
-        velocityEngine.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
-        velocityEngine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, new SLF4JLogChute());
-        velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        // Velocity 2.x property names (resource.loaders plural, new namespace)
+        velocityEngine.setProperty("resource.loaders", "class");
+        velocityEngine.setProperty("resource.loader.class.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        // No log system configuration needed — Velocity 2.x logs via SLF4J natively
 
         velocityEngine.init();
 
@@ -209,7 +208,7 @@ public class GenerateModels {
 
             final String[] listNodeInfo = {name, ((StringFieldModel) listNode.getValue("id")).getValue()};
             if (listRootFieldModel instanceof EmptyFieldModel) {
-                listHierarchy.add(0, listNodeInfo);
+                listHierarchy.addFirst(listNodeInfo);
             } else {
                 listHierarchy.add(listNodeInfo);
             }
@@ -218,9 +217,9 @@ public class GenerateModels {
         for (final Map.Entry<String, List<String[]>> entry : mappedListNodes.entrySet()) {
             final String rootId = entry.getKey();
             final List<String[]> nodes = entry.getValue();
-            final String className = nodes.get(0)[0];
+            final String className = nodes.getFirst()[0];
 
-            final Path listDirectoryPath = enumsDirectory.toPath().resolve(Paths.get("lists", getPackageForRootIdForList(rootId).split("\\.")));
+            final Path listDirectoryPath = enumsDirectory.toPath().resolve(Path.of("lists", getPackageForRootIdForList(rootId).split("\\.")));
             final File listDirectoryPathFile = listDirectoryPath.toFile();
             //noinspection ResultOfMethodCallIgnored
             listDirectoryPathFile.mkdirs();

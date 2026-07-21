@@ -33,7 +33,7 @@
     <parent>
         <artifactId>sdk-root</artifactId>
         <groupId>com.microfocus.adm.almoctane.sdk</groupId>
-        <version>25.4-SNAPSHOT</version>
+        <version>26.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -53,12 +53,6 @@
     </modules>
 
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>
             <artifactId>sdk-src</artifactId>

@@ -36,11 +36,13 @@ import com.hpe.adm.nga.sdk.utils.AuthenticationUtils;
 import com.hpe.adm.nga.sdk.utils.ConfigurationUtils;
 import com.hpe.adm.nga.sdk.utils.ContextUtils;
 import com.hpe.adm.nga.sdk.utils.HttpUtils;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-public class TestWorkSpaceAdmin {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class TestWorkSpaceAdmin {
 
     static {
         // for local execution
@@ -54,8 +56,8 @@ public class TestWorkSpaceAdmin {
     private static String sharedSpaceId;
     private static String workspaceId;
 
-    @BeforeClass
-    public static void init() {
+    @BeforeAll
+    static void init() {
         HttpUtils.SetSystemKeepAlive(false);
         HttpUtils.SetSystemProxy();
 
@@ -67,19 +69,19 @@ public class TestWorkSpaceAdmin {
     }
 
     @Test
-    public void testGetWorkSpaceAdmin() {
+    void getWorkSpaceAdmin() {
         Octane octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, String.valueOf(Octane.NO_WORKSPACE_ID));
 
         final OctaneCollection<EntityModel> entityModels = octane.entityList(Octane.NO_ENTITY).get().execute();
-        Assert.assertTrue(entityModels.size() > 0);
-        Assert.assertEquals("workspace", entityModels.iterator().next().getValue("type").getValue());
+        assertTrue(entityModels.size() > 0);
+        assertEquals("workspace", entityModels.iterator().next().getValue("type").getValue());
     }
 
     @Test
-    public void testGetWorkSpaceUsers() {
+    void getWorkSpaceUsers() {
         Octane octane = ContextUtils.getContextWorkspace(url, authentication, sharedSpaceId, workspaceId);
         final OctaneCollection<EntityModel> entityModels = octane.entityList("workspace_users").get().execute();
-        Assert.assertTrue(entityModels.size() > 0);
-        Assert.assertEquals("workspace_user", entityModels.iterator().next().getValue("type").getValue());
+        assertTrue(entityModels.size() > 0);
+        assertEquals("workspace_user", entityModels.iterator().next().getValue("type").getValue());
     }
 }

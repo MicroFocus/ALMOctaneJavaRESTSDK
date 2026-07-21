@@ -103,9 +103,9 @@ public class EntityUtil {
             EntityModel refRightEntityModel = (EntityModel) rightFieldModel.getValue();
             return areEqualByContent(refLeftEntityModel, refRightEntityModel);
         }
-        if(leftFieldModel instanceof MultiReferenceFieldModel && rightFieldModel instanceof MultiReferenceFieldModel) {
-            Collection<EntityModel> refLeftEntityModel = ((MultiReferenceFieldModel)leftFieldModel).getValue();
-            Collection<EntityModel> refRightEntityModel = ((MultiReferenceFieldModel)rightFieldModel).getValue();
+        if(leftFieldModel instanceof MultiReferenceFieldModel model && rightFieldModel instanceof MultiReferenceFieldModel model1) {
+            Collection<EntityModel> refLeftEntityModel = model.getValue();
+            Collection<EntityModel> refRightEntityModel = model1.getValue();
             return containsSameEntities(refLeftEntityModel, refRightEntityModel, EntityUtil::areEqualByContent);
         }
         //simple field, just equals the value

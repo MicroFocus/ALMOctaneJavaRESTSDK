@@ -32,10 +32,11 @@ import com.hpe.adm.nga.sdk.metadata.EntityMetadata;
 import com.hpe.adm.nga.sdk.metadata.FieldMetadata;
 import com.hpe.adm.nga.sdk.metadata.Metadata;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  *
@@ -48,14 +49,14 @@ public class TestReadMetadata extends TestBase {
     }
 
     @Test
-    public void testReadMetadataEntities() throws Exception {
+    void readMetadataEntities() throws Exception {
         Metadata metadata = octane.metadata();
         Collection<EntityMetadata> entityMetadata = metadata.entities().execute();
         Collection<EntityMetadata> entityMetadataTwoEntities = metadata.entities("defects").execute();
     }
 
     @Test
-    public void testReadMetadataFields() throws Exception {
+    void readMetadataFields() throws Exception {
         Metadata metadata = octane.metadata();
         Collection<FieldMetadata> fieldMetadata = metadata.fields().execute();
 
@@ -67,6 +68,6 @@ public class TestReadMetadata extends TestBase {
         }
 
         String message = "[field_type_data] is null for field type [reference] " + referenceTypeDataIsEmpty + " times in \"Metadata.fields().execute()\"";
-        Assert.assertFalse(message, referenceTypeDataIsEmpty > 0);
+        assertFalse(referenceTypeDataIsEmpty > 0, message);
     }
 }

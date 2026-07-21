@@ -33,7 +33,7 @@
     <parent>
         <artifactId>sdk-root</artifactId>
         <groupId>com.microfocus.adm.almoctane.sdk</groupId>
-        <version>25.4-SNAPSHOT</version>
+        <version>26.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -59,8 +59,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.microfocus.adm.almoctane.sdk</groupId>

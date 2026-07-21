@@ -53,18 +53,15 @@ public class BusinessRuleEntityModel extends EntityModel {
     private EntityModel convert(EntityModel entityModel) {
         entityModel.setValues(entityModel.getValues().stream()
                 .map(fieldModel -> {
-                    if (fieldModel instanceof ArrayFieldModel) {
-                        ArrayFieldModel arrayFieldModel = (ArrayFieldModel) fieldModel;
+                    if (fieldModel instanceof ArrayFieldModel arrayFieldModel) {
 
                         return new ReferenceArrayFieldModel(fieldModel.getName(),
                                 getEntitiesFromArray(new JSONArray(arrayFieldModel.getValue())));
-                    } else if (fieldModel instanceof ObjectFieldModel) {
-                        ObjectFieldModel objectFieldModel = (ObjectFieldModel) fieldModel;
+                    } else if (fieldModel instanceof ObjectFieldModel objectFieldModel) {
 
                         return new ReferenceFieldModel(fieldModel.getName(),
                                 convert(ModelParser.getInstance().getEntityModel(new JSONObject(objectFieldModel.getValue()))));
-                    } else if (fieldModel instanceof StringFieldModel) {
-                        StringFieldModel stringFieldModel = (StringFieldModel) fieldModel;
+                    } else if (fieldModel instanceof StringFieldModel stringFieldModel) {
 
                         if (!Stream.of("comment", "value").collect(Collectors.toSet()).contains(fieldModel.getName())) {
                             Fact fact = Fact.getFact(stringFieldModel.getValue());
@@ -72,12 +69,10 @@ public class BusinessRuleEntityModel extends EntityModel {
                                 return new FactFieldModel(stringFieldModel.getName(), fact);
                             }
                         }
-                    } else if (fieldModel instanceof ReferenceFieldModel) {
-                        ReferenceFieldModel refFieldModel = (ReferenceFieldModel) fieldModel;
+                    } else if (fieldModel instanceof ReferenceFieldModel refFieldModel) {
 
                         return new ReferenceFieldModel(fieldModel.getName(), convert(refFieldModel.getValue()));
-                    } else if (fieldModel instanceof MultiReferenceFieldModel) {
-                        MultiReferenceFieldModel multiReferenceFieldModel = (MultiReferenceFieldModel) fieldModel;
+                    } else if (fieldModel instanceof MultiReferenceFieldModel multiReferenceFieldModel) {
 
                         return new MultiReferenceFieldModel(multiReferenceFieldModel.getName(),
                                 multiReferenceFieldModel.getValue().stream()
@@ -104,14 +99,11 @@ public class BusinessRuleEntityModel extends EntityModel {
         Collection<Fact> facts = new ArrayList<>();
 
         this.getValues().forEach(fieldModel -> {
-            if (fieldModel instanceof FactFieldModel) {
-                facts.add(((FactFieldModel) fieldModel).getValue());
-            } else if (fieldModel instanceof MultiReferenceFieldModel) {
-                MultiReferenceFieldModel multiRefFieldModel = (MultiReferenceFieldModel) fieldModel;
-                multiRefFieldModel.getValue().forEach(em -> facts.addAll(new BusinessRuleEntityModel(em, false).getFacts()));
-            } else if (fieldModel instanceof ReferenceFieldModel) {
-                ReferenceFieldModel refFieldModel = (ReferenceFieldModel) fieldModel;
-                facts.addAll(new BusinessRuleEntityModel(refFieldModel.getValue(), false).getFacts());
+            switch (fieldModel) {
+                case FactFieldModel model -> facts.add(model.getValue());
+                case MultiReferenceFieldModel multiRefFieldModel -> multiRefFieldModel.getValue().forEach(em -> facts.addAll(new BusinessRuleEntityModel(em, false).getFacts()));
+                case ReferenceFieldModel refFieldModel -> facts.addAll(new BusinessRuleEntityModel(refFieldModel.getValue(), false).getFacts());
+                case null, default -> {}
             }
         });
 

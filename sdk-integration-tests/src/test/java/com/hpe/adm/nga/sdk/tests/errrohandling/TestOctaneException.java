@@ -35,14 +35,15 @@ import com.hpe.adm.nga.sdk.model.ErrorModel;
 import com.hpe.adm.nga.sdk.model.LongFieldModel;
 import com.hpe.adm.nga.sdk.model.StringFieldModel;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test octane server specific runtime exceptions
@@ -54,7 +55,7 @@ public class TestOctaneException extends TestBase {
     }
 
     @Test
-    public void testOctanePartialException() {
+    void octanePartialException() {
 
         EntityModel entityModel1 = new EntityModel();
         entityModel1.setValue(new StringFieldModel("name", "potato1"));
@@ -69,20 +70,20 @@ public class TestOctaneException extends TestBase {
         try {
             entityList.create().entities(Arrays.asList(entityModel1, entityModel2)).execute();
         } catch (Exception ex) {
-            Assert.assertTrue(ex instanceof OctanePartialException);
+            assertInstanceOf(OctanePartialException.class, ex);
 
             //One should pass, one should fail
             assertEquals(1, ((OctanePartialException) ex).getEntitiesModels().size());
             return;
         }
-        Assert.fail("Should have thrown an " + OctanePartialException.class.getName());
+        fail("Should have thrown an " + OctanePartialException.class.getName());
     }
 
     /**
      *  Update a single entity with an invalid field
      */
     @Test
-    public void testOctaneException() {
+    void octaneException() {
 
         EntityModel entityModel = new EntityModel();
         entityModel.setValue(new StringFieldModel("name", "potato"));
@@ -90,7 +91,7 @@ public class TestOctaneException extends TestBase {
         Collection<EntityModel> entityModels = entityList.create().entities(Collections.singletonList(entityModel)).execute();
 
         if(entityModels.size() != 1) {
-            Assert.fail("Failed to create entity model for test");
+            fail("Failed to create entity model for test");
         }
 
         entityModel = entityModels.iterator().next();
@@ -102,7 +103,7 @@ public class TestOctaneException extends TestBase {
         try {
             entityList.at(entityModel.getId()).update().entity(entityModel).execute();
         } catch (Exception ex) {
-            Assert.assertTrue(ex instanceof OctaneException);
+            assertInstanceOf(OctaneException.class, ex);
 
             OctaneException octaneException = (OctaneException) ex;
             assertEquals("platform.modify_non_editable_field", octaneException.getError().getValue("error_code").getValue());
@@ -110,7 +111,7 @@ public class TestOctaneException extends TestBase {
             return;
         }
 
-        Assert.fail("Should have thrown an " + OctaneException.class.getName());
+        fail("Should have thrown an " + OctaneException.class.getName());
     }
 
 }

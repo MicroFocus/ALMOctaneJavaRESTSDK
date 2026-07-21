@@ -37,9 +37,9 @@ import com.hpe.adm.nga.sdk.query.Query;
 import com.hpe.adm.nga.sdk.query.QueryMethod;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -53,11 +53,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration tests for {@link com.hpe.adm.nga.sdk.attachments.AttachmentList}
  */
-public class TestAttachments extends TestBase {
+class TestAttachments extends TestBase {
 
     private static EntityModel attachmentParent;
     private static String ownerFieldName;
@@ -65,8 +69,8 @@ public class TestAttachments extends TestBase {
     /**
      * Create a parent defect for all tests
      */
-    @BeforeClass
-    public static void createAttachmentParent() {
+    @BeforeAll
+    static void createAttachmentParent() {
         try {
             Collection<EntityModel> entities = DataGenerator.generateEntityModel(octane, "defects");
             entities = octane.entityList("defects").create().entities(entities).execute();
@@ -82,7 +86,7 @@ public class TestAttachments extends TestBase {
      * Create a text attachment. File extensions has to be .txt
      */
     @Test
-    public void testTextAttachment() {
+    void textAttachment() {
 
         EntityModel initialAttachment = new EntityModel();
         initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".txt"));
@@ -111,7 +115,7 @@ public class TestAttachments extends TestBase {
      * Create a text attachment using ISO-8859-1 encoding. File extensions has to be .txt
      */
     @Test
-    public void testAttachmentName() {
+    void attachmentName() {
         String defaultCharset = Charset.defaultCharset().displayName();
         setEncoding("ISO-8859-1");
 
@@ -145,7 +149,7 @@ public class TestAttachments extends TestBase {
      * the server will compute the mime type and compare it to the file extension.
      */
     @Test
-    public void testImageAttachment() {
+    void imageAttachment() {
 
         EntityModel initialAttachment = new EntityModel();
         initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".png"));
@@ -176,7 +180,7 @@ public class TestAttachments extends TestBase {
      * The owner fields are also read only, so you cannot move an attachment to another entity.
      */
     @Test
-    public void testUpdateAttachment() {
+    void updateAttachment() {
 
         EntityModel initialAttachment = new EntityModel();
         initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".txt"));
@@ -229,7 +233,7 @@ public class TestAttachments extends TestBase {
      * Create an attachment, then delete it
      */
     @Test
-    public void testDeleteAttachment() {
+    void deleteAttachment() {
 
         EntityModel initialAttachment = new EntityModel();
         initialAttachment.setValue(new StringFieldModel("name", UUID.randomUUID().toString() + ".txt"));
@@ -261,7 +265,7 @@ public class TestAttachments extends TestBase {
                     .query(Query.statement("id", QueryMethod.EqualTo, uploadedAttachment.getValue("id").getValue()).build())
                     .execute();
 
-        Assert.assertEquals(entities.size(), 0);
+        assertEquals(0, entities.size());
     }
 
     /**
@@ -270,7 +274,7 @@ public class TestAttachments extends TestBase {
      * @param ownerFieldName name of owner field to fetch
      */
     private EntityModel reloadEntityModel(Collection<EntityModel> createResponse, String ownerFieldName) {
-        Assert.assertTrue("One attachment should have been created", createResponse.size() == 1);
+        assertEquals(1, createResponse.size(), "One attachment should have been created");
         EntityModel entityModel = createResponse.iterator().next();
         String id = entityModel.getValue("id").getValue().toString();
 
@@ -289,17 +293,17 @@ public class TestAttachments extends TestBase {
      * @param ownerFieldName name of owner field to compare
      */
     private void checkAttachmentJson(EntityModel initialEntityModel, EntityModel uploadedEntityModel, String ownerFieldName) {
-        Assert.assertEquals(
+        assertEquals(
                 initialEntityModel.getValue("name").getValue(),
                 uploadedEntityModel.getValue("name").getValue());
 
-        Assert.assertEquals(
+        assertEquals(
                 initialEntityModel.getValue("description").getValue(),
                 uploadedEntityModel.getValue("description").getValue());
 
         EntityModel uploadedOwner = (EntityModel) initialEntityModel.getValue(ownerFieldName).getValue();
         EntityModel createdOwner = (EntityModel) uploadedEntityModel.getValue(ownerFieldName).getValue();
-        Assert.assertEquals(uploadedOwner.getValue("id").getValue(),
+        assertEquals(uploadedOwner.getValue("id").getValue(),
                 createdOwner.getValue("id").getValue());
     }
 
@@ -311,15 +315,13 @@ public class TestAttachments extends TestBase {
     private void checkAttachmentContent(byte[] requestContent, EntityModel attachmentEntityModel) {
         String id = attachmentEntityModel.getValue("id").getValue().toString();
         InputStream responseInputStream = octane.attachmentList().at(id).getBinary().execute();
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             byte[] responseContent = ByteStreams.toByteArray(responseInputStream);
-            Assert.assertTrue(
-                    "Content of fetched attachment must be the same as what was uploaded",
-                    Arrays.equals(requestContent, responseContent));
+            assertTrue(
+                    Arrays.equals(requestContent, responseContent),
+                    "Content of fetched attachment must be the same as what was uploaded");
 
-        } catch (IOException e) {
-            Assert.fail("Failed to read response attachment, " + e.getMessage());
-        }
+        }, "Failed to read response attachment, ");
     }
 
     /**
@@ -356,9 +358,9 @@ public class TestAttachments extends TestBase {
      * @return random rgb represented as an int
      */
     private static int getRandomRgb() {
-        int r = (int) (Math.random() * 256); //red
-        int g = (int) (Math.random() * 256); //green
-        int b = (int) (Math.random() * 256); //blue
+        int r = (int) (ThreadLocalRandom.current().nextDouble() * 256); //red
+        int g = (int) (ThreadLocalRandom.current().nextDouble() * 256); //green
+        int b = (int) (ThreadLocalRandom.current().nextDouble() * 256); //blue
         return (255 << 24) | (r << 16) | (g << 8) | b;
     }
 

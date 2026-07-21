@@ -30,21 +30,23 @@ package com.hpe.adm.nga.sdk.tests.siteadmin.server;
 
 import com.hpe.adm.nga.sdk.siteadmin.version.Version;
 import com.hpe.adm.nga.sdk.tests.base.TestBase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Used to test the {@link com.hpe.adm.nga.sdk.siteadmin.version.GetServerVersion} API
  */
-public class TestGetServerVersion extends TestBase {
+class TestGetServerVersion extends TestBase {
 
     /**
      * Tests getting the server version
      */
     @Test
-    public void testGetServerVersion() {
+    void getServerVersion() {
         final Version serverVersion = siteAdmin.getServer().getServerVersion().execute();
-        Assert.assertNotNull(serverVersion);
-        Assert.assertFalse(serverVersion.getVersion().isEmpty());
+        assertNotNull(serverVersion);
+        assertFalse(serverVersion.getVersion().isEmpty());
     }
 }

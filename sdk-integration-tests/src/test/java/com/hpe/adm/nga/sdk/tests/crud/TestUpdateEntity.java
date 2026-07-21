@@ -37,12 +37,13 @@ import com.hpe.adm.nga.sdk.tests.base.TestBase;
 import com.hpe.adm.nga.sdk.utils.CommonUtils;
 import com.hpe.adm.nga.sdk.utils.QueryUtils;
 import com.hpe.adm.nga.sdk.utils.generator.DataGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by Guy Guetta on 21/04/2016.
@@ -54,7 +55,7 @@ public class TestUpdateEntity extends TestBase {
     }
 
     @Test
-    public void testUpdateEntityById() throws Exception {
+    void updateEntityById() throws Exception {
 
         String updatedNameValue = "updatedName" + UUID.randomUUID();
         Set<FieldModel> fields = new HashSet<>();
@@ -71,11 +72,11 @@ public class TestUpdateEntity extends TestBase {
 
         EntityModel getEntity = entityList.at(entityId).get().addFields("name").execute();
 
-        Assert.assertTrue(CommonUtils.isEntityAInEntityB(updatedEntity, getEntity));
+        assertTrue(CommonUtils.isEntityAInEntityB(updatedEntity, getEntity));
     }
 
     @Test
-    public void testUpdateEntityCollectionIdInBody() throws Exception {
+    void updateEntityCollectionIdInBody() throws Exception {
 
         List<String> updatedNameValues = DataGenerator.generateNamesForUpdate();
         Collection<EntityModel> generatedEntity = DataGenerator.generateEntityModelCollection(octane, entityName);
@@ -99,12 +100,13 @@ public class TestUpdateEntity extends TestBase {
 
         Collection<EntityModel> getEntity = entityList.get().addFields("name").query(query).execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
+        assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
 
     }
 
-    @Test // for release entity only
-    public void testUpdateEntityCollectionWithQuery() throws Exception {
+    // for release entity only
+    @Test
+    void updateEntityCollectionWithQuery() throws Exception {
 
         String entityName = "releases";
 
@@ -129,6 +131,6 @@ public class TestUpdateEntity extends TestBase {
 
         Collection<EntityModel> getEntity = octane.entityList(entityName).get().addFields("end_date").query(query).execute();
 
-        Assert.assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
+        assertTrue(CommonUtils.isCollectionAInCollectionB(updatedEntityCollection, getEntity));
     }
 }

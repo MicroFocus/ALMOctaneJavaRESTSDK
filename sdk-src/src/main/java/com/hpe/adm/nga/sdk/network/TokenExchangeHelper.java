@@ -32,9 +32,7 @@ package com.hpe.adm.nga.sdk.network;
  * Helper class to perform token exchange operations.
  */
 public final class TokenExchangeHelper {
-    private TokenExchangeHelper() {};
-
-    /**
+    private TokenExchangeHelper() {}/**
      * Minimal helper to extract "access_token" from JSON string
      * Works without external JSON libraries.
      */
