@@ -191,7 +191,8 @@ Currently the admin sections are not available using generated entities - but th
 
 ## What's New
 * 26.3
-    * Raised the minimum supported Java version from 8 to 21.
+    * Raised the minimum supported Java version from 8 to 21
+    * Updated libraries to versions compatible with Java 21
 * CE 25.4
     * OAuth2's token exchange mechanism is now supported. (see an example [here](https://github.com/MicroFocus/ALMOctaneJavaRESTSDK/blob/master/sdk-usage-examples/src/main/java/com/hpe/adm/nga/sdk/examples/oauth2/OAuth2OctaneHttpClientExample.java))
 * CE 25.2
