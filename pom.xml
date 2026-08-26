@@ -120,6 +120,7 @@
         <google-libraries-bom.version>26.84.0</google-libraries-bom.version>
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
         <license-maven-plugin.version>5.0.0</license-maven-plugin.version>
+        <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
     </properties>
 
     <dependencies>
@@ -224,6 +225,44 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-pinned-versions</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <banDynamicVersions>
+                                    <allowSnapshots>false</allowSnapshots>
+                                    <ignores>
+                                        <!-- Internal multi-module SNAPSHOT dependencies between the modules of this reactor -->
+                                        <ignore>com.microfocus.adm.almoctane.sdk:sdk-src</ignore>
+                                        <ignore>com.microfocus.adm.almoctane.sdk:sdk-generate-entity-models-maven-plugin</ignore>
+                                        <ignore>com.microfocus.adm.almoctane.sdk.extension:sdk-extension-src</ignore>
+                                    </ignores>
+                                </banDynamicVersions>
+                                <requireReleaseDeps>
+                                    <message>No SNAPSHOT dependencies are allowed. All dependencies must use pinned release versions.</message>
+                                    <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+                                    <excludes>
+                                        <!-- Internal multi-module SNAPSHOT dependencies between the modules of this reactor -->
+                                        <exclude>com.microfocus.adm.almoctane.sdk:sdk-src</exclude>
+                                        <exclude>com.microfocus.adm.almoctane.sdk:sdk-generate-entity-models-maven-plugin</exclude>
+                                        <exclude>com.microfocus.adm.almoctane.sdk.extension:sdk-extension-src</exclude>
+                                    </excludes>
+                                </requireReleaseDeps>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
